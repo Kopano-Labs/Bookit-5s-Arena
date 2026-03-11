@@ -104,6 +104,8 @@ const BookingForm = ({ courtId, pricePerHour }) => {
               <option value="1">1 hour</option>
               <option value="2">2 hours</option>
               <option value="3">3 hours</option>
+              <option value="4">4 hours</option>
+              <option value="6">6 hours</option>
             </select>
           </div>
         </div>
