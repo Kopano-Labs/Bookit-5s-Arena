@@ -85,20 +85,23 @@ const Header = () => {
           >
             Courts
           </Link>
-          {/*<!-- Logged In Only -->*/}
+          {isLoggedIn && (
+            <>
           <Link
-            href="/bookings.html"
+            href="/bookings"
             className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
           >
             Bookings
           </Link>
           <Link
-            href="/add-room.html"
+            href="/courts/add"
             className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
           >
             Add Court
           </Link>
-        </div>
+        </>>
+          )}
+      </div>
       </div>
     </header>);
 };
