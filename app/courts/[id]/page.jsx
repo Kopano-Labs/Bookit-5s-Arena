@@ -1,12 +1,12 @@
 import Heading from '@/components/Heading';
 import BookingForm from  '@/components/BookingForm';
 import Image from 'next/image';
-import Link from 'next/';
+import Link from 'next/link';
 import {FaChevronLeft } from 'react-icons/fa';
 import courts from '@/data/courts.json';
 
-const CourtPage = ({params}) => {
-    const { id } = params;
+const CourtPage = async ({ params }) => {
+    const { id } = await params;
 const court = courts.find((court) => court.$id === id);
 
     if (!court) {
