@@ -3,6 +3,9 @@ import Link from "next/link";
 import logo from '@/assets/images/myLogo.svg';
 import {FaUser, FaSignOutAlt, FaSignInAlt, FaFutbol} from 'react-icons/fa';
 
+// TODO: Replace with real auth session check when backend is ready
+const isLoggedIn = false;
+
 const Header = () => {
     return (<header className="bg-gray-100">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -40,31 +43,34 @@ const Header = () => {
               </div>
             </div>
           </div>
-          {/*<!-- Right Side Menu -->*/}
-          <div className="ml-auto">
+
+         <div className="ml-auto">
             <div className="ml-4 flex items-center md:ml-6">
-              {/*<!-- Logged Out Only -->*/}
-              <Link
-                href="login.html"
-                className="mr-3 text-gray-800 hover:text-gray-600"
-              >
-                <FaSignInAlt className="inline mr-1" /> Login
-              </Link>
-              <Link
-                href="register.html"
-                className="mr-3 text-gray-800 hover:text-gray-600"
-              >
-                <FaUser className="inline mr-1" /> Register
-              </Link>
-              <Link href="my-rooms.html">
-                <FaFutbol className="inline mr-1" /> My Courts
-              </Link>
-              <Link
-                href="login.html"
-                className="mx-3 text-gray-800 hover:text-gray-600"
-              >
-                <FaSignOutAlt className="inline mr-1" /> Sign Out
-              </Link>
+              {isLoggedIn ? (
+                <>
+                  <Link href="/my-courts" className="mr-3 text-gray-800 hover:text-gray-600">
+                    <FaFutbol className="inline mr-1" /> My Courts
+                  </Link>
+                  <button className="mx-3 text-gray-800 hover:text-gray-600">
+                    <FaSignOutAlt className="inline mr-1" /> Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="mr-3 text-gray-800 hover:text-gray-600"
+                  >
+                    <FaSignInAlt className="inline mr-1" /> Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="mr-3 text-gray-800 hover:text-gray-600"
+                  >
+                    <FaUser className="inline mr-1" /> Register
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
