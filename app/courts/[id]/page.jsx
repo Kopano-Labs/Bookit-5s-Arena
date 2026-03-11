@@ -44,15 +44,15 @@ const court = courts.find((court) => court.$id === id);
                 {court.amenities}
               </li>
               <li>
-                <span className="font-semibold text-gray-800">Availability:</span>
+                <span className="font-semibold text-gray-800">Availability:</span>{' '}
                 {court.availability}
               </li>
               <li>
-                <span className="font-semibold text-gray-800">Price:</span>
+                <span className="font-semibold text-gray-800">Price:</span>{' '}
                 R{court.price_per_hour}/hour
               </li>
               <li>
-                <span className="font-semibold text-gray-800">Address:</span> 
+                <span className="font-semibold text-gray-800">Address:</span>{' '} 
                 {court.address}
 
               </li>
