@@ -47,7 +47,7 @@ const court = courts.find((court) => court.$id === id);
               </li>
               <li>
                 <span className="font-semibold text-gray-800">Price:</span>
-                R{court.price}/hour
+                R{court.price_per_hour}/hour
               </li>
               <li>
                 <span className="font-semibold text-gray-800">Address:</span> 
