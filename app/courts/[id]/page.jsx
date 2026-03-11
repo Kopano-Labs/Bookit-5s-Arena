@@ -58,7 +58,7 @@ const court = courts.find((court) => court.$id === id);
           </div>
         </div>
 
-        <BookingForm />
+        <BookingForm courtId={court.$id} pricePerHour={court.price_per_hour} />
 
 
       </div>
