@@ -33,13 +33,15 @@ const court = courts.find((court) => court.$id === id);
             className="w-full sm:w-1/3 h-64 object-cover rounded-lg"
           />
 
-          <div className="mt-4 sm:mt-0 sm:flex-1">
+         <div className="mt-4 sm:mt-0 sm:flex-1">
             <p className="text-gray-600 mb-4">
                 {court.description} 
             </p>
 
             <ul className="space-y-2">
               <li>
+                <span className="font-semibold text-gray-800">Amenities:</span>{' '}
+                {court.amenities}
               </li>
               <li>
                 <span className="font-semibold text-gray-800">Availability:</span>

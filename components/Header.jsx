@@ -27,7 +27,8 @@ const Header = () => {
                 >
                   Courts
                 </Link>
-                {/*<!-- Logged In Only -->*/}
+                {isLoggedIn && (
+                  <>
                 <Link
                   href="/bookings.html"
                   className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
@@ -40,6 +41,8 @@ const Header = () => {
                 >
                   Add Court
                 </Link>
+                </>
+                )}
               </div>
             </div>
           </div>
@@ -99,7 +102,7 @@ const Header = () => {
           >
             Add Court
           </Link>
-        </>>
+        </>
           )}
       </div>
       </div>
