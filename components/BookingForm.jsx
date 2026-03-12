@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-const BookingForm = ({ courtId, pricePerHour }) => {
+const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -51,8 +51,9 @@ const BookingForm = ({ courtId, pricePerHour }) => {
       return;
     }
 
+    const encodedName = encodeURIComponent(courtName || courtId);
     router.push(
-      `/bookings/success?court=${courtId}&date=${date}&time=${startTime}&duration=${duration}&total=${totalPrice}`
+      `/bookings/success?court=${encodedName}&date=${date}&time=${startTime}&duration=${duration}&total=${totalPrice}`
     );
   };
 
