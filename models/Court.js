@@ -2,47 +2,20 @@ import mongoose from 'mongoose';
 
 const CourtSchema = new mongoose.Schema(
   {
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    name: {
-      type: String,
-      required: [true, 'Court name is required'],
-      trim: true,
-    },
-    description: {
-      type: String,
-      required: [true, 'Description is required'],
-    },
-    address: {
-      type: String,
-      required: [true, 'Address is required'],
-    },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    name: { type: String, required: true, trim: true },
+    description: { type: String, trim: true },
+    address: { type: String, trim: true },
     location: {
-      type: String,
+      lat: { type: Number },
+      lng: { type: Number },
     },
-    capacity: {
-      type: Number,
-      default: 10,
-    },
-    amenities: {
-      type: String,
-    },
-    availability: {
-      type: String,
-      default: '10:00 AM - 22:00 PM',
-    },
-    price_per_hour: {
-      type: Number,
-      required: [true, 'Price per hour is required'],
-      min: [0, 'Price cannot be negative'],
-    },
-    image: {
-      type: String,
-      default: 'court-default.jpg',
-    },
+    capacity: { type: Number, default: 10 },
+    amenities: { type: String, trim: true },
+    availability: { type: String, trim: true },
+    price_per_hour: { type: Number, required: true },
+    image: { type: String, default: 'court-default.jpg' },
+    sortOrder: { type: Number, default: 99 },
   },
   { timestamps: true }
 );
