@@ -1,17 +1,18 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Heading from '@/components/Heading';
 import { FaCheckCircle, FaFutbol, FaCalendarAlt, FaClock } from 'react-icons/fa';
 
-// TODO: In production, fetch real booking details using a booking ID from searchParams
-// e.g. const { bookingId } = searchParams; then fetch from your backend
+const BookingSuccessPage = () => {
+  const searchParams = useSearchParams();
 
-const BookingSuccessPage = ({ searchParams }) => {
-  // Placeholder values — replace with real data from your backend
-  const courtName = searchParams?.court ?? 'Your Court';
-  const date = searchParams?.date ?? '—';
-  const startTime = searchParams?.time ?? '—';
-  const duration = searchParams?.duration ?? '1';
-  const total = searchParams?.total ?? '—';
+  const courtId = searchParams.get('court') ?? '—';
+  const date = searchParams.get('date') ?? '—';
+  const startTime = searchParams.get('time') ?? '—';
+  const duration = searchParams.get('duration') ?? '1';
+  const total = searchParams.get('total') ?? '—';
 
   return (
     <>
@@ -26,7 +27,7 @@ const BookingSuccessPage = ({ searchParams }) => {
         <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-5 text-left space-y-3">
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <FaFutbol className="text-gray-400" />
-            <span><span className="font-semibold">Court:</span> {courtName}</span>
+            <span><span className="font-semibold">Court ID:</span> {courtId}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <FaCalendarAlt className="text-gray-400" />
