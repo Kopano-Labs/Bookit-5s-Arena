@@ -1,0 +1,33 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 General Chat
+    url: https://github.com
+    about: For non-feature related talk.
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### 💡 Have a great idea for the Arena? 
+        Fill out the details below so we can discuss how to build it!
+  - type: textarea
+    id: pitch-description
+    attributes:
+      label: "What is your idea?"
+      description: "Explain the feature. (e.g., 'A way for players to split the pitch cost')."
+      placeholder: "I think we should add..."
+    validations:
+      required: true
+  - type: textarea
+    id: user-value
+    attributes:
+      label: "Why is this useful?"
+      description: "How does this help someone booking a pitch?"
+  - type: dropdown
+    id: priority
+    attributes:
+      label: "How urgent is this?"
+      options:
+        - "Nice to have"
+        - "Essential for Launch"
+        - "Future Goal"
