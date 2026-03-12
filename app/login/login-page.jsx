@@ -1,39 +1,80 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Heading from '@/components/Heading';
-import { FaSignInAlt } from 'react-icons/fa';
+import { FaSignInAlt, FaGoogle } from 'react-icons/fa';
 
-const LoginPage = () => { 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+const LoginPage = () => {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+  // Email + Password login
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-        // TODO: Replace with real auth call (e.g. NextAuth signIn)
-        console.log('Login attempt:', { email, password});
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
 
-        setLoading(false);
-    };
+    setLoading(false);
 
-    return (
-        <>
-            <Heading title="Login" />
-            <div className="max-w-md mx-auto bg-white shadow rounded-lg p-8 mt-4">
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      router.push('/');
+      router.refresh();
+    }
+  };
+
+  // Google OAuth login
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    await signIn('google', { callbackUrl: '/' });
+  };
+
+  return (
+    <>
+      <Heading title="Login" />
+      <div className="max-w-md mx-auto bg-white shadow rounded-lg p-8 mt-4">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
           <FaSignInAlt /> Sign In to Your Account
         </h2>
+
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
             {error}
           </div>
         )}
+
+        {/* Google Sign In Button */}
+        <button
+          onClick={handleGoogleSignIn}
+          disabled={googleLoading}
+          className="w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+        >
+          <FaGoogle className="text-red-500" />
+          {googleLoading ? 'Redirecting...' : 'Continue with Google'}
+        </button>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white px-2 text-gray-500">or sign in with email</span>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
