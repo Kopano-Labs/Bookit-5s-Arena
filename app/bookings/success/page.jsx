@@ -27,7 +27,7 @@ const BookingSuccessPage = () => {
         <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-5 text-left space-y-3">
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <FaFutbol className="text-gray-400" />
-            <span><span className="font-semibold">Court ID:</span> {courtId}</span>
+            <span><span className="font-semibold">Court:</span> {courtId}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <FaCalendarAlt className="text-gray-400" />
