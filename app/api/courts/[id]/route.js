@@ -7,8 +7,9 @@ import Court from '@/models/Court';
 // GET /api/courts/:id — fetch a single court (public)
 export async function GET(request, { params }) {
   try {
+    const { id } = await params;
     await connectDB();
-    const court = await Court.findById(params.id);
+    const court = await Court.findById(id);
 
     if (!court) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
@@ -24,6 +25,7 @@ export async function GET(request, { params }) {
 // PUT /api/courts/:id — update a court (owner only)
 export async function PUT(request, { params }) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -31,7 +33,7 @@ export async function PUT(request, { params }) {
     }
 
     await connectDB();
-    const court = await Court.findById(params.id);
+    const court = await Court.findById(id);
 
     if (!court) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
@@ -42,7 +44,7 @@ export async function PUT(request, { params }) {
     }
 
     const body = await request.json();
-    const updatedCourt = await Court.findByIdAndUpdate(params.id, body, {
+    const updatedCourt = await Court.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
@@ -57,6 +59,7 @@ export async function PUT(request, { params }) {
 // DELETE /api/courts/:id — delete a court (owner only)
 export async function DELETE(request, { params }) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -64,7 +67,7 @@ export async function DELETE(request, { params }) {
     }
 
     await connectDB();
-    const court = await Court.findById(params.id);
+    const court = await Court.findById(id);
 
     if (!court) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
