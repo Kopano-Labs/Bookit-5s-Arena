@@ -7,6 +7,7 @@ import Booking from '@/models/Booking';
 // DELETE /api/bookings/:id — cancel a booking (owner only)
 export async function DELETE(request, { params }) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -14,7 +15,7 @@ export async function DELETE(request, { params }) {
     }
 
     await connectDB();
-    const booking = await Booking.findById(params.id);
+    const booking = await Booking.findById(id);
 
     if (!booking) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
@@ -27,7 +28,6 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Update status to cancelled rather than deleting the record
     booking.status = 'cancelled';
     await booking.save();
 
