@@ -73,7 +73,7 @@ const CourtPage = async ({ params }) => {
           </div>
         </div>
 
-        <BookingForm courtId={court._id} pricePerHour={court.price_per_hour} />
+        <BookingForm courtId={court._id} courtName={court.name} pricePerHour={court.price_per_hour} />
       </div>
     </>
   );
