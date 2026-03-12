@@ -8,7 +8,7 @@ import Court from '@/models/Court';
 export async function GET() {
   try {
     await connectDB();
-    const courts = await Court.find({}).sort({ createdAt: -1 });
+    const courts = await Court.find({}).sort({ sortOrder: 1, createdAt: 1 });
     return NextResponse.json(courts, { status: 200 });
   } catch (error) {
     console.error('GET /api/courts error:', error);
