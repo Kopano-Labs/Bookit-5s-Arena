@@ -1,13 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 const BookingForm = ({ courtId, pricePerHour }) => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [duration, setDuration] = useState('1');
-  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const totalPrice = pricePerHour * Number(duration);
 
@@ -15,38 +20,55 @@ const BookingForm = ({ courtId, pricePerHour }) => {
     e.preventDefault();
     setError('');
 
+    if (!session) {
+      router.push('/login');
+      return;
+    }
+
     if (!date || !startTime || !duration) {
       setError('Please fill in all fields.');
       return;
     }
 
-    // TODO: Replace with real API call when backend is ready
-    console.log('Booking submitted:', { courtId, date, startTime, duration, totalPrice });
-    setSubmitted(true);
-  };
+    setLoading(true);
 
-  if (submitted) {
-    return (
-      <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md text-green-700">
-        <h2 className="text-lg font-bold">Booking Request Sent!</h2>
-        <p className="mt-1 text-sm">
-          You requested <strong>{courtId}</strong> on <strong>{date}</strong> at{' '}
-          <strong>{startTime}</strong> for <strong>{duration} hour(s)</strong>.
-        </p>
-        <p className="mt-1 text-sm font-semibold">Total: R{totalPrice}</p>
-        <button
-          onClick={() => { setSubmitted(false); setDate(''); setStartTime(''); setDuration('1'); }}
-          className="mt-3 text-sm underline text-green-700 hover:text-green-900"
-        >
-          Make another booking
-        </button>
-      </div>
+    const res = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        courtId,
+        date,
+        start_time: startTime,
+        duration: Number(duration),
+      }),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (!res.ok) {
+      setError(data.error || 'Failed to create booking. Please try again.');
+      return;
+    }
+
+    router.push(
+      `/bookings/success?court=${courtId}&date=${date}&time=${startTime}&duration=${duration}&total=${totalPrice}`
     );
-  }
+  };
 
   return (
     <div className="mt-6">
       <h2 className="text-xl font-bold">Book this Court</h2>
+
+      {!session && (
+        <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-700 text-sm">
+          You need to{' '}
+          <a href="/login" className="font-semibold underline">
+            sign in
+          </a>{' '}
+          to book a court.
+        </div>
+      )}
 
       {error && (
         <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
@@ -104,8 +126,6 @@ const BookingForm = ({ courtId, pricePerHour }) => {
               <option value="1">1 hour</option>
               <option value="2">2 hours</option>
               <option value="3">3 hours</option>
-              <option value="4">4 hours</option>
-              <option value="6">6 hours</option>
             </select>
           </div>
         </div>
@@ -120,9 +140,10 @@ const BookingForm = ({ courtId, pricePerHour }) => {
         <div className="mt-6">
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800"
+            disabled={loading}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Book Court
+            {loading ? 'Booking...' : session ? 'Book Court' : 'Sign In to Book'}
           </button>
         </div>
       </form>
