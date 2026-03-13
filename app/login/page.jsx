@@ -50,39 +50,60 @@ const LoginPage = () => {
 
       {/* ── Animated background ── */}
       <div className="fixed inset-0 -z-10 overflow-hidden bg-gray-950">
-        {/* Orb 1 */}
+        {/* Ambient green glow */}
         <div
           className="absolute rounded-full"
           style={{
-            top: '5%', left: '10%',
+            top: '20%', left: '-10%',
+            width: '700px', height: '700px',
+            background: 'radial-gradient(circle, rgba(22,163,74,0.18) 0%, transparent 65%)',
+          }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{
+            bottom: '-10%', right: '-5%',
             width: '600px', height: '600px',
-            background: 'radial-gradient(circle, rgba(34,197,94,0.28) 0%, transparent 70%)',
-            animation: 'authFloat1 9s ease-in-out infinite',
+            background: 'radial-gradient(circle, rgba(21,128,61,0.15) 0%, transparent 65%)',
           }}
         />
-        {/* Orb 2 */}
+
+        {/* Rolling footballs */}
+        {/* Ball 1 — large, rolls right, lower third */}
+        <div style={{
+          position: 'absolute', top: '68%',
+          fontSize: '88px', lineHeight: 1, userSelect: 'none',
+          animation: 'rollRight 11s linear infinite',
+          animationDelay: '0s',
+        }}>⚽</div>
+
+        {/* Ball 2 — small, rolls left, upper area */}
+        <div style={{
+          position: 'absolute', top: '12%',
+          fontSize: '52px', lineHeight: 1, userSelect: 'none',
+          animation: 'rollLeft 14s linear infinite',
+          animationDelay: '3s',
+        }}>⚽</div>
+
+        {/* Ball 3 — medium, rolls right, mid area */}
+        <div style={{
+          position: 'absolute', top: '42%',
+          fontSize: '66px', lineHeight: 1, userSelect: 'none',
+          animation: 'rollRightSlow 18s linear infinite',
+          animationDelay: '6s',
+        }}>⚽</div>
+
+        {/* Ball 4 — tiny, rolls left, bottom */}
+        <div style={{
+          position: 'absolute', top: '82%',
+          fontSize: '40px', lineHeight: 1, userSelect: 'none',
+          animation: 'rollLeft 9s linear infinite',
+          animationDelay: '1.5s',
+        }}>⚽</div>
+
+        {/* Subtle grid */}
         <div
-          className="absolute rounded-full"
-          style={{
-            bottom: '0%', right: '5%',
-            width: '500px', height: '500px',
-            background: 'radial-gradient(circle, rgba(16,185,129,0.22) 0%, transparent 70%)',
-            animation: 'authFloat2 13s ease-in-out infinite',
-          }}
-        />
-        {/* Orb 3 */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            top: '40%', right: '20%',
-            width: '380px', height: '380px',
-            background: 'radial-gradient(circle, rgba(74,222,128,0.14) 0%, transparent 70%)',
-            animation: 'authFloat3 16s ease-in-out infinite',
-          }}
-        />
-        {/* Subtle football grid */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage:
               'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)',
