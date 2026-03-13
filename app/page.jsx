@@ -268,20 +268,20 @@ const HomePage = async () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {EVENTS.map((e, i) => (
-              <div
-                key={i}
-                className={`group bg-gray-50 hover:bg-gray-900 p-8 transition-all duration-300 border-t-4 ${e.border}`}
-              >
-                <div className="text-4xl mb-5 leading-none">{e.emoji}</div>
-                <h3
-                  className="font-black uppercase text-lg mb-3 text-gray-900 group-hover:text-white transition-colors"
-                  style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+             <div
+                  key={i}
+                  className={`group bg-gray-50 hover:bg-gray-900 p-8 transition-all duration-300 border-t-4 ${e.border}`}
                 >
-                  {e.title}
-                </h3>
-                <p className="text-gray-500 group-hover:text-gray-300 text-sm leading-relaxed transition-colors">
-                  {e.desc}
-                </p>
+                  <div className="text-4xl mb-5 leading-none">{e.emoji}</div>
+                  <h3
+                    className="font-black uppercase text-lg mb-3 text-gray-900 group-hover:text-white transition-colors"
+                    style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+                  >
+                    {e.title}
+                  </h3>
+                  <p className="text-gray-500 group-hover:text-gray-300 text-sm leading-relaxed transition-colors">
+                    {e.desc}
+                  </p>
               </div>
             ))}
           </div>
