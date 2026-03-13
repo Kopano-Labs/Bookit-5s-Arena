@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import logo from '@/assets/images/myLogo.svg';
 import { FaUser, FaSignOutAlt, FaSignInAlt, FaFutbol, FaCalendarAlt } from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -14,13 +13,21 @@ const Header = () => {
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href='/'>
+            <Link href='/' className="flex items-center gap-2">
               <Image
-                className="h-16 w-16"
-                src={logo}
-                alt="5's Arena Logo"
+                className="h-12 w-12 rounded-full object-cover border-2 border-green-500"
+                src="/images/logo.png"
+                alt="5s Arena Logo"
+                width={48}
+                height={48}
                 priority={true}
               />
+              <span
+                className="hidden sm:block font-black text-gray-900 uppercase text-sm tracking-wide leading-tight"
+                style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+              >
+                5s<br />Arena
+              </span>
             </Link>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-3">
