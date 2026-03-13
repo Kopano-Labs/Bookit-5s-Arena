@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Heading from '@/components/Heading';
 import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 
-    const MyCourtsPage = () => {
+  const MyCourtsPage = () => {
       const [courts, setCourts] = useState([]);
       const [loading, setLoading] = useState(true);
 
