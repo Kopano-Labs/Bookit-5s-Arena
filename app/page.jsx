@@ -14,7 +14,7 @@ import {
         border: 'border-t-green-500',
       },
       {
-        image: 'https://images.unsplash.com/photo-1599232288126-7f26b2030a28?w=600&q=80',
+        image: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=600&q=80',
         title: 'Tournaments',
         desc: 'Organise your own 5v5 tournament on our floodlit courts. We provide the venue, sound system and bar — you bring the teams and the competitive spirit.',
         border: 'border-t-yellow-500',
@@ -34,7 +34,7 @@ import {
   ];
 
 const AMENITIES = [
-  'Floodlit Courts', 'Sound System', 'Clubhouse Restaurant',
+  'Floodlit Courts', 'Sound System', 'Bar & Restaurant',
   'Secure Parking', 'All-Weather Turf', 'Synthetic Grass',
 ];
 
