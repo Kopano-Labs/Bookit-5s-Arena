@@ -5,6 +5,7 @@ import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
 
+// POST /api/bookings/:id/resend — re-send booking receipt to user's email
 export async function POST(request, { params }) {
   try {
     const { id } = await params;
@@ -21,7 +22,7 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.user.toString() !== session.user.id && session.user.role !== 'admin') {
+    if (booking.user.toString() !== session.user.id) {
       return NextResponse.json({ error: 'Not authorised' }, { status: 403 });
     }
 
@@ -35,9 +36,9 @@ export async function POST(request, { params }) {
       total_price: booking.total_price,
     });
 
-    return NextResponse.json({ message: 'Receipt sent successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'Receipt sent' }, { status: 200 });
   } catch (error) {
     console.error('POST /api/bookings/:id/resend error:', error);
-    return NextResponse.json({ error: 'Failed to resend receipt' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to send receipt' }, { status: 500 });
   }
 }
