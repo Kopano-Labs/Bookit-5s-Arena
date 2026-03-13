@@ -1,5 +1,6 @@
 import Heading from '@/components/Heading';
 import CourtCard from '@/components/CourtCard';
+import SocialSection from '@/components/SocialSection';
 
 // Fetch courts from our API instead of static JSON
 const getCourts = async () => {
@@ -32,6 +33,7 @@ const HomePage = async () => {
           ))
         )}
       </div>
+      <SocialSection />
     </>
   );
 };
