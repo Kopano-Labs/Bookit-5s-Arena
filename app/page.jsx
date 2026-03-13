@@ -8,25 +8,25 @@ import {
 // ─── static data ─────────────────────────────────────────────
   const EVENTS = [
       {
-        image: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&q=80',
+        image: 'https://images.unsplash.com/photo-1758275557508-5caf0d3e89c0?w=600&q=80',
         title: 'Birthday Parties',
         desc: 'Private court hire with full access to our bar & clubhouse. Catering options available. Perfect for groups of all sizes — book the pitch, celebrate in style.',
         border: 'border-t-green-500',
       },
       {
-        image: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=600&q=80',
+        image: 'https://images.unsplash.com/photo-1582500347014-3fbe150ed85a?w=600&q=80',
         title: 'Tournaments',
         desc: 'Organise your own 5v5 tournament on our floodlit courts. We provide the venue, sound system and bar — you bring the teams and the competitive spirit.',
         border: 'border-t-yellow-500',
       },
       {
-        image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80',
+        image: 'https://images.unsplash.com/photo-1730816434702-c86dfdc5ee03?w=600&q=80',
         title: 'Corporate Events',
         desc: 'The ultimate team-building day out. Use our courts, clubhouse bar and restaurant to host a full corporate event your team will never forget.',
         border: 'border-t-blue-500',
       },
       {
-        image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80',
+        image: 'https://images.unsplash.com/photo-1771257807779-a72e74deaa11?w=600&q=80',
         title: 'Holiday Clinics',
         desc: 'Coached football clinics for all ages and skill levels during school holidays. Great way to keep the kids active, improving and having fun.',
         border: 'border-t-purple-500',
