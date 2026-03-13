@@ -269,19 +269,27 @@ const HomePage = async () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {EVENTS.map((e, i) => (
              <div
-                  key={i}
-                  className={`group bg-gray-50 hover:bg-gray-900 p-8 transition-all duration-300 border-t-4 ${e.border}`}
-                >
-                  <div className="text-4xl mb-5 leading-none">{e.emoji}</div>
-                  <h3
-                    className="font-black uppercase text-lg mb-3 text-gray-900 group-hover:text-white transition-colors"
-                    style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                  >
-                    {e.title}
-                  </h3>
-                  <p className="text-gray-500 group-hover:text-gray-300 text-sm leading-relaxed transition-colors">
-                    {e.desc}
-                  </p>
+                key={i}
+                className={`group bg-gray-50 hover:bg-gray-900 overflow-hidden transition-all duration-300 border-t-4 ${e.border}`}
+              >
+                <div className="h-44 overflow-hidden">
+                    <img
+                      src={e.image}
+                      alt={e.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3
+                      className="font-black uppercase text-lg mb-3 text-gray-900 group-hover:text-white transition-colors"
+                      style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+                    >
+                      {e.title}
+                    </h3>
+                    <p className="text-gray-500 group-hover:text-gray-300 text-sm leading-relaxed transition-colors">
+                      {e.desc}
+                    </p>
+                </div>
               </div>
             ))}
           </div>
@@ -322,7 +330,7 @@ const HomePage = async () => {
               <p className="text-gray-300 text-lg leading-relaxed mb-4">
                 5s Arena is played on state-of-the-art, all-weather, floodlit,
                 synthetic grass facilities in the heart of Milnerton, Cape Town.
-                More action. More goals. More football.
+                We have a bar &amp; restaurant, sound system and secure parking on site.
               </p>
               <p className="text-gray-400 leading-relaxed mb-10">
                 Small pitches, urban locations, short game times and manageable
