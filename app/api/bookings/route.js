@@ -101,15 +101,31 @@ if (hasOverlap) {
     const total_price = court.price_per_hour * duration;
 
     const booking = await Booking.create({
-      court: courtId,
-      user: session.user.id,
-      date,
-      start_time,
-      duration,
-      total_price,
-    });
+  court: courtId,
+  user: session.user.id,
+  date,
+  start_time,
+  duration,
+  total_price,
+});
+
+    // Send confirmation email (non-blocking — won't fail the booking if email fails)
+    try {
+        await sendBookingConfirmation({
+          to: session.user.email,
+          name: session.user.name,
+          courtName: court.name,
+          date,
+          start_time,
+          duration,
+          total_price,
+        });
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+    }
 
     return NextResponse.json(booking, { status: 201 });
+;
   } catch (error) {
     console.error('POST /api/bookings error:', error);
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
