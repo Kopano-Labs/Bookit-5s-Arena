@@ -58,7 +58,7 @@ import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
           <div className="space-y-4">
             {courts.map((court) => (
               <div
-                key={court.$id}
+                key={court._id}
                 className="bg-white shadow rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
               >
                 <div className="flex items-start gap-4">
