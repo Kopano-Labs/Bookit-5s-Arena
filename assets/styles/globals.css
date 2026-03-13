@@ -9,19 +9,23 @@
   }
 }
 
-@keyframes authFloat1 {
-  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
-  33%       { transform: translateY(-60px) translateX(40px) scale(1.05); }
-  66%       { transform: translateY(30px) translateX(-30px) scale(0.96); }
+@keyframes rollRight {
+  0%   { transform: translateX(-160px) rotate(0deg);    opacity: 0; }
+  6%   { opacity: 1; }
+  94%  { opacity: 1; }
+  100% { transform: translateX(calc(100vw + 160px)) rotate(1200deg); opacity: 0; }
 }
 
-@keyframes authFloat2 {
-  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
-  50%       { transform: translateY(70px) translateX(-50px) scale(1.08); }
+@keyframes rollLeft {
+  0%   { transform: translateX(calc(100vw + 160px)) rotate(0deg);   opacity: 0; }
+  6%   { opacity: 1; }
+  94%  { opacity: 1; }
+  100% { transform: translateX(-160px) rotate(-1200deg); opacity: 0; }
 }
 
-@keyframes authFloat3 {
-  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
-  40%       { transform: translateY(-40px) translateX(60px) scale(0.92); }
-  80%       { transform: translateY(50px) translateX(-30px) scale(1.04); }
+@keyframes rollRightSlow {
+  0%   { transform: translateX(-200px) rotate(0deg);    opacity: 0; }
+  5%   { opacity: 0.7; }
+  95%  { opacity: 0.7; }
+  100% { transform: translateX(calc(100vw + 200px)) rotate(900deg); opacity: 0; }
 }
