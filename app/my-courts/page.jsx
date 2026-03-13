@@ -42,7 +42,8 @@ import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
           </Link>
         </div>
 
-        {mockMyCourts.length === 0 ? (
+        {courts.length === 0 ? (
+
           <div className="bg-white shadow rounded-lg p-10 text-center">
             <FaFutbol className="mx-auto text-4xl text-gray-300 mb-4" />
             <p className="text-gray-500 text-lg">You haven&apos;t added any courts yet.</p>
