@@ -90,14 +90,19 @@ import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
                   >
                     View
                   </Link>
-                  {/* TODO: Link to edit court page when built */}
-                  <button className="text-sm px-3 py-1 border border-blue-200 text-blue-500 rounded-md hover:bg-blue-50 flex items-center gap-1">
-                    <FaEdit className="text-xs" /> Edit
-                  </button>
-                  {/* TODO: Wire up delete to backend */}
-                  <button className="text-sm px-3 py-1 border border-red-200 text-red-500 rounded-md hover:bg-red-50 flex items-center gap-1">
-                    <FaTrash className="text-xs" /> Delete
-                  </button>
+          <Link
+              href={`/courts/${court._id}/edit`}
+              className="text-sm px-3 py-1 border border-blue-200 text-blue-500 rounded-md hover:bg-blue-50 flex items-center gap-1"
+          >
+            <FaEdit className="text-xs" /> Edit
+          </Link>
+          <button
+              onClick={() => handleDelete(court._id)}
+              className="text-sm px-3 py-1 border border-red-200 text-red-500 rounded-md hover:bg-red-50 flex items-center gap-1"
+          >
+            <FaTrash className="text-xs" /> Delete
+          </button>
+
                 </div>
               </div>
             ))}
