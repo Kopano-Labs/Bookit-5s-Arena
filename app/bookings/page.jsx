@@ -115,10 +115,10 @@ const BookingsPage = () => {
                   </span>
                   <div className="flex gap-2">
                     <Link
-                      href={`/courts/${booking.court?._id}`}
+                  href={`/bookings/${booking._id}`}
                       className="text-sm px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                     >
-                      View Court
+                      View Booking
                     </Link>
                     {booking.status !== 'cancelled' && (
                       <button
