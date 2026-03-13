@@ -4,11 +4,24 @@ import { authOptions } from '@/lib/authOptions';
 import connectDB from '@/lib/mongodb';
 import Court from '@/models/Court';
 
-// GET /api/courts — fetch all courts (public)
-export async function GET() {
+// GET /api/courts — fetch courts (public). Add ?mine=true to get only the logged-in user's courts.
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const mine = searchParams.get('mine') === 'true';
+
+    let filter = {};
+
+    if (mine) {
+      const session = await getServerSession(authOptions);
+      if (!session) {
+        return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
+      }
+      filter = { owner: session.user.id };
+    }
+
     await connectDB();
-    const courts = await Court.find({}).sort({ sortOrder: 1, createdAt: 1 });
+    const courts = await Court.find(filter).sort({ sortOrder: 1, createdAt: 1 });
     return NextResponse.json(courts, { status: 200 });
   } catch (error) {
     console.error('GET /api/courts error:', error);

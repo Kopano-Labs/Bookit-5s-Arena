@@ -1,29 +1,45 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Heading from '@/components/Heading';
 import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 
-// TODO: Replace with real data fetched for the logged-in user from your backend
-const mockMyCourts = [
-  {
-    $id: '1',
-    name: 'Premier Court',
-    image: 'court-1.jpg',
-    address: 'Pringle Rd, Milnerton, Cape Town',
-    availability: '10:00 AM - 22:00 PM',
-    price_per_hour: 400,
-  },
-  {
-    $id: '2',
-    name: 'Secondary Court',
-    image: 'court-2.jpg',
-    address: 'Pringle Rd, Milnerton, Cape Town',
-    availability: '10:00 AM - 22:00 PM',
-    price_per_hour: 400,
-  },
-];
-
 const MyCourtsPage = () => {
+  const [courts, setCourts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const fetchMyCourts = async () => {
+    try {
+      const res = await fetch('/api/courts?mine=true');
+      if (!res.ok) throw new Error('Failed to fetch');
+      const data = await res.json();
+      setCourts(data);
+    } catch {
+      setError('Could not load your courts. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (courtId) => {
+    if (!confirm('Are you sure you want to delete this court? This cannot be undone.')) return;
+
+    const res = await fetch(`/api/courts/${courtId}`, { method: 'DELETE' });
+
+    if (res.ok) {
+      setCourts((prev) => prev.filter((c) => c._id !== courtId));
+    } else {
+      alert('Failed to delete court. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    fetchMyCourts();
+  }, []);
+
   return (
     <>
       <Heading title="My Courts" />
@@ -37,7 +53,11 @@ const MyCourtsPage = () => {
           </Link>
         </div>
 
-        {mockMyCourts.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-10 text-gray-500">Loading your courts...</div>
+        ) : error ? (
+          <div className="text-center py-10 text-red-500">{error}</div>
+        ) : courts.length === 0 ? (
           <div className="bg-white shadow rounded-lg p-10 text-center">
             <FaFutbol className="mx-auto text-4xl text-gray-300 mb-4" />
             <p className="text-gray-500 text-lg">You haven&apos;t added any courts yet.</p>
@@ -50,9 +70,9 @@ const MyCourtsPage = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {mockMyCourts.map((court) => (
+            {courts.map((court) => (
               <div
-                key={court.$id}
+                key={court._id}
                 className="bg-white shadow rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
               >
                 <div className="flex items-start gap-4">
@@ -79,17 +99,21 @@ const MyCourtsPage = () => {
 
                 <div className="flex gap-2">
                   <Link
-                    href={`/courts/${court.$id}`}
+                    href={`/courts/${court._id}`}
                     className="text-sm px-3 py-1 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                   >
                     View
                   </Link>
-                  {/* TODO: Link to edit court page when built */}
-                  <button className="text-sm px-3 py-1 border border-blue-200 text-blue-500 rounded-md hover:bg-blue-50 flex items-center gap-1">
+                  <Link
+                    href={`/courts/${court._id}/edit`}
+                    className="text-sm px-3 py-1 border border-blue-200 text-blue-500 rounded-md hover:bg-blue-50 flex items-center gap-1"
+                  >
                     <FaEdit className="text-xs" /> Edit
-                  </button>
-                  {/* TODO: Wire up delete to backend */}
-                  <button className="text-sm px-3 py-1 border border-red-200 text-red-500 rounded-md hover:bg-red-50 flex items-center gap-1">
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(court._id)}
+                    className="text-sm px-3 py-1 border border-red-200 text-red-500 rounded-md hover:bg-red-50 flex items-center gap-1"
+                  >
                     <FaTrash className="text-xs" /> Delete
                   </button>
                 </div>
