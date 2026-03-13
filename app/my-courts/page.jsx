@@ -85,7 +85,7 @@ import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 
                 <div className="flex gap-2">
                   <Link
-                    href={`/courts/${court.$id}`}
+                    href={`/courts/${court._id}`}
                     className="text-sm px-3 py-1 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                   >
                     View
