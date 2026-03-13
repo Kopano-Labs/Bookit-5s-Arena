@@ -56,7 +56,7 @@ import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
           </div>
         ) : (
           <div className="space-y-4">
-            {mockMyCourts.map((court) => (
+            {courts.map((court) => (
               <div
                 key={court.$id}
                 className="bg-white shadow rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
