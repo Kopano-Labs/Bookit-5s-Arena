@@ -84,7 +84,7 @@ const HomePage = async () => {
             Milnerton · Cape Town · Hellenic Football Club
           </p>
           <h1
-            className="text-white font-black uppercase leading-none mb-6 transition-transform duration-300 hover:scale-[1.04] hover:-translate-y-3 cursor-default group"
+            className="hero-title text-white font-black uppercase leading-none mb-6"
             style={{
               fontSize: 'clamp(3rem, 9vw, 7.5rem)',
               fontFamily: 'Impact, Arial Black, sans-serif',
@@ -93,7 +93,7 @@ const HomePage = async () => {
           >
             WELCOME TO
             <br />
-            <span className="text-green-400 group-hover:text-green-300 transition-colors duration-300">FIVES ARENA</span>
+            <span className="text-green-400">FIVES ARENA</span>
           </h1>
           <p className="text-gray-300 text-xl max-w-xl mb-10 leading-relaxed">
             Cape Town&apos;s premier 5-a-side football experience.
@@ -242,9 +242,9 @@ const HomePage = async () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-wrap justify-center gap-6 md:gap-10">
             {AMENITIES.map((a, i) => (
-              <div key={i} className="flex items-center gap-2 text-white group cursor-default hover:scale-110 transition-transform duration-200">
-                <span className="text-2xl group-hover:scale-125 transition-transform duration-200 leading-none">{a.emoji}</span>
-                <span className="font-bold uppercase tracking-wide text-sm group-hover:text-green-200 transition-colors duration-200">{a.label}</span>
+              <div key={i} className="amenity-badge text-white">
+                <span className="amenity-icon text-3xl leading-none">{a.emoji}</span>
+                <span className="font-bold uppercase tracking-wide text-sm">{a.label}</span>
               </div>
             ))}
           </div>
@@ -431,7 +431,7 @@ const HomePage = async () => {
             {/* Facebook Page Feed */}
             <div className="flex-shrink-0 w-full lg:w-auto flex justify-center">
               <iframe
-                src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ffivesarena&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false"
+                src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D61588019843126&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false"
                 width="500"
                 height="600"
                 style={{ border: 'none', overflow: 'hidden', maxWidth: '100%', borderRadius: '12px' }}
@@ -447,7 +447,7 @@ const HomePage = async () => {
             <div className="flex flex-col gap-4 w-full lg:max-w-xs">
               <p className="text-gray-400 uppercase tracking-widest text-xs mb-2">Find us on</p>
               {[
-                { icon: <FaFacebook size={22} />, label: 'Facebook', sub: '@fivesarena', href: 'https://www.facebook.com/fivesarena', color: '#1877F2' },
+                { icon: <FaFacebook size={22} />, label: 'Facebook', sub: 'Fives Arena', href: 'https://www.facebook.com/profile.php?id=61588019843126', color: '#1877F2' },
                 { icon: <FaInstagram size={22} />, label: 'Instagram', sub: '@fivesarena', href: 'https://www.instagram.com/fivesarena', color: '#E1306C' },
                 { icon: <FaTiktok size={22} />, label: 'TikTok', sub: '@fivesarena', href: 'https://www.tiktok.com/@fivesarena', color: '#ffffff' },
                 { icon: <FaWhatsapp size={22} />, label: 'WhatsApp', sub: '063 782 0245', href: 'https://wa.me/27637820245', color: '#25D366' },
@@ -529,7 +529,7 @@ const HomePage = async () => {
             {/* Logo */}
             <div className="flex flex-col items-center gap-3 mb-8">
               <img
-                src="/images/logo.png"
+                src="/images/logo.jpg"
                 alt="5s Arena"
                 className="w-20 h-20 rounded-full object-cover border-2 border-green-500 shadow-lg shadow-green-900/40"
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -546,7 +546,7 @@ const HomePage = async () => {
             <p className="text-gray-600 uppercase tracking-widest text-xs mb-4">Follow Us</p>
             <div className="flex justify-center gap-4">
               {[
-                { icon: <FaFacebook size={20} />, href: 'https://www.facebook.com/fivesarena', label: 'Facebook' },
+                { icon: <FaFacebook size={20} />, href: 'https://www.facebook.com/profile.php?id=61588019843126', label: 'Facebook' },
                 { icon: <FaInstagram size={20} />, href: 'https://www.instagram.com/fivesarena', label: 'Instagram' },
                 { icon: <FaTiktok size={20} />, href: 'https://www.tiktok.com/@fivesarena', label: 'TikTok' },
                 { icon: <FaWhatsapp size={20} />, href: 'https://wa.me/27637820245', label: 'WhatsApp' },
