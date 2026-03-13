@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaUser, FaGoogle, FaFacebook, FaApple } from 'react-icons/fa';
+import { FaUser, FaGoogle, FaFacebook } from 'react-icons/fa';
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -16,12 +16,16 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [facebookLoading, setFacebookLoading] = useState(false);
-  const [appleLoading, setAppleLoading] = useState(false);
+  const [captchaChecked, setCaptchaChecked] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
+    if (!captchaChecked) {
+      setError('Please confirm you are not a robot to continue.');
+      return;
+    }
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
@@ -68,55 +72,43 @@ const RegisterPage = () => {
     await signIn('facebook', { callbackUrl: '/' });
   };
 
-  const handleAppleSignIn = async () => {
-    setAppleLoading(true);
-    await signIn('apple', { callbackUrl: '/' });
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center py-16 px-4 relative overflow-hidden bg-gray-950">
+    <div className="min-h-screen flex items-center justify-center py-16 px-4 relative overflow-hidden">
 
       {/* ── Animated background ── */}
       <div className="fixed inset-0 -z-10 overflow-hidden bg-gray-950">
-        {/* Orb 1 */}
+        {/* Ambient green glow 1 */}
         <div
           className="absolute rounded-full"
           style={{
             top: '5%', left: '10%',
             width: '600px', height: '600px',
-            background: 'radial-gradient(circle, rgba(34,197,94,0.28) 0%, transparent 70%)',
-            animation: 'authFloat1 9s ease-in-out infinite',
+            background: 'radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%)',
           }}
         />
-        {/* Orb 2 */}
+        {/* Ambient green glow 2 */}
         <div
           className="absolute rounded-full"
           style={{
             bottom: '0%', right: '5%',
             width: '500px', height: '500px',
-            background: 'radial-gradient(circle, rgba(16,185,129,0.22) 0%, transparent 70%)',
-            animation: 'authFloat2 13s ease-in-out infinite',
+            background: 'radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)',
           }}
         />
-        {/* Orb 3 */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            top: '40%', right: '20%',
-            width: '380px', height: '380px',
-            background: 'radial-gradient(circle, rgba(74,222,128,0.14) 0%, transparent 70%)',
-            animation: 'authFloat3 16s ease-in-out infinite',
-          }}
-        />
-        {/* Subtle football grid */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
+        {/* ONE massive football — green glow, rolls along the bottom */}
+        <div style={{
+          position: 'absolute',
+          bottom: '-90px',
+          left: 0,
+          fontSize: '340px',
+          lineHeight: 1,
+          userSelect: 'none',
+          pointerEvents: 'none',
+          filter:
+            'drop-shadow(0 0 50px rgba(34,197,94,0.9)) drop-shadow(0 0 100px rgba(34,197,94,0.45)) drop-shadow(0 -10px 30px rgba(74,222,128,0.3))',
+          animation: 'rollRightMassive 22s linear infinite',
+          animationDelay: '0s',
+        }}>⚽</div>
       </div>
 
       {/* ── Card ── */}
@@ -160,14 +152,6 @@ const RegisterPage = () => {
           >
             <FaFacebook className="text-white text-base" />
             {facebookLoading ? 'Redirecting...' : 'Continue with Facebook'}
-          </button>
-          <button
-            onClick={handleAppleSignIn}
-            disabled={appleLoading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-black hover:bg-gray-800 transition-all disabled:opacity-50 shadow-sm"
-          >
-            <FaApple className="text-white text-base" />
-            {appleLoading ? 'Redirecting...' : 'Continue with Apple'}
           </button>
         </div>
 
@@ -234,12 +218,27 @@ const RegisterPage = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-              placeholder="••••••••"
+              placeholder="Repeat your password"
             />
           </div>
+          {/* ── Human verification ── */}
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all ${captchaChecked ? 'border-green-400 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+            <input
+              type="checkbox"
+              id="captcha"
+              checked={captchaChecked}
+              onChange={(e) => setCaptchaChecked(e.target.checked)}
+              className="w-5 h-5 rounded accent-green-500 cursor-pointer flex-shrink-0"
+            />
+            <label htmlFor="captcha" className="text-sm text-gray-700 font-medium cursor-pointer select-none flex-1">
+              I&apos;m not a robot 🤖
+            </label>
+            <span className="text-[10px] text-gray-400 uppercase tracking-wide flex-shrink-0">Security</span>
+          </div>
+
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !captchaChecked}
             className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gray-900 hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1"
           >
             {loading ? 'Creating account...' : 'Create Account'}
