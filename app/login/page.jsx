@@ -62,48 +62,20 @@ const LoginPage = () => {
           }}
         />
 
-        {/* Rolling footballs */}
-        {/* Ball 1 — large, rolls right, lower third */}
+        {/* ONE massive football — neon green glow, rolls along the bottom */}
         <div style={{
-          position: 'absolute', top: '68%',
-          fontSize: '88px', lineHeight: 1, userSelect: 'none',
-          animation: 'rollRight 11s linear infinite',
+          position: 'absolute',
+          bottom: '-90px',
+          left: 0,
+          fontSize: '340px',
+          lineHeight: 1,
+          userSelect: 'none',
+          pointerEvents: 'none',
+          filter:
+            'drop-shadow(0 0 50px rgba(34,197,94,0.9)) drop-shadow(0 0 100px rgba(34,197,94,0.45)) drop-shadow(0 -10px 30px rgba(74,222,128,0.3))',
+          animation: 'rollRightMassive 22s linear infinite',
           animationDelay: '0s',
         }}>⚽</div>
-
-        {/* Ball 2 — small, rolls left, upper area */}
-        <div style={{
-          position: 'absolute', top: '12%',
-          fontSize: '52px', lineHeight: 1, userSelect: 'none',
-          animation: 'rollLeft 14s linear infinite',
-          animationDelay: '3s',
-        }}>⚽</div>
-
-        {/* Ball 3 — medium, rolls right, mid area */}
-        <div style={{
-          position: 'absolute', top: '42%',
-          fontSize: '66px', lineHeight: 1, userSelect: 'none',
-          animation: 'rollRightSlow 18s linear infinite',
-          animationDelay: '6s',
-        }}>⚽</div>
-
-        {/* Ball 4 — tiny, rolls left, bottom */}
-        <div style={{
-          position: 'absolute', top: '82%',
-          fontSize: '40px', lineHeight: 1, userSelect: 'none',
-          animation: 'rollLeft 9s linear infinite',
-          animationDelay: '1.5s',
-        }}>⚽</div>
-
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
       </div>
 
       {/* ── Card ── */}
