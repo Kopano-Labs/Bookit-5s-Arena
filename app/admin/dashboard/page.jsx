@@ -29,11 +29,15 @@
         });
     }, [fromDate, toDate, statusFilter]);
 
-    useEffect(() => {
-      if (status === 'unauthenticated') { router.push('/login'); return; }
-      if (status === 'authenticated' && session.user.role !== 'admin') { router.push('/'); return; }
-      if (status === 'authenticated') fetchStats();
-    }, [status, session, router, fetchStats]);
+        useEffect(() => {
+          if (status === 'unauthenticated') { router.push('/login'); return; }
+          if (status === 'authenticated' && session.user.role !== 'admin') { router.push('/'); return; }
+          if (status === 'authenticated') {
+              fetch('/api/admin/stats')
+                .then((res) => res.json())
+                .then((data) => { setStats(data); setLoading(false); });
+          }
+      }, [status, session, router]);
 
     if (loading || !stats) return <div className="text-center py-10 text-gray-500">Loading dashboard...</div>;
 
