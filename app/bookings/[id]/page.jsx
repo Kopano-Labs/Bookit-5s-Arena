@@ -67,8 +67,8 @@ const BookingDetailPage = () => {
         )}
         <div className="space-y-2 text-sm text-gray-700">
           {court?.description && <p className="text-teal-600 italic">{court.description}</p>}
-          {court?.amenities?.length > 0 && (
-            <p><span className="font-semibold text-gray-800">Amenities:</span> {court.amenities.join(', ')}</p>
+          {court?.amenities && (
+            <p><span className="font-semibold text-gray-800">Amenities:</span> {court.amenities}</p>
           )}
           <p><span className="font-semibold text-gray-800">Availability:</span> {court?.availability}</p>
           <p><span className="font-semibold text-gray-800">Price:</span> R{court?.price_per_hour}/hour</p>
