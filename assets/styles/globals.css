@@ -1,11 +1,27 @@
 @import "tailwindcss";
 
-    @layer utilities {
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-    }
-    }
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
 
+@keyframes authFloat1 {
+  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+  33%       { transform: translateY(-60px) translateX(40px) scale(1.05); }
+  66%       { transform: translateY(30px) translateX(-30px) scale(0.96); }
+}
+
+@keyframes authFloat2 {
+  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+  50%       { transform: translateY(70px) translateX(-50px) scale(1.08); }
+}
+
+@keyframes authFloat3 {
+  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+  40%       { transform: translateY(-40px) translateX(60px) scale(0.92); }
+  80%       { transform: translateY(50px) translateX(-30px) scale(1.04); }
+}
