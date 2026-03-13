@@ -29,13 +29,17 @@ export async function GET(request) {
   }
 }
 
-// POST /api/courts — create a new court (logged-in users only)
+// POST /api/courts — create a new court (admin only)
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session) {
       return NextResponse.json({ error: 'You must be logged in to add a court' }, { status: 401 });
+    }
+
+    if (session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Only admins can add courts' }, { status: 403 });
     }
 
     const body = await request.json();
