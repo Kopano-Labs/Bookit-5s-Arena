@@ -5,7 +5,7 @@ import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Court from '@/models/Court';
 
-export async function GET() {
+export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -15,33 +15,43 @@ export async function GET() {
 
     await connectDB();
 
+    const { searchParams } = new URL(request.url);
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    const statusFilter = searchParams.get('status');
+
     const today = new Date().toISOString().split('T')[0];
 
-    const [totalBookings, revenueResult, courts, upcomingBookings, mostBooked] = await Promise.all([
-      // Total non-cancelled bookings
-      Booking.countDocuments({ status: { $ne: 'cancelled' } }),
+    const match = { status: { $ne: 'cancelled' } };
+    if (from) match.date = { ...match.date, $gte: from };
+    if (to) match.date = { ...match.date, $lte: to };
+    if (statusFilter === 'upcoming') match.date = { ...match.date, $gte: today };
+    if (statusFilter === 'past') match.date = { ...match.date, $lt: today };
 
-      // Sum of all revenue
+    const [totalBookings, revenueResult, courts, upcomingBookings, mostBooked, courtBreakdown] = await Promise.all([
+      Booking.countDocuments(match),
       Booking.aggregate([
-        { $match: { status: { $ne: 'cancelled' } } },
+        { $match: match },
         { $group: { _id: null, total: { $sum: '$total_price' } } },
       ]),
-
-      // Total courts
       Court.countDocuments(),
-
-      // Upcoming bookings from today
       Booking.countDocuments({ date: { $gte: today }, status: { $ne: 'cancelled' } }),
-
-      // Most booked court
       Booking.aggregate([
-        { $match: { status: { $ne: 'cancelled' } } },
+        { $match: match },
         { $group: { _id: '$court', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $limit: 1 },
         { $lookup: { from: 'courts', localField: '_id', foreignField: '_id', as: 'court' } },
         { $unwind: '$court' },
         { $project: { name: '$court.name', count: 1 } },
+      ]),
+      Booking.aggregate([
+        { $match: match },
+        { $group: { _id: '$court', bookings: { $sum: 1 }, revenue: { $sum: '$total_price' } } },
+        { $sort: { bookings: -1 } },
+        { $lookup: { from: 'courts', localField: '_id', foreignField: '_id', as: 'court' } },
+        { $unwind: '$court' },
+        { $project: { name: '$court.name', bookings: 1, revenue: 1 } },
       ]),
     ]);
 
@@ -51,6 +61,7 @@ export async function GET() {
       totalCourts: courts,
       upcomingBookings,
       mostBookedCourt: mostBooked[0] ?? null,
+      courtBreakdown,
     });
   } catch (error) {
     console.error('GET /api/admin/stats error:', error);
