@@ -4,25 +4,32 @@
         import dbConnect from '@/lib/mongodb';
         import Booking from '@/models/Booking';
 
-        export async function PATCH(request, { params }) {
-        const session = await getServerSession(authOptions);
-        if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
-        if (session.user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+            export async function PATCH(request, { params }) {
+                    try {
+                        const session = await getServerSession(authOptions);
+                        if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
+                        if (session.user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-        await dbConnect();
-        const { status } = await request.json();
+                        await dbConnect();
 
-        const allowed = ['pending', 'confirmed', 'cancelled'];
-        if (!allowed.includes(status)) {
-            return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
-        }
+                        const { id } = await params;
+                        const { status } = await request.json();
 
-        const booking = await Booking.findByIdAndUpdate(
-            params.id,
-            { status },
-            { new: true }
-        );
+                        const allowed = ['pending', 'confirmed', 'cancelled'];
+                        if (!allowed.includes(status)) {
+                        return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+                        }
 
-        if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
-        return NextResponse.json(booking);
-        }
+                        const booking = await Booking.findByIdAndUpdate(
+                        id,
+                        { status },
+                        { new: true }
+                        );
+
+                        if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+                        return NextResponse.json(booking);
+                    } catch (error) {
+                console.error('Update booking error:', error);
+                return NextResponse.json({ error: error.message }, { status: 500 });
+            }
+            }
