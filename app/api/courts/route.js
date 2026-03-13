@@ -17,12 +17,14 @@ export async function GET(request) {
       if (!session) {
         return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
       }
-      if (session.user.role !== 'admin') {
-        return NextResponse.json({ error: 'Only admins can add courts' }, { status: 403 });
-     }
 
+    if (session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Only admins can add courts' }, { status: 403 });
+      }
+      
       filter = { owner: session.user.id };
     }
+
 
     await connectDB();
     const courts = await Court.find(filter).sort({ sortOrder: 1, createdAt: 1 });
