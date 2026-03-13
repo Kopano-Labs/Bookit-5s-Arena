@@ -532,7 +532,6 @@ const HomePage = async () => {
                 src="/images/logo.jpg"
                 alt="5s Arena"
                 className="w-20 h-20 rounded-full object-cover border-2 border-green-500 shadow-lg shadow-green-900/40"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
               <p
                 className="font-black uppercase text-white text-2xl tracking-wide"
