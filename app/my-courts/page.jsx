@@ -7,26 +7,6 @@ import Heading from '@/components/Heading';
 import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 
 
-// TODO: Replace with real data fetched for the logged-in user from your backend
-const mockMyCourts = [
-  {
-    $id: '1',
-    name: 'Premier Court',
-    image: 'court-1.jpg',
-    address: 'Pringle Rd, Milnerton, Cape Town',
-    availability: '10:00 AM - 22:00 PM',
-    price_per_hour: 400,
-  },
-  {
-    $id: '2',
-    name: 'Secondary Court',
-    image: 'court-2.jpg',
-    address: 'Pringle Rd, Milnerton, Cape Town',
-    availability: '10:00 AM - 22:00 PM',
-    price_per_hour: 400,
-  },
-];
-
 const MyCourtsPage = () => {
   return (
     <>
