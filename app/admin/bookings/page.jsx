@@ -37,8 +37,11 @@ const AdminBookings = () => {
     if (status === 'authenticated') {
       fetch('/api/admin/bookings')
         .then((res) => res.json())
-        .then((data) => { setBookings(data); setLoading(false); });
-    }
+        .then((data) => {
+          setBookings(Array.isArray(data) ? data : []);
+          setLoading(false);
+      });
+        }
   }, [status, session, router]);
 
   const handleStatusChange = async (bookingId, newStatus) => {
