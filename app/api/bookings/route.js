@@ -53,11 +53,30 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
     }
 
-    // Check for double booking — same court, same date, same start time
-    const existingBooking = await Booking.findOne({ court: courtId, date, start_time });
-    if (existingBooking) {
+    // Check for overlapping bookings on the same court and date
+    const toMinutes = (t) => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    };
+
+    const newStart = toMinutes(start_time);
+    const newEnd = newStart + duration * 60;
+
+    const sameDayBookings = await Booking.find({
+      court: courtId,
+      date,
+      status: { $ne: 'cancelled' },
+    }).select('start_time duration');
+
+    const hasOverlap = sameDayBookings.some((b) => {
+      const existStart = toMinutes(b.start_time);
+      const existEnd = existStart + b.duration * 60;
+      return newStart < existEnd && newEnd > existStart;
+    });
+
+    if (hasOverlap) {
       return NextResponse.json(
-        { error: 'This court is already booked at that time. Please choose a different slot.' },
+        { error: 'This court is already booked during that time. Please choose a different slot.' },
         { status: 409 }
       );
     }
