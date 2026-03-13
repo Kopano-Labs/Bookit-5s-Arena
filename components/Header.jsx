@@ -38,12 +38,16 @@ const Header = () => {
                     >
                       <FaCalendarAlt className="inline mr-1" /> Bookings
                     </Link>
-                    <Link
+
+              {session.user.role === 'admin' && (
+                  <Link
                       href="/courts/add"
                       className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
                     >
                       Add Court
-                    </Link>
+                  </Link>
+              )}
+
                   </>
                 )}
               </div>
@@ -57,9 +61,11 @@ const Header = () => {
                   <span className="mr-3 text-sm text-gray-600 hidden md:block">
                     Hi, {session.user.name?.split(' ')[0]}!
                   </span>
+              {session.user.role === 'admin' && (
                   <Link href="/my-courts" className="mr-3 text-gray-800 hover:text-gray-600">
-                    <FaFutbol className="inline mr-1" /> My Courts
+                    <FaFutbol className="inline mr-1" /> My Courts  
                   </Link>
+              )}
                   <button
                     onClick={() => signOut({ callbackUrl: '/' })}
                     className="mx-3 text-gray-800 hover:text-gray-600"
@@ -99,12 +105,14 @@ const Header = () => {
               >
                 Bookings
               </Link>
-              <Link
-                href="/courts/add"
-                className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-              >
-                Add Court
-              </Link>
+             {session.user.role === 'admin' && (
+                <Link
+                    href="/courts/add"
+                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
+                  >
+                    Add Court
+                </Link>
+              )}
             </>
           )}
         </div>
