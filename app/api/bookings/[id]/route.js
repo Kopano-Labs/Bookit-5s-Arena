@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
+import '@/models/Court';
 import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
 
 // GET /api/bookings/:id — fetch a single booking (owner or admin)
