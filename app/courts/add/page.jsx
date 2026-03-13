@@ -38,10 +38,23 @@ const AddCourtPage = () => {
 
     setLoading(true);
 
-    // TODO: Replace with real API call to POST /api/courts
-    console.log('New court submitted:', form);
+    const res = await fetch('/api/courts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...form,
+        price_per_hour: Number(form.price_per_hour),
+        capacity: Number(form.capacity),
+      }),
+    });
 
-    setLoading(false);
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error || 'Failed to add court. Please try again.');
+      return;
+    }
+
     setSuccess(true);
   };
 
@@ -61,10 +74,10 @@ const AddCourtPage = () => {
               Add Another Court
             </button>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/my-courts')}
               className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 text-sm"
             >
-              View All Courts
+               View My Courts
             </button>
           </div>
         </div>
