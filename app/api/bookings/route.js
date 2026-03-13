@@ -53,14 +53,50 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
     }
 
-    // Check for double booking — same court, same date, same start time
-    const existingBooking = await Booking.findOne({ court: courtId, date, start_time });
-    if (existingBooking) {
-      return NextResponse.json(
-        { error: 'This court is already booked at that time. Please choose a different slot.' },
-        { status: 409 }
-      );
-    }
+    // Validate time window
+const toMinutes = (t) => {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+};
+
+const OPEN_MINUTES = 10 * 60;   // 10:00
+const CLOSE_MINUTES = 22 * 60;  // 22:00
+
+const timeRegex = /^\d{2}:\d{2}$/;
+if (!timeRegex.test(start_time)) {
+  return NextResponse.json({ error: 'Invalid start time format' }, { status: 400 });
+}
+
+const newStart = toMinutes(start_time);
+const newEnd = newStart + duration * 60;
+
+if (newStart < OPEN_MINUTES || newEnd > CLOSE_MINUTES) {
+  return NextResponse.json(
+    { error: 'Bookings must start at 10:00 and end by 22:00.' },
+    { status: 400 }
+  );
+}
+
+// Check for overlapping bookings on the same court and date
+const sameDayBookings = await Booking.find({
+  court: courtId,
+  date,
+  status: { $ne: 'cancelled' },
+}).select('start_time duration');
+
+const hasOverlap = sameDayBookings.some((b) => {
+  const existStart = toMinutes(b.start_time);
+  const existEnd = existStart + b.duration * 60;
+  return newStart < existEnd && newEnd > existStart;
+});
+
+if (hasOverlap) {
+  return NextResponse.json(
+    { error: 'This court is already booked during that time. Please choose a different slot.' },
+    { status: 409 }
+  );
+}
+
 
     const total_price = court.price_per_hour * duration;
 
