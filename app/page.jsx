@@ -1,32 +1,31 @@
 import Link from 'next/link';
 import {
   FaFutbol, FaMapMarkerAlt, FaPhone, FaEnvelope,
-  FaWhatsapp, FaInstagram, FaFacebook, FaTiktok,
-  FaArrowRight, FaCheckCircle,
+  FaWhatsapp, FaInstagram, FaFacebook, FaTiktok, FaArrowRight,
 } from 'react-icons/fa';
 
 // ─── static data ─────────────────────────────────────────────
   const EVENTS = [
       {
-        image: 'https://images.unsplash.com/photo-1758275557508-5caf0d3e89c0?w=600&q=80',
+        image: '/images/events/Birthday%20Parties.png',
         title: 'Birthday Parties',
         desc: 'Private court hire with full access to our bar & clubhouse. Catering options available. Perfect for groups of all sizes — book the pitch, celebrate in style.',
         border: 'border-t-green-500',
       },
       {
-        image: 'https://images.unsplash.com/photo-1582500347014-3fbe150ed85a?w=600&q=80',
+        image: '/images/events/Tournaments.png',
         title: 'Tournaments',
         desc: 'Organise your own 5v5 tournament on our floodlit courts. We provide the venue, sound system and bar — you bring the teams and the competitive spirit.',
         border: 'border-t-yellow-500',
       },
       {
-        image: 'https://images.unsplash.com/photo-1730816434702-c86dfdc5ee03?w=600&q=80',
+        image: '/images/events/Corporate%20Events.png',
         title: 'Corporate Events',
         desc: 'The ultimate team-building day out. Use our courts, clubhouse bar and restaurant to host a full corporate event your team will never forget.',
         border: 'border-t-blue-500',
       },
       {
-        image: 'https://images.unsplash.com/photo-1771257807779-a72e74deaa11?w=600&q=80',
+        image: '/images/events/Holiday%20Clinics.png',
         title: 'Holiday Clinics',
         desc: 'Coached football clinics for all ages and skill levels during school holidays. Great way to keep the kids active, improving and having fun.',
         border: 'border-t-purple-500',
@@ -34,8 +33,12 @@ import {
   ];
 
 const AMENITIES = [
-  'Floodlit Courts', 'Sound System', 'Bar & Restaurant',
-  'Secure Parking', 'All-Weather Turf', 'Synthetic Grass',
+  { emoji: '💡', label: 'Floodlit Courts' },
+  { emoji: '🔊', label: 'Sound System' },
+  { emoji: '🍺', label: 'Bar & Restaurant' },
+  { emoji: '🚗', label: 'Secure Parking' },
+  { emoji: '🌦️', label: 'All-Weather Turf' },
+  { emoji: '⚽', label: 'Synthetic Grass' },
 ];
 
 // ─── server-side fetch ────────────────────────────────────────
@@ -81,7 +84,7 @@ const HomePage = async () => {
             Milnerton · Cape Town · Hellenic Football Club
           </p>
           <h1
-            className="text-white font-black uppercase leading-none mb-6"
+            className="text-white font-black uppercase leading-none mb-6 transition-transform duration-300 hover:scale-[1.04] hover:-translate-y-3 cursor-default group"
             style={{
               fontSize: 'clamp(3rem, 9vw, 7.5rem)',
               fontFamily: 'Impact, Arial Black, sans-serif',
@@ -90,7 +93,7 @@ const HomePage = async () => {
           >
             WELCOME TO
             <br />
-            <span className="text-green-400">FIVES ARENA</span>
+            <span className="text-green-400 group-hover:text-green-300 transition-colors duration-300">FIVES ARENA</span>
           </h1>
           <p className="text-gray-300 text-xl max-w-xl mb-10 leading-relaxed">
             Cape Town&apos;s premier 5-a-side football experience.
@@ -171,12 +174,12 @@ const HomePage = async () => {
               No courts available right now. Check back soon.
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {courts.map((court) => (
                 <Link
                   key={court._id}
                   href={`/courts/${court._id}`}
-                  className="group bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 block"
+                  className="group bg-white overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300 block hover:ring-2 hover:ring-green-400 hover:shadow-[0_0_0_2px_#4ade80,0_0_22px_rgba(74,222,128,0.45),0_10px_30px_rgba(0,0,0,0.12)]"
                 >
                   {court.image ? (
                     <div className="relative h-52 overflow-hidden">
@@ -239,9 +242,9 @@ const HomePage = async () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-wrap justify-center gap-6 md:gap-10">
             {AMENITIES.map((a, i) => (
-              <div key={i} className="flex items-center gap-2 text-white">
-                <FaCheckCircle className="text-green-200" />
-                <span className="font-bold uppercase tracking-wide text-sm">{a}</span>
+              <div key={i} className="flex items-center gap-2 text-white group cursor-default hover:scale-110 transition-transform duration-200">
+                <span className="text-2xl group-hover:scale-125 transition-transform duration-200 leading-none">{a.emoji}</span>
+                <span className="font-bold uppercase tracking-wide text-sm group-hover:text-green-200 transition-colors duration-200">{a.label}</span>
               </div>
             ))}
           </div>
@@ -256,7 +259,7 @@ const HomePage = async () => {
               More than just football
             </p>
             <h2
-              className="font-black uppercase text-gray-900"
+              className="events-title font-black uppercase text-gray-900"
               style={{
                 fontSize: 'clamp(2rem, 5vw, 3.5rem)',
                 fontFamily: 'Impact, Arial Black, sans-serif',
@@ -268,27 +271,27 @@ const HomePage = async () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {EVENTS.map((e, i) => (
-             <div
+              <div
                 key={i}
-                className={`group bg-gray-50 hover:bg-gray-900 overflow-hidden transition-all duration-300 border-t-4 ${e.border}`}
+                className={`group bg-white overflow-hidden transition-all duration-300 border-t-4 ${e.border} flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-xl`}
               >
-                <div className="h-44 overflow-hidden">
-                    <img
-                      src={e.image}
-                      alt={e.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3
-                      className="font-black uppercase text-lg mb-3 text-gray-900 group-hover:text-white transition-colors"
-                      style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                    >
-                      {e.title}
-                    </h3>
-                    <p className="text-gray-500 group-hover:text-gray-300 text-sm leading-relaxed transition-colors">
-                      {e.desc}
-                    </p>
+                <div className="p-6">
+                  <h3
+                    className="font-black uppercase text-xl mb-3 text-gray-900"
+                    style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+                  >
+                    {e.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    {e.desc}
+                  </p>
+                </div>
+                <div className="h-48 overflow-hidden mt-auto">
+                  <img
+                    src={e.image}
+                    alt={e.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
               </div>
             ))}
@@ -360,24 +363,110 @@ const HomePage = async () => {
               </div>
             </div>
 
-            {/* venue card */}
-            <div className="border border-green-900 bg-green-950/30 p-10 text-center">
-              <FaFutbol className="text-green-400 text-8xl mx-auto mb-6" />
-              <p className="text-green-400 font-bold text-xl uppercase tracking-widest mb-2">
-                Hellenic Football Club
-              </p>
-              <p className="text-gray-300 mb-1">Pringle Rd, Milnerton</p>
-              <p className="text-gray-300 mb-6">Cape Town, 7441</p>
-              <div className="border-t border-green-900 pt-6">
+            {/* Google Maps card */}
+            <div className="border border-green-900 overflow-hidden flex flex-col">
+              {/* Live map — click anywhere to open Google Maps */}
+              <div className="relative h-72">
+                <iframe
+                  title="Hellenic Football Club Location"
+                  src="https://maps.google.com/maps?q=Hellenic+Football+Club,+Pringle+Rd,+Milnerton,+Cape+Town,+South+Africa&output=embed&z=16"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+                {/* Transparent overlay — clicking opens Google Maps */}
                 <a
-                  href="https://maps.google.com/?q=Pringle+Rd+Milnerton+Cape+Town"
+                  href="https://maps.google.com/?q=Hellenic+Football+Club,+Pringle+Rd,+Milnerton,+Cape+Town"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 font-bold uppercase text-sm tracking-wide transition-colors"
+                  className="absolute inset-0 z-10"
+                  aria-label="Open in Google Maps"
+                />
+              </div>
+              {/* Address bar */}
+              <div className="bg-green-950/40 border-t border-green-900 px-6 py-5 flex items-center justify-between">
+                <div>
+                  <p className="text-green-400 font-bold text-sm uppercase tracking-widest mb-0.5">
+                    Hellenic Football Club
+                  </p>
+                  <p className="text-gray-400 text-sm">Pringle Rd, Milnerton · Cape Town 7441</p>
+                </div>
+                <a
+                  href="https://maps.google.com/?q=Hellenic+Football+Club,+Pringle+Rd,+Milnerton,+Cape+Town"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 font-bold uppercase text-xs tracking-wide transition-colors flex-shrink-0 ml-4"
                 >
-                  <FaMapMarkerAlt /> Get Directions
+                  <FaMapMarkerAlt /> Directions
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ SOCIAL FEED ══════════════════════════════════════ */}
+      <section className="py-20 bg-gray-900">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="text-green-400 font-bold tracking-widest uppercase text-sm mb-2">
+              Stay connected
+            </p>
+            <h2
+              className="events-title font-black uppercase text-white"
+              style={{
+                fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                fontFamily: 'Impact, Arial Black, sans-serif',
+              }}
+            >
+              FOLLOW OUR JOURNEY
+            </h2>
+            <p className="text-gray-400 mt-3 text-sm">See what&apos;s happening at 5s Arena — follow us for latest updates, goals &amp; events</p>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-10 items-start justify-center">
+            {/* Facebook Page Feed */}
+            <div className="flex-shrink-0 w-full lg:w-auto flex justify-center">
+              <iframe
+                src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ffivesarena&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false"
+                width="500"
+                height="600"
+                style={{ border: 'none', overflow: 'hidden', maxWidth: '100%', borderRadius: '12px' }}
+                scrolling="no"
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                title="5s Arena Facebook Page"
+              />
+            </div>
+
+            {/* Social links sidebar */}
+            <div className="flex flex-col gap-4 w-full lg:max-w-xs">
+              <p className="text-gray-400 uppercase tracking-widest text-xs mb-2">Find us on</p>
+              {[
+                { icon: <FaFacebook size={22} />, label: 'Facebook', sub: '@fivesarena', href: 'https://www.facebook.com/fivesarena', color: '#1877F2' },
+                { icon: <FaInstagram size={22} />, label: 'Instagram', sub: '@fivesarena', href: 'https://www.instagram.com/fivesarena', color: '#E1306C' },
+                { icon: <FaTiktok size={22} />, label: 'TikTok', sub: '@fivesarena', href: 'https://www.tiktok.com/@fivesarena', color: '#ffffff' },
+                { icon: <FaWhatsapp size={22} />, label: 'WhatsApp', sub: '063 782 0245', href: 'https://wa.me/27637820245', color: '#25D366' },
+              ].map((s, i) => (
+                <a
+                  key={i}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 border border-gray-700 hover:border-green-500 hover:bg-gray-800 transition-all rounded-xl group"
+                >
+                  <span style={{ color: s.color }} className="group-hover:scale-110 transition-transform duration-200">{s.icon}</span>
+                  <div>
+                    <p className="text-white font-bold text-sm leading-none mb-0.5">{s.label}</p>
+                    <p className="text-gray-500 text-xs">{s.sub}</p>
+                  </div>
+                  <FaArrowRight className="ml-auto text-gray-600 group-hover:text-green-400 transition-colors text-xs" />
+                </a>
+              ))}
             </div>
           </div>
         </div>
@@ -435,8 +524,26 @@ const HomePage = async () => {
             </a>
           </div>
 
-          <div className="text-center">
-            <p className="text-gray-600 uppercase tracking-widest text-xs mb-6">Follow Us</p>
+          {/* Footer brand + socials */}
+          <div className="text-center border-t border-gray-800 pt-10">
+            {/* Logo */}
+            <div className="flex flex-col items-center gap-3 mb-8">
+              <img
+                src="/images/logo.png"
+                alt="5s Arena"
+                className="w-20 h-20 rounded-full object-cover border-2 border-green-500 shadow-lg shadow-green-900/40"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+              <p
+                className="font-black uppercase text-white text-2xl tracking-wide"
+                style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+              >
+                5S ARENA
+              </p>
+              <p className="text-gray-500 text-sm">Cape Town&apos;s Premier 5-a-Side Venue · Milnerton</p>
+            </div>
+
+            <p className="text-gray-600 uppercase tracking-widest text-xs mb-4">Follow Us</p>
             <div className="flex justify-center gap-4">
               {[
                 { icon: <FaFacebook size={20} />, href: 'https://www.facebook.com/fivesarena', label: 'Facebook' },
