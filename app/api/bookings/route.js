@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/authOptions';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Court from '@/models/Court';
+import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
 
 // GET /api/bookings — get all bookings for the logged-in user
 export async function GET() {
@@ -125,7 +126,6 @@ if (hasOverlap) {
     }
 
     return NextResponse.json(booking, { status: 201 });
-;
   } catch (error) {
     console.error('POST /api/bookings error:', error);
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
