@@ -6,32 +6,32 @@ import {
 } from 'react-icons/fa';
 
 // ─── static data ─────────────────────────────────────────────
-const EVENTS = [
-  {
-    emoji: '🎂',
-    title: 'Birthday Parties',
-    desc: 'Private court booking with catering options and clubhouse access for the whole squad.',
-    border: 'border-t-green-500',
-  },
-  {
-    emoji: '🏆',
-    title: 'Tournaments',
-    desc: "Organise your own 5v5 event. We provide the facilities — you bring the teams.",
-    border: 'border-t-yellow-500',
-  },
-  {
-    emoji: '💼',
-    title: 'Corporate Events',
-    desc: '5-a-side is the perfect team-building activity for businesses of all sizes and industries.',
-    border: 'border-t-blue-500',
-  },
-  {
-    emoji: '⚽',
-    title: 'Holiday Clinics',
-    desc: 'Keep the kids active during school holidays with coached football clinics for all skill levels.',
-    border: 'border-t-purple-500',
-  },
-];
+  const EVENTS = [
+      {
+        image: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&q=80',
+        title: 'Birthday Parties',
+        desc: 'Private court hire with full access to our bar & clubhouse. Catering options available. Perfect for groups of all sizes — book the pitch, celebrate in style.',
+        border: 'border-t-green-500',
+      },
+      {
+        image: 'https://images.unsplash.com/photo-1599232288126-7f26b2030a28?w=600&q=80',
+        title: 'Tournaments',
+        desc: 'Organise your own 5v5 tournament on our floodlit courts. We provide the venue, sound system and bar — you bring the teams and the competitive spirit.',
+        border: 'border-t-yellow-500',
+      },
+      {
+        image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80',
+        title: 'Corporate Events',
+        desc: 'The ultimate team-building day out. Use our courts, clubhouse bar and restaurant to host a full corporate event your team will never forget.',
+        border: 'border-t-blue-500',
+      },
+      {
+        image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80',
+        title: 'Holiday Clinics',
+        desc: 'Coached football clinics for all ages and skill levels during school holidays. Great way to keep the kids active, improving and having fun.',
+        border: 'border-t-purple-500',
+      },
+  ];
 
 const AMENITIES = [
   'Floodlit Courts', 'Sound System', 'Clubhouse Restaurant',
