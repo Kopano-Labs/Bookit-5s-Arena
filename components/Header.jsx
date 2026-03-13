@@ -39,14 +39,22 @@ const Header = () => {
                       <FaCalendarAlt className="inline mr-1" /> Bookings
                     </Link>
 
-              {session.user.role === 'admin' && (
-                  <Link
-                      href="/courts/add"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                    >
-                      Add Court
-                  </Link>
-              )}
+                {session.user.role === 'admin' && (
+                  <>
+                      <Link
+                        href="/admin/dashboard"
+                        className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/courts/add"
+                        className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
+                      >
+                        Add Court
+                    </Link>
+                  </>
+                )}
 
                   </>
                 )}
