@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaSignInAlt, FaGoogle, FaFacebook, FaApple } from 'react-icons/fa';
+import { FaSignInAlt, FaGoogle, FaFacebook, FaUserSecret } from 'react-icons/fa';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -14,7 +14,6 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [facebookLoading, setFacebookLoading] = useState(false);
-  const [appleLoading, setAppleLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,13 +39,8 @@ const LoginPage = () => {
     await signIn('facebook', { callbackUrl: '/' });
   };
 
-  const handleAppleSignIn = async () => {
-    setAppleLoading(true);
-    await signIn('apple', { callbackUrl: '/' });
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center py-16 px-4 relative overflow-hidden bg-gray-950">
+    <div className="min-h-screen flex items-center justify-center py-16 px-4 relative overflow-hidden">
 
       {/* ── Animated background ── */}
       <div className="fixed inset-0 -z-10 overflow-hidden bg-gray-950">
@@ -154,14 +148,18 @@ const LoginPage = () => {
             <FaFacebook className="text-white text-base" />
             {facebookLoading ? 'Redirecting...' : 'Continue with Facebook'}
           </button>
-          <button
-            onClick={handleAppleSignIn}
-            disabled={appleLoading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-black hover:bg-gray-800 transition-all disabled:opacity-50 shadow-sm"
+        </div>
+
+        {/* Guest access */}
+        <div className="mb-4">
+          <Link
+            href="/"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-gray-500 border border-dashed border-gray-300 hover:border-gray-400 hover:text-gray-700 transition-all"
           >
-            <FaApple className="text-white text-base" />
-            {appleLoading ? 'Redirecting...' : 'Continue with Apple'}
-          </button>
+            <FaUserSecret className="text-base" />
+            Browse as Guest
+            <span className="ml-1 text-xs font-normal text-gray-400">(limited access)</span>
+          </Link>
         </div>
 
         <div className="relative mb-6">
