@@ -178,10 +178,10 @@ const HomePage = async () => {
                   href={`/courts/${court._id}`}
                   className="group bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 block"
                 >
-                  {court.image_url ? (
+                  {court.image ? (
                     <div className="relative h-52 overflow-hidden">
                       <img
-                        src={court.image_url}
+                        src={`/images/courts/${court.image}`}
                         alt={court.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -207,7 +207,7 @@ const HomePage = async () => {
                     </div>
                   )}
                   <div className="p-5">
-                    {!court.image_url && (
+                    {!court.image && (
                       <h3 className="font-black text-xl uppercase mb-2">{court.name}</h3>
                     )}
                     {court.description && (
