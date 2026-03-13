@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
+import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
 
 // GET /api/bookings/:id — fetch a single booking (owner or admin)
 export async function GET(request, { params }) {
@@ -94,9 +95,24 @@ export async function PUT(request, { params }) {
     booking.start_time = start_time;
     booking.duration = duration;
     booking.total_price = booking.court.price_per_hour * duration;
-    await booking.save();
+        await booking.save();
 
-    return NextResponse.json(booking, { status: 200 });
+          try {
+            await sendBookingConfirmation({
+              to: session.user.email,
+              name: session.user.name,
+              courtName: booking.court.name,
+              date: booking.date,
+              start_time: booking.start_time,
+              duration: booking.duration,
+              total_price: booking.total_price,
+              type: 'update',
+            });
+          } catch (emailError) {
+            console.error('Failed to send update email:', emailError);
+          }
+
+          return NextResponse.json(booking, { status: 200 });
   } catch (error) {
     console.error('PUT /api/bookings/:id error:', error);
     return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
