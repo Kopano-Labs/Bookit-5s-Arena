@@ -6,9 +6,30 @@ import Image from 'next/image';
 import Heading from '@/components/Heading';
 import { FaFutbol, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 
+    const MyCourtsPage = () => {
+      const [courts, setCourts] = useState([]);
+      const [loading, setLoading] = useState(true);
 
-const MyCourtsPage = () => {
-  return (
+      useEffect(() => {
+        const fetchCourts = async () => {
+          const res = await fetch('/api/courts?mine=true');
+          const data = await res.json();
+          setCourts(data);
+          setLoading(false);
+        };
+        fetchCourts();
+      }, []);
+
+      const handleDelete = async (id) => {
+        if (!confirm('Are you sure you want to delete this court?')) return;
+        await fetch(`/api/courts/${id}`, { method: 'DELETE' });
+        setCourts((prev) => prev.filter((c) => c._id !== id));
+      };
+
+      if (loading) return <div className="text-center py-10 text-gray-500">Loading...</div>;
+
+      return (
+
     <>
       <Heading title="My Courts" />
       <div className="max-w-4xl mx-auto">
