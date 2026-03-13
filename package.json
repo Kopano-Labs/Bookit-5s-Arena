@@ -1,7 +1,7 @@
 {
   "name": "bookit-5s-arena",
   "version": "0.1.0",
-  "type": "module", 
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -18,7 +18,8 @@
     "next-auth": "^4.24.13",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "resend": "^6.9.3"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
