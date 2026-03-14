@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaCalendarAlt, FaClock, FaFutbol, FaLock } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaFutbol, FaLock, FaCreditCard } from 'react-icons/fa';
 
 const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const { data: session } = useSession();
@@ -34,7 +34,8 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
 
     setLoading(true);
 
-    const res = await fetch('/api/bookings', {
+    // Create checkout session via Stripe
+    const res = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -46,17 +47,15 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
     });
 
     const data = await res.json();
-    setLoading(false);
 
     if (!res.ok) {
       setError(data.error || 'Failed to create booking. Please try again.');
+      setLoading(false);
       return;
     }
 
-    const encodedName = encodeURIComponent(courtName || courtId);
-    router.push(
-      `/bookings/success?court=${encodedName}&date=${date}&time=${startTime}&duration=${duration}&total=${totalPrice}`
-    );
+    // Redirect to Stripe hosted checkout
+    window.location.href = data.url;
   };
 
   const inputClass =
@@ -157,14 +156,32 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full py-3.5 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
           style={{
             background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)',
             boxShadow: '0 0 25px rgba(34,197,94,0.35)',
           }}
         >
-          {loading ? 'Booking...' : session ? 'Book Court' : 'Sign In to Book'}
+          {loading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Redirecting to Payment...
+            </>
+          ) : session ? (
+            <>
+              <FaCreditCard size={14} />
+              Pay & Book Court — R{totalPrice}
+            </>
+          ) : (
+            'Sign In to Book'
+          )}
         </button>
+
+        {session && (
+          <p className="text-center text-xs text-gray-600 flex items-center justify-center gap-1.5">
+            <span>🔒</span> Secured by Stripe · Your card details are never stored on our servers
+          </p>
+        )}
       </form>
     </div>
   );
