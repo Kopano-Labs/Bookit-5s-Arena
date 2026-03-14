@@ -7,6 +7,10 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  /* Hide scrollbar for swipe carousels */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes rollRight {
