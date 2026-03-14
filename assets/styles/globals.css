@@ -31,18 +31,19 @@
   background-position: center;
 }
 
-/* ── Court card / detail — slower, subtler Ken Burns for card images ── */
+/* ── Court card / detail — smooth Ken Burns matching hero intensity ── */
 @keyframes kenBurnsSlow {
-  0%   { transform: scale(1.04) translate(0%, 0%); }
-  20%  { transform: scale(1.10) translate(-1.5%, 1%); }
-  40%  { transform: scale(1.07) translate(1.5%, -1%); }
-  60%  { transform: scale(1.12) translate(-1%, 1.5%); }
-  80%  { transform: scale(1.08) translate(1%, -0.5%); }
-  100% { transform: scale(1.04) translate(0%, 0%); }
+  0%   { transform: scale(1.08) translate(0%, 0%); }
+  15%  { transform: scale(1.16) translate(-2%, 1.5%); }
+  30%  { transform: scale(1.12) translate(1.8%, -1.2%); }
+  50%  { transform: scale(1.18) translate(-1.5%, 2%); }
+  70%  { transform: scale(1.14) translate(2%, -1%); }
+  85%  { transform: scale(1.10) translate(-0.5%, 0.8%); }
+  100% { transform: scale(1.08) translate(0%, 0%); }
 }
 
 .court-card-bg {
-  animation: kenBurnsSlow 35s ease-in-out infinite;
+  animation: kenBurnsSlow 24s ease-in-out infinite;
   will-change: transform;
   transform-origin: center center;
 }

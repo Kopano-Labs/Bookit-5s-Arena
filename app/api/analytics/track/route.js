@@ -18,7 +18,24 @@ export async function POST(request) {
     const body = await request.json();
     const { path, event = 'pageview', meta = {} } = body;
 
-    if (!path) return NextResponse.json({ error: 'path required' }, { status: 400 });
+    if (!path || typeof path !== 'string') return NextResponse.json({ error: 'path required' }, { status: 400 });
+
+    // Validate input types and lengths to prevent abuse
+    if (typeof event !== 'string' || event.length > 50) {
+      return NextResponse.json({ error: 'Invalid event' }, { status: 400 });
+    }
+    if (path.length > 500) {
+      return NextResponse.json({ error: 'Path too long' }, { status: 400 });
+    }
+    // Sanitize meta — only allow simple string values, no nested objects/operators
+    const sanitizedMeta = {};
+    if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
+      for (const [key, val] of Object.entries(meta)) {
+        if (typeof key === 'string' && key.length < 50 && !key.startsWith('$')) {
+          sanitizedMeta[key] = typeof val === 'string' ? val.slice(0, 200) : String(val).slice(0, 200);
+        }
+      }
+    }
 
     // Get or create session ID from cookie
     const cookieStore = await cookies();
@@ -49,7 +66,7 @@ export async function POST(request) {
       userId,
       device,
       event,
-      meta,
+      meta: sanitizedMeta,
     });
 
     const response = NextResponse.json({ ok: true });

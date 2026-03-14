@@ -46,6 +46,21 @@ export async function POST(request) {
       );
     }
 
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(courtId)) {
+      return NextResponse.json({ error: 'Invalid court ID' }, { status: 400 });
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+      return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+    }
+
+    // Validate duration is a number in allowed range
+    if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
+      return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
+    }
+
     await connectDB();
 
     // Check the court exists

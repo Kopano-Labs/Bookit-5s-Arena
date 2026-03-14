@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaFutbol, FaClock, FaMoneyBillWave, FaMapMarkerAlt,
   FaTrophy, FaStar, FaArrowRight, FaLock, FaUserPlus,
-  FaFire, FaGift, FaChartLine,
+  FaFire, FaGift, FaChartLine, FaShareAlt, FaCopy,
+  FaWhatsapp, FaTwitter, FaFacebook, FaUser, FaUsers,
+  FaGlobeAfrica, FaCheck,
 } from 'react-icons/fa';
 import InfoTooltip from '@/components/InfoTooltip';
 
@@ -48,10 +49,23 @@ function StatCard({ icon, label, value, color, delay, tooltip }) {
 
 export default function RewardsPage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [referralData, setReferralData] = useState(null);
+  const [referralLoading, setReferralLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  // Fetch referral data when the referrals tab is active
+  useEffect(() => {
+    if (activeTab !== 'referrals' || status !== 'authenticated') return;
+    setReferralLoading(true);
+    fetch('/api/referral')
+      .then((r) => r.json())
+      .then((d) => { setReferralData(d); setReferralLoading(false); })
+      .catch(() => setReferralLoading(false));
+  }, [activeTab, status]);
 
   useEffect(() => {
     if (status === 'unauthenticated') return;
@@ -133,6 +147,7 @@ export default function RewardsPage() {
     { id: 'achievements', label: 'Achievements', icon: <FaTrophy size={11} /> },
     { id: 'history', label: 'My Bookings', icon: <FaFutbol size={11} /> },
     { id: 'perks', label: 'Perks', icon: <FaGift size={11} /> },
+    { id: 'referrals', label: 'Referrals', icon: <FaShareAlt size={11} /> },
   ];
 
   return (
@@ -528,6 +543,238 @@ export default function RewardsPage() {
               >
                 WhatsApp to Redeem Perks
               </motion.a>
+            </motion.div>
+          )}
+
+          {/* ── REFERRALS TAB ── */}
+          {activeTab === 'referrals' && (
+            <motion.div
+              key="referrals"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.35 }}
+              className="space-y-5"
+            >
+              {referralLoading || !referralData ? (
+                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center">
+                  <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                  <p className="text-green-400 animate-pulse font-semibold text-sm">Loading referral data...</p>
+                </div>
+              ) : (
+                <>
+                  {/* Your Referral Code */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0 }}
+                    className="bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center"
+                  >
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-3 flex items-center justify-center gap-1">
+                      <FaShareAlt className="text-green-400" /> Your Referral Code
+                    </p>
+                    <div className="inline-flex items-center gap-3 bg-gray-800 border border-gray-700 rounded-xl px-6 py-4 mb-4">
+                      <span className="text-3xl font-black text-green-400 tracking-[0.3em] font-mono">
+                        {referralData.referralCode}
+                      </span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(referralData.referralCode);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
+                        }}
+                        className={`p-2 rounded-lg transition-all ${copied ? 'bg-green-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white hover:bg-gray-600'}`}
+                        title="Copy code"
+                      >
+                        {copied ? <FaCheck size={14} /> : <FaCopy size={14} />}
+                      </button>
+                    </div>
+                    <p className="text-gray-500 text-xs">Share this code with friends. When they register, you both earn rewards!</p>
+                  </motion.div>
+
+                  {/* Share Buttons */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.07 }}
+                    className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+                  >
+                    <a
+                      href={`https://wa.me/?text=Join%20me%20at%205s%20Arena%20and%20earn%20rewards!%20Use%20my%20code%20${referralData.referralCode}%20when%20you%20register:%20${encodeURIComponent(referralData.shareUrl)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-green-800/30 border border-green-700/50 text-green-400 text-xs font-bold uppercase tracking-widest hover:bg-green-800/50 transition-all"
+                    >
+                      <FaWhatsapp size={16} /> WhatsApp
+                    </a>
+                    <a
+                      href={`https://twitter.com/intent/tweet?text=Join%20me%20at%205s%20Arena%20and%20earn%20rewards!%20Use%20my%20code%20${referralData.referralCode}&url=${encodeURIComponent(referralData.shareUrl)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-800/30 border border-blue-700/50 text-blue-400 text-xs font-bold uppercase tracking-widest hover:bg-blue-800/50 transition-all"
+                    >
+                      <FaTwitter size={16} /> Twitter
+                    </a>
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralData.shareUrl)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-900/30 border border-blue-800/50 text-blue-300 text-xs font-bold uppercase tracking-widest hover:bg-blue-900/50 transition-all"
+                    >
+                      <FaFacebook size={16} /> Facebook
+                    </a>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(referralData.shareUrl);
+                        setCopiedLink(true);
+                        setTimeout(() => setCopiedLink(false), 2000);
+                      }}
+                      className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                        copiedLink
+                          ? 'bg-green-800/50 border border-green-600/60 text-green-300'
+                          : 'bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:bg-gray-800 hover:text-white'
+                      }`}
+                    >
+                      {copiedLink ? <><FaCheck size={14} /> Copied!</> : <><FaCopy size={14} /> Copy Link</>}
+                    </button>
+                  </motion.div>
+
+                  {/* 5-Stage Referral Chain Visual */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.14 }}
+                    className="bg-gray-900 border border-gray-800 rounded-2xl p-6"
+                  >
+                    <h3 className="text-sm font-black uppercase tracking-widest text-white mb-1 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                      <FaUsers className="text-green-400" /> 5-Stage Referral Chain
+                    </h3>
+                    <p className="text-gray-500 text-xs mb-5">Earn points when your referrals invite others — up to 5 levels deep!</p>
+
+                    <div className="space-y-3">
+                      {[
+                        { level: 1, label: 'Direct Invite', points: 200, icon: <FaUser className="text-green-400" />, color: 'green' },
+                        { level: 2, label: "Invite's Invite", points: 100, icon: <FaUsers className="text-emerald-400" />, color: 'emerald' },
+                        { level: 3, label: 'Level 3', points: 50, icon: <FaUsers className="text-teal-400" />, color: 'teal' },
+                        { level: 4, label: 'Level 4', points: 25, icon: <FaGlobeAfrica className="text-cyan-400" />, color: 'cyan' },
+                        { level: 5, label: 'Level 5', points: 10, icon: <FaGlobeAfrica className="text-sky-400" />, color: 'sky' },
+                      ].map((lvl, i) => {
+                        const chainAtLevel = referralData.chain.filter((c) => c.level === lvl.level);
+                        return (
+                          <motion.div
+                            key={lvl.level}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 + i * 0.08, duration: 0.4 }}
+                            className="flex items-center gap-3"
+                          >
+                            {/* Level indicator */}
+                            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center text-lg">
+                              {lvl.icon}
+                            </div>
+                            {/* Bar */}
+                            <div className="flex-1 bg-gray-800 rounded-xl p-3 flex items-center justify-between border border-gray-700/50">
+                              <div>
+                                <p className="text-white text-sm font-bold">{lvl.label}</p>
+                                <p className="text-gray-500 text-xs">{chainAtLevel.length} {chainAtLevel.length === 1 ? 'person' : 'people'}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-green-400 font-black text-sm">+{lvl.points} pts</p>
+                                <p className="text-gray-600 text-[10px]">per referral</p>
+                              </div>
+                            </div>
+                            {/* Connector line */}
+                            {i < 4 && (
+                              <div className="absolute left-9 w-0.5 h-3 bg-gray-700 hidden" />
+                            )}
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Trickle-down visual */}
+                    <div className="mt-5 pt-4 border-t border-gray-800 text-center">
+                      <p className="text-gray-500 text-xs">
+                        When someone you invite brings a friend, you earn <span className="text-green-400 font-bold">100 pts</span>.
+                        Their friend invites someone? You earn <span className="text-green-400 font-bold">50 pts</span>, and so on!
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Referral Stats */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.21 }}
+                  >
+                    <div className="grid grid-cols-3 gap-4">
+                      <StatCard
+                        icon={<FaStar />}
+                        label="Referral Points"
+                        value={referralData.referralPoints.toLocaleString()}
+                        color="text-green-400"
+                        delay={0}
+                        tooltip="Total points earned from referrals"
+                      />
+                      <StatCard
+                        icon={<FaUserPlus />}
+                        label="Direct Referrals"
+                        value={referralData.directReferrals}
+                        color="text-blue-400"
+                        delay={0.07}
+                        tooltip="People who used your code directly"
+                      />
+                      <StatCard
+                        icon={<FaUsers />}
+                        label="Total Chain"
+                        value={referralData.totalChainSize}
+                        color="text-purple-400"
+                        delay={0.14}
+                        tooltip="Everyone in your referral network across all levels"
+                      />
+                    </div>
+                  </motion.div>
+
+                  {/* Recent Referrals */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.28 }}
+                    className="bg-gray-900 border border-gray-800 rounded-2xl p-5"
+                  >
+                    <h3 className="text-sm font-black uppercase tracking-widest text-white mb-4 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                      <FaChartLine className="text-green-400" /> Recent Referrals
+                    </h3>
+                    {referralData.chain.length === 0 ? (
+                      <div className="text-center py-8">
+                        <FaShareAlt className="text-3xl text-gray-700 mx-auto mb-3" />
+                        <p className="text-gray-500 font-semibold text-sm">No referrals yet</p>
+                        <p className="text-gray-600 text-xs mt-1">Share your code to start earning points!</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {referralData.chain.slice(0, 10).map((entry, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -16 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 + i * 0.05, duration: 0.35 }}
+                            className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-gray-800/50 border border-gray-700/30 hover:border-gray-700 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-gray-700 border border-gray-600 flex items-center justify-center text-xs text-gray-400 font-bold flex-shrink-0">
+                                {entry.name?.[0] || '?'}
+                              </div>
+                              <div>
+                                <p className="text-white text-sm font-semibold">{entry.name}</p>
+                                <p className="text-gray-500 text-xs">Level {entry.level}</p>
+                              </div>
+                            </div>
+                            <span className="text-green-400 font-bold text-sm">+{entry.pointsEarned} pts</span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                </>
+              )}
             </motion.div>
           )}
 

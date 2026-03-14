@@ -14,6 +14,30 @@ export async function POST(request) {
       );
     }
 
+    // Validate types to prevent NoSQL injection
+    if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
+      return NextResponse.json(
+        { error: 'Invalid input types' },
+        { status: 400 }
+      );
+    }
+
+    // Validate name length
+    if (name.trim().length < 2 || name.trim().length > 100) {
+      return NextResponse.json(
+        { error: 'Name must be between 2 and 100 characters' },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { error: 'Please enter a valid email address' },
+        { status: 400 }
+      );
+    }
+
     // ── Verify Google reCAPTCHA token (server-side) ──────────────
     if (!recaptchaToken) {
       return NextResponse.json(
@@ -52,7 +76,8 @@ export async function POST(request) {
       );
     }
 
-    const user = await User.create({ name, email, password });
+    // Only pass whitelisted fields — prevent mass-assignment (e.g. injecting role: 'admin')
+    const user = await User.create({ name: name.trim(), email: email.trim().toLowerCase(), password });
 
     return NextResponse.json(
       { message: 'Account created successfully', userId: user._id },

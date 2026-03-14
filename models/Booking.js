@@ -59,6 +59,9 @@ BookingSchema.index({ court: 1, date: 1, start_time: 1 }, { unique: true });
 // In dev, hot-reload can leave a stale model in mongoose.models with the old schema.
 // Always delete and re-register so schema changes (new fields, new enum values) take effect immediately.
 if (mongoose.models.Booking) {
-  delete mongoose.models['Booking'];
+  try { mongoose.deleteModel('Booking'); } catch { /* ignore */ }
+}
+if (mongoose.modelSchemas?.Booking) {
+  delete mongoose.modelSchemas.Booking;
 }
 export default mongoose.model('Booking', BookingSchema);

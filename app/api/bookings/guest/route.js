@@ -20,6 +20,31 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Name, email and phone number are required for guest reservations.' }, { status: 400 });
     }
 
+    // Validate ObjectId format to prevent NoSQL injection
+    if (!/^[a-fA-F0-9]{24}$/.test(courtId)) {
+      return NextResponse.json({ error: 'Invalid court ID.' }, { status: 400 });
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+      return NextResponse.json({ error: 'Invalid date format.' }, { status: 400 });
+    }
+
+    // Validate start_time format (HH:MM)
+    if (!/^\d{2}:\d{2}$/.test(start_time)) {
+      return NextResponse.json({ error: 'Invalid start time format.' }, { status: 400 });
+    }
+
+    // Validate duration is an integer in allowed range
+    if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
+      return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours.' }, { status: 400 });
+    }
+
+    // Validate guest name length
+    if (typeof guestName !== 'string' || guestName.trim().length < 2 || guestName.trim().length > 100) {
+      return NextResponse.json({ error: 'Name must be between 2 and 100 characters.' }, { status: 400 });
+    }
+
     // Basic email validation
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
       return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
@@ -56,9 +81,9 @@ export async function POST(request) {
 
     const total_price = court.price_per_hour * duration;
 
+    // Build booking — omit `user` so Mongoose uses schema default (null)
     const booking = await Booking.create({
       court: courtId,
-      user: null,
       guestName: guestName.trim(),
       guestEmail: guestEmail.trim().toLowerCase(),
       guestPhone: guestPhone.trim(),
@@ -73,6 +98,16 @@ export async function POST(request) {
     return NextResponse.json(booking, { status: 201 });
   } catch (error) {
     console.error('POST /api/bookings/guest error:', error);
-    return NextResponse.json({ error: 'Failed to create reservation.' }, { status: 500 });
+
+    // Provide a cleaner user-facing message
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((e) => e.message);
+      return NextResponse.json(
+        { error: `Reservation could not be processed. Please try again or contact us via WhatsApp.` },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({ error: 'Something went wrong. Please try again or contact us via WhatsApp.' }, { status: 500 });
   }
 }

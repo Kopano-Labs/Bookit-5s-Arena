@@ -24,11 +24,14 @@
                 const match = {};
                 if (from || to) {
                 match.date = {};
-                if (from) match.date.$gte = from;
-                if (to) match.date.$lte = to;
+                if (from && /^\d{4}-\d{2}-\d{2}$/.test(from)) match.date.$gte = from;
+                if (to && /^\d{4}-\d{2}-\d{2}$/.test(to)) match.date.$lte = to;
                 }
-                if (status) match.status = status;
-                if (court) match.court = court;
+                // Validate status against allowed enum to prevent NoSQL injection
+                const allowedStatuses = ['pending', 'confirmed', 'cancelled'];
+                if (status && allowedStatuses.includes(status)) match.status = status;
+                // Validate court ObjectId format
+                if (court && /^[a-fA-F0-9]{24}$/.test(court)) match.court = court;
 
                 const bookings = await Booking.find(match)
                 .populate('court', 'name price_per_hour')
@@ -39,6 +42,6 @@
                 return NextResponse.json(bookings);
             } catch (error) {
                 console.error('Admin bookings error:', error);
-                return NextResponse.json({ error: error.message }, { status: 500 });
+                return NextResponse.json({ error: 'Failed to fetch bookings' }, { status: 500 });
             }
             }

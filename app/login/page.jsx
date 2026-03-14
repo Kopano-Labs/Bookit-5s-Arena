@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaSignInAlt, FaGoogle, FaUserSecret } from 'react-icons/fa';
 import ArenaBackground from '@/components/ArenaBackground';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const LoginPage = () => {
   const router = useRouter();

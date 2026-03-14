@@ -8,6 +8,7 @@ import {
   FaUserEdit, FaEnvelope, FaArrowLeft, FaCheckCircle,
   FaCamera, FaAt,
   FaUser, FaLock, FaBell, FaBellSlash, FaTrophy, FaChevronDown, FaLink,
+  FaShareAlt, FaGift,
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import InfoTooltip from '@/components/InfoTooltip';
@@ -99,8 +100,8 @@ const ProfilePage = () => {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
-  // Which accordion sections are open
-  const [openSections, setOpenSections] = useState({ profile: true, security: false, comms: false, benefits: true });
+  // Which accordion sections are open — all start collapsed; user clicks to expand
+  const [openSections, setOpenSections] = useState({ profile: false, security: false, comms: false, benefits: false, refer: false });
 
   const toggleSection = (id) =>
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -318,6 +319,11 @@ const ProfilePage = () => {
         <form onSubmit={handleSubmit}>
 
           {/* 1. Profile Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          >
           <AccordionSection
             id="profile"
             icon={FaUser}
@@ -379,8 +385,14 @@ const ProfilePage = () => {
               />
             </Field>
           </AccordionSection>
+          </motion.div>
 
           {/* 2. Security */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          >
           <AccordionSection
             id="security"
             icon={FaLock}
@@ -420,8 +432,14 @@ const ProfilePage = () => {
               />
             </Field>
           </AccordionSection>
+          </motion.div>
 
           {/* 3. Communications */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
           <AccordionSection
             id="comms"
             icon={newsletterOptIn ? FaBell : FaBellSlash}
@@ -473,8 +491,14 @@ const ProfilePage = () => {
               </div>
             </div>
           </AccordionSection>
+          </motion.div>
 
           {/* 4. Member Benefits */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
           <AccordionSection
             id="benefits"
             icon={FaTrophy}
@@ -550,6 +574,58 @@ const ProfilePage = () => {
               </Link>
             </div>
           </AccordionSection>
+          </motion.div>
+
+          {/* 5. Share & Refer */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          >
+          <AccordionSection
+            id="refer"
+            icon={FaShareAlt}
+            iconColor="text-purple-400"
+            title="Share & Refer"
+            summary="Earn bonus points by inviting friends"
+            isOpen={openSections.refer}
+            onToggle={toggleSection}
+          >
+            <div className="bg-gradient-to-r from-purple-900/20 to-gray-800/30 border border-purple-800/40 rounded-xl p-4 text-sm">
+              <p className="text-purple-400 font-bold mb-2 flex items-center gap-2">
+                <FaGift /> Invite Friends — Earn Rewards
+                <InfoTooltip
+                  text="Share your referral link. When someone signs up and books, you earn points. The referral chain goes 5 levels deep — if your friend refers someone, you still earn!"
+                  position="top"
+                />
+              </p>
+              <p className="text-gray-400 text-xs mb-3">
+                Every friend who joins and books earns you <span className="text-purple-300 font-bold">200 points</span>.
+                The chain goes <span className="text-purple-300 font-bold">5 levels deep</span> — their referrals earn you points too!
+              </p>
+              <div className="grid grid-cols-5 gap-1 mb-3">
+                {[
+                  { level: 'L1', pts: '200', opacity: 'opacity-100' },
+                  { level: 'L2', pts: '100', opacity: 'opacity-85' },
+                  { level: 'L3', pts: '50', opacity: 'opacity-70' },
+                  { level: 'L4', pts: '25', opacity: 'opacity-55' },
+                  { level: 'L5', pts: '10', opacity: 'opacity-40' },
+                ].map((l) => (
+                  <div key={l.level} className={`text-center py-2 rounded-lg bg-purple-900/30 border border-purple-800/30 ${l.opacity}`}>
+                    <p className="text-purple-300 text-[10px] font-bold">{l.level}</p>
+                    <p className="text-white text-xs font-black">+{l.pts}</p>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/rewards"
+                className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 font-bold transition-colors"
+              >
+                <FaShareAlt size={10} /> View Referrals & Share Link →
+              </Link>
+            </div>
+          </AccordionSection>
+          </motion.div>
 
           {/* Submit — outside accordions, full width */}
           <motion.button

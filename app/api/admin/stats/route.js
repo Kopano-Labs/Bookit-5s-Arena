@@ -24,8 +24,10 @@ export async function GET(request) {
     const today = new Date().toISOString().split('T')[0];
 
     const match = { status: { $ne: 'cancelled' } };
-    if (from) match.date = { ...match.date, $gte: from };
-    if (to) match.date = { ...match.date, $lte: to };
+    // Validate date formats to prevent injection
+    if (from && /^\d{4}-\d{2}-\d{2}$/.test(from)) match.date = { ...match.date, $gte: from };
+    if (to && /^\d{4}-\d{2}-\d{2}$/.test(to)) match.date = { ...match.date, $lte: to };
+    // Only allow known status filters
     if (statusFilter === 'upcoming') match.date = { ...match.date, $gte: today };
     if (statusFilter === 'past') match.date = { ...match.date, $lt: today };
 

@@ -21,10 +21,20 @@ export async function POST(request) {
     const { bookingId } = await request.json();
     if (!bookingId) return Response.json({ error: 'Missing bookingId' }, { status: 400 });
 
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(bookingId)) {
+      return Response.json({ error: 'Invalid booking ID' }, { status: 400 });
+    }
+
     await connectDB();
 
     const booking = await Booking.findById(bookingId).populate('court', 'name image');
     if (!booking) return Response.json({ error: 'Booking not found' }, { status: 404 });
+
+    // Verify the logged-in user owns this booking (prevent IDOR)
+    if (!booking.user || booking.user.toString() !== session.user.id) {
+      return Response.json({ error: 'Not authorised' }, { status: 403 });
+    }
 
     // Already confirmed and paid — just return populated booking
     if (booking.paymentStatus === 'paid') {

@@ -21,15 +21,6 @@ const statusBadge = (status) => {
   return map[status] || 'bg-gray-800 text-gray-400 border-gray-700';
 };
 
-const payBadge = (ps) => {
-  const map = {
-    paid: 'text-green-400',
-    unpaid: 'text-gray-500',
-    refunded: 'text-blue-400',
-  };
-  return map[ps] || 'text-gray-500';
-};
-
 const AdminDashboard = () => {
   const { data: session, status } = useSession();
   const router = useRouter();

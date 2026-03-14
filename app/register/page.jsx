@@ -7,7 +7,7 @@ import Link from 'next/link';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { FaUser, FaGoogle, FaShieldAlt } from 'react-icons/fa';
 import ArenaBackground from '@/components/ArenaBackground';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const RegisterPage = () => {
   const router = useRouter();

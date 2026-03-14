@@ -10,6 +10,12 @@ import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
+
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+    }
+
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -38,6 +44,12 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     const { id } = await params;
+
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+    }
+
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -64,6 +76,26 @@ export async function PUT(request, { params }) {
     }
 
     const { date, start_time, duration } = await request.json();
+
+    // Validate required fields
+    if (!date || !start_time || !duration) {
+      return NextResponse.json({ error: 'Date, start time and duration are required' }, { status: 400 });
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+      return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+    }
+
+    // Validate start_time format (HH:MM)
+    if (!/^\d{2}:\d{2}$/.test(start_time)) {
+      return NextResponse.json({ error: 'Invalid start time format' }, { status: 400 });
+    }
+
+    // Validate duration is an integer in allowed range
+    if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
+      return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
+    }
 
     const toMinutes = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
     const OPEN = 10 * 60, CLOSE = 22 * 60;
@@ -120,10 +152,16 @@ export async function PUT(request, { params }) {
   }
 }
 
-// DELETE /api/bookings/:id — cancel a booking (owner only)
+// DELETE /api/bookings/:id — cancel a booking (owner or admin)
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
+
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+    }
+
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -137,7 +175,10 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.user.toString() !== session.user.id) {
+    // Allow booking owner or admin to cancel
+    const isOwner = booking.user && booking.user.toString() === session.user.id;
+    const isAdmin = session.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: 'You are not authorised to cancel this booking' }, { status: 403 });
     }
 

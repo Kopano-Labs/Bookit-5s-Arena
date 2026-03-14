@@ -46,9 +46,43 @@ const UserSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    // Referral system
+    referralCode: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    referredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    referralPoints: {
+      type: Number,
+      default: 0,
+    },
+    referralChain: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        level: { type: Number, min: 1, max: 5 },
+        pointsEarned: { type: Number, default: 0 },
+      },
+    ],
   },
   { timestamps: true }
 );
+
+// Auto-generate referral code if not set
+UserSchema.pre('save', async function () {
+  if (!this.referralCode) {
+    const namePart = (this.name || 'user')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .substring(0, 4)
+      .toUpperCase();
+    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+    this.referralCode = `${namePart}${randomPart}`;
+  }
+});
 
 // Hash password before saving if it was modified
 UserSchema.pre('save', async function () {
@@ -61,4 +95,12 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+// In dev, hot-reload can leave a stale model in mongoose.models with the old schema.
+// Always delete and re-register so schema changes (new fields, new enum values) take effect immediately.
+if (mongoose.models.User) {
+  try { mongoose.deleteModel('User'); } catch { /* ignore */ }
+}
+if (mongoose.modelSchemas?.User) {
+  delete mongoose.modelSchemas.User;
+}
+export default mongoose.model('User', UserSchema);

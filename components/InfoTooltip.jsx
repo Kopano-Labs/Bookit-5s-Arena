@@ -24,17 +24,18 @@ const InfoTooltip = ({ text, position = 'top', size = 14 }) => {
 
   return (
     <span ref={ref} className="relative inline-flex items-center" style={{ verticalAlign: 'middle' }}>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
+      <span
+        role="note"
+        tabIndex={0}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
-        className="inline-flex items-center justify-center rounded-full bg-gray-700 hover:bg-green-800 border border-gray-600 hover:border-green-500 text-gray-400 hover:text-green-300 transition-all cursor-help"
+        className="inline-flex items-center justify-center rounded-full bg-gray-700 hover:bg-green-800 border border-gray-600 hover:border-green-500 text-gray-400 hover:text-green-300 transition-all cursor-help select-none"
         style={{ width: size, height: size, fontSize: size * 0.6, fontWeight: 900, fontStyle: 'italic', lineHeight: 1 }}
         aria-label="More information"
       >
         i
-      </button>
+      </span>
 
       <AnimatePresence>
         {open && (

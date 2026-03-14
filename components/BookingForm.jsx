@@ -398,7 +398,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
 
         {session && !showPayOptions && (
           <p className="text-center text-xs text-gray-600 flex items-center justify-center gap-1.5">
-            <span>Lock</span> Secured by Stripe · Your card details are never stored on our servers
+            <FaLock size={10} /> Secured by Stripe · Your card details are never stored on our servers
           </p>
         )}
       </form>

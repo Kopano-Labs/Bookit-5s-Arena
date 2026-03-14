@@ -31,8 +31,13 @@ export async function PUT(request) {
   const body = await request.json();
   const { name, username, newsletterOptIn, currentPassword, newPassword } = body;
 
-  if (!name || name.trim().length < 2) {
-    return Response.json({ error: 'Name must be at least 2 characters.' }, { status: 400 });
+  // Validate types to prevent NoSQL injection
+  if (typeof name !== 'string') {
+    return Response.json({ error: 'Invalid input.' }, { status: 400 });
+  }
+
+  if (!name || name.trim().length < 2 || name.trim().length > 100) {
+    return Response.json({ error: 'Name must be between 2 and 100 characters.' }, { status: 400 });
   }
 
   // Validate username if provided

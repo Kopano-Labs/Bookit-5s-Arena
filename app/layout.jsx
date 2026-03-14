@@ -24,7 +24,12 @@ export const metadata = {
   },
   twitter: { card: 'summary', title: '5s Arena | Cape Town Football', description: 'Book 5-a-side courts in Milnerton, Cape Town. From R400/hour.' },
   robots: { index: true, follow: true },
-  viewport: { width: 'device-width', initialScale: 1, themeColor: '#15803d' },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#15803d',
 };
 
 const RootLayout = ({ children }) => {
@@ -34,6 +39,8 @@ const RootLayout = ({ children }) => {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap" rel="stylesheet" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/images/logo.jpg" />
       </head>
       <body>
         <AuthProvider>
