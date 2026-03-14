@@ -17,6 +17,16 @@ const getCourt = async (id) => {
   }
 };
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const court = await getCourt(id);
+  if (!court) return { title: 'Court Not Found' };
+  return {
+    title: court.name,
+    description: court.description || `Book ${court.name} at 5s Arena — floodlit 5-a-side court in Milnerton, Cape Town.`,
+  };
+}
+
 const CourtPage = async ({ params }) => {
   const { id } = await params;
   const court = await getCourt(id);

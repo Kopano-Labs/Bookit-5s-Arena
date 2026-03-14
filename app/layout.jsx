@@ -1,16 +1,32 @@
+import dynamic from 'next/dynamic';
 import AuthProvider from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookNowFloat from '@/components/BookNowFloat';
-import ChatWidget from '@/components/ChatWidget';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
-import Analytics from '@/components/Analytics';
 import CookieBanner from '@/components/CookieBanner';
 import '@/assets/styles/globals.css';
 
+const ChatWidget = dynamic(() => import('@/components/ChatWidget'), { ssr: false });
+const Analytics = dynamic(() => import('@/components/Analytics'), { ssr: false });
+
 export const metadata = {
-  title: 'Bookit 5s Arena',
-  description: 'Book 5-a-side football pitches quickly and easily.',
+  title: { default: '5s Arena | 5-a-Side Football Cape Town', template: '%s | 5s Arena' },
+  description: "Cape Town's premier 5-a-side football venue. Book floodlit courts at Hellenic Football Club, Milnerton. From R400/hour. Bar, restaurant & secure parking on site.",
+  keywords: ['5-a-side football', 'Cape Town', 'Milnerton', 'court booking', 'football venue', 'Hellenic Football Club', '5s Arena'],
+  authors: [{ name: '5s Arena' }],
+  openGraph: {
+    type: 'website',
+    locale: 'en_ZA',
+    url: process.env.NEXTAUTH_URL || 'https://5sarena.co.za',
+    siteName: '5s Arena',
+    title: '5s Arena | 5-a-Side Football Cape Town',
+    description: "Cape Town's premier 5-a-side football venue in Milnerton. Floodlit courts, bar & restaurant. Book online from R400/hour.",
+    images: [{ url: '/images/logo.jpg', width: 512, height: 512, alt: '5s Arena Logo' }],
+  },
+  twitter: { card: 'summary', title: '5s Arena | Cape Town Football', description: 'Book 5-a-side courts in Milnerton, Cape Town. From R400/hour.' },
+  robots: { index: true, follow: true },
+  viewport: { width: 'device-width', initialScale: 1, themeColor: '#15803d' },
 };
 
 const RootLayout = ({ children }) => {

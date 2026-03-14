@@ -4,6 +4,8 @@ import {
   FaWhatsapp, FaInstagram, FaFacebook, FaTiktok, FaArrowRight,
 } from 'react-icons/fa';
 
+export const revalidate = 60; // revalidate page every 60 seconds
+
 // ─── static data ─────────────────────────────────────────────
   const EVENTS = [
       {
@@ -44,9 +46,7 @@ const AMENITIES = [
 // ─── server-side fetch ────────────────────────────────────────
 const getCourts = async () => {
   try {
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/courts`, {
-      cache: 'no-store',
-    });
+    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/courts`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -187,7 +187,7 @@ const HomePage = async () => {
                   >
                     {court.image ? (
                       <div className="relative h-48 overflow-hidden">
-                        <img src={`/images/courts/${court.image}`} alt={court.name} className="w-full h-full object-cover" />
+                        <img src={`/images/courts/${court.image}`} alt={court.name} loading="lazy" className="w-full h-full object-cover" />
                         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)' }} />
                         <div className="absolute bottom-4 left-4">
                           <span className="text-white font-black text-lg uppercase" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>{court.name}</span>
@@ -234,6 +234,7 @@ const HomePage = async () => {
                         <img
                           src={`/images/courts/${court.image}`}
                           alt={court.name}
+                          loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div
@@ -329,6 +330,7 @@ const HomePage = async () => {
                   <img
                     src={e.image}
                     alt={e.title}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>

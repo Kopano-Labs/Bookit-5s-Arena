@@ -1,5 +1,7 @@
 'use client';
 
+export const metadata = { title: 'Login', description: 'Sign in to your 5s Arena account to manage court bookings.' };
+
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';

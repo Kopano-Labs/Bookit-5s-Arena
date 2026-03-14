@@ -1,5 +1,7 @@
 'use client';
 
+export const metadata = { title: 'Create Account', description: 'Join 5s Arena to book 5-a-side football courts in Cape Town.' };
+
 import { useState, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
