@@ -9,6 +9,7 @@ import {
   FaUserEdit, FaLock, FaEnvelope, FaArrowLeft, FaCheckCircle,
   FaCamera, FaAt, FaBell, FaBellSlash,
 } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const ProfilePage = () => {
   const { data: session, status, update } = useSession();
@@ -151,17 +152,24 @@ const ProfilePage = () => {
         </Link>
 
         {/* Card */}
-        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-2xl">
+        <motion.div
+          className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-2xl"
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        >
 
           {/* ── Header strip with avatar ── */}
           <div className="bg-gray-800 px-8 py-6 border-b border-gray-700">
             <div className="flex items-center gap-5">
 
               {/* Clickable avatar */}
-              <div
+              <motion.div
                 className="relative flex-shrink-0 cursor-pointer group"
                 onClick={() => fileInputRef.current?.click()}
                 title="Click to change photo"
+                whileHover={{ scale: 1.08 }}
+                transition={{ duration: 0.2 }}
               >
                 {displayAvatar ? (
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
@@ -184,7 +192,7 @@ const ProfilePage = () => {
                     <FaCamera className="text-white text-xl" />
                   )}
                 </div>
-              </div>
+              </motion.div>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -243,14 +251,14 @@ const ProfilePage = () => {
                   <input
                     type="text"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
                     className="block w-full pl-9 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all placeholder-gray-500 font-mono"
-                    placeholder="your_handle"
+                    placeholder="YourHandle"
                     minLength={3}
                     maxLength={30}
                   />
                 </div>
-                <p className="text-gray-600 text-xs mt-1">3–30 characters. Letters (A–Z, a–z), numbers and underscores only.</p>
+                <p className="text-gray-600 text-xs mt-1">3–30 characters. Letters, numbers and underscores only.</p>
               </div>
 
               {/* Email (read-only) */}
@@ -353,16 +361,56 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <button
+              {/* ── Member Stats ── */}
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-700" /></div>
+                <div className="relative flex justify-center">
+                  <span className="bg-gray-900 px-3 text-gray-500 text-xs uppercase tracking-widest">Member Benefits</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Courts Booked', icon: '⚽', value: session?.user?.totalBookings ?? '—', color: 'text-green-400' },
+                  { label: 'Hours Played', icon: '⏱', value: session?.user?.totalHours ? `${session.user.totalHours}h` : '—', color: 'text-blue-400' },
+                  { label: 'Loyalty Tier', icon: '🏆', value: session?.user?.loyaltyTier ?? 'Bronze', color: 'text-yellow-400' },
+                ].map((stat) => (
+                  <motion.div
+                    key={stat.label}
+                    whileHover={{ y: -2, scale: 1.02 }}
+                    className="bg-gray-800 border border-gray-700 rounded-xl p-3 text-center"
+                  >
+                    <p className="text-xl mb-1">{stat.icon}</p>
+                    <p className={`text-sm font-black ${stat.color}`}>{stat.value}</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wide mt-0.5">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="bg-gradient-to-r from-green-900/30 to-gray-800/30 border border-green-800/40 rounded-xl p-4 text-sm">
+                <p className="text-green-400 font-bold mb-1 flex items-center gap-2">
+                  <span>⭐</span> Member Perks — Active
+                </p>
+                <ul className="text-gray-400 text-xs space-y-1">
+                  <li>✓ Priority court reservations</li>
+                  <li>✓ Booking reminders via email</li>
+                  <li>✓ Exclusive member-only promotions</li>
+                  <li>✓ 7-day advance booking window</li>
+                </ul>
+              </div>
+
+              <motion.button
                 type="submit"
                 disabled={loading}
+                whileHover={{ scale: 1.02, boxShadow: '0 0 35px rgba(34,197,94,0.5)' }}
+                whileTap={{ scale: 0.97 }}
                 className="w-full py-3.5 px-4 rounded-xl text-sm font-black text-white bg-green-600 hover:bg-green-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]"
               >
                 {loading ? 'Saving...' : 'Save Changes'}
-              </button>
+              </motion.button>
             </form>
           </div>
-        </div>
+        </motion.div>
 
         <p className="text-center text-gray-600 text-xs mt-6">
           Need help?{' '}

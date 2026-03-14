@@ -37,7 +37,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'You must be logged in to book a court' }, { status: 401 });
     }
 
-    const { courtId, date, start_time, duration } = await request.json();
+    const { courtId, date, start_time, duration, payAtVenue } = await request.json();
 
     if (!courtId || !date || !start_time || !duration) {
       return NextResponse.json(
@@ -108,6 +108,8 @@ if (hasOverlap) {
   start_time,
   duration,
   total_price,
+  status: 'pending',
+  paymentStatus: payAtVenue ? 'reserved' : 'unpaid',
 });
 
     // Send confirmation email (non-blocking — won't fail the booking if email fails)

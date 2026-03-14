@@ -37,7 +37,7 @@ const BookingSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ['unpaid', 'paid', 'refunded'],
+      enum: ['unpaid', 'paid', 'refunded', 'reserved'],
       default: 'unpaid',
     },
     stripeSessionId: {

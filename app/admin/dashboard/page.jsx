@@ -9,6 +9,7 @@ import {
   FaFilter, FaTimes, FaUsers, FaCheckCircle, FaHourglassHalf,
   FaBan, FaArrowUp, FaChartBar, FaStar,
 } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const statusBadge = (status) => {
   const map = {
@@ -103,7 +104,12 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 py-10 px-4">
+    <motion.div
+      className="min-h-screen bg-gray-950 py-10 px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* Header */}
@@ -158,17 +164,27 @@ const AdminDashboard = () => {
         </div>
 
         {/* Top stat cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+          initial="hidden"
+          animate="visible"
+        >
           {topCards.map((card) => (
-            <div key={card.label} className={`border rounded-2xl p-5 flex flex-col items-center text-center gap-2 shadow-lg ${card.bg}`}>
+            <motion.div
+              key={card.label}
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } } }}
+              whileHover={{ y: -4, scale: 1.01, transition: { duration: 0.2 } }}
+              className={`border rounded-2xl p-5 flex flex-col items-center text-center gap-2 shadow-lg ${card.bg}`}
+            >
               <div className="p-3 rounded-xl bg-gray-900/60">{card.icon}</div>
               <p className="text-2xl font-black text-white">{card.value}</p>
               <p className="text-xs text-gray-500 uppercase tracking-wide leading-tight">{card.label}</p>
               <p className="text-xs text-gray-600">{card.sub}</p>
               {card.sub2 && <p className="text-xs text-green-500 font-semibold">{card.sub2}</p>}
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Revenue trend + Status breakdown row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -289,10 +305,15 @@ const AdminDashboard = () => {
 
           {/* Court Breakdown */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
-            <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-2">
-              <FaStar className="text-yellow-400" />
-              <h3 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+            <div
+              className={`px-6 py-4 border-b border-gray-800 flex items-center gap-2 ${selectedCourt ? 'cursor-pointer hover:bg-gray-800/40 transition-colors' : ''}`}
+              onClick={() => selectedCourt && setSelectedCourt(null)}
+              title={selectedCourt ? 'Click to view all courts' : ''}
+            >
+              <FaStar className={`${selectedCourt ? 'text-green-400' : 'text-yellow-400'} transition-colors`} />
+              <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${selectedCourt ? 'text-green-400' : 'text-white'}`} style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 Court Performance
+                {selectedCourt && <span className="text-[10px] text-green-500 font-normal normal-case tracking-normal">(click to reset view)</span>}
               </h3>
             </div>
             {stats.courtBreakdown.length === 0 ? (
@@ -382,7 +403,7 @@ const AdminDashboard = () => {
         </div>
 
       </div>
-    </div>
+    </motion.div>
   );
 };
 

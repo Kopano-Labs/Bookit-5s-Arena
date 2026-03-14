@@ -2,6 +2,7 @@ import BookingForm from '@/components/BookingForm';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaChevronLeft, FaFutbol, FaMapMarkerAlt, FaClock, FaStar } from 'react-icons/fa';
+import CourtDetailClient from './CourtDetailClient';
 
 // Fetch single court from our API
 const getCourt = async (id) => {
@@ -49,7 +50,8 @@ const CourtPage = async ({ params }) => {
 
   return (
     <div className="min-h-screen bg-gray-950 py-10 px-4">
-      <div className="max-w-4xl mx-auto">
+      <CourtDetailClient>
+        <div className="max-w-4xl mx-auto">
 
         {/* Back link */}
         <Link
@@ -121,7 +123,8 @@ const CourtPage = async ({ params }) => {
             <BookingForm courtId={court._id} courtName={court.name} pricePerHour={court.price_per_hour} />
           </div>
         </div>
-      </div>
+        </div>
+      </CourtDetailClient>
     </div>
   );
 };

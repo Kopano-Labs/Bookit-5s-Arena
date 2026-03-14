@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { FaFilter, FaTimes } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const STATUS_STYLES = {
   confirmed: 'bg-green-900/40 text-green-400 border border-green-800/60',
@@ -85,11 +86,20 @@ const AdminBookings = () => {
   const inputClass = 'bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all';
 
   return (
-    <div className="min-h-screen bg-gray-950 py-10 px-4">
+    <motion.div
+      className="min-h-screen bg-gray-950 py-10 px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Page header */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+        >
           <h1
             className="text-3xl font-black uppercase tracking-widest text-white"
             style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
@@ -97,10 +107,15 @@ const AdminBookings = () => {
             Manage Bookings
           </h1>
           <p className="text-gray-500 text-sm mt-1">View and update all court reservations</p>
-        </div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-wrap gap-4 items-end shadow-lg">
+        <motion.div
+          className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-wrap gap-4 items-end shadow-lg"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">From</label>
             <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className={inputClass} />
@@ -131,7 +146,7 @@ const AdminBookings = () => {
           >
             <FaTimes size={11} /> Clear
           </button>
-        </div>
+        </motion.div>
 
         {/* Table */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
@@ -140,7 +155,12 @@ const AdminBookings = () => {
           ) : bookings.length === 0 ? (
             <p className="text-center py-16 text-gray-600">No bookings found.</p>
           ) : (
-            <div className="overflow-x-auto">
+            <motion.div
+              className="overflow-x-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-800 text-left">
@@ -183,18 +203,20 @@ const AdminBookings = () => {
                                 ? 'bg-green-900/40 text-green-400 border border-green-800/60'
                                 : b.paymentStatus === 'refunded'
                                 ? 'bg-blue-900/40 text-blue-400 border border-blue-800/60'
+                                : b.paymentStatus === 'reserved'
+                                ? 'bg-amber-900/40 text-amber-400 border border-amber-800/60'
                                 : 'bg-gray-800 text-gray-500 border border-gray-700'
                             }`}>
-                              {b.paymentStatus ?? 'unpaid'}
+                              {b.paymentStatus === 'reserved' ? '📍 Pay at Venue' : (b.paymentStatus ?? 'unpaid')}
                             </span>
                           </div>
-                          {(b.paymentStatus === 'unpaid' || !b.paymentStatus) && b.status === 'confirmed' && (
+                          {(b.paymentStatus === 'unpaid' || b.paymentStatus === 'reserved' || !b.paymentStatus) && b.status !== 'cancelled' && (
                             <button
                               onClick={() => handleMarkPaid(b._id)}
                               disabled={updating === b._id}
                               className="text-[10px] font-bold text-green-400 hover:text-green-300 border border-green-800/60 hover:border-green-600 rounded px-1.5 py-0.5 transition-all disabled:opacity-50"
                             >
-                              Mark Paid
+                              ✓ Mark Paid
                             </button>
                           )}
                         </div>
@@ -215,11 +237,11 @@ const AdminBookings = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
