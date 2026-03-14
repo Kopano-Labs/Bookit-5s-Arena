@@ -1,7 +1,5 @@
 'use client';
 
-export const metadata = { title: 'My Bookings', description: 'View and manage your 5s Arena court bookings.' };
-
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';

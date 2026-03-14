@@ -1,7 +1,5 @@
 'use client';
 
-export const metadata = { title: 'Admin Dashboard', robots: { index: false } };
-
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
