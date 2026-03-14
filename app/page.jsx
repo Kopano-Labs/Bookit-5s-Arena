@@ -205,8 +205,12 @@ const HomePage = async () => {
                           <span className="text-xl font-black text-gray-900">R{court.price_per_hour}</span>
                           <span className="text-gray-400 text-sm"> /hr</span>
                         </div>
-                        <span className="inline-flex items-center gap-1 bg-green-600 text-white font-bold px-3 py-1.5 text-xs uppercase tracking-wide">
-                          Book <FaArrowRight size={9} />
+                        <span className="inline-flex items-center gap-1.5 text-white font-black px-4 py-2 rounded-full text-xs uppercase tracking-widest"
+                          style={{
+                            background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+                            boxShadow: '0 0 14px rgba(34,197,94,0.4)',
+                          }}>
+                          Book <FaArrowRight size={8} />
                         </span>
                       </div>
                     </div>
@@ -254,8 +258,12 @@ const HomePage = async () => {
                           <span className="text-2xl font-black text-gray-900">R{court.price_per_hour}</span>
                           <span className="text-gray-400 text-sm"> /hour</span>
                         </div>
-                        <span className="inline-flex items-center gap-1 bg-green-600 hover:bg-green-500 text-white font-bold px-4 py-2 text-sm uppercase tracking-wide transition-colors">
-                          Book Now <FaArrowRight size={11} />
+                        <span className="inline-flex items-center gap-2 text-white font-black px-5 py-2.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 group-hover:scale-105"
+                          style={{
+                            background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+                            boxShadow: '0 0 18px rgba(34,197,94,0.45)',
+                          }}>
+                          BOOK NOW <FaArrowRight size={9} />
                         </span>
                       </div>
                     </div>
