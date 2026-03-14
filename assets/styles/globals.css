@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap');
 
 @layer utilities {
   .line-clamp-2 {
