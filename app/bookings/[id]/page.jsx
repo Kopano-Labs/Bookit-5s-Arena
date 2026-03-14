@@ -30,10 +30,10 @@ const BookingDetailPage = () => {
     setResending(false);
   };
 
-  const isWithin8Hours = () => {
+  const isWithin1Hour = () => {
     if (!booking) return false;
     const bookingDateTime = new Date(`${booking.date}T${booking.start_time}:00`);
-    return (bookingDateTime - new Date()) / (1000 * 60 * 60) < 8;
+    return (bookingDateTime - new Date()) / (1000 * 60 * 60) < 1;
   };
 
   if (loading) {
@@ -58,7 +58,7 @@ const BookingDetailPage = () => {
   }
 
   const court = booking.court;
-  const canEdit = !isWithin8Hours() && booking.status !== 'cancelled';
+  const canEdit = !isWithin1Hour() && booking.status !== 'cancelled';
 
   const statusStyle =
     booking.status === 'confirmed'
@@ -192,7 +192,7 @@ const BookingDetailPage = () => {
             ) : (
               <button
                 disabled
-                title={booking.status === 'cancelled' ? 'Cancelled bookings cannot be edited' : 'Cannot edit within 8 hours of start time'}
+                title={booking.status === 'cancelled' ? 'Cancelled bookings cannot be edited' : 'Cannot edit within 1 hour of start time'}
                 className="flex items-center gap-2 px-4 py-2.5 bg-gray-800/50 border border-gray-800 text-gray-600 rounded-xl text-sm cursor-not-allowed"
               >
                 <FaEdit size={12} /> Edit Booking
@@ -209,8 +209,8 @@ const BookingDetailPage = () => {
           {/* T&Cs */}
           <div className="pt-4 border-t border-gray-800">
             <p className="text-xs text-gray-600 leading-relaxed">
-              By booking a court at 5s Arena, you agree to our Terms &amp; Conditions. Bookings are non-refundable within 8 hours
-              of the scheduled start time. Cancellations made more than 8 hours in advance will be reviewed by management.
+              By booking a court at 5s Arena, you agree to our Terms &amp; Conditions. Bookings are non-refundable within 1 hour
+              of the scheduled start time. Cancellations made more than 1 hour in advance will be reviewed by management.
               5s Arena reserves the right to cancel bookings due to unforeseen circumstances, in which case a full refund or
               rebooking will be offered. Players are responsible for their own safety and that of other participants. 5s Arena
               accepts no liability for injury, loss, or damage to personal property. All bookings are subject to availability
