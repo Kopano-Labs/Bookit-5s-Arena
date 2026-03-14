@@ -21,7 +21,7 @@ export async function POST(request) {
     if (!path) return NextResponse.json({ error: 'path required' }, { status: 400 });
 
     // Get or create session ID from cookie
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     let sessionId = cookieStore.get('_sid')?.value;
     const isNewSession = !sessionId;
     if (!sessionId) sessionId = uuidv4();
