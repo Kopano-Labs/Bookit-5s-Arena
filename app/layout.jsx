@@ -5,6 +5,7 @@ import BookNowFloat from '@/components/BookNowFloat';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import CookieBanner from '@/components/CookieBanner';
 import ClientOnly from '@/components/ClientOnly';
+import PageTransition from '@/components/PageTransition';
 import '@/assets/styles/globals.css';
 
 export const metadata = {
@@ -40,7 +41,9 @@ const RootLayout = ({ children }) => {
           <ClientOnly />
           <Header />
           <main className="px-4 sm:px-6 lg:px-8 py-6">
-            {children}
+            <PageTransition>
+              {children}
+            </PageTransition>
           </main>
           <Footer />
           {/* Fixed floating elements — outside main so they overlay everything */}
