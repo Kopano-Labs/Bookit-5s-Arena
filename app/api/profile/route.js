@@ -13,34 +13,48 @@ export async function GET(request) {
   const user = await User.findById(session.user.id).select('-password');
   if (!user) return Response.json({ error: 'User not found' }, { status: 404 });
 
-  return Response.json({ name: user.name, email: user.email, image: user.image, role: user.role });
+  return Response.json({
+    name: user.name,
+    email: user.email,
+    image: user.profileImage || user.image,
+    role: user.role,
+    username: user.username || '',
+    newsletterOptIn: user.newsletterOptIn || false,
+  });
 }
 
-// PUT — update name and/or password
+// PUT — update name, username, newsletter opt-in and/or password
 export async function PUT(request) {
   const session = await getServerSession(authOptions);
   if (!session) return Response.json({ error: 'Unauthorised' }, { status: 401 });
 
   const body = await request.json();
-  const { name, currentPassword, newPassword } = body;
+  const { name, username, newsletterOptIn, currentPassword, newPassword } = body;
 
   if (!name || name.trim().length < 2) {
     return Response.json({ error: 'Name must be at least 2 characters.' }, { status: 400 });
+  }
+
+  // Validate username if provided
+  if (username && !/^[a-z0-9_]{3,30}$/.test(username)) {
+    return Response.json({ error: 'Username must be 3–30 characters: lowercase letters, numbers, underscores only.' }, { status: 400 });
   }
 
   await connectDB();
   const user = await User.findById(session.user.id);
   if (!user) return Response.json({ error: 'User not found' }, { status: 404 });
 
-  // Update name
+  // Update fields
   user.name = name.trim();
+  if (username !== undefined) user.username = username.trim() || null;
+  if (typeof newsletterOptIn === 'boolean') user.newsletterOptIn = newsletterOptIn;
 
-  // Update password only if provided
+  // Update password only if a new one was provided
   if (newPassword) {
     if (newPassword.length < 6) {
       return Response.json({ error: 'New password must be at least 6 characters.' }, { status: 400 });
     }
-    // Credentials users must verify current password
+    // Credentials users must verify current password first
     if (user.password) {
       if (!currentPassword) {
         return Response.json({ error: 'Please enter your current password to change it.' }, { status: 400 });
