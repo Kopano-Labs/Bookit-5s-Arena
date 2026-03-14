@@ -1,11 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaUser, FaGoogle, FaFacebook } from 'react-icons/fa';
+import { FaUser, FaGoogle, FaFacebook, FaShieldAlt } from 'react-icons/fa';
 
+// ── Captcha helpers ──────────────────────────────────────────────────────────
+const GRID_EMOJIS = ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓'];
+
+const makeCaptchaGrid = () =>
+  [...GRID_EMOJIS].sort(() => Math.random() - 0.5);
+
+// ── Component ────────────────────────────────────────────────────────────────
 const RegisterPage = () => {
   const router = useRouter();
   const [name, setName] = useState('');
@@ -16,14 +23,48 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [facebookLoading, setFacebookLoading] = useState(false);
-  const [captchaChecked, setCaptchaChecked] = useState(false);
+
+  // Captcha state
+  const [captchaGrid, setCaptchaGrid] = useState(() => makeCaptchaGrid());
+  const [selected, setSelected] = useState(new Set());
+  const [captchaPassed, setCaptchaPassed] = useState(false);
+  const [captchaError, setCaptchaError] = useState('');
+
+  const footballIndices = useMemo(
+    () => captchaGrid.reduce((acc, e, i) => (e === '⚽' ? [...acc, i] : acc), []),
+    [captchaGrid]
+  );
+
+  const toggleCell = (i) => {
+    if (captchaPassed) return;
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
+    setCaptchaError('');
+  };
+
+  const verifyCaptcha = () => {
+    const correct =
+      footballIndices.length === selected.size &&
+      footballIndices.every((i) => selected.has(i));
+    if (correct) {
+      setCaptchaPassed(true);
+      setCaptchaError('');
+    } else {
+      setCaptchaError('Incorrect — please try again.');
+      setSelected(new Set());
+      setCaptchaGrid(makeCaptchaGrid());
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (!captchaChecked) {
-      setError('Please confirm you are not a robot to continue.');
+    if (!captchaPassed) {
+      setError('Please complete the security check first.');
       return;
     }
     if (password !== confirmPassword) {
@@ -36,13 +77,11 @@ const RegisterPage = () => {
     }
 
     setLoading(true);
-
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password }),
     });
-
     const data = await res.json();
 
     if (!res.ok) {
@@ -53,7 +92,6 @@ const RegisterPage = () => {
 
     const result = await signIn('credentials', { email, password, redirect: false });
     setLoading(false);
-
     if (result?.error) {
       setError(result.error);
     } else {
@@ -77,37 +115,21 @@ const RegisterPage = () => {
 
       {/* ── Animated background ── */}
       <div className="fixed inset-0 -z-10 overflow-hidden bg-gray-950">
-        {/* Ambient green glow 1 */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            top: '5%', left: '10%',
-            width: '600px', height: '600px',
-            background: 'radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%)',
-          }}
-        />
-        {/* Ambient green glow 2 */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            bottom: '0%', right: '5%',
-            width: '500px', height: '500px',
-            background: 'radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)',
-          }}
-        />
-        {/* ONE massive football — green glow, rolls along the bottom */}
+        {/* Ambient glow 1 */}
+        <div className="absolute rounded-full" style={{ top: '5%', left: '10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%)' }} />
+        {/* Ambient glow 2 */}
+        <div className="absolute rounded-full" style={{ bottom: '0%', right: '5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)' }} />
+        {/* ONE massive football — green & black */}
         <div style={{
           position: 'absolute',
-          bottom: '-90px',
+          bottom: '20px',
           left: 0,
-          fontSize: '340px',
+          fontSize: '420px',
           lineHeight: 1,
           userSelect: 'none',
           pointerEvents: 'none',
-          filter:
-            'drop-shadow(0 0 50px rgba(34,197,94,0.9)) drop-shadow(0 0 100px rgba(34,197,94,0.45)) drop-shadow(0 -10px 30px rgba(74,222,128,0.3))',
+          filter: 'hue-rotate(110deg) saturate(18) brightness(0.78) drop-shadow(0 0 70px rgba(34,197,94,1)) drop-shadow(0 0 140px rgba(34,197,94,0.55))',
           animation: 'rollRightMassive 22s linear infinite',
-          animationDelay: '0s',
         }}>⚽</div>
       </div>
 
@@ -119,46 +141,33 @@ const RegisterPage = () => {
           <div className="inline-flex items-center justify-center w-14 h-14 bg-gray-900 rounded-full mb-4 shadow-lg">
             <FaUser className="text-green-400 text-xl" />
           </div>
-          <h1
-            className="text-3xl font-black uppercase tracking-tight text-gray-900"
-            style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-          >
+          <h1 className="text-3xl font-black uppercase tracking-tight text-gray-900" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
             Create Account
           </h1>
           <p className="text-gray-500 text-sm mt-1">Join 5s Arena today</p>
         </div>
 
         {error && (
-          <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-            {error}
-          </div>
+          <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">{error}</div>
         )}
 
-        {/* Social signup buttons */}
+        {/* Social signup */}
         <div className="space-y-3 mb-6">
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50 shadow-sm"
-          >
+          <button onClick={handleGoogleSignIn} disabled={googleLoading}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50 shadow-sm">
             <FaGoogle className="text-red-500 text-base" />
             {googleLoading ? 'Redirecting...' : 'Continue with Google'}
           </button>
-          <button
-            onClick={handleFacebookSignIn}
-            disabled={facebookLoading}
+          <button onClick={handleFacebookSignIn} disabled={facebookLoading}
             className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50 shadow-sm"
-            style={{ backgroundColor: '#1877F2' }}
-          >
+            style={{ backgroundColor: '#1877F2' }}>
             <FaFacebook className="text-white text-base" />
             {facebookLoading ? 'Redirecting...' : 'Continue with Facebook'}
           </button>
         </div>
 
         <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200" />
-          </div>
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
           <div className="relative flex justify-center text-sm">
             <span className="bg-white px-3 text-gray-400 text-xs uppercase tracking-widest">or register with email</span>
           </div>
@@ -166,90 +175,80 @@ const RegisterPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} required
               className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-              placeholder="John Doe"
-            />
+              placeholder="John Doe" />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
               className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-              placeholder="you@example.com"
-            />
+              placeholder="you@example.com" />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
               className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-              placeholder="Min. 6 characters"
-            />
+              placeholder="Min. 6 characters" />
           </div>
           <div>
-            <label htmlFor="confirm_password" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirm_password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirm Password</label>
+            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required
               className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-              placeholder="Repeat your password"
-            />
-          </div>
-          {/* ── Human verification ── */}
-          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all ${captchaChecked ? 'border-green-400 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-            <input
-              type="checkbox"
-              id="captcha"
-              checked={captchaChecked}
-              onChange={(e) => setCaptchaChecked(e.target.checked)}
-              className="w-5 h-5 rounded accent-green-500 cursor-pointer flex-shrink-0"
-            />
-            <label htmlFor="captcha" className="text-sm text-gray-700 font-medium cursor-pointer select-none flex-1">
-              I&apos;m not a robot 🤖
-            </label>
-            <span className="text-[10px] text-gray-400 uppercase tracking-wide flex-shrink-0">Security</span>
+              placeholder="Repeat your password" />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || !captchaChecked}
-            className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gray-900 hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1"
-          >
+          {/* ── Image Captcha ── */}
+          <div className={`rounded-xl border-2 p-4 transition-all ${captchaPassed ? 'border-green-400 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+            <div className="flex items-center gap-2 mb-3">
+              <FaShieldAlt className={captchaPassed ? 'text-green-500' : 'text-gray-400'} size={14} />
+              <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                {captchaPassed ? '✅ Verified — you\'re human!' : 'Security check — click all ⚽ footballs'}
+              </p>
+            </div>
+            {!captchaPassed && (
+              <>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {captchaGrid.map((emoji, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => toggleCell(i)}
+                      className={`aspect-square rounded-xl text-3xl flex items-center justify-center transition-all duration-150 border-2 select-none
+                        ${selected.has(i)
+                          ? 'border-green-500 bg-green-100 shadow-[0_0_10px_rgba(34,197,94,0.4)] scale-95'
+                          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-100'
+                        }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+                {captchaError && (
+                  <p className="text-red-500 text-xs mb-2 text-center font-medium">{captchaError}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={verifyCaptcha}
+                  disabled={selected.size === 0}
+                  className="w-full py-2 text-xs font-bold uppercase tracking-widest bg-gray-900 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-40"
+                >
+                  Verify Selection
+                </button>
+              </>
+            )}
+          </div>
+
+          <button type="submit" disabled={loading || !captchaPassed}
+            className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gray-900 hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1">
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">
           Already have an account?{' '}
-          <Link href="/login" className="font-bold text-green-600 hover:text-green-500">
-            Sign in here
-          </Link>
+          <Link href="/login" className="font-bold text-green-600 hover:text-green-500">Sign in here</Link>
         </p>
       </div>
     </div>
