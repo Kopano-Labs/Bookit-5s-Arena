@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaBirthdayCake,
   FaBuilding,
@@ -77,7 +77,15 @@ const packages = [
   },
 ];
 
-const WHATSAPP_NUMBER = '27600000000'; // Replace with actual number
+const WHATSAPP_NUMBER = '27637820245';
+
+/* Court images used as event backgrounds */
+const EVENT_IMAGES = [
+  '/images/courts/court-1.jpg',
+  '/images/courts/court-2.jpg',
+  '/images/courts/court-3.jpg',
+  '/images/courts/court-4.jpg',
+];
 
 export default function EventsPage() {
   const formRef = useRef(null);
@@ -163,24 +171,48 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Hero */}
-      <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-green-900/20 to-gray-950" />
+      {/* Hero with animated court image background */}
+      <section className="relative py-24 px-4 overflow-hidden">
+        {/* Animated background — Ken Burns on court images */}
+        <div className="absolute inset-0">
+          <motion.img
+            src={EVENT_IMAGES[0]}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ scale: 1 }}
+            animate={{ scale: 1.15, x: [0, -20, 0], y: [0, -10, 0] }}
+            transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/80 to-gray-950" />
+        </div>
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="relative max-w-5xl mx-auto text-center"
         >
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+            className="w-16 h-16 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/30"
+          >
+            <FaStar className="text-green-400 text-2xl" />
+          </motion.div>
           <h1
             className="text-5xl md:text-7xl font-black text-white uppercase tracking-widest mb-4"
             style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
           >
-            Events & Parties
+            Events & <span className="text-green-400">Parties</span>
           </h1>
-          <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
+          <motion.p
+            className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
             From kids birthdays to corporate team building — we have the perfect package for your next event at 5s Arena.
-          </p>
+          </motion.p>
         </motion.div>
       </section>
 
@@ -192,26 +224,42 @@ export default function EventsPage() {
             return (
               <motion.div
                 key={pkg.id}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-green-500/50 transition-all duration-300 group"
+                initial={{ opacity: 0, y: 50, rotateX: 8 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.25 } }}
+                className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-green-500/50 hover:shadow-[0_0_40px_rgba(34,197,94,0.15)] transition-all duration-300 group"
               >
-                {/* Card header */}
-                <div
-                  className={`bg-gradient-to-r ${pkg.color} p-6 flex items-center gap-4`}
-                >
-                  <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
-                    <Icon className="text-white text-2xl" />
-                  </div>
-                  <div>
-                    <h3
-                      className="text-xl font-black text-white uppercase tracking-wider"
-                      style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+                {/* Card header with court image */}
+                <div className="relative h-44 overflow-hidden">
+                  <motion.img
+                    src={EVENT_IMAGES[i % EVENT_IMAGES.length]}
+                    alt={pkg.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    initial={{ scale: 1 }}
+                    whileHover={{ scale: 1.12 }}
+                    animate={{ scale: [1, 1.08, 1] }}
+                    transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${pkg.color} opacity-60`} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-5 flex items-center gap-3">
+                    <motion.div
+                      className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20"
+                      whileHover={{ rotate: 15, scale: 1.1 }}
+                      transition={{ type: 'spring', stiffness: 300 }}
                     >
-                      {pkg.name}
-                    </h3>
-                    <p className="text-white/90 text-2xl font-bold">{pkg.price}</p>
+                      <Icon className="text-white text-xl" />
+                    </motion.div>
+                    <div>
+                      <h3
+                        className="text-lg font-black text-white uppercase tracking-wider drop-shadow-lg"
+                        style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+                      >
+                        {pkg.name}
+                      </h3>
+                      <p className="text-green-400 text-xl font-black">{pkg.price}</p>
+                    </div>
                   </div>
                 </div>
 
@@ -219,19 +267,27 @@ export default function EventsPage() {
                 <div className="p-6">
                   <ul className="space-y-3 mb-6">
                     {pkg.features.map((feat, j) => (
-                      <li key={j} className="flex items-center gap-3 text-gray-300">
+                      <motion.li
+                        key={j}
+                        className="flex items-center gap-3 text-gray-300"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.12 + j * 0.05 + 0.3 }}
+                      >
                         <FaCheck className="text-green-400 text-sm flex-shrink-0" />
                         <span>{feat}</span>
-                      </li>
+                      </motion.li>
                     ))}
                   </ul>
 
-                  <button
+                  <motion.button
                     onClick={() => handleSelectPackage(pkg)}
                     className="w-full py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer"
+                    whileHover={{ scale: 1.03, boxShadow: '0 0 25px rgba(34,197,94,0.5)' }}
+                    whileTap={{ scale: 0.97 }}
                   >
                     Book This Package
-                  </button>
+                  </motion.button>
                 </div>
               </motion.div>
             );

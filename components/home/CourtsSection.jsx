@@ -26,7 +26,7 @@ function CourtCard({ court, index, mobile }) {
         ? 'flex-shrink-0 snap-start'
         : ''
       }
-      style={mobile ? { minWidth: '72vw', maxWidth: '300px' } : {}}
+      style={mobile ? { minWidth: '280px', maxWidth: '320px', width: '75vw' } : {}}
     >
       <Link
         href={`/courts/${court._id}`}
@@ -147,7 +147,7 @@ export default function CourtsSection({ courts = [] }) {
             </p>
 
             {/* Desktop grid */}
-            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="hidden md:grid md:grid-cols-2 xl:grid-cols-4 gap-6">
               {courts.map((court, i) => (
                 <CourtCard key={court._id} court={court} index={i} />
               ))}

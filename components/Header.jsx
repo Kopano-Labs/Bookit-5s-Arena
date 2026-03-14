@@ -3,14 +3,26 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaUser, FaSignOutAlt, FaSignInAlt, FaCalendarAlt,
   FaBars, FaTimes, FaUserEdit, FaEnvelope, FaChartBar,
   FaFutbol, FaTachometerAlt, FaListAlt, FaBookOpen,
-  FaGlassCheers, FaTrophy, FaUsers,
+  FaGlassCheers, FaTrophy, FaStar, FaTv,
 } from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
+
+/* ── Animated nav icon wrapper ── */
+const NavIcon = ({ children }) => (
+  <motion.span
+    className="inline-flex"
+    whileHover={{ scale: 1.3, rotate: 12, transition: { type: 'spring', stiffness: 400, damping: 10 } }}
+    whileTap={{ scale: 0.7, rotate: -20, transition: { duration: 0.1 } }}
+  >
+    {children}
+  </motion.span>
+);
 
 const Header = () => {
   const { data: session } = useSession();
@@ -18,12 +30,44 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navClass = (href) => {
-    const base = 'flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg transition-all uppercase tracking-widest';
+    const base = 'flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest';
     const active = pathname === href || (href !== '/' && href !== '/#courts' && pathname?.startsWith(href))
       ? 'text-white bg-gray-800 border-b-2 border-green-500 shadow-[0_2px_8px_rgba(34,197,94,0.25)]'
       : 'text-gray-400 hover:text-white hover:bg-gray-800';
     return `${base} ${active}`;
   };
+
+  const mobileClass = (href) => {
+    const active = pathname === href || (href !== '/' && href !== '/#courts' && pathname?.startsWith(href));
+    return `flex items-center gap-2.5 px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest transition-all ${
+      active
+        ? 'text-white bg-gray-800 border-l-2 border-green-500'
+        : 'text-gray-300 hover:text-white hover:bg-gray-800'
+    }`;
+  };
+
+  /* ── Public tabs (alphabetical) ── */
+  const publicTabs = [
+    { href: '/#courts',  icon: <FaFutbol size={11} className="text-green-400" />,   label: 'Courts' },
+    { href: '/events',   icon: <FaGlassCheers size={11} className="text-pink-400" />, label: 'Events' },
+    { href: '/fixtures', icon: <FaTv size={11} className="text-blue-400" />,         label: 'Fixtures' },
+    { href: '/leagues',  icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Leagues' },
+    { href: '/rules',    icon: <FaBookOpen size={11} className="text-orange-400" />, label: 'Rules' },
+  ];
+
+  /* ── Auth tabs (user-only, alphabetical) ── */
+  const userTabs = [
+    { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings' },
+    { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards', hideAdmin: true },
+  ];
+
+  /* ── Admin tabs ── */
+  const adminTabs = [
+    { href: '/admin/dashboard',  icon: <FaTachometerAlt size={11} className="text-purple-400" />, label: 'Dashboard' },
+    { href: '/admin/bookings',   icon: <FaListAlt size={11} className="text-teal-400" />,         label: 'Manage' },
+    { href: '/admin/newsletter', icon: <FaEnvelope size={11} className="text-rose-400" />,         label: 'Newsletter' },
+    { href: '/admin/analytics',  icon: <FaChartBar size={11} className="text-amber-400" />,        label: 'Analytics' },
+  ];
 
   return (
     <header className="bg-gray-950 border-b border-gray-800 sticky top-0 z-50 shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
@@ -32,16 +76,14 @@ const Header = () => {
 
           {/* ── Logo ── */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 group-hover:border-green-400 group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 shadow-[0_0_14px_rgba(34,197,94,0.45)] group-hover:shadow-[0_0_22px_rgba(34,197,94,0.75)]">
-              <Image
-                src="/images/logo.jpg"
-                alt="5s Arena"
-                fill
-                sizes="44px"
-                className="object-cover"
-                priority
-              />
-            </div>
+            <motion.div
+              className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)]"
+              whileHover={{ scale: 1.12, boxShadow: '0 0 22px rgba(34,197,94,0.75)' }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              <Image src="/images/logo.jpg" alt="5s Arena" fill sizes="44px" className="object-cover" priority />
+            </motion.div>
             <span
               className="hidden sm:block font-black text-white uppercase leading-tight text-sm tracking-widest"
               style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
@@ -52,46 +94,33 @@ const Header = () => {
 
           {/* ── Desktop Nav ── */}
           <div className="hidden md:flex items-center gap-0.5">
-            <Link href="/#courts" className={navClass('/#courts')}>
-              <FaFutbol size={11} /> Courts
-            </Link>
-            <Link href="/events" className={navClass('/events')}>
-              <FaGlassCheers size={11} /> Events
-            </Link>
-            <Link href="/leagues" className={navClass('/leagues')}>
-              <FaTrophy size={11} /> Leagues
-            </Link>
-            <Link href="/find-players" className={navClass('/find-players')}>
-              <FaUsers size={11} /> Players
-            </Link>
-            <Link href="/rules" className={navClass('/rules')}>
-              <FaBookOpen size={11} /> Rules
-            </Link>
+            {/* Public tabs */}
+            {publicTabs.map((tab) => (
+              <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                <NavIcon>{tab.icon}</NavIcon> {tab.label}
+              </Link>
+            ))}
+
+            {/* Auth tabs */}
             {session && (
               <>
-                <Link href="/bookings" className={navClass('/bookings')}>
-                  <FaCalendarAlt size={11} /> Bookings
-                </Link>
-                {session.user.role !== 'admin' && (
-                  <Link href="/rewards" className={navClass('/rewards')} title="Loyalty rewards & member perks">
-                    <span className="text-yellow-400">⭐</span> Rewards
-                  </Link>
-                )}
+                {userTabs
+                  .filter((t) => !(t.hideAdmin && session.user.role === 'admin'))
+                  .map((tab) => (
+                    <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                      <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                    </Link>
+                  ))}
+
+                {/* Admin tabs */}
                 {session.user.role === 'admin' && (
                   <>
-                    <Link href="/admin/dashboard" className={navClass('/admin/dashboard')}>
-                      <FaTachometerAlt size={11} /> Dashboard
-                    </Link>
-                    <Link href="/admin/bookings" className={navClass('/admin/bookings')}>
-                      <FaListAlt size={11} /> Manage
-                    </Link>
-                    <Link href="/admin/newsletter" className={navClass('/admin/newsletter')}>
-                      <FaEnvelope size={11} /> Newsletter
-                    </Link>
-                    <Link href="/admin/analytics" className={navClass('/admin/analytics')}>
-                      <FaChartBar size={11} /> Analytics
-                    </Link>
-                    <Link href="/courts/add" className="flex items-center gap-1 px-4 py-2 text-xs font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-lg transition-all uppercase tracking-widest">
+                    {adminTabs.map((tab) => (
+                      <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                        <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                      </Link>
+                    ))}
+                    <Link href="/courts/add" className="flex items-center gap-1 px-3 py-2 text-[10px] font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-lg transition-all uppercase tracking-widest">
                       + Court
                     </Link>
                   </>
@@ -104,19 +133,17 @@ const Header = () => {
           <div className="flex items-center gap-2">
             {session ? (
               <>
-                {/* Profile avatar — shows uploaded photo or initials */}
                 <Link
                   href="/profile"
                   className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-800 transition-all group border border-transparent hover:border-gray-700"
                 >
                   {session.user.image ? (
-                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0 shadow-[0_0_10px_rgba(34,197,94,0.3)]">
-                      <img
-                        src={session.user.image}
-                        alt={session.user.name || 'Profile'}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                    <motion.div
+                      className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      <img src={session.user.image} alt={session.user.name || 'Profile'} className="w-full h-full object-cover" />
+                    </motion.div>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-black shadow-inner border border-green-500 flex-shrink-0">
                       {session.user.name?.[0]?.toUpperCase() || 'U'}
@@ -129,12 +156,14 @@ const Header = () => {
                     </p>
                   </div>
                 </Link>
-                <button
+                <motion.button
                   onClick={() => signOut({ callbackUrl: '/' })}
                   className="hidden md:flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-green-700 rounded-lg transition-all uppercase tracking-widest"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <FaSignOutAlt size={12} /> Out
-                </button>
+                </motion.button>
               </>
             ) : (
               <>
@@ -144,113 +173,123 @@ const Header = () => {
                 >
                   <FaSignInAlt size={12} /> Login
                 </Link>
-                <Link
-                  href="/register"
-                  className="hidden md:flex items-center gap-1.5 px-5 py-2 text-xs font-black text-white bg-green-600 hover:bg-green-500 rounded-lg transition-all uppercase tracking-widest shadow-[0_0_12px_rgba(34,197,94,0.4)] hover:shadow-[0_0_20px_rgba(34,197,94,0.7)]"
-                >
-                  <FaUser size={11} /> Register
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    href="/register"
+                    className="hidden md:flex items-center gap-1.5 px-5 py-2 text-xs font-black text-white bg-green-600 hover:bg-green-500 rounded-lg transition-all uppercase tracking-widest shadow-[0_0_12px_rgba(34,197,94,0.4)] hover:shadow-[0_0_20px_rgba(34,197,94,0.7)]"
+                  >
+                    <FaUser size={11} /> Register
+                  </Link>
+                </motion.div>
               </>
             )}
 
             {/* Mobile toggle */}
-            <button
+            <motion.button
               className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Menu"
+              whileTap={{ scale: 0.85, rotate: 90 }}
             >
               {mobileOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
-            </button>
+            </motion.button>
           </div>
         </div>
       </nav>
 
       {/* ── Mobile Drawer ── */}
-      {mobileOpen && (
-        <div className="md:hidden bg-gray-900 border-t border-gray-800 px-4 pb-5 pt-3 space-y-1">
-
-          {/* Mobile user identity strip */}
-          {session && (
-            <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-gray-800">
-              {session.user.image ? (
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0">
-                  <img src={session.user.image} alt={session.user.name || 'Profile'} className="w-full h-full object-cover" />
-                </div>
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-black border border-green-500 flex-shrink-0">
-                  {session.user.name?.[0]?.toUpperCase() || 'U'}
-                </div>
-              )}
-              <div>
-                <p className="text-white text-sm font-bold">{session.user.name}</p>
-                {session.user.username && (
-                  <p className="text-green-400 text-xs font-mono">@{session.user.username}</p>
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            className="md:hidden bg-gray-900 border-t border-gray-800 px-4 pb-5 pt-3 space-y-1 overflow-hidden"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+          >
+            {/* Mobile user identity strip */}
+            {session && (
+              <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-gray-800">
+                {session.user.image ? (
+                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0">
+                    <img src={session.user.image} alt={session.user.name || 'Profile'} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-black border border-green-500 flex-shrink-0">
+                    {session.user.name?.[0]?.toUpperCase() || 'U'}
+                  </div>
                 )}
+                <div>
+                  <p className="text-white text-sm font-bold">{session.user.name}</p>
+                  {session.user.username && (
+                    <p className="text-green-400 text-xs font-mono">@{session.user.username}</p>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <Link href="/#courts" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
-            Courts
-          </Link>
-          <Link href="/events" onClick={() => setMobileOpen(false)} className={`block px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest ${pathname === '/events' ? 'text-white bg-gray-800 border-l-2 border-green-500' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}>
-            <FaGlassCheers className="inline mr-2" size={13} />Events
-          </Link>
-          <Link href="/leagues" onClick={() => setMobileOpen(false)} className={`block px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest ${pathname === '/leagues' ? 'text-white bg-gray-800 border-l-2 border-green-500' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}>
-            <FaTrophy className="inline mr-2" size={13} />Leagues
-          </Link>
-          <Link href="/find-players" onClick={() => setMobileOpen(false)} className={`block px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest ${pathname === '/find-players' ? 'text-white bg-gray-800 border-l-2 border-green-500' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}>
-            <FaUsers className="inline mr-2" size={13} />Find Players
-          </Link>
-          <Link href="/rules" onClick={() => setMobileOpen(false)} className={`block px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest ${pathname === '/rules' ? 'text-white bg-gray-800 border-l-2 border-green-500' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}>
-            <FaBookOpen className="inline mr-2" size={13} />Rules
-          </Link>
-          {session ? (
-            <>
-              <Link href="/bookings" onClick={() => setMobileOpen(false)} className={`block px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest ${pathname === '/bookings' ? 'text-white bg-gray-800 border-l-2 border-green-500' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}>
-                <FaCalendarAlt className="inline mr-2" size={13} />Bookings
-              </Link>
-              {session.user.role !== 'admin' && (
-                <Link href="/rewards" onClick={() => setMobileOpen(false)} className={`block px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest ${pathname === '/rewards' ? 'text-white bg-gray-800 border-l-2 border-green-500' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}>
-                  ⭐ Rewards
+            {/* Public tabs */}
+            {publicTabs.map((tab, i) => (
+              <motion.div
+                key={tab.href}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.04 }}
+              >
+                <Link href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                  {tab.icon} {tab.label}
                 </Link>
-              )}
-              <Link href="/profile" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
-                <FaUserEdit className="inline mr-2" size={13} />Edit Profile
-              </Link>
-              {session.user.role === 'admin' && (
-                <>
-                  <Link href="/admin/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
-                    <FaTachometerAlt className="inline mr-2" size={12} />Dashboard
-                  </Link>
-                  <Link href="/admin/bookings" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
-                    <FaListAlt className="inline mr-2" size={12} />Manage
-                  </Link>
-                  <Link href="/admin/newsletter" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
-                    <FaEnvelope className="inline mr-2" size={12} />Newsletter
-                  </Link>
-                  <Link href="/admin/analytics" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
-                    <FaChartBar className="inline mr-2" size={12} />Analytics
-                  </Link>
-                  <Link href="/courts/add" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-xl">+ Add Court</Link>
-                </>
-              )}
-              <button onClick={() => signOut({ callbackUrl: '/' })} className="w-full text-left px-3 py-3 text-sm font-bold text-red-400 hover:bg-gray-800 rounded-xl uppercase tracking-widest">
-                <FaSignOutAlt className="inline mr-2" size={13} />Sign Out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/login" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
-                <FaSignInAlt className="inline mr-2" size={13} />Login
-              </Link>
-              <Link href="/register" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-sm font-black text-white bg-green-600 hover:bg-green-500 rounded-xl text-center uppercase tracking-widest">
-                Register
-              </Link>
-            </>
-          )}
-        </div>
-      )}
+              </motion.div>
+            ))}
+
+            {session ? (
+              <>
+                {userTabs
+                  .filter((t) => !(t.hideAdmin && session.user.role === 'admin'))
+                  .map((tab, i) => (
+                    <motion.div
+                      key={tab.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: (publicTabs.length + i) * 0.04 }}
+                    >
+                      <Link href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                        {tab.icon} {tab.label}
+                      </Link>
+                    </motion.div>
+                  ))}
+                <Link href="/profile" onClick={() => setMobileOpen(false)} className={mobileClass('/profile')}>
+                  <FaUserEdit className="text-emerald-400" size={13} /> Edit Profile
+                </Link>
+                {session.user.role === 'admin' && (
+                  <>
+                    {adminTabs.map((tab) => (
+                      <Link key={tab.href} href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                        {tab.icon} {tab.label}
+                      </Link>
+                    ))}
+                    <Link href="/courts/add" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-xl">
+                      + Add Court
+                    </Link>
+                  </>
+                )}
+                <button onClick={() => signOut({ callbackUrl: '/' })} className="w-full text-left px-3 py-3 text-sm font-bold text-red-400 hover:bg-gray-800 rounded-xl uppercase tracking-widest">
+                  <FaSignOutAlt className="inline mr-2" size={13} />Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
+                  <FaSignInAlt className="inline mr-2" size={13} />Login
+                </Link>
+                <Link href="/register" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-sm font-black text-white bg-green-600 hover:bg-green-500 rounded-xl text-center uppercase tracking-widest">
+                  Register
+                </Link>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
