@@ -174,65 +174,95 @@ const HomePage = async () => {
               No courts available right now. Check back soon.
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {courts.map((court) => (
-                <Link
-                  key={court._id}
-                  href={`/courts/${court._id}`}
-                  className="group bg-white overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300 block hover:ring-2 hover:ring-green-400 hover:shadow-[0_0_0_2px_#4ade80,0_0_22px_rgba(74,222,128,0.45),0_10px_30px_rgba(0,0,0,0.12)]"
-                >
-                  {court.image ? (
-                    <div className="relative h-52 overflow-hidden">
-                      <img
-                        src={`/images/courts/${court.image}`}
-                        alt={court.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          background:
-                            'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)',
-                        }}
-                      />
-                      <div className="absolute bottom-4 left-4">
-                        <span
-                          className="text-white font-black text-xl uppercase"
-                          style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                        >
-                          {court.name}
+            <>
+              {/* Mobile: horizontal swipe carousel */}
+              <div className="flex md:hidden gap-4 overflow-x-auto pb-4 -mx-6 px-6 snap-x snap-mandatory scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {courts.map((court) => (
+                  <Link
+                    key={court._id}
+                    href={`/courts/${court._id}`}
+                    className="group bg-white overflow-hidden shadow-sm flex-shrink-0 snap-start block w-72 hover:ring-2 hover:ring-green-400"
+                    style={{ minWidth: '72vw', maxWidth: '300px' }}
+                  >
+                    {court.image ? (
+                      <div className="relative h-48 overflow-hidden">
+                        <img src={`/images/courts/${court.image}`} alt={court.name} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)' }} />
+                        <div className="absolute bottom-4 left-4">
+                          <span className="text-white font-black text-lg uppercase" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>{court.name}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-48 bg-gray-900 flex items-center justify-center">
+                        <FaFutbol className="text-green-400 text-4xl" />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      {!court.image && <h3 className="font-black text-lg uppercase mb-2">{court.name}</h3>}
+                      {court.description && <p className="text-gray-500 text-sm mb-3 line-clamp-2">{court.description}</p>}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-xl font-black text-gray-900">R{court.price_per_hour}</span>
+                          <span className="text-gray-400 text-sm"> /hr</span>
+                        </div>
+                        <span className="inline-flex items-center gap-1 bg-green-600 text-white font-bold px-3 py-1.5 text-xs uppercase tracking-wide">
+                          Book <FaArrowRight size={9} />
                         </span>
                       </div>
                     </div>
-                  ) : (
-                    <div className="h-52 bg-gray-900 flex items-center justify-center">
-                      <FaFutbol className="text-green-400 text-5xl" />
-                    </div>
-                  )}
-                  <div className="p-5">
-                    {!court.image && (
-                      <h3 className="font-black text-xl uppercase mb-2">{court.name}</h3>
-                    )}
-                    {court.description && (
-                      <p className="text-gray-500 text-sm mb-4 line-clamp-2">
-                        {court.description}
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-2xl font-black text-gray-900">
-                          R{court.price_per_hour}
-                        </span>
-                        <span className="text-gray-400 text-sm"> /hour</span>
+                  </Link>
+                ))}
+              </div>
+              {/* Swipe hint — mobile only */}
+              <p className="md:hidden text-center text-gray-400 text-xs mt-1 mb-2">← Swipe to see all courts →</p>
+
+              {/* Tablet/Desktop: normal grid */}
+              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {courts.map((court) => (
+                  <Link
+                    key={court._id}
+                    href={`/courts/${court._id}`}
+                    className="group bg-white overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300 block hover:ring-2 hover:ring-green-400 hover:shadow-[0_0_0_2px_#4ade80,0_0_22px_rgba(74,222,128,0.45),0_10px_30px_rgba(0,0,0,0.12)]"
+                  >
+                    {court.image ? (
+                      <div className="relative h-52 overflow-hidden">
+                        <img
+                          src={`/images/courts/${court.image}`}
+                          alt={court.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div
+                          className="absolute inset-0"
+                          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)' }}
+                        />
+                        <div className="absolute bottom-4 left-4">
+                          <span className="text-white font-black text-xl uppercase" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                            {court.name}
+                          </span>
+                        </div>
                       </div>
-                      <span className="inline-flex items-center gap-1 bg-green-600 hover:bg-green-500 text-white font-bold px-4 py-2 text-sm uppercase tracking-wide transition-colors">
-                        Book Now <FaArrowRight size={11} />
-                      </span>
+                    ) : (
+                      <div className="h-52 bg-gray-900 flex items-center justify-center">
+                        <FaFutbol className="text-green-400 text-5xl" />
+                      </div>
+                    )}
+                    <div className="p-5">
+                      {!court.image && <h3 className="font-black text-xl uppercase mb-2">{court.name}</h3>}
+                      {court.description && <p className="text-gray-500 text-sm mb-4 line-clamp-2">{court.description}</p>}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-2xl font-black text-gray-900">R{court.price_per_hour}</span>
+                          <span className="text-gray-400 text-sm"> /hour</span>
+                        </div>
+                        <span className="inline-flex items-center gap-1 bg-green-600 hover:bg-green-500 text-white font-bold px-4 py-2 text-sm uppercase tracking-wide transition-colors">
+                          Book Now <FaArrowRight size={11} />
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </section>
