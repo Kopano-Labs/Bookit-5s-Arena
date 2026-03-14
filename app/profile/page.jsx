@@ -132,7 +132,7 @@ const ProfilePage = () => {
         setCurrentPassword('');
         setNewPassword('');
         setConfirmNew('');
-        await update({ name });
+        await update({ name, username: username.trim(), image: avatarUrl || undefined });
       }
     } catch {
       setError('Network error. Please try again.');

@@ -4,6 +4,8 @@ import {
   FaWhatsapp, FaInstagram, FaFacebook, FaTiktok, FaArrowRight,
 } from 'react-icons/fa';
 
+export const revalidate = 60; // revalidate page every 60 seconds
+
 // ─── static data ─────────────────────────────────────────────
   const EVENTS = [
       {
@@ -44,9 +46,7 @@ const AMENITIES = [
 // ─── server-side fetch ────────────────────────────────────────
 const getCourts = async () => {
   try {
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/courts`, {
-      cache: 'no-store',
-    });
+    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/courts`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -63,15 +63,16 @@ const HomePage = async () => {
     <div className="min-h-screen bg-white">
 
       {/* ══ HERO ══════════════════════════════════════════════ */}
-      <section
-        className="relative min-h-screen flex items-end pb-24 overflow-hidden"
-        style={{
-          backgroundImage:
-            'url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
+      <section className="relative min-h-screen flex items-end pb-24 overflow-hidden">
+        {/* Animated background — Ken Burns loop */}
+        <div
+          className="absolute inset-0 hero-bg"
+          style={{
+            backgroundImage:
+              'url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80)',
+          }}
+        />
+        {/* Gradient overlay */}
         <div
           className="absolute inset-0"
           style={{
@@ -181,12 +182,12 @@ const HomePage = async () => {
                   <Link
                     key={court._id}
                     href={`/courts/${court._id}`}
-                    className="group bg-white overflow-hidden shadow-sm flex-shrink-0 snap-start block w-72 hover:ring-2 hover:ring-green-400"
+                    className="group bg-white overflow-hidden shadow-sm flex-shrink-0 snap-start block w-72 hover:ring-2 hover:ring-green-400 rounded-2xl"
                     style={{ minWidth: '72vw', maxWidth: '300px' }}
                   >
                     {court.image ? (
                       <div className="relative h-48 overflow-hidden">
-                        <img src={`/images/courts/${court.image}`} alt={court.name} className="w-full h-full object-cover" />
+                        <img src={`/images/courts/${court.image}`} alt={court.name} loading="lazy" className="w-full h-full object-cover" />
                         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)' }} />
                         <div className="absolute bottom-4 left-4">
                           <span className="text-white font-black text-lg uppercase" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>{court.name}</span>
@@ -226,13 +227,14 @@ const HomePage = async () => {
                   <Link
                     key={court._id}
                     href={`/courts/${court._id}`}
-                    className="group bg-white overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300 block hover:ring-2 hover:ring-green-400 hover:shadow-[0_0_0_2px_#4ade80,0_0_22px_rgba(74,222,128,0.45),0_10px_30px_rgba(0,0,0,0.12)]"
+                    className="group bg-white overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300 block hover:ring-2 hover:ring-green-400 hover:shadow-[0_0_0_2px_#4ade80,0_0_22px_rgba(74,222,128,0.45),0_10px_30px_rgba(0,0,0,0.12)] rounded-2xl"
                   >
                     {court.image ? (
                       <div className="relative h-52 overflow-hidden">
                         <img
                           src={`/images/courts/${court.image}`}
                           alt={court.name}
+                          loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div
@@ -297,10 +299,10 @@ const HomePage = async () => {
               More than just football
             </p>
             <h2
-              className="events-title font-black uppercase text-gray-900"
+              className="font-black uppercase text-gray-900"
               style={{
                 fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-                fontFamily: "'Rubik Dirt', Impact, Arial Black, sans-serif",
+                fontFamily: 'Impact, Arial Black, sans-serif',
               }}
             >
               EVENTS &amp; SERVICES
@@ -311,7 +313,7 @@ const HomePage = async () => {
             {EVENTS.map((e, i) => (
               <div
                 key={i}
-                className={`group bg-white overflow-hidden transition-all duration-300 border-t-4 ${e.border} flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-xl`}
+                className={`group bg-white overflow-hidden transition-all duration-300 border-t-4 ${e.border} flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-xl rounded-2xl`}
               >
                 <div className="p-6">
                   <h3
@@ -324,10 +326,11 @@ const HomePage = async () => {
                     {e.desc}
                   </p>
                 </div>
-                <div className="h-48 overflow-hidden mt-auto">
+                <div className="h-48 overflow-hidden mt-auto rounded-b-2xl">
                   <img
                     src={e.image}
                     alt={e.title}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
