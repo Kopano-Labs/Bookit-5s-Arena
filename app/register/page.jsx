@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaUser, FaGoogle, FaFacebook, FaShieldAlt } from 'react-icons/fa';
+import ArenaBackground from '@/components/ArenaBackground';
 
 // ── Captcha helpers ──────────────────────────────────────────────────────────
 const GRID_EMOJIS = ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓'];
@@ -113,25 +114,7 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center py-16 px-4 relative overflow-hidden">
 
-      {/* ── Animated background ── */}
-      <div className="fixed inset-0 -z-10 overflow-hidden bg-gray-950">
-        {/* Ambient glow 1 */}
-        <div className="absolute rounded-full" style={{ top: '5%', left: '10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%)' }} />
-        {/* Ambient glow 2 */}
-        <div className="absolute rounded-full" style={{ bottom: '0%', right: '5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)' }} />
-        {/* ONE massive football — green & black */}
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          left: 0,
-          fontSize: '420px',
-          lineHeight: 1,
-          userSelect: 'none',
-          pointerEvents: 'none',
-          filter: 'hue-rotate(110deg) saturate(18) brightness(0.78) drop-shadow(0 0 70px rgba(34,197,94,1)) drop-shadow(0 0 140px rgba(34,197,94,0.55))',
-          animation: 'rollRightMassive 22s linear infinite',
-        }}>⚽</div>
-      </div>
+      <ArenaBackground />
 
       {/* ── Card ── */}
       <div className="w-full max-w-md bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-8 border border-white/20">
