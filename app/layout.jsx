@@ -1,14 +1,11 @@
-import dynamic from 'next/dynamic';
 import AuthProvider from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookNowFloat from '@/components/BookNowFloat';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import CookieBanner from '@/components/CookieBanner';
+import ClientOnly from '@/components/ClientOnly';
 import '@/assets/styles/globals.css';
-
-const ChatWidget = dynamic(() => import('@/components/ChatWidget'), { ssr: false });
-const Analytics = dynamic(() => import('@/components/Analytics'), { ssr: false });
 
 export const metadata = {
   title: { default: '5s Arena | 5-a-Side Football Cape Town', template: '%s | 5s Arena' },
@@ -40,7 +37,7 @@ const RootLayout = ({ children }) => {
       <body>
         <AuthProvider>
           <AnalyticsTracker />
-          <Analytics />
+          <ClientOnly />
           <Header />
           <main className="px-4 sm:px-6 lg:px-8 py-6">
             {children}
@@ -48,7 +45,6 @@ const RootLayout = ({ children }) => {
           <Footer />
           {/* Fixed floating elements — outside main so they overlay everything */}
           <BookNowFloat />
-          <ChatWidget />
           <CookieBanner />
         </AuthProvider>
       </body>
