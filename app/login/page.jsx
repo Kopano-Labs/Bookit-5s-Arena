@@ -62,17 +62,16 @@ const LoginPage = () => {
           }}
         />
 
-        {/* ONE massive football — neon green glow, rolls along the bottom */}
+        {/* ONE massive football — green & black, rolls along the bottom */}
         <div style={{
           position: 'absolute',
-          bottom: '-90px',
+          bottom: '20px',
           left: 0,
-          fontSize: '340px',
+          fontSize: '420px',
           lineHeight: 1,
           userSelect: 'none',
           pointerEvents: 'none',
-          filter:
-            'drop-shadow(0 0 50px rgba(34,197,94,0.9)) drop-shadow(0 0 100px rgba(34,197,94,0.45)) drop-shadow(0 -10px 30px rgba(74,222,128,0.3))',
+          filter: 'hue-rotate(110deg) saturate(18) brightness(0.78) drop-shadow(0 0 70px rgba(34,197,94,1)) drop-shadow(0 0 140px rgba(34,197,94,0.55))',
           animation: 'rollRightMassive 22s linear infinite',
           animationDelay: '0s',
         }}>⚽</div>
