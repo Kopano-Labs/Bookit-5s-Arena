@@ -3,6 +3,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookNowFloat from '@/components/BookNowFloat';
 import ChatWidget from '@/components/ChatWidget';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
+import CookieBanner from '@/components/CookieBanner';
 import '@/assets/styles/globals.css';
 
 export const metadata = {
@@ -20,6 +22,7 @@ const RootLayout = ({ children }) => {
       </head>
       <body>
         <AuthProvider>
+          <AnalyticsTracker />
           <Header />
           <main className="px-4 sm:px-6 lg:px-8 py-6">
             {children}
@@ -28,6 +31,7 @@ const RootLayout = ({ children }) => {
           {/* Fixed floating elements — outside main so they overlay everything */}
           <BookNowFloat />
           <ChatWidget />
+          <CookieBanner />
         </AuthProvider>
       </body>
     </html>
