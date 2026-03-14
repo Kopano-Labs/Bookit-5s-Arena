@@ -17,12 +17,28 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      // Not required — Google OAuth users won't have a password
+      // Not required — OAuth users won't have a password
       minlength: [6, 'Password must be at least 6 characters'],
     },
     image: {
       type: String,
       default: null,
+    },
+    // Custom uploaded avatar (overrides image from OAuth)
+    profileImage: {
+      type: String,
+      default: null,
+    },
+    // Public handle — auto-generated from name on OAuth sign-up, editable by user
+    username: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    // Newsletter opt-in
+    newsletterOptIn: {
+      type: Boolean,
+      default: false,
     },
     // 'user' = regular user, 'admin' = can add/edit/delete courts
     role: {
