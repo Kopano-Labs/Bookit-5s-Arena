@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaSignInAlt, FaGoogle, FaFacebook, FaUserSecret } from 'react-icons/fa';
+import ArenaBackground from '@/components/ArenaBackground';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -42,40 +43,7 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center py-16 px-4 relative overflow-hidden">
 
-      {/* ── Animated background ── */}
-      <div className="fixed inset-0 -z-10 overflow-hidden bg-gray-950">
-        {/* Ambient green glow */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            top: '20%', left: '-10%',
-            width: '700px', height: '700px',
-            background: 'radial-gradient(circle, rgba(22,163,74,0.18) 0%, transparent 65%)',
-          }}
-        />
-        <div
-          className="absolute rounded-full"
-          style={{
-            bottom: '-10%', right: '-5%',
-            width: '600px', height: '600px',
-            background: 'radial-gradient(circle, rgba(21,128,61,0.15) 0%, transparent 65%)',
-          }}
-        />
-
-        {/* ONE massive football — green & black, rolls along the bottom */}
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          left: 0,
-          fontSize: '420px',
-          lineHeight: 1,
-          userSelect: 'none',
-          pointerEvents: 'none',
-          filter: 'hue-rotate(110deg) saturate(18) brightness(0.78) drop-shadow(0 0 70px rgba(34,197,94,1)) drop-shadow(0 0 140px rgba(34,197,94,0.55))',
-          animation: 'rollRightMassive 22s linear infinite',
-          animationDelay: '0s',
-        }}>⚽</div>
-      </div>
+      <ArenaBackground />
 
       {/* ── Card ── */}
       <div className="w-full max-w-md bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-8 border border-white/20">
