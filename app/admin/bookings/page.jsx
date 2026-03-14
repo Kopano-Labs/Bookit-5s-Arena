@@ -126,6 +126,7 @@ const AdminBookings = () => {
                     <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Dur.</th>
                     <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Total</th>
                     <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Status</th>
+                    <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Payment</th>
                     <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Update</th>
                   </tr>
                 </thead>
@@ -144,6 +145,17 @@ const AdminBookings = () => {
                       <td className="px-5 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${STATUS_STYLES[b.status] ?? 'bg-gray-800 text-gray-500'}`}>
                           {b.status ?? 'unknown'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${
+                          b.paymentStatus === 'paid'
+                            ? 'bg-green-900/40 text-green-400 border border-green-800/60'
+                            : b.paymentStatus === 'refunded'
+                            ? 'bg-blue-900/40 text-blue-400 border border-blue-800/60'
+                            : 'bg-gray-800 text-gray-500 border border-gray-700'
+                        }`}>
+                          {b.paymentStatus ?? 'unpaid'}
                         </span>
                       </td>
                       <td className="px-5 py-4">
