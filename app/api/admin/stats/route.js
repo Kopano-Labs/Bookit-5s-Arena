@@ -120,6 +120,13 @@ export async function GET(request) {
     });
     statusCounts.cancelled = cancelledCount;
 
+    // Payment breakdown
+    const allBookings = await Booking.find({}).lean();
+    const paidCount = allBookings.filter(b => b.paymentStatus === 'paid').length;
+    const unpaidConfirmed = allBookings.filter(b => b.status === 'confirmed' && b.paymentStatus !== 'paid').length;
+    const refundedCount = allBookings.filter(b => b.paymentStatus === 'refunded').length;
+    const paidRevenue = allBookings.filter(b => b.paymentStatus === 'paid').reduce((sum, b) => sum + (b.total_price || 0), 0);
+
     // Format recent bookings
     const recentBookingsList = recentBookings.map((b) => ({
       _id: b._id,
@@ -146,6 +153,10 @@ export async function GET(request) {
       statusCounts,
       recentBookings: recentBookingsList,
       peakHours: hourBreakdown.map((h) => ({ hour: `${h._id}:00`, count: h.count })),
+      paidCount,
+      unpaidConfirmed,
+      refundedCount,
+      paidRevenue,
     });
   } catch (error) {
     console.error('GET /api/admin/stats error:', error);

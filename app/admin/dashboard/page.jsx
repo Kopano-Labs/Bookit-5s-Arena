@@ -84,6 +84,7 @@ const AdminDashboard = () => {
       icon: <FaMoneyBillWave className="text-2xl text-green-400" />,
       bg: 'bg-green-900/20 border-green-800/40',
       sub: `Avg R${stats.avgBookingValue}/booking`,
+      sub2: stats.paidCount > 0 ? `R${(stats.paidRevenue ?? 0).toLocaleString()} confirmed paid` : null,
     },
     {
       label: 'Total Courts',
@@ -164,6 +165,7 @@ const AdminDashboard = () => {
               <p className="text-2xl font-black text-white">{card.value}</p>
               <p className="text-xs text-gray-500 uppercase tracking-wide leading-tight">{card.label}</p>
               <p className="text-xs text-gray-600">{card.sub}</p>
+              {card.sub2 && <p className="text-xs text-green-500 font-semibold">{card.sub2}</p>}
             </div>
           ))}
         </div>
@@ -249,6 +251,36 @@ const AdminDashboard = () => {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Payment Status panel */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
+          <h3 className="text-sm font-black uppercase tracking-widest text-white mb-5 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+            <FaMoneyBillWave className="text-green-400" /> Payment Status
+          </h3>
+          <div className="space-y-4">
+            {[
+              { label: 'Paid', count: stats.paidCount ?? 0, color: '#22c55e', textColor: 'text-green-400', icon: '✅' },
+              { label: 'Confirmed Unpaid', count: stats.unpaidConfirmed ?? 0, color: '#f59e0b', textColor: 'text-amber-400', icon: '⚠️' },
+              { label: 'Refunded', count: stats.refundedCount ?? 0, color: '#60a5fa', textColor: 'text-blue-400', icon: '🔄' },
+            ].map((s) => {
+              const total = (stats.paidCount ?? 0) + (stats.unpaidConfirmed ?? 0) + (stats.refundedCount ?? 0);
+              const pct = total > 0 ? Math.round((s.count / total) * 100) : 0;
+              return (
+                <div key={s.label}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className={`flex items-center gap-2 text-xs ${s.textColor}`}>
+                      <span>{s.icon}</span> {s.label}
+                    </div>
+                    <span className="text-xs font-bold text-white">{s.count} <span className="text-gray-600">({pct}%)</span></span>
+                  </div>
+                  <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: s.color }} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

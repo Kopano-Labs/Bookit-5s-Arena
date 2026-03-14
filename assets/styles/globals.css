@@ -13,18 +13,22 @@
   }
 }
 
-/* ── Hero Ken Burns animation ── */
+/* ── Hero Ken Burns animation — GPU-accelerated via transform ── */
 @keyframes kenBurns {
-  0%   { background-position: 20% 60%; background-size: 120%; }
-  25%  { background-position: 80% 40%; background-size: 130%; }
-  50%  { background-position: 60% 70%; background-size: 125%; }
-  75%  { background-position: 30% 30%; background-size: 135%; }
-  100% { background-position: 20% 60%; background-size: 120%; }
+  0%   { transform: scale(1.08) translate(0%, 0%); }
+  20%  { transform: scale(1.18) translate(-2.5%, 1.5%); }
+  40%  { transform: scale(1.13) translate(2%, -1.5%); }
+  60%  { transform: scale(1.20) translate(-1.5%, 2%); }
+  80%  { transform: scale(1.15) translate(1.5%, -1%); }
+  100% { transform: scale(1.08) translate(0%, 0%); }
 }
 
 .hero-bg {
-  animation: kenBurns 20s ease-in-out infinite;
-  will-change: background-position, background-size;
+  animation: kenBurns 28s ease-in-out infinite;
+  will-change: transform;
+  transform-origin: center center;
+  background-size: cover;
+  background-position: center;
 }
 
 @keyframes rollRight {

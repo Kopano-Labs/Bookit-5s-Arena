@@ -6,6 +6,7 @@ import { useState } from 'react';
 import {
   FaUser, FaSignOutAlt, FaSignInAlt, FaCalendarAlt,
   FaBars, FaTimes, FaUserEdit, FaEnvelope, FaChartBar,
+  FaFutbol, FaTachometerAlt, FaListAlt,
 } from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -20,7 +21,7 @@ const Header = () => {
 
           {/* ── Logo ── */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 group-hover:border-green-400 transition-all duration-300 shadow-[0_0_14px_rgba(34,197,94,0.45)] group-hover:shadow-[0_0_22px_rgba(34,197,94,0.75)]">
+            <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 group-hover:border-green-400 group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 shadow-[0_0_14px_rgba(34,197,94,0.45)] group-hover:shadow-[0_0_22px_rgba(34,197,94,0.75)]">
               <Image
                 src="/images/logo.jpg"
                 alt="5s Arena"
@@ -40,8 +41,8 @@ const Header = () => {
 
           {/* ── Desktop Nav ── */}
           <div className="hidden md:flex items-center gap-0.5">
-            <Link href="/#courts" className="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
-              Courts
+            <Link href="/#courts" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+              <FaFutbol size={11} /> Courts
             </Link>
             {session && (
               <>
@@ -50,11 +51,11 @@ const Header = () => {
                 </Link>
                 {session.user.role === 'admin' && (
                   <>
-                    <Link href="/admin/dashboard" className="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
-                      Dashboard
+                    <Link href="/admin/dashboard" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                      <FaTachometerAlt size={11} /> Dashboard
                     </Link>
-                    <Link href="/admin/bookings" className="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
-                      Manage
+                    <Link href="/admin/bookings" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                      <FaListAlt size={11} /> Manage
                     </Link>
                     <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
                       <FaEnvelope size={11} /> Newsletter
@@ -102,7 +103,7 @@ const Header = () => {
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="hidden md:flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-500 hover:text-red-400 hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest"
+                  className="hidden md:flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-green-700 rounded-lg transition-all uppercase tracking-widest"
                 >
                   <FaSignOutAlt size={12} /> Out
                 </button>
@@ -174,8 +175,12 @@ const Header = () => {
               </Link>
               {session.user.role === 'admin' && (
                 <>
-                  <Link href="/admin/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">Dashboard</Link>
-                  <Link href="/admin/bookings" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">Manage Bookings</Link>
+                  <Link href="/admin/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
+                    <FaTachometerAlt className="inline mr-2" size={12} />Dashboard
+                  </Link>
+                  <Link href="/admin/bookings" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
+                    <FaListAlt className="inline mr-2" size={12} />Manage
+                  </Link>
                   <Link href="/admin/newsletter" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
                     <FaEnvelope className="inline mr-2" size={12} />Newsletter
                   </Link>

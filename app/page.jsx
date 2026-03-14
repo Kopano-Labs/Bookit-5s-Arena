@@ -70,8 +70,6 @@ const HomePage = async () => {
           style={{
             backgroundImage:
               'url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80)',
-            backgroundSize: '120%',
-            backgroundPosition: 'center',
           }}
         />
         {/* Gradient overlay */}

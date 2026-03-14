@@ -5,10 +5,20 @@ import { FaCommentDots, FaTimes, FaWhatsapp, FaPaperPlane, FaFutbol } from 'reac
 
 // ── Quick-answer FAQ (no API call needed) ──────────────────────
 const FAQ = [
-  { keys: ['price', 'cost', 'how much', 'rate', 'fee', 'rand', 'r400'], answer: 'Court bookings start from **R400/hour**. Prices vary by court and time slot — check the Book a Court section on the home page for exact pricing.' },
+  { keys: ['hi', 'hello', 'hey', 'howzit', 'hiya', 'morning', 'afternoon', 'evening', 'yo', 'sup', 'greetings', 'good day', 'sawubona'],
+    answer: 'Hey there! ⚽ Welcome to **5s Arena**! I can help with pricing, bookings, events, location — what would you like to know?' },
+  { keys: ['thanks', 'thank you', 'thx', 'ty', 'cheers', 'appreciated', 'dankie'],
+    answer: "You're welcome! ⚽ See you on the pitch at **5s Arena**! Anything else I can help with?" },
+  { keys: ['bye', 'goodbye', 'cya', 'see you', 'later', 'laters', 'totsiens'],
+    answer: '👋 See you on the pitch! Come play at **5s Arena** soon — book online anytime at our website!' },
+  { keys: ['who are you', 'what are you', 'are you a bot', 'are you ai', 'are you human', 'are you real'],
+    answer: "I'm the **5s Arena** virtual assistant! ⚽ I'm an AI, but our real team is always available on WhatsApp **063 782 0245** if you need a human." },
+  { keys: ['awesome', 'great', 'nice', 'cool', 'perfect', 'excellent', 'amazing', 'lekker', 'eish'],
+    answer: "Lekker! ⚽ That's what we love to hear at **5s Arena**. Anything else I can help you with?" },
+  { keys: ['price', 'cost', 'how much', 'rate', 'fee', 'rand', 'r400', 'cheap', 'expensive', 'affordable', 'per hour', 'pricing'], answer: 'Court bookings start from **R400/hour**. Prices vary by court and time slot — check the Book a Court section on the home page for exact pricing.' },
   { keys: ['where', 'location', 'address', 'find', 'directions', 'milnerton', 'cape town', 'hellenic'], answer: 'We\'re at **Hellenic Football Club, Pringle Rd, Milnerton, Cape Town 7441**. Click the map on our homepage for turn-by-turn directions!' },
   { keys: ['open', 'hours', 'time', 'when', 'close', 'operate'], answer: 'We\'re open **10:00 AM – 10:00 PM** every day. Floodlit courts mean you can play right up until closing time!' },
-  { keys: ['book', 'reserve', 'booking', 'how to'], answer: 'Booking is easy! Create a free account (or log in), choose a court from the home page, pick your date & time, and confirm. Done — pitch is yours!' },
+  { keys: ['book', 'reserve', 'booking', 'how to', 'online', 'sign up', 'register', 'account', 'how do i book'], answer: 'Booking is easy! Create a free account (or log in), choose a court from the home page, pick your date & time, and confirm. Done — pitch is yours!' },
   { keys: ['birthday', 'party', 'parties', 'celebrate'], answer: '🎉 We LOVE birthday parties! Private court hire with full bar & clubhouse access, catering options available. WhatsApp **063 782 0245** for a tailored package.' },
   { keys: ['corporate', 'team build', 'company', 'office'], answer: '🏢 Corporate team-building days are our speciality. Courts + sound system + bar & restaurant = a day your team won\'t forget. Contact us for packages!' },
   { keys: ['tournament', 'league', 'competition'], answer: '🏆 Run your own 5v5 tournament with us! We supply the floodlit venue, sound system and bar. WhatsApp **063 782 0245** to organise.' },
@@ -18,7 +28,7 @@ const FAQ = [
   { keys: ['lights', 'floodlit', 'night', 'evening', 'dark'], answer: '💡 All courts are **fully floodlit** so evening games look and feel like a proper match.' },
   { keys: ['grass', 'surface', 'turf', 'pitch', 'artificial', 'synthetic'], answer: '🌿 All our pitches have **all-weather synthetic grass** — top quality, grippy, and playable in any conditions.' },
   { keys: ['cancel', 'refund', 'reschedule'], answer: 'For cancellations or rescheduling, please WhatsApp us at **063 782 0245** as soon as possible and we\'ll do our best to help.' },
-  { keys: ['contact', 'phone', 'call', 'whatsapp', 'email', 'reach'], answer: 'Reach us on 📱 **WhatsApp: 063 782 0245** or 📧 **fivearena@mail.com**. We usually reply quickly!' },
+  { keys: ['contact', 'phone', 'call', 'whatsapp', 'email', 'reach', 'help', 'support', 'speak to', 'talk to', 'human', 'person'], answer: 'Reach us on 📱 **WhatsApp: 063 782 0245** or 📧 **fivearena@mail.com**. We usually reply quickly!' },
   { keys: ['social', 'facebook', 'instagram', 'tiktok', 'follow'], answer: 'Follow us! 👉 **Facebook**: Fives Arena (search the page) · **Instagram** & **TikTok**: @fivesarena. Stay up to date with highlights, events & news.' },
 ];
 
@@ -136,7 +146,7 @@ export default function ChatWidget() {
           {
             role: 'assistant',
             content:
-              'Sorry, I didn\'t quite get that. Could you rephrase? Or try asking about pricing, booking, events or our location.',
+              "I'm not sure about that specific question ⚽. You can ask about our **pricing**, **bookings**, **location**, **events**, or **facilities** — or reach us directly on WhatsApp at **063 782 0245**!",
           },
         ]);
       }
