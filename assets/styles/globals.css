@@ -31,6 +31,22 @@
   background-position: center;
 }
 
+/* ── Court card / detail — slower, subtler Ken Burns for card images ── */
+@keyframes kenBurnsSlow {
+  0%   { transform: scale(1.04) translate(0%, 0%); }
+  20%  { transform: scale(1.10) translate(-1.5%, 1%); }
+  40%  { transform: scale(1.07) translate(1.5%, -1%); }
+  60%  { transform: scale(1.12) translate(-1%, 1.5%); }
+  80%  { transform: scale(1.08) translate(1%, -0.5%); }
+  100% { transform: scale(1.04) translate(0%, 0%); }
+}
+
+.court-card-bg {
+  animation: kenBurnsSlow 35s ease-in-out infinite;
+  will-change: transform;
+  transform-origin: center center;
+}
+
 @keyframes rollRight {
   0%   { transform: translateX(-160px) rotate(0deg);    opacity: 0; }
   6%   { opacity: 1; }

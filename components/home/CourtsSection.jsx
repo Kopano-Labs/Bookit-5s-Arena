@@ -41,8 +41,8 @@ function CourtCard({ court, index, mobile }) {
               src={`/images/courts/${court.image}`}
               alt={court.name}
               loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-600"
-              style={{ transitionDuration: '600ms' }}
+              className="w-full h-full object-cover court-card-bg"
+              style={{ willChange: 'transform' }}
             />
             {/* Glassmorphism shimmer on hover */}
             <div

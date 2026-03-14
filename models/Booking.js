@@ -56,4 +56,9 @@ const BookingSchema = new mongoose.Schema(
 // Prevent double bookings: same court, same date, overlapping time
 BookingSchema.index({ court: 1, date: 1, start_time: 1 }, { unique: true });
 
-export default mongoose.models.Booking || mongoose.model('Booking', BookingSchema);
+// In dev, hot-reload can leave a stale model in mongoose.models with the old schema.
+// Always delete and re-register so schema changes (new fields, new enum values) take effect immediately.
+if (mongoose.models.Booking) {
+  delete mongoose.models['Booking'];
+}
+export default mongoose.model('Booking', BookingSchema);
