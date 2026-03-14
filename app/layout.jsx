@@ -1,6 +1,8 @@
 import AuthProvider from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BookNowFloat from '@/components/BookNowFloat';
+import ChatWidget from '@/components/ChatWidget';
 import '@/assets/styles/globals.css';
 
 export const metadata = {
@@ -19,10 +21,13 @@ const RootLayout = ({ children }) => {
       <body>
         <AuthProvider>
           <Header />
-          <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+          <main>
             {children}
           </main>
           <Footer />
+          {/* Fixed floating elements — outside main so they overlay everything */}
+          <BookNowFloat />
+          <ChatWidget />
         </AuthProvider>
       </body>
     </html>
