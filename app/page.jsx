@@ -184,7 +184,7 @@ const HomePage = async () => {
                   <Link
                     key={court._id}
                     href={`/courts/${court._id}`}
-                    className="group bg-white overflow-hidden shadow-sm flex-shrink-0 snap-start block w-72 hover:ring-2 hover:ring-green-400"
+                    className="group bg-white overflow-hidden shadow-sm flex-shrink-0 snap-start block w-72 hover:ring-2 hover:ring-green-400 rounded-2xl"
                     style={{ minWidth: '72vw', maxWidth: '300px' }}
                   >
                     {court.image ? (
@@ -229,7 +229,7 @@ const HomePage = async () => {
                   <Link
                     key={court._id}
                     href={`/courts/${court._id}`}
-                    className="group bg-white overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300 block hover:ring-2 hover:ring-green-400 hover:shadow-[0_0_0_2px_#4ade80,0_0_22px_rgba(74,222,128,0.45),0_10px_30px_rgba(0,0,0,0.12)]"
+                    className="group bg-white overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300 block hover:ring-2 hover:ring-green-400 hover:shadow-[0_0_0_2px_#4ade80,0_0_22px_rgba(74,222,128,0.45),0_10px_30px_rgba(0,0,0,0.12)] rounded-2xl"
                   >
                     {court.image ? (
                       <div className="relative h-52 overflow-hidden">
@@ -300,10 +300,10 @@ const HomePage = async () => {
               More than just football
             </p>
             <h2
-              className="events-title font-black uppercase text-gray-900"
+              className="font-black uppercase text-gray-900"
               style={{
                 fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-                fontFamily: "'Rubik Dirt', Impact, Arial Black, sans-serif",
+                fontFamily: 'Impact, Arial Black, sans-serif',
               }}
             >
               EVENTS &amp; SERVICES
@@ -314,7 +314,7 @@ const HomePage = async () => {
             {EVENTS.map((e, i) => (
               <div
                 key={i}
-                className={`group bg-white overflow-hidden transition-all duration-300 border-t-4 ${e.border} flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-xl`}
+                className={`group bg-white overflow-hidden transition-all duration-300 border-t-4 ${e.border} flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-xl rounded-2xl`}
               >
                 <div className="p-6">
                   <h3
@@ -327,7 +327,7 @@ const HomePage = async () => {
                     {e.desc}
                   </p>
                 </div>
-                <div className="h-48 overflow-hidden mt-auto">
+                <div className="h-48 overflow-hidden mt-auto rounded-b-2xl">
                   <img
                     src={e.image}
                     alt={e.title}
