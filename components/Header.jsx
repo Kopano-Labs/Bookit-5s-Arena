@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from 'react';
 import {
   FaUser, FaSignOutAlt, FaSignInAlt, FaCalendarAlt,
-  FaBars, FaTimes, FaUserEdit, FaEnvelope,
+  FaBars, FaTimes, FaUserEdit, FaEnvelope, FaChartBar,
 } from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -58,6 +58,9 @@ const Header = () => {
                     </Link>
                     <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
                       <FaEnvelope size={11} /> Newsletter
+                    </Link>
+                    <Link href="/admin/analytics" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                      <FaChartBar size={11} /> Analytics
                     </Link>
                     <Link href="/courts/add" className="flex items-center gap-1 px-4 py-2 text-xs font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-lg transition-all uppercase tracking-widest">
                       + Court
@@ -175,6 +178,9 @@ const Header = () => {
                   <Link href="/admin/bookings" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">Manage Bookings</Link>
                   <Link href="/admin/newsletter" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
                     <FaEnvelope className="inline mr-2" size={12} />Newsletter
+                  </Link>
+                  <Link href="/admin/analytics" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
+                    <FaChartBar className="inline mr-2" size={12} />Analytics
                   </Link>
                   <Link href="/courts/add" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-xl">+ Add Court</Link>
                 </>
