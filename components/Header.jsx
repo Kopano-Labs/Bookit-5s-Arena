@@ -3,7 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from 'react';
-import { FaUser, FaSignOutAlt, FaSignInAlt, FaCalendarAlt, FaBars, FaTimes, FaUserEdit } from 'react-icons/fa';
+import {
+  FaUser, FaSignOutAlt, FaSignInAlt, FaCalendarAlt,
+  FaBars, FaTimes, FaUserEdit, FaEnvelope,
+} from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
 
 const Header = () => {
@@ -53,6 +56,9 @@ const Header = () => {
                     <Link href="/admin/bookings" className="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
                       Manage
                     </Link>
+                    <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                      <FaEnvelope size={11} /> Newsletter
+                    </Link>
                     <Link href="/courts/add" className="flex items-center gap-1 px-4 py-2 text-xs font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-lg transition-all uppercase tracking-widest">
                       + Court
                     </Link>
@@ -66,17 +72,29 @@ const Header = () => {
           <div className="flex items-center gap-2">
             {session ? (
               <>
-                {/* Profile avatar button */}
+                {/* Profile avatar — shows uploaded photo or initials */}
                 <Link
                   href="/profile"
                   className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-800 transition-all group border border-transparent hover:border-gray-700"
                 >
-                  <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-black shadow-inner border border-green-500">
-                    {session.user.name?.[0]?.toUpperCase() || 'U'}
-                  </div>
+                  {session.user.image ? (
+                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0 shadow-[0_0_10px_rgba(34,197,94,0.3)]">
+                      <img
+                        src={session.user.image}
+                        alt={session.user.name || 'Profile'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-black shadow-inner border border-green-500 flex-shrink-0">
+                      {session.user.name?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  )}
                   <div className="hidden lg:block text-left leading-tight">
                     <p className="text-white text-xs font-bold">{session.user.name?.split(' ')[0]}</p>
-                    <p className="text-green-400 text-[10px] uppercase tracking-widest">Profile</p>
+                    <p className="text-green-400 text-[10px] uppercase tracking-widest">
+                      {session.user.username ? `@${session.user.username}` : 'Profile'}
+                    </p>
                   </div>
                 </Link>
                 <button
@@ -118,6 +136,28 @@ const Header = () => {
       {/* ── Mobile Drawer ── */}
       {mobileOpen && (
         <div className="md:hidden bg-gray-900 border-t border-gray-800 px-4 pb-5 pt-3 space-y-1">
+
+          {/* Mobile user identity strip */}
+          {session && (
+            <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-gray-800">
+              {session.user.image ? (
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0">
+                  <img src={session.user.image} alt={session.user.name || 'Profile'} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-black border border-green-500 flex-shrink-0">
+                  {session.user.name?.[0]?.toUpperCase() || 'U'}
+                </div>
+              )}
+              <div>
+                <p className="text-white text-sm font-bold">{session.user.name}</p>
+                {session.user.username && (
+                  <p className="text-green-400 text-xs font-mono">@{session.user.username}</p>
+                )}
+              </div>
+            </div>
+          )}
+
           <Link href="/#courts" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
             Courts
           </Link>
@@ -133,6 +173,9 @@ const Header = () => {
                 <>
                   <Link href="/admin/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">Dashboard</Link>
                   <Link href="/admin/bookings" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">Manage Bookings</Link>
+                  <Link href="/admin/newsletter" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl">
+                    <FaEnvelope className="inline mr-2" size={12} />Newsletter
+                  </Link>
                   <Link href="/courts/add" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-xl">+ Add Court</Link>
                 </>
               )}
