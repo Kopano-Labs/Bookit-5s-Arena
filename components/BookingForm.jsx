@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { FaCalendarAlt, FaClock, FaFutbol, FaLock } from 'react-icons/fa';
 
 const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const { data: session } = useSession();
@@ -57,31 +59,43 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
     );
   };
 
+  const inputClass =
+    'w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all placeholder-gray-500';
+  const labelClass = 'block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest';
+
   return (
-    <div className="mt-6">
-      <h2 className="text-xl font-bold">Book this Court</h2>
+    <div className="mt-8 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <h2
+        className="text-lg font-black uppercase tracking-widest text-white mb-6 flex items-center gap-2"
+        style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+      >
+        <FaFutbol className="text-green-400" /> Book This Court
+      </h2>
 
       {!session && (
-        <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-700 text-sm">
-          You need to{' '}
-          <a href="/login" className="font-semibold underline">
-            sign in
-          </a>{' '}
-          to book a court.
+        <div className="mb-5 p-4 bg-yellow-900/30 border border-yellow-700/40 rounded-xl text-yellow-300 text-sm flex items-center gap-2">
+          <FaLock className="flex-shrink-0" />
+          <span>
+            You need to{' '}
+            <Link href="/login" className="font-bold underline hover:text-yellow-200">
+              sign in
+            </Link>{' '}
+            to book a court.
+          </span>
         </div>
       )}
 
       {error && (
-        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+        <div className="mb-5 p-3 bg-red-950 border border-red-800 rounded-xl text-red-400 text-sm">
           {error}
         </div>
       )}
 
-      <form className="mt-4" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-              Date
+            <label htmlFor="date" className={labelClass}>
+              <FaCalendarAlt className="inline mr-1.5 mb-0.5" />Date
             </label>
             <input
               type="date"
@@ -90,14 +104,14 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className={inputClass}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="start_time" className="block text-sm font-medium text-gray-700">
-              Start Time
+            <label htmlFor="start_time" className={labelClass}>
+              <FaClock className="inline mr-1.5 mb-0.5" />Start Time
             </label>
             <input
               type="time"
@@ -107,13 +121,13 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               onChange={(e) => setStartTime(e.target.value)}
               min="10:00"
               max="21:00"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className={inputClass}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="duration" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="duration" className={labelClass}>
               Duration
             </label>
             <select
@@ -121,7 +135,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               name="duration"
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className={inputClass}
               required
             >
               <option value="1">1 hour</option>
@@ -132,21 +146,25 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
         </div>
 
         {date && startTime && (
-          <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700">
-            <span className="font-semibold">Total: </span>R{totalPrice}{' '}
-            <span className="text-gray-500">({duration} hr × R{pricePerHour}/hr)</span>
+          <div className="p-4 bg-green-900/20 border border-green-800/40 rounded-xl text-sm text-green-300">
+            <span className="font-bold text-white">Total: R{totalPrice}</span>
+            <span className="text-green-500 ml-2">
+              ({duration} hr × R{pricePerHour}/hr)
+            </span>
           </div>
         )}
 
-        <div className="mt-6">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Booking...' : session ? 'Book Court' : 'Sign In to Book'}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3.5 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)',
+            boxShadow: '0 0 25px rgba(34,197,94,0.35)',
+          }}
+        >
+          {loading ? 'Booking...' : session ? 'Book Court' : 'Sign In to Book'}
+        </button>
       </form>
     </div>
   );
