@@ -1,4 +1,5 @@
 import BookingForm from '@/components/BookingForm';
+import InfoTooltip from '@/components/InfoTooltip';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaChevronLeft, FaFutbol, FaMapMarkerAlt, FaClock, FaStar } from 'react-icons/fa';
@@ -92,14 +93,18 @@ const CourtPage = async ({ params }) => {
               <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 flex items-start gap-3">
                 <FaStar className="text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Amenities</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                    Amenities <InfoTooltip text="Facilities available at this court. All courts have floodlights for evening play." position="right" size={12} />
+                  </p>
                   <p className="text-white text-sm font-medium">{court.amenities}</p>
                 </div>
               </div>
               <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 flex items-start gap-3">
                 <FaClock className="text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Availability</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                    Availability <InfoTooltip text="Operating hours for this court. Bookings outside these hours are not available. Contact us for special arrangements." position="right" size={12} />
+                  </p>
                   <p className="text-white text-sm font-medium">{court.availability}</p>
                 </div>
               </div>
@@ -113,7 +118,9 @@ const CourtPage = async ({ params }) => {
               <div className="bg-green-900/20 border border-green-800/40 rounded-xl p-4 flex items-start gap-3">
                 <FaFutbol className="text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs text-green-600 uppercase tracking-widest mb-1">Price per Hour</p>
+                  <p className="text-xs text-green-600 uppercase tracking-widest mb-1 flex items-center gap-1">
+                    Price per Hour <InfoTooltip text="Rate per hour. Total cost = hourly rate × duration. You can book 1–3 hours per session. Pay online via Stripe or pay cash/card at the venue." position="top" size={12} />
+                  </p>
                   <p className="text-green-400 text-2xl font-black">R{court.price_per_hour}</p>
                 </div>
               </div>

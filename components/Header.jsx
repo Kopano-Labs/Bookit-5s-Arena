@@ -9,10 +9,20 @@ import {
   FaFutbol, FaTachometerAlt, FaListAlt,
 } from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
 
 const Header = () => {
   const { data: session } = useSession();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navClass = (href) => {
+    const base = 'flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg transition-all uppercase tracking-widest';
+    const active = pathname === href || (href !== '/' && href !== '/#courts' && pathname?.startsWith(href))
+      ? 'text-white bg-gray-800 border-b-2 border-green-500 shadow-[0_2px_8px_rgba(34,197,94,0.25)]'
+      : 'text-gray-400 hover:text-white hover:bg-gray-800';
+    return `${base} ${active}`;
+  };
 
   return (
     <header className="bg-gray-950 border-b border-gray-800 sticky top-0 z-50 shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
@@ -41,26 +51,29 @@ const Header = () => {
 
           {/* ── Desktop Nav ── */}
           <div className="hidden md:flex items-center gap-0.5">
-            <Link href="/#courts" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+            <Link href="/#courts" className={navClass('/#courts')}>
               <FaFutbol size={11} /> Courts
             </Link>
             {session && (
               <>
-                <Link href="/bookings" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                <Link href="/bookings" className={navClass('/bookings')}>
                   <FaCalendarAlt size={11} /> Bookings
+                </Link>
+                <Link href="/rewards" className={navClass('/rewards')} title="Loyalty rewards & member perks">
+                  <span className="text-yellow-400">⭐</span> Rewards
                 </Link>
                 {session.user.role === 'admin' && (
                   <>
-                    <Link href="/admin/dashboard" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                    <Link href="/admin/dashboard" className={navClass('/admin/dashboard')}>
                       <FaTachometerAlt size={11} /> Dashboard
                     </Link>
-                    <Link href="/admin/bookings" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                    <Link href="/admin/bookings" className={navClass('/admin/bookings')}>
                       <FaListAlt size={11} /> Manage
                     </Link>
-                    <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                    <Link href="/admin/newsletter" className={navClass('/admin/newsletter')}>
                       <FaEnvelope size={11} /> Newsletter
                     </Link>
-                    <Link href="/admin/analytics" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest">
+                    <Link href="/admin/analytics" className={navClass('/admin/analytics')}>
                       <FaChartBar size={11} /> Analytics
                     </Link>
                     <Link href="/courts/add" className="flex items-center gap-1 px-4 py-2 text-xs font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-lg transition-all uppercase tracking-widest">
@@ -167,8 +180,11 @@ const Header = () => {
           </Link>
           {session ? (
             <>
-              <Link href="/bookings" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
+              <Link href="/bookings" onClick={() => setMobileOpen(false)} className={`block px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest ${pathname === '/bookings' ? 'text-white bg-gray-800 border-l-2 border-green-500' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}>
                 <FaCalendarAlt className="inline mr-2" size={13} />Bookings
+              </Link>
+              <Link href="/rewards" onClick={() => setMobileOpen(false)} className={`block px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest ${pathname === '/rewards' ? 'text-white bg-gray-800 border-l-2 border-green-500' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}>
+                ⭐ Rewards
               </Link>
               <Link href="/profile" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
                 <FaUserEdit className="inline mr-2" size={13} />Edit Profile

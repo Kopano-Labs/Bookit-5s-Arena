@@ -10,6 +10,7 @@ import {
   FaCreditCard, FaWhatsapp, FaPhone, FaMapMarkerAlt,
   FaCheckCircle, FaChevronDown,
 } from 'react-icons/fa';
+import InfoTooltip from './InfoTooltip';
 
 const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const { data: session } = useSession();
@@ -23,6 +24,11 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const [reserveLoading, setReserveLoading] = useState(false);
   const [reserved, setReserved] = useState(false);
   const [showPayOptions, setShowPayOptions] = useState(false);
+  const [showGuestForm, setShowGuestForm] = useState(false);
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const [guestPhone, setGuestPhone] = useState('');
+  const [guestReserveLoading, setGuestReserveLoading] = useState(false);
 
   const totalPrice = pricePerHour * Number(duration);
 
@@ -62,6 +68,28 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
     });
     const data = await res.json();
     setReserveLoading(false);
+    if (!res.ok) { setError(data.error || 'Failed to reserve. Please try again.'); return; }
+    setReserved(true);
+  };
+
+  const handleGuestReserve = async () => {
+    setError('');
+    if (!validateForm()) return;
+    if (!guestName.trim() || !guestEmail.trim() || !guestPhone.trim()) {
+      setError('Please fill in your name, email and phone number.');
+      return;
+    }
+    setGuestReserveLoading(true);
+    const res = await fetch('/api/bookings/guest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        courtId, date, start_time: startTime, duration: Number(duration),
+        guestName, guestEmail, guestPhone,
+      }),
+    });
+    const data = await res.json();
+    setGuestReserveLoading(false);
     if (!res.ok) { setError(data.error || 'Failed to reserve. Please try again.'); return; }
     setReserved(true);
   };
@@ -143,20 +171,110 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-5 p-4 bg-yellow-900/30 border border-yellow-700/40 rounded-xl text-yellow-300 text-sm"
+          className="mb-5 space-y-3"
         >
-          <div className="flex items-center gap-2 mb-2">
-            <FaLock className="flex-shrink-0" />
-            <span className="font-bold">Sign in to book or reserve this court.</span>
+          {/* Auth options */}
+          <div className="p-4 bg-yellow-900/30 border border-yellow-700/40 rounded-xl text-yellow-300 text-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <FaLock className="flex-shrink-0" />
+              <span className="font-bold">Sign in for full booking access.</span>
+            </div>
+            <div className="flex gap-2">
+              <Link href="/login" className="flex-1 text-center py-2 px-3 rounded-lg bg-green-700 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors">
+                Sign In
+              </Link>
+              <Link href="/register" className="flex-1 text-center py-2 px-3 rounded-lg bg-gray-700 text-white text-xs font-semibold hover:bg-gray-600 transition-colors">
+                Create Account
+              </Link>
+            </div>
           </div>
-          <div className="flex gap-2 mt-3">
-            <Link href="/login" className="flex-1 text-center py-2 px-3 rounded-lg bg-green-700 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors">
-              Sign In
-            </Link>
-            <Link href="/register" className="flex-1 text-center py-2 px-3 rounded-lg bg-gray-700 text-white text-xs font-semibold hover:bg-gray-600 transition-colors">
-              Create Account
-            </Link>
+
+          {/* Guest reserve toggle */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-800" /></div>
+            <div className="relative flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowGuestForm((v) => !v)}
+                className="bg-gray-900 px-3 flex items-center gap-1 text-gray-500 hover:text-amber-400 text-xs uppercase tracking-widest transition-colors"
+              >
+                or reserve as guest · pay at venue
+                <motion.span animate={{ rotate: showGuestForm ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <FaChevronDown size={9} />
+                </motion.span>
+              </button>
+            </div>
           </div>
+
+          <AnimatePresence>
+            {showGuestForm && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="bg-gray-800/60 border border-amber-700/40 rounded-xl p-4 space-y-3">
+                  <p className="text-amber-300 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    <FaMapMarkerAlt className="text-amber-400" /> Guest Reservation — Pay at Venue
+                    <InfoTooltip text="No account needed! We'll hold your court slot. Create a free account to earn loyalty points and manage bookings online." position="right" />
+                  </p>
+                  <p className="text-gray-500 text-xs">Fill in your details to hold this slot. Bring R{totalPrice} on arrival.</p>
+
+                  <div className="space-y-2.5">
+                    <input
+                      type="text"
+                      placeholder="Full Name *"
+                      value={guestName}
+                      onChange={(e) => setGuestName(e.target.value)}
+                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none placeholder-gray-500"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email Address *"
+                      value={guestEmail}
+                      onChange={(e) => setGuestEmail(e.target.value)}
+                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none placeholder-gray-500"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone Number * (e.g. 0821234567)"
+                      value={guestPhone}
+                      onChange={(e) => setGuestPhone(e.target.value)}
+                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none placeholder-gray-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <a href="https://wa.me/27637820245" target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-green-800/40 border border-green-700/50 text-green-400 text-xs font-semibold hover:bg-green-800/60 transition-colors">
+                      <FaWhatsapp size={13} /> WhatsApp
+                    </a>
+                    <a href="tel:+27637820245"
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-gray-700/50 border border-gray-600 text-gray-300 text-xs font-semibold hover:bg-gray-700 transition-colors">
+                      <FaPhone size={11} /> Call Us
+                    </a>
+                  </div>
+
+                  <motion.button
+                    type="button"
+                    onClick={handleGuestReserve}
+                    disabled={guestReserveLoading}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white uppercase tracking-widest transition-all disabled:opacity-50 bg-amber-700 hover:bg-amber-600 flex items-center justify-center gap-2"
+                  >
+                    {guestReserveLoading ? (
+                      <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Reserving...</>
+                    ) : (
+                      <>Hold My Slot — Pay R{totalPrice} at Venue</>
+                    )}
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
 
@@ -173,11 +291,11 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
             <input type="date" id="date" value={date} onChange={(e) => setDate(e.target.value)} min={new Date().toISOString().split('T')[0]} className={inputClass} required />
           </div>
           <div>
-            <label htmlFor="start_time" className={labelClass}><FaClock className="inline mr-1.5 mb-0.5" />Start Time</label>
+            <label htmlFor="start_time" className={labelClass}><FaClock className="inline mr-1.5 mb-0.5" />Start Time <InfoTooltip text="Courts are open 10:00 AM – 9:00 PM. Book at least 1 day in advance." position="top" /></label>
             <input type="time" id="start_time" value={startTime} onChange={(e) => setStartTime(e.target.value)} min="10:00" max="21:00" className={inputClass} required />
           </div>
           <div>
-            <label htmlFor="duration" className={labelClass}>Duration</label>
+            <label htmlFor="duration" className={labelClass}>Duration <InfoTooltip text="Minimum 1 hour, maximum 3 hours per booking. Extra time can be arranged on-site if the court is free." position="top" /></label>
             <select id="duration" value={duration} onChange={(e) => setDuration(e.target.value)} className={inputClass} required>
               <option value="1">1 hour</option>
               <option value="2">2 hours</option>
@@ -206,7 +324,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               {loading ? (
                 <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Redirecting to Payment...</>
               ) : (
-                <><FaCreditCard size={14} /> Pay Online Now — R{totalPrice}</>
+                <><FaCreditCard size={14} /> Pay Online Now — R{totalPrice} <InfoTooltip text="Securely pay via Stripe. Your booking is instantly confirmed once payment is complete. Card details are never stored on our servers." position="top" size={13} /></>
               )}
             </motion.button>
 
@@ -236,7 +354,9 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                     <div className="flex items-start gap-3">
                       <FaMapMarkerAlt className="text-amber-400 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="text-white text-sm font-bold">Reserve and Pay at Venue</p>
+                        <p className="text-white text-sm font-bold flex items-center gap-1.5">
+                          Reserve and Pay at Venue <InfoTooltip text="Your slot is held for you. Bring R{totalPrice} cash or card when you arrive. WhatsApp us to confirm — unclaimed slots may be released 30 min before start time." position="top" />
+                        </p>
                         <p className="text-gray-400 text-xs mt-0.5">
                           Hold your slot now — bring R{totalPrice} cash or card on arrival.
                           WhatsApp or call us to lock in your time.

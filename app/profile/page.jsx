@@ -10,6 +10,7 @@ import {
   FaCamera, FaAt, FaBell, FaBellSlash,
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import InfoTooltip from '@/components/InfoTooltip';
 
 const ProfilePage = () => {
   const { data: session, status, update } = useSession();
@@ -245,6 +246,7 @@ const ProfilePage = () => {
                 <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide flex items-center gap-1.5">
                   <FaAt size={11} /> Username
                   <span className="text-gray-600 font-normal normal-case tracking-normal text-xs ml-1">(your public handle)</span>
+                  <InfoTooltip text="Your unique @handle shown on bookings and your profile. 3–30 characters. Letters, numbers and underscores only." position="right" />
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-green-400 text-sm font-bold pointer-events-none">@</span>
@@ -365,15 +367,17 @@ const ProfilePage = () => {
               <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-700" /></div>
                 <div className="relative flex justify-center">
-                  <span className="bg-gray-900 px-3 text-gray-500 text-xs uppercase tracking-widest">Member Benefits</span>
+                  <span className="bg-gray-900 px-3 text-gray-500 text-xs uppercase tracking-widest flex items-center gap-1.5">
+                    Member Benefits <InfoTooltip text="Your stats grow every time you book. Higher tiers unlock exclusive perks, priority slots and member-only promotions." position="top" />
+                  </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: 'Courts Booked', icon: '⚽', value: session?.user?.totalBookings ?? '—', color: 'text-green-400' },
-                  { label: 'Hours Played', icon: '⏱', value: session?.user?.totalHours ? `${session.user.totalHours}h` : '—', color: 'text-blue-400' },
-                  { label: 'Loyalty Tier', icon: '🏆', value: session?.user?.loyaltyTier ?? 'Bronze', color: 'text-yellow-400' },
+                  { label: 'Courts Booked', icon: '⚽', value: session?.user?.totalBookings ?? '—', color: 'text-green-400', tip: 'Total number of confirmed court bookings on your account.' },
+                  { label: 'Hours Played', icon: '⏱', value: session?.user?.totalHours ? `${session.user.totalHours}h` : '—', color: 'text-blue-400', tip: 'Total hours booked across all your sessions.' },
+                  { label: 'Loyalty Tier', icon: '🏆', value: session?.user?.loyaltyTier ?? 'Bronze', color: 'text-yellow-400', tip: 'Bronze → Silver → Gold → Diamond. Visit the Rewards page to see how to level up!' },
                 ].map((stat) => (
                   <motion.div
                     key={stat.label}
@@ -382,7 +386,9 @@ const ProfilePage = () => {
                   >
                     <p className="text-xl mb-1">{stat.icon}</p>
                     <p className={`text-sm font-black ${stat.color}`}>{stat.value}</p>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wide mt-0.5">{stat.label}</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wide mt-0.5 flex items-center justify-center gap-1">
+                      {stat.label} <InfoTooltip text={stat.tip} position="bottom" size={11} />
+                    </p>
                   </motion.div>
                 ))}
               </div>
@@ -390,6 +396,7 @@ const ProfilePage = () => {
               <div className="bg-gradient-to-r from-green-900/30 to-gray-800/30 border border-green-800/40 rounded-xl p-4 text-sm">
                 <p className="text-green-400 font-bold mb-1 flex items-center gap-2">
                   <span>⭐</span> Member Perks — Active
+                  <InfoTooltip text="These perks are active for all registered members. As you climb tiers, you'll unlock additional exclusive benefits on the Rewards page." position="top" />
                 </p>
                 <ul className="text-gray-400 text-xs space-y-1">
                   <li>✓ Priority court reservations</li>

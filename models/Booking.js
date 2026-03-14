@@ -10,8 +10,13 @@ const BookingSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
+      default: null,
     },
+    // Guest booking fields (when user is not authenticated)
+    guestName:  { type: String, default: null },
+    guestEmail: { type: String, default: null },
+    guestPhone: { type: String, default: null },
     date: {
       type: String, // stored as 'YYYY-MM-DD'
       required: [true, 'Booking date is required'],
