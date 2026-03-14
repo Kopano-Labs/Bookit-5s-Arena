@@ -1,23 +1,72 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { FaCheckCircle, FaFutbol, FaCalendarAlt, FaClock, FaArrowRight } from 'react-icons/fa';
+import { FaCheckCircle, FaFutbol, FaCalendarAlt, FaClock, FaArrowRight, FaCreditCard } from 'react-icons/fa';
 
 const BookingSuccessPage = () => {
   const searchParams = useSearchParams();
+  const bookingId = searchParams.get('bookingId');
 
-  const courtId   = searchParams.get('court')    ?? '—';
-  const date      = searchParams.get('date')     ?? '—';
-  const startTime = searchParams.get('time')     ?? '—';
-  const duration  = searchParams.get('duration') ?? '1';
-  const total     = searchParams.get('total')    ?? '—';
+  // Legacy support for direct (non-Stripe) success redirects
+  const legacyCourt    = searchParams.get('court')    ?? null;
+  const legacyDate     = searchParams.get('date')     ?? null;
+  const legacyTime     = searchParams.get('time')     ?? null;
+  const legacyDuration = searchParams.get('duration') ?? null;
+  const legacyTotal    = searchParams.get('total')    ?? null;
+
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(!!bookingId);
+  const [retries, setRetries] = useState(0);
+
+  useEffect(() => {
+    if (!bookingId) return;
+
+    const fetchBooking = async () => {
+      try {
+        const res = await fetch(`/api/bookings/${bookingId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setBooking(data);
+          setLoading(false);
+        } else if (retries < 5) {
+          // Webhook might not have fired yet — retry after 2s
+          setTimeout(() => setRetries((r) => r + 1), 2000);
+        } else {
+          setLoading(false);
+        }
+      } catch {
+        setLoading(false);
+      }
+    };
+
+    fetchBooking();
+  }, [bookingId, retries]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-green-400 font-semibold animate-pulse">Confirming your payment...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Use fetched booking data or fall back to legacy URL params
+  const courtName = booking?.court?.name ?? legacyCourt ?? '—';
+  const date      = booking?.date         ?? legacyDate  ?? '—';
+  const time      = booking?.start_time   ?? legacyTime  ?? '—';
+  const duration  = String(booking?.duration ?? legacyDuration ?? '1');
+  const total     = String(booking?.total_price ?? legacyTotal ?? '—');
+  const isPaid    = booking?.paymentStatus === 'paid';
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center py-16 px-4">
       <div className="w-full max-w-lg">
 
-        {/* Glow card */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
 
           {/* Top strip */}
@@ -32,8 +81,13 @@ const BookingSuccessPage = () => {
               You&apos;re Booked!
             </h1>
             <p className="text-green-400 text-sm mt-2 font-semibold">
-              Booking confirmed — see you on the pitch! ⚽
+              Payment confirmed — see you on the pitch! ⚽
             </p>
+            {isPaid && (
+              <div className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 bg-green-900/40 border border-green-700/60 rounded-full text-xs text-green-400 font-bold">
+                <FaCreditCard size={10} /> Payment Successful · Secured by Stripe
+              </div>
+            )}
           </div>
 
           {/* Details */}
@@ -41,7 +95,7 @@ const BookingSuccessPage = () => {
             <div className="flex items-center gap-3 py-3 border-b border-gray-800">
               <FaFutbol className="text-green-400 flex-shrink-0" />
               <span className="text-xs text-gray-500 uppercase tracking-widest w-20">Court</span>
-              <span className="text-white font-semibold">{courtId}</span>
+              <span className="text-white font-semibold">{courtName}</span>
             </div>
             <div className="flex items-center gap-3 py-3 border-b border-gray-800">
               <FaCalendarAlt className="text-green-400 flex-shrink-0" />
@@ -49,10 +103,7 @@ const BookingSuccessPage = () => {
               <span className="text-white font-semibold">
                 {date !== '—'
                   ? new Date(date).toLocaleDateString('en-ZA', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
+                      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                     })
                   : '—'}
               </span>
@@ -61,7 +112,7 @@ const BookingSuccessPage = () => {
               <FaClock className="text-green-400 flex-shrink-0" />
               <span className="text-xs text-gray-500 uppercase tracking-widest w-20">Time</span>
               <span className="text-white font-semibold">
-                {startTime} · {duration} hour{Number(duration) > 1 ? 's' : ''}
+                {time} · {duration} hour{Number(duration) > 1 ? 's' : ''}
               </span>
             </div>
             <div className="flex items-center gap-3 py-4">
