@@ -7,7 +7,7 @@ const BookNowFloat = () => {
   const [visible, setVisible] = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  // Show after scrolling 300px
+  // Appear after scrolling 300px
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 300);
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -21,60 +21,67 @@ const BookNowFloat = () => {
   };
 
   return (
-    <button
-      onClick={scrollToCourts}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      aria-label="Book a court"
+    <div
       style={{
         position: 'fixed',
         right: 0,
         top: '50%',
-        transform: `translateY(-50%) translateX(${visible ? '0' : '110px'})`,
+        transform: `translateY(-50%) translateX(${visible ? '0' : '120px'})`,
+        transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
         zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '10px',
-        padding: '18px 10px',
-        background: hovered ? '#16a34a' : '#15803d',
-        borderRadius: '12px 0 0 12px',
-        cursor: 'pointer',
-        border: 'none',
-        outline: 'none',
-        transition: 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease',
-        boxShadow: hovered
-          ? '-4px 0 30px rgba(34,197,94,0.7), -2px 0 10px rgba(0,0,0,0.4)'
-          : '-4px 0 20px rgba(34,197,94,0.4), -2px 0 8px rgba(0,0,0,0.3)',
-        animation: visible ? 'none' : undefined,
       }}
     >
-      <FaFutbol
+      <button
+        onClick={scrollToCourts}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        aria-label="Book a court"
         style={{
-          color: '#fff',
-          fontSize: '20px',
-          transform: hovered ? 'rotate(20deg) scale(1.2)' : 'rotate(0deg) scale(1)',
-          transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: hovered ? '10px' : '0px',
+          padding: hovered ? '13px 18px 13px 14px' : '13px 12px',
+          width: hovered ? 'auto' : '48px',
+          overflow: 'hidden',
+          background: hovered ? '#16a34a' : '#15803d',
+          borderRadius: '10px 0 0 10px',
+          cursor: 'pointer',
+          border: 'none',
+          outline: 'none',
+          transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          boxShadow: hovered
+            ? '-4px 0 30px rgba(34,197,94,0.8), -2px 0 12px rgba(0,0,0,0.4)'
+            : '-3px 0 16px rgba(34,197,94,0.45)',
+          whiteSpace: 'nowrap',
         }}
-      />
-      {'BOOK NOW'.split('').map((ch, i) => (
-        <span
-          key={i}
+      >
+        <FaFutbol
           style={{
             color: '#fff',
-            fontSize: '11px',
+            fontSize: '22px',
+            flexShrink: 0,
+            transform: hovered ? 'rotate(20deg) scale(1.15)' : 'rotate(0deg) scale(1)',
+            transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          }}
+        />
+        <span
+          style={{
+            color: '#fff',
+            fontSize: '13px',
             fontWeight: 900,
-            letterSpacing: '0.08em',
-            writingMode: 'vertical-rl',
-            textOrientation: 'mixed',
             fontFamily: 'Impact, Arial Black, sans-serif',
-            lineHeight: 1,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            opacity: hovered ? 1 : 0,
+            maxWidth: hovered ? '120px' : '0px',
+            transition: 'opacity 0.2s ease 0.05s, max-width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            overflow: 'hidden',
           }}
         >
-          {ch === ' ' ? '\u00A0' : ch}
+          BOOK NOW
         </span>
-      ))}
-    </button>
+      </button>
+    </div>
   );
 };
 
