@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
   FaCalendarAlt, FaFutbol, FaMoneyBillWave, FaClock,
   FaFilter, FaTimes, FaUsers, FaCheckCircle, FaHourglassHalf,
-  FaBan, FaTrendingUp, FaChartBar, FaStar,
+  FaBan, FaArrowUp, FaChartBar, FaStar,
 } from 'react-icons/fa';
 
 const statusBadge = (status) => {
@@ -174,7 +174,7 @@ const AdminDashboard = () => {
           <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-                <FaTrendingUp className="text-green-400" /> Revenue — Last 7 Days
+                <FaArrowUp className="text-green-400" /> Revenue — Last 7 Days
               </h3>
               <span className="text-xs text-gray-600">
                 R{(stats.revenueTrend?.reduce((a, d) => a + d.revenue, 0) || 0).toLocaleString()} total
