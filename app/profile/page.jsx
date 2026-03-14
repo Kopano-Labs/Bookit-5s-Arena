@@ -106,8 +106,8 @@ const ProfilePage = () => {
       setError('New password must be at least 6 characters.');
       return;
     }
-    if (username && !/^[a-z0-9_]{3,30}$/.test(username)) {
-      setError('Username: 3–30 chars, lowercase letters / numbers / underscores only.');
+    if (username && !/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+      setError('Username: 3–30 chars, letters (upper or lower), numbers, underscores only.');
       return;
     }
 
@@ -250,7 +250,7 @@ const ProfilePage = () => {
                     maxLength={30}
                   />
                 </div>
-                <p className="text-gray-600 text-xs mt-1">3–30 characters. Letters, numbers and underscores only.</p>
+                <p className="text-gray-600 text-xs mt-1">3–30 characters. Letters (A–Z, a–z), numbers and underscores only.</p>
               </div>
 
               {/* Email (read-only) */}

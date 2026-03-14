@@ -18,31 +18,42 @@ const BookingSuccessPage = () => {
 
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(!!bookingId);
-  const [retries, setRetries] = useState(0);
 
   useEffect(() => {
     if (!bookingId) return;
 
-    const fetchBooking = async () => {
+    const confirmBooking = async () => {
       try {
-        const res = await fetch(`/api/bookings/${bookingId}`);
-        if (res.ok) {
-          const data = await res.json();
+        // 1. Proactively verify payment with Stripe and auto-confirm the booking.
+        //    This fires immediately so the UI shows "Confirmed" even if the
+        //    webhook hasn't arrived yet.
+        const verifyRes = await fetch('/api/stripe/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId }),
+        });
+
+        if (verifyRes.ok) {
+          const data = await verifyRes.json();
           setBooking(data);
           setLoading(false);
-        } else if (retries < 5) {
-          // Webhook might not have fired yet — retry after 2s
-          setTimeout(() => setRetries((r) => r + 1), 2000);
-        } else {
-          setLoading(false);
+          return;
         }
-      } catch {
+
+        // 2. Fallback — fetch booking directly (webhook may have already fired)
+        const fallback = await fetch(`/api/bookings/${bookingId}`);
+        if (fallback.ok) {
+          setBooking(await fallback.json());
+        }
+      } catch (err) {
+        console.error('Success page fetch error:', err);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchBooking();
-  }, [bookingId, retries]);
+    confirmBooking();
+  }, [bookingId]);
 
   if (loading) {
     return (
@@ -122,8 +133,24 @@ const BookingSuccessPage = () => {
             </div>
           </div>
 
+          {/* Booking status badge */}
+          {booking && (
+            <div className="px-8 pb-2">
+              <div className={`flex items-center justify-between p-3 rounded-xl border text-sm font-semibold ${
+                isPaid
+                  ? 'bg-green-900/20 border-green-700/40 text-green-400'
+                  : 'bg-yellow-900/20 border-yellow-700/40 text-yellow-400'
+              }`}>
+                <span>Booking Status</span>
+                <span className="uppercase tracking-wider text-xs">
+                  {booking.status === 'confirmed' ? '✓ Confirmed' : booking.status}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Actions */}
-          <div className="px-8 pb-8 flex flex-col sm:flex-row gap-3">
+          <div className="px-8 py-6 flex flex-col sm:flex-row gap-3">
             <Link
               href="/bookings"
               className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"

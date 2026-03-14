@@ -36,8 +36,8 @@ export async function PUT(request) {
   }
 
   // Validate username if provided
-  if (username && !/^[a-z0-9_]{3,30}$/.test(username)) {
-    return Response.json({ error: 'Username must be 3–30 characters: lowercase letters, numbers, underscores only.' }, { status: 400 });
+  if (username && !/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+    return Response.json({ error: 'Username must be 3–30 characters: letters, numbers, underscores only.' }, { status: 400 });
   }
 
   await connectDB();
