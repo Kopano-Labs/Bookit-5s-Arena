@@ -4,7 +4,10 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaCalendarAlt, FaClock, FaEnvelope, FaEdit, FaArrowLeft } from 'react-icons/fa';
+import {
+  FaCalendarAlt, FaClock, FaEnvelope, FaEdit, FaArrowLeft,
+  FaMapMarkerAlt, FaStar, FaFutbol,
+} from 'react-icons/fa';
 
 const BookingDetailPage = () => {
   const { id } = useParams();
@@ -33,132 +36,190 @@ const BookingDetailPage = () => {
     return (bookingDateTime - new Date()) / (1000 * 60 * 60) < 8;
   };
 
-  if (loading) return <div className="text-center py-10 text-gray-500">Loading booking...</div>;
-  if (!booking || booking.error) return <div className="text-center py-10 text-red-500">Booking not found.</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-green-400 animate-pulse text-lg">Loading booking...</div>
+      </div>
+    );
+  }
+
+  if (!booking || booking.error) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 text-lg mb-4">Booking not found.</p>
+          <Link href="/bookings" className="text-green-400 hover:text-green-300 text-sm">
+            ← Back to Bookings
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const court = booking.court;
   const canEdit = !isWithin8Hours() && booking.status !== 'cancelled';
 
   const statusStyle =
-    booking.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-    booking.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-    'bg-yellow-100 text-yellow-700';
+    booking.status === 'confirmed'
+      ? 'bg-green-900/40 text-green-400 border border-green-800/60'
+      : booking.status === 'cancelled'
+      ? 'bg-red-900/40 text-red-400 border border-red-800/60'
+      : 'bg-yellow-900/40 text-yellow-400 border border-yellow-800/60';
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gray-950 py-10 px-4">
+      <div className="max-w-4xl mx-auto">
 
-      <Link href="/bookings" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6">
-        <FaArrowLeft className="text-xs" /> Back to Bookings
-      </Link>
+        <Link
+          href="/bookings"
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-green-400 text-sm mb-8 transition-colors uppercase tracking-wide"
+        >
+          <FaArrowLeft size={11} /> Back to Bookings
+        </Link>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">{court?.name}</h1>
-      <hr className="mb-6" />
-
-      {/* Court info */}
-      <div className="flex flex-col md:flex-row gap-6 mb-8">
-        {court?.image && (
-          <Image
-            src={`/images/courts/${court.image}`}
-            alt={court.name}
-            width={300}
-            height={200}
-            className="w-full md:w-72 h-52 object-cover rounded-lg"
-          />
-        )}
-        <div className="space-y-2 text-sm text-gray-700">
-          {court?.description && <p className="text-teal-600 italic">{court.description}</p>}
-          {court?.amenities && (
-            <p><span className="font-semibold text-gray-800">Amenities:</span> {court.amenities}</p>
-          )}
-          <p><span className="font-semibold text-gray-800">Availability:</span> {court?.availability}</p>
-          <p><span className="font-semibold text-gray-800">Price:</span> R{court?.price_per_hour}/hour</p>
-          <p><span className="font-semibold text-gray-800">Address:</span> {court?.address}</p>
-        </div>
-      </div>
-
-      {/* Booking details */}
-      <div className="bg-white shadow rounded-lg p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Booked Court</h2>
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${statusStyle}`}>
-            {booking.status}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Date</p>
-            <p className="font-medium text-gray-800 flex items-center gap-1">
-              <FaCalendarAlt className="text-gray-400 text-xs" />
-              {new Date(booking.date).toLocaleDateString('en-ZA', {
-                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-              })}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Start Time</p>
-            <p className="font-medium text-gray-800 flex items-center gap-1">
-              <FaClock className="text-gray-400 text-xs" /> {booking.start_time}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Duration</p>
-            <p className="font-medium text-gray-800">{booking.duration} hour{booking.duration > 1 ? 's' : ''}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Total Paid</p>
-            <p className="font-bold text-gray-900">R{booking.total_price}</p>
+        {/* Court info card */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl mb-6">
+          <div className="flex flex-col md:flex-row">
+            {court?.image && (
+              <div className="relative w-full md:w-72 h-52 flex-shrink-0">
+                <Image
+                  src={`/images/courts/${court.image}`}
+                  alt={court.name}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/60 hidden md:block" />
+              </div>
+            )}
+            <div className="p-6 space-y-3 flex-1">
+              <h1
+                className="text-2xl font-black uppercase tracking-widest text-white"
+                style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+              >
+                {court?.name}
+              </h1>
+              {court?.description && (
+                <p className="text-green-400 text-sm italic">{court.description}</p>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                {court?.amenities && (
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <FaStar className="text-green-500 flex-shrink-0" size={11} />
+                    {court.amenities}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-gray-400">
+                  <FaClock className="text-green-500 flex-shrink-0" size={11} />
+                  {court?.availability}
+                </div>
+                <div className="flex items-center gap-2 text-gray-400">
+                  <FaFutbol className="text-green-500 flex-shrink-0" size={11} />
+                  R{court?.price_per_hour}/hour
+                </div>
+                {court?.address && (
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <FaMapMarkerAlt className="text-green-500 flex-shrink-0" size={11} />
+                    {court.address}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex flex-wrap gap-3 pt-1">
-          <button
-            onClick={handleResend}
-            disabled={resending}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            <FaEnvelope className="text-xs" />
-            {resending ? 'Sending...' : 'Resend Receipt to Email'}
-          </button>
-
-          {canEdit ? (
-            <Link
-              href={`/bookings/${id}/edit`}
-              className="flex items-center gap-2 px-4 py-2 border border-blue-200 text-blue-600 rounded-md text-sm hover:bg-blue-50"
+        {/* Booking details card */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-6 shadow-2xl">
+          <div className="flex items-center justify-between">
+            <h2
+              className="text-xl font-black uppercase tracking-widest text-white"
+              style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
             >
-              <FaEdit className="text-xs" /> Edit Booking
-            </Link>
-          ) : (
+              Booking Details
+            </h2>
+            <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${statusStyle}`}>
+              {booking.status}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1">
+                <FaCalendarAlt size={9} /> Date
+              </p>
+              <p className="font-semibold text-white text-sm">
+                {new Date(booking.date).toLocaleDateString('en-ZA', {
+                  weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                })}
+              </p>
+            </div>
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1">
+                <FaClock size={9} /> Start
+              </p>
+              <p className="font-semibold text-white text-sm">{booking.start_time}</p>
+            </div>
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Duration</p>
+              <p className="font-semibold text-white text-sm">
+                {booking.duration} hour{booking.duration > 1 ? 's' : ''}
+              </p>
+            </div>
+            <div className="bg-green-900/20 border border-green-800/40 rounded-xl p-4">
+              <p className="text-xs text-green-600 uppercase tracking-widest mb-2">Total Paid</p>
+              <p className="font-black text-green-400 text-xl">R{booking.total_price}</p>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap gap-3">
             <button
-              disabled
-              title={booking.status === 'cancelled' ? 'Cancelled bookings cannot be edited' : 'Cannot edit within 8 hours of start time'}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-400 rounded-md text-sm cursor-not-allowed"
+              onClick={handleResend}
+              disabled={resending}
+              className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-300 hover:text-white hover:border-gray-600 transition-all disabled:opacity-50"
             >
-              <FaEdit className="text-xs" /> Edit Booking
+              <FaEnvelope size={12} />
+              {resending ? 'Sending...' : 'Resend Receipt'}
             </button>
+
+            {canEdit ? (
+              <Link
+                href={`/bookings/${id}/edit`}
+                className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 border border-green-800/60 text-green-400 rounded-xl text-sm hover:border-green-600 hover:bg-green-900/20 transition-all"
+              >
+                <FaEdit size={12} /> Edit Booking
+              </Link>
+            ) : (
+              <button
+                disabled
+                title={booking.status === 'cancelled' ? 'Cancelled bookings cannot be edited' : 'Cannot edit within 8 hours of start time'}
+                className="flex items-center gap-2 px-4 py-2.5 bg-gray-800/50 border border-gray-800 text-gray-600 rounded-xl text-sm cursor-not-allowed"
+              >
+                <FaEdit size={12} /> Edit Booking
+              </button>
+            )}
+          </div>
+
+          {resendMsg && (
+            <p className={`text-sm font-medium ${resendMsg.includes('sent') ? 'text-green-400' : 'text-red-400'}`}>
+              {resendMsg}
+            </p>
           )}
+
+          {/* T&Cs */}
+          <div className="pt-4 border-t border-gray-800">
+            <p className="text-xs text-gray-600 leading-relaxed">
+              By booking a court at 5s Arena, you agree to our Terms &amp; Conditions. Bookings are non-refundable within 8 hours
+              of the scheduled start time. Cancellations made more than 8 hours in advance will be reviewed by management.
+              5s Arena reserves the right to cancel bookings due to unforeseen circumstances, in which case a full refund or
+              rebooking will be offered. Players are responsible for their own safety and that of other participants. 5s Arena
+              accepts no liability for injury, loss, or damage to personal property. All bookings are subject to availability
+              and confirmation.
+            </p>
+          </div>
         </div>
 
-        {resendMsg && (
-          <p className={`text-sm ${resendMsg.includes('sent') ? 'text-green-600' : 'text-red-500'}`}>
-            {resendMsg}
-          </p>
-        )}
-
-        {/* T&Cs */}
-        <div className="pt-4 border-t">
-          <p className="text-xs text-gray-400 leading-relaxed">
-            By booking a court at 5s Arena, you agree to our Terms &amp; Conditions. Bookings are non-refundable within 8 hours
-            of the scheduled start time. Cancellations made more than 8 hours in advance will be reviewed by management.
-            5s Arena reserves the right to cancel bookings due to unforeseen circumstances, in which case a full refund or
-            rebooking will be offered. Players are responsible for their own safety and that of other participants. 5s Arena
-            accepts no liability for injury, loss, or damage to personal property. All bookings are subject to availability
-            and confirmation.
-          </p>
-        </div>
       </div>
-
     </div>
   );
 };
