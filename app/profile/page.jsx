@@ -336,8 +336,8 @@ const ProfilePage = () => {
                     <p className="text-white text-sm font-semibold">Newsletter &amp; Promotions</p>
                     <p className="text-gray-500 text-xs mt-0.5">
                       {newsletterOptIn
-                        ? 'You\'ll receive offers, fixtures &amp; arena news.'
-                        : 'Subscribe to get deals, fixtures &amp; arena news.'}
+                        ? "You'll receive offers, fixtures & arena news."
+                        : 'Subscribe to get deals, fixtures & arena news.'}
                     </p>
                   </div>
                 </div>
