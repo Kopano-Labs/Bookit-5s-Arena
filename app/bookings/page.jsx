@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaFutbol, FaCalendarAlt, FaClock, FaTrash, FaArrowRight } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const statusStyles = {
   confirmed: 'bg-green-900/40 text-green-400 border border-green-800/60',
