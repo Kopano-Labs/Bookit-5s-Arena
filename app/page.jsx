@@ -63,15 +63,18 @@ const HomePage = async () => {
     <div className="min-h-screen bg-white">
 
       {/* ══ HERO ══════════════════════════════════════════════ */}
-      <section
-        className="relative min-h-screen flex items-end pb-24 overflow-hidden"
-        style={{
-          backgroundImage:
-            'url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
+      <section className="relative min-h-screen flex items-end pb-24 overflow-hidden">
+        {/* Animated background — Ken Burns loop */}
+        <div
+          className="absolute inset-0 hero-bg"
+          style={{
+            backgroundImage:
+              'url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80)',
+            backgroundSize: '120%',
+            backgroundPosition: 'center',
+          }}
+        />
+        {/* Gradient overlay */}
         <div
           className="absolute inset-0"
           style={{
