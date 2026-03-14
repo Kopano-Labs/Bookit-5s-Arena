@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaSignInAlt, FaGoogle, FaUserSecret } from 'react-icons/fa';
 import ArenaBackground from '@/components/ArenaBackground';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -42,14 +43,22 @@ const LoginPage = () => {
       <ArenaBackground />
 
       {/* ── Card ── */}
-      <div className="w-full max-w-md bg-gray-900/95 backdrop-blur-sm shadow-2xl rounded-2xl p-8 border border-gray-800 relative z-10">
+      <motion.div
+        className="w-full max-w-md bg-gray-900/95 backdrop-blur-sm shadow-2xl rounded-2xl p-8 border border-gray-800 relative z-10"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+      >
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)', boxShadow: '0 0 30px rgba(34,197,94,0.4)' }}>
+          <motion.div
+            className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)', boxShadow: '0 0 30px rgba(34,197,94,0.4)' }}
+            whileHover={{ scale: 1.1, rotate: -5 }}
+          >
             <FaSignInAlt className="text-white text-xl" />
-          </div>
+          </motion.div>
           <h1
             className="text-3xl font-black uppercase tracking-tight text-white"
             style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
@@ -67,14 +76,16 @@ const LoginPage = () => {
 
         {/* Google button */}
         <div className="space-y-3 mb-6">
-          <button
+          <motion.button
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
             className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-gray-800 border border-gray-700 rounded-xl text-sm font-semibold text-gray-200 hover:border-gray-600 hover:text-white transition-all disabled:opacity-50 shadow-sm"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             <FaGoogle className="text-red-400 text-base" />
             {googleLoading ? 'Redirecting...' : 'Continue with Google'}
-          </button>
+          </motion.button>
         </div>
 
         {/* Guest access */}
@@ -127,17 +138,19 @@ const LoginPage = () => {
               placeholder="••••••••"
             />
           </div>
-          <button
+          <motion.button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] mt-1"
+            className="w-full py-3.5 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             style={{
               background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)',
               boxShadow: '0 0 25px rgba(34,197,94,0.35)',
             }}
+            whileHover={{ scale: 1.02, boxShadow: '0 0 35px rgba(34,197,94,0.55)' }}
+            whileTap={{ scale: 0.97 }}
           >
             {loading ? 'Signing in...' : 'Sign In'}
-          </button>
+          </motion.button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
@@ -146,7 +159,7 @@ const LoginPage = () => {
             Register here
           </Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 };
