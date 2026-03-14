@@ -5,11 +5,32 @@ import User from '@/models/User';
 // POST /api/auth/register
 export async function POST(request) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, recaptchaToken } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: 'Name, email and password are required' },
+        { status: 400 }
+      );
+    }
+
+    // ── Verify Google reCAPTCHA token (server-side) ──────────────
+    if (!recaptchaToken) {
+      return NextResponse.json(
+        { error: 'Please complete the reCAPTCHA check.' },
+        { status: 400 }
+      );
+    }
+
+    const recaptchaRes = await fetch(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+      { method: 'POST' }
+    );
+    const recaptchaData = await recaptchaRes.json();
+
+    if (!recaptchaData.success) {
+      return NextResponse.json(
+        { error: 'reCAPTCHA verification failed. Please try again.' },
         { status: 400 }
       );
     }
