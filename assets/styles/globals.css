@@ -13,6 +13,20 @@
   }
 }
 
+/* ── Hero Ken Burns animation ── */
+@keyframes kenBurns {
+  0%   { background-position: 20% 60%; background-size: 120%; }
+  25%  { background-position: 80% 40%; background-size: 130%; }
+  50%  { background-position: 60% 70%; background-size: 125%; }
+  75%  { background-position: 30% 30%; background-size: 135%; }
+  100% { background-position: 20% 60%; background-size: 120%; }
+}
+
+.hero-bg {
+  animation: kenBurns 20s ease-in-out infinite;
+  will-change: background-position, background-size;
+}
+
 @keyframes rollRight {
   0%   { transform: translateX(-160px) rotate(0deg);    opacity: 0; }
   6%   { opacity: 1; }
