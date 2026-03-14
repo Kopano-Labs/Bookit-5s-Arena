@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import BookNowFloat from '@/components/BookNowFloat';
 import ChatWidget from '@/components/ChatWidget';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import Analytics from '@/components/Analytics';
 import CookieBanner from '@/components/CookieBanner';
 import '@/assets/styles/globals.css';
 
@@ -23,6 +24,7 @@ const RootLayout = ({ children }) => {
       <body>
         <AuthProvider>
           <AnalyticsTracker />
+          <Analytics />
           <Header />
           <main className="px-4 sm:px-6 lg:px-8 py-6">
             {children}

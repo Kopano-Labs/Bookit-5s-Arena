@@ -36,6 +36,7 @@ const AdminDashboard = () => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [selectedCourt, setSelectedCourt] = useState(null);
 
   const fetchStats = useCallback((params) => {
     const p = params || new URLSearchParams();
@@ -268,12 +269,17 @@ const AdminDashboard = () => {
               <div className="divide-y divide-gray-800">
                 {stats.courtBreakdown.map((c, i) => {
                   const pct = stats.totalBookings > 0 ? Math.round((c.bookings / stats.totalBookings) * 100) : 0;
+                  const isSelected = selectedCourt === c.name;
                   return (
-                    <div key={c._id} className="px-6 py-4 hover:bg-gray-800/40 transition-colors">
+                    <div
+                      key={c._id}
+                      onClick={() => setSelectedCourt(isSelected ? null : c.name)}
+                      className={`px-6 py-4 cursor-pointer transition-colors ${isSelected ? 'bg-green-900/20 border-l-2 border-green-500' : 'hover:bg-gray-800/40'}`}
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center text-[10px] font-black text-gray-400">{i + 1}</span>
-                          <span className="font-semibold text-white text-sm">{c.name}</span>
+                          <span className={`font-semibold text-sm ${isSelected ? 'text-green-400' : 'text-white'}`}>{c.name}</span>
                         </div>
                         <div className="text-right">
                           <span className="font-bold text-green-400 text-sm">R{c.revenue.toLocaleString()}</span>
@@ -300,28 +306,46 @@ const AdminDashboard = () => {
                 View All →
               </Link>
             </div>
-            {!stats.recentBookings?.length ? (
-              <p className="text-center py-10 text-gray-600 text-sm">No bookings yet.</p>
-            ) : (
-              <div className="divide-y divide-gray-800">
-                {stats.recentBookings.map((b) => (
-                  <div key={b._id} className="px-6 py-3.5 hover:bg-gray-800/40 transition-colors">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-white text-sm font-semibold truncate">{b.courtName}</p>
-                        <p className="text-gray-500 text-xs truncate">{b.userName} · {b.date} {b.start_time}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                        <span className="font-bold text-green-400 text-sm">R{b.total_price}</span>
-                        <span className={`text-[10px] font-bold border px-2 py-0.5 rounded-full uppercase tracking-wide ${statusBadge(b.status)}`}>
-                          {b.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            {selectedCourt && (
+              <div className="px-6 py-2.5 bg-green-900/20 border-b border-green-800/40 flex items-center justify-between">
+                <span className="text-xs text-green-400 font-semibold">Viewing: {selectedCourt}</span>
+                <button
+                  onClick={() => setSelectedCourt(null)}
+                  className="text-xs text-gray-500 hover:text-white transition-colors flex items-center gap-1"
+                >
+                  <FaTimes size={10} /> Clear
+                </button>
               </div>
             )}
+            {(() => {
+              const filtered = selectedCourt
+                ? (stats.recentBookings ?? []).filter((b) => b.courtName === selectedCourt)
+                : (stats.recentBookings ?? []);
+              return !filtered.length ? (
+                <p className="text-center py-10 text-gray-600 text-sm">
+                  {selectedCourt ? `No recent bookings for ${selectedCourt}.` : 'No bookings yet.'}
+                </p>
+              ) : (
+                <div className="divide-y divide-gray-800">
+                  {filtered.map((b) => (
+                    <div key={b._id} className="px-6 py-3.5 hover:bg-gray-800/40 transition-colors">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-white text-sm font-semibold truncate">{b.courtName}</p>
+                          <p className="text-gray-500 text-xs truncate">{b.userName} · {b.date} {b.start_time}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                          <span className="font-bold text-green-400 text-sm">R{b.total_price}</span>
+                          <span className={`text-[10px] font-bold border px-2 py-0.5 rounded-full uppercase tracking-wide ${statusBadge(b.status)}`}>
+                            {b.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </div>
 

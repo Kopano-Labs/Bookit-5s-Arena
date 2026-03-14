@@ -46,13 +46,37 @@ const AdminBookings = () => {
 
   const handleStatusChange = async (bookingId, newStatus) => {
     setUpdating(bookingId);
+    const booking = bookings.find((b) => b._id === bookingId);
     await fetch(`/api/admin/bookings/${bookingId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus }),
     });
+    // Auto-mark paid when confirming a Stripe-originated booking
+    let autoPaymentUpdate = {};
+    if (newStatus === 'confirmed' && booking?.stripeSessionId && booking?.paymentStatus !== 'paid') {
+      await fetch(`/api/admin/bookings/${bookingId}/payment`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentStatus: 'paid' }),
+      });
+      autoPaymentUpdate = { paymentStatus: 'paid' };
+    }
     setBookings((prev) =>
-      prev.map((b) => (b._id === bookingId ? { ...b, status: newStatus } : b))
+      prev.map((b) => (b._id === bookingId ? { ...b, status: newStatus, ...autoPaymentUpdate } : b))
+    );
+    setUpdating(null);
+  };
+
+  const handleMarkPaid = async (bookingId) => {
+    setUpdating(bookingId);
+    await fetch(`/api/admin/bookings/${bookingId}/payment`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentStatus: 'paid' }),
+    });
+    setBookings((prev) =>
+      prev.map((b) => (b._id === bookingId ? { ...b, paymentStatus: 'paid' } : b))
     );
     setUpdating(null);
   };
@@ -148,15 +172,31 @@ const AdminBookings = () => {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${
-                          b.paymentStatus === 'paid'
-                            ? 'bg-green-900/40 text-green-400 border border-green-800/60'
-                            : b.paymentStatus === 'refunded'
-                            ? 'bg-blue-900/40 text-blue-400 border border-blue-800/60'
-                            : 'bg-gray-800 text-gray-500 border border-gray-700'
-                        }`}>
-                          {b.paymentStatus ?? 'unpaid'}
-                        </span>
+                        <div className="flex flex-col gap-1.5 items-start">
+                          <div className="flex items-center gap-1.5">
+                            {(b.paymentStatus === 'unpaid' || !b.paymentStatus) && b.status === 'confirmed' && (
+                              <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" title="Confirmed but unpaid — action needed" />
+                            )}
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${
+                              b.paymentStatus === 'paid'
+                                ? 'bg-green-900/40 text-green-400 border border-green-800/60'
+                                : b.paymentStatus === 'refunded'
+                                ? 'bg-blue-900/40 text-blue-400 border border-blue-800/60'
+                                : 'bg-gray-800 text-gray-500 border border-gray-700'
+                            }`}>
+                              {b.paymentStatus ?? 'unpaid'}
+                            </span>
+                          </div>
+                          {(b.paymentStatus === 'unpaid' || !b.paymentStatus) && b.status === 'confirmed' && (
+                            <button
+                              onClick={() => handleMarkPaid(b._id)}
+                              disabled={updating === b._id}
+                              className="text-[10px] font-bold text-green-400 hover:text-green-300 border border-green-800/60 hover:border-green-600 rounded px-1.5 py-0.5 transition-all disabled:opacity-50"
+                            >
+                              Mark Paid
+                            </button>
+                          )}
+                        </div>
                       </td>
                       <td className="px-5 py-4">
                         <select

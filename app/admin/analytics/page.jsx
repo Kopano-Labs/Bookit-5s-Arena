@@ -312,9 +312,7 @@ export default function AnalyticsPage() {
               {(data?.topEvents || []).length === 0 && (
                 <tr>
                   <td colSpan={2} className="px-5 py-8 text-center text-gray-600 text-xs">
-                    No custom events tracked yet. Use{' '}
-                    <code className="text-green-500 font-mono">window.trackEvent('event_name')</code>{' '}
-                    anywhere in your app.
+                    Page views are tracked automatically. Custom events will appear here as users interact with the site.
                   </td>
                 </tr>
               )}
