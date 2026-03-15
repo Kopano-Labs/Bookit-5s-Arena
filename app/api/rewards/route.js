@@ -16,15 +16,47 @@ const getTier = (count) => {
 const getAchievements = (bookings) => {
   const confirmed = bookings.filter((b) => b.status === 'confirmed');
   const courts = new Set(bookings.map((b) => b.court?.toString()));
-  const dates = bookings.map((b) => b.date).sort();
+  const sortedByDate = [...bookings].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // Streak: count consecutive weeks
-  let streak = 0;
-  const weeks = new Set(dates.map((d) => {
-    const date = new Date(d);
-    const startOfYear = new Date(date.getFullYear(), 0, 1);
-    return `${date.getFullYear()}-W${Math.ceil(((date - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7)}`;
-  }));
+  // Helper to find the Nth booking (sorted by date)
+  const nthBooking = (n) => sortedByDate[n - 1];
+  const formatUnlockInfo = (booking) => {
+    if (!booking) return {};
+    return {
+      unlockedAt: booking.date,
+      unlockedCourt: booking.court?.name || 'Court',
+    };
+  };
+
+  // Find the booking that caused explorer unlock (2nd unique court)
+  const explorerBooking = (() => {
+    const seen = new Set();
+    for (const b of sortedByDate) {
+      seen.add(b.court?.toString());
+      if (seen.size >= 2) return b;
+    }
+    return null;
+  })();
+
+  // Find when total hours crossed 10
+  const marathonBooking = (() => {
+    let total = 0;
+    for (const b of confirmed.sort((a, b) => new Date(a.date) - new Date(b.date))) {
+      total += b.duration || 0;
+      if (total >= 10) return b;
+    }
+    return null;
+  })();
+
+  // Find when total spent crossed R5000
+  const spenderBooking = (() => {
+    let total = 0;
+    for (const b of confirmed.sort((a, b) => new Date(a.date) - new Date(b.date))) {
+      total += b.total_price || 0;
+      if (total >= 5000) return b;
+    }
+    return null;
+  })();
 
   const achievements = [
     {
@@ -34,6 +66,7 @@ const getAchievements = (bookings) => {
       icon: '⚽',
       unlocked: bookings.length >= 1,
       rarity: 'common',
+      ...formatUnlockInfo(nthBooking(1)),
     },
     {
       id: 'hat_trick',
@@ -42,6 +75,7 @@ const getAchievements = (bookings) => {
       icon: '🎯',
       unlocked: bookings.length >= 3,
       rarity: 'common',
+      ...formatUnlockInfo(nthBooking(3)),
     },
     {
       id: 'regular',
@@ -50,6 +84,7 @@ const getAchievements = (bookings) => {
       icon: '🏃',
       unlocked: bookings.length >= 5,
       rarity: 'uncommon',
+      ...formatUnlockInfo(nthBooking(5)),
     },
     {
       id: 'explorer',
@@ -58,6 +93,7 @@ const getAchievements = (bookings) => {
       icon: '🗺️',
       unlocked: courts.size >= 2,
       rarity: 'uncommon',
+      ...formatUnlockInfo(explorerBooking),
     },
     {
       id: 'marathon',
@@ -66,6 +102,7 @@ const getAchievements = (bookings) => {
       icon: '⏱️',
       unlocked: confirmed.reduce((s, b) => s + (b.duration || 0), 0) >= 10,
       rarity: 'rare',
+      ...formatUnlockInfo(marathonBooking),
     },
     {
       id: 'veteran',
@@ -74,6 +111,7 @@ const getAchievements = (bookings) => {
       icon: '🏆',
       unlocked: bookings.length >= 10,
       rarity: 'rare',
+      ...formatUnlockInfo(nthBooking(10)),
     },
     {
       id: 'big_spender',
@@ -82,6 +120,7 @@ const getAchievements = (bookings) => {
       icon: '💸',
       unlocked: confirmed.reduce((s, b) => s + (b.total_price || 0), 0) >= 5000,
       rarity: 'epic',
+      ...formatUnlockInfo(spenderBooking),
     },
     {
       id: 'legend',
@@ -90,6 +129,7 @@ const getAchievements = (bookings) => {
       icon: '👑',
       unlocked: bookings.length >= 20,
       rarity: 'legendary',
+      ...formatUnlockInfo(nthBooking(20)),
     },
   ];
 

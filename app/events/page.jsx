@@ -15,7 +15,9 @@ import {
   FaChevronDown,
   FaExclamationTriangle,
   FaInfoCircle,
+  FaCalendarAlt,
 } from 'react-icons/fa';
+import AnimatedTitle from '@/components/AnimatedTitle';
 
 const packages = [
   {
@@ -140,28 +142,13 @@ export default function EventsPage() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="relative max-w-5xl mx-auto text-center"
         >
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-            className="w-16 h-16 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/30"
-          >
-            <FaStar className="text-green-400 text-2xl" />
-          </motion.div>
-          <h1
-            className="text-5xl md:text-7xl font-black text-white uppercase tracking-widest mb-4"
-            style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-          >
-            Events & <span className="text-green-400">Parties</span>
-          </h1>
-          <motion.p
-            className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            From kids birthdays to corporate team building — we have the perfect package for your next event at 5s Arena.
-          </motion.p>
+          <AnimatedTitle
+            text={[{ text: 'Events & ', highlight: false }, { text: 'Services', highlight: true }]}
+            subtitle="Birthday celebrations, corporate team building, social tournaments — your next unforgettable event starts here at 5s Arena."
+            icon={<FaStar />}
+            size="xl"
+            align="center"
+          />
           <motion.div
             className="inline-flex items-center gap-2 px-4 py-2 bg-amber-900/30 border border-amber-700/50 rounded-full text-amber-400 text-sm"
             initial={{ opacity: 0, y: 10 }}
@@ -240,11 +227,11 @@ export default function EventsPage() {
 
                   <motion.button
                     onClick={() => handleSelectPackage(pkg)}
-                    className="w-full py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer"
+                    className="w-full py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2"
                     whileHover={{ scale: 1.03, boxShadow: '0 0 25px rgba(34,197,94,0.5)' }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    Book This Package
+                    <FaCalendarAlt size={14} /> Book Event &rarr;
                   </motion.button>
                 </div>
               </motion.div>

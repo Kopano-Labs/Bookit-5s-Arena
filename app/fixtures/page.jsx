@@ -6,8 +6,10 @@ import {
   FaTrophy, FaFutbol, FaNewspaper, FaPlayCircle, FaClock,
   FaExternalLinkAlt, FaSyncAlt, FaChevronDown, FaChevronUp,
   FaChevronLeft, FaChevronRight, FaYoutube, FaTimes,
-  FaInfoCircle, FaFire, FaStar,
+  FaInfoCircle, FaFire, FaStar, FaCheck, FaFilter,
+  FaHeart, FaTh, FaList,
 } from 'react-icons/fa';
+import AnimatedTitle from '@/components/AnimatedTitle';
 
 // ═══════════════════════════════════════════════════════════════
 // MOCK DATA
@@ -83,18 +85,18 @@ const mockMatches = [
 ];
 
 const mockNews = [
-  { id: 1,  title: 'Arsenal Close Gap on Man City After Dominant Derby Win',              source: 'Sky Sports',     timeAgo: '2 hours ago', category: 'Match Report', gradient: 'from-red-900 to-red-700' },
-  { id: 2,  title: 'Barcelona Secure El Clasico Bragging Rights with 3-1 Triumph',         source: 'ESPN FC',        timeAgo: '3 hours ago', category: 'Match Report', gradient: 'from-blue-900 to-red-800' },
-  { id: 3,  title: 'BREAKING: Kylian Mbappe Agrees Personal Terms with Man City',          source: 'Fabrizio Romano',timeAgo: '45 min ago',  category: 'Breaking',     gradient: 'from-sky-900 to-sky-700' },
-  { id: 4,  title: 'Liverpool Manager Addresses Champions League Knockout Strategy',       source: 'The Athletic',   timeAgo: '5 hours ago', category: 'Interview',    gradient: 'from-red-800 to-red-600' },
-  { id: 5,  title: 'La Liga Title Race: Three Teams Separated by Two Points',              source: 'Marca',          timeAgo: '6 hours ago', category: 'Analysis',     gradient: 'from-orange-900 to-yellow-800' },
-  { id: 6,  title: 'VAR Controversy Overshadows Soweto Derby as Pirates Edge Chiefs',       source: 'SuperSport',     timeAgo: '1 hour ago',  category: 'Match Report', gradient: 'from-yellow-900 to-gray-800' },
-  { id: 7,  title: 'Sundowns Set New PSL Record with 15th Consecutive Win',                source: 'KickOff',        timeAgo: '4 hours ago', category: 'Match Report', gradient: 'from-yellow-800 to-green-900' },
-  { id: 8,  title: 'EXCLUSIVE: Chelsea Table R1.2 Billion Bid for Serie A Star',           source: 'Sky Sports',     timeAgo: '30 min ago',  category: 'Transfer',     gradient: 'from-blue-800 to-blue-600' },
-  { id: 9,  title: 'Tactical Analysis: How Arteta Outclassed Pochettino',                  source: 'The Guardian',   timeAgo: '7 hours ago', category: 'Analysis',     gradient: 'from-gray-800 to-gray-600' },
-  { id: 10, title: 'Bayern Munich Complete Signing of English Wonderkid for R850M',        source: 'BILD',           timeAgo: '2 hours ago', category: 'Transfer',     gradient: 'from-red-900 to-red-700' },
-  { id: 11, title: 'Real Madrid Injury Update: Vinicius Jr Faces Three Weeks Out',         source: 'AS',             timeAgo: '8 hours ago', category: 'Breaking',     gradient: 'from-yellow-900 to-white/10' },
-  { id: 12, title: 'Premier League Top Scorers: Updated Golden Boot Race After Matchday 30',source: 'BBC Sport',     timeAgo: '1 hour ago',  category: 'Analysis',     gradient: 'from-purple-900 to-indigo-800' },
+  { id: 1,  title: 'Arsenal Close Gap on Man City After Dominant Derby Win',              source: 'Sky Sports',     timeAgo: '2 hours ago', category: 'Match Report', gradient: 'from-red-900 to-red-700',        leagues: ['PL'] },
+  { id: 2,  title: 'Barcelona Secure El Clasico Bragging Rights with 3-1 Triumph',         source: 'ESPN FC',        timeAgo: '3 hours ago', category: 'Match Report', gradient: 'from-blue-900 to-red-800',       leagues: ['LL'] },
+  { id: 3,  title: 'BREAKING: Kylian Mbappe Agrees Personal Terms with Man City',          source: 'Fabrizio Romano',timeAgo: '45 min ago',  category: 'Breaking',     gradient: 'from-sky-900 to-sky-700',        leagues: ['PL'] },
+  { id: 4,  title: 'Liverpool Manager Addresses Champions League Knockout Strategy',       source: 'The Athletic',   timeAgo: '5 hours ago', category: 'Interview',    gradient: 'from-red-800 to-red-600',        leagues: ['PL', 'UCL'] },
+  { id: 5,  title: 'La Liga Title Race: Three Teams Separated by Two Points',              source: 'Marca',          timeAgo: '6 hours ago', category: 'Analysis',     gradient: 'from-orange-900 to-yellow-800',  leagues: ['LL'] },
+  { id: 6,  title: 'VAR Controversy Overshadows Soweto Derby as Pirates Edge Chiefs',       source: 'SuperSport',     timeAgo: '1 hour ago',  category: 'Match Report', gradient: 'from-yellow-900 to-gray-800',    leagues: ['PSL'] },
+  { id: 7,  title: 'Sundowns Set New PSL Record with 15th Consecutive Win',                source: 'KickOff',        timeAgo: '4 hours ago', category: 'Match Report', gradient: 'from-yellow-800 to-green-900',   leagues: ['PSL'] },
+  { id: 8,  title: 'EXCLUSIVE: Chelsea Table R1.2 Billion Bid for Serie A Star',           source: 'Sky Sports',     timeAgo: '30 min ago',  category: 'Transfer',     gradient: 'from-blue-800 to-blue-600',      leagues: ['PL', 'SA'] },
+  { id: 9,  title: 'Tactical Analysis: How Arteta Outclassed Pochettino',                  source: 'The Guardian',   timeAgo: '7 hours ago', category: 'Analysis',     gradient: 'from-gray-800 to-gray-600',      leagues: ['PL'] },
+  { id: 10, title: 'Bayern Munich Complete Signing of English Wonderkid for R850M',        source: 'BILD',           timeAgo: '2 hours ago', category: 'Transfer',     gradient: 'from-red-900 to-red-700',        leagues: ['BL'] },
+  { id: 11, title: 'Real Madrid Injury Update: Vinicius Jr Faces Three Weeks Out',         source: 'AS',             timeAgo: '8 hours ago', category: 'Breaking',     gradient: 'from-yellow-900 to-white/10',    leagues: ['LL', 'UCL'] },
+  { id: 12, title: 'Premier League Top Scorers: Updated Golden Boot Race After Matchday 30',source: 'BBC Sport',     timeAgo: '1 hour ago',  category: 'Analysis',     gradient: 'from-purple-900 to-indigo-800',  leagues: ['PL'] },
 ];
 
 const CATEGORY_COLORS = {
@@ -242,49 +244,133 @@ const StatusBadge = ({ match }) => {
   );
 };
 
-const MatchCard = ({ match, i }) => (
-  <motion.div
-    custom={i}
-    variants={cardVariants}
-    whileHover={{ scale: 1.012, transition: { duration: 0.2 } }}
-    className={`bg-gray-900 border rounded-2xl p-4 md:p-5 shadow-lg transition-colors ${
-      match.status === 'IN_PLAY'
-        ? 'border-red-800/50 bg-gray-900/80 shadow-red-900/20'
-        : 'border-gray-800 hover:border-gray-700'
-    }`}
-  >
-    <div className="flex items-center gap-3 md:gap-4">
-      <LeagueBadge code={match.league} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex-1 flex items-center justify-end gap-2">
-            <p className="text-sm md:text-base font-bold text-white truncate text-right">{match.home}</p>
-            <TeamBadge team={match.home} size="sm" />
-          </div>
-          <div className="flex-shrink-0 mx-2 md:mx-4">
-            {match.status === 'TIMED' ? (
-              <motion.span className="text-sm font-bold text-gray-500" animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>vs</motion.span>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl md:text-2xl font-black text-green-400 tabular-nums">{match.homeScore}</span>
-                <span className="text-lg text-gray-600 font-bold">-</span>
-                <span className="text-xl md:text-2xl font-black text-green-400 tabular-nums">{match.awayScore}</span>
+const MatchCard = ({ match, i, expanded, onToggle }) => {
+  // Mock match events for inline detail view
+  const mockEvents = match.status !== 'TIMED' ? [
+    { min: 12, type: 'goal', team: 'home', player: 'Player A', detail: 'Right foot shot' },
+    { min: 34, type: 'yellow', team: 'away', player: 'Player B', detail: 'Tactical foul' },
+    { min: 56, type: 'goal', team: 'away', player: 'Player C', detail: 'Header from corner' },
+    { min: 78, type: 'sub', team: 'home', player: 'Player D on for Player E', detail: '' },
+  ] : [];
+
+  return (
+    <motion.div
+      custom={i}
+      variants={cardVariants}
+      className={`bg-gray-900 border rounded-2xl shadow-lg transition-colors overflow-hidden ${
+        match.status === 'IN_PLAY'
+          ? 'border-red-800/50 bg-gray-900/80 shadow-red-900/20'
+          : expanded ? 'border-green-800/50' : 'border-gray-800 hover:border-gray-700'
+      }`}
+    >
+      {/* Main match row — clickable */}
+      <div
+        className="p-4 md:p-5 cursor-pointer"
+        onClick={() => onToggle?.(match.id)}
+      >
+        <div className="flex items-center gap-3 md:gap-4">
+          <LeagueBadge code={match.league} />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1 flex items-center justify-end gap-2">
+                <p className="text-sm md:text-base font-bold text-white truncate text-right">{match.home}</p>
+                <TeamBadge team={match.home} size="sm" />
               </div>
-            )}
+              <div className="flex-shrink-0 mx-2 md:mx-4">
+                {match.status === 'TIMED' ? (
+                  <motion.span className="text-sm font-bold text-gray-500" animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>vs</motion.span>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xl md:text-2xl font-black text-green-400 tabular-nums">{match.homeScore}</span>
+                    <span className="text-lg text-gray-600 font-bold">-</span>
+                    <span className="text-xl md:text-2xl font-black text-green-400 tabular-nums">{match.awayScore}</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 flex items-center gap-2">
+                <TeamBadge team={match.away} size="sm" />
+                <p className="text-sm md:text-base font-bold text-white truncate">{match.away}</p>
+              </div>
+            </div>
+            <div className="text-center mt-1.5 flex items-center justify-center gap-3">
+              <StatusBadge match={match} />
+              {match.date && <span className="text-[9px] text-gray-600 uppercase tracking-wider hidden md:inline">{match.date}</span>}
+              <span className="text-[9px] text-gray-600 hidden md:inline">Click for details</span>
+            </div>
           </div>
-          <div className="flex-1 flex items-center gap-2">
-            <TeamBadge team={match.away} size="sm" />
-            <p className="text-sm md:text-base font-bold text-white truncate">{match.away}</p>
-          </div>
-        </div>
-        <div className="text-center mt-1.5 flex items-center justify-center gap-3">
-          <StatusBadge match={match} />
-          {match.date && <span className="text-[9px] text-gray-600 uppercase tracking-wider hidden md:inline">{match.date}</span>}
         </div>
       </div>
-    </div>
-  </motion.div>
-);
+
+      {/* Inline expanded match detail */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-gray-800 px-5 py-4 space-y-4">
+              {/* Match timeline */}
+              <div>
+                <h4 className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Match Events</h4>
+                <div className="space-y-2">
+                  {mockEvents.map((ev, idx) => (
+                    <div key={idx} className="flex items-center gap-3 text-xs">
+                      <span className="text-green-400 font-bold w-8">{ev.min}'</span>
+                      <span className={`w-5 text-center ${
+                        ev.type === 'goal' ? 'text-green-400' :
+                        ev.type === 'yellow' ? 'text-yellow-400' :
+                        ev.type === 'red' ? 'text-red-400' : 'text-blue-400'
+                      }`}>
+                        {ev.type === 'goal' ? '\u26BD' : ev.type === 'yellow' ? '\uD83D\uDFE8' : ev.type === 'red' ? '\uD83D\uDFE5' : '\uD83D\uDD04'}
+                      </span>
+                      <span className="text-white font-semibold">{ev.player}</span>
+                      {ev.detail && <span className="text-gray-500">— {ev.detail}</span>}
+                      <span className={`ml-auto text-[9px] uppercase tracking-wide ${ev.team === 'home' ? 'text-blue-400' : 'text-purple-400'}`}>
+                        {ev.team === 'home' ? match.home : match.away}
+                      </span>
+                    </div>
+                  ))}
+                  {mockEvents.length === 0 && (
+                    <p className="text-gray-600 text-xs">Match has not started yet. Events will appear here during play.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Referee decisions */}
+              <div className="flex items-center gap-4 text-xs text-gray-400">
+                <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Referee:</span>
+                <span>TBC</span>
+                <span className="text-gray-700">|</span>
+                <span>VAR decisions: 0</span>
+              </div>
+
+              {/* Highlights link */}
+              <div className="flex items-center gap-3">
+                <a
+                  href="#"
+                  className="flex items-center gap-2 text-xs text-green-400 hover:text-green-300 bg-green-900/20 border border-green-800/40 rounded-lg px-3 py-1.5 transition-all"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FaPlayCircle size={11} /> Watch Highlights
+                </a>
+                <a
+                  href="#"
+                  className="flex items-center gap-2 text-xs text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 transition-all"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FaExternalLinkAlt size={9} /> Full Match Report
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 // ═══════════════════════════════════════════════════════════════
 // MAIN COMPONENT
@@ -295,25 +381,99 @@ const FixturesPage = () => {
   const [expandedLeagues, setExpandedLeagues] = useState({ PL: true, LL: true, SA: true, BL: true, PSL: true, UCL: true });
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [refreshing, setRefreshing] = useState(false);
+  const [expandedMatch, setExpandedMatch] = useState(null);
+
+  const toggleMatchDetail = (matchId) => {
+    setExpandedMatch((prev) => (prev === matchId ? null : matchId));
+  };
 
   // News modal state
   const [newsModal, setNewsModal] = useState(null);
+
+  // ── My Leagues / News / Highlights preferences ──
+  const [myLeaguesOpen, setMyLeaguesOpen] = useState(false);
+  const [myNewsOpen, setMyNewsOpen] = useState(false);
+  const [myHighlightsOpen, setMyHighlightsOpen] = useState(false);
+
+  // Selected leagues (all selected by default)
+  const [selectedLeagues, setSelectedLeagues] = useState(() => new Set(Object.keys(LEAGUE_META)));
+  const toggleSelectedLeague = (code) => {
+    setSelectedLeagues(prev => {
+      const next = new Set(prev);
+      if (next.has(code)) { if (next.size > 1) next.delete(code); } else { next.add(code); }
+      return next;
+    });
+  };
+
+  // Prioritised leagues (pushed to top)
+  const [priorityLeagues, setPriorityLeagues] = useState(() => new Set());
+  const togglePriorityLeague = (code) => {
+    setPriorityLeagues(prev => {
+      const next = new Set(prev);
+      next.has(code) ? next.delete(code) : next.add(code);
+      return next;
+    });
+  };
+
+  // News league filter
+  const [newsLeagueFilter, setNewsLeagueFilter] = useState('ALL');
+
+  // News source filters
+  const allNewsSources = [...new Set(mockNews.map(n => n.source))];
+  const [selectedNewsSources, setSelectedNewsSources] = useState(() => new Set(allNewsSources));
+  const toggleNewsSource = (src) => {
+    setSelectedNewsSources(prev => {
+      const next = new Set(prev);
+      if (next.has(src)) { if (next.size > 1) next.delete(src); } else { next.add(src); }
+      return next;
+    });
+  };
+  const [priorityNewsSources, setPriorityNewsSources] = useState(() => new Set());
+  const togglePriorityNews = (src) => {
+    setPriorityNewsSources(prev => {
+      const next = new Set(prev);
+      next.has(src) ? next.delete(src) : next.add(src);
+      return next;
+    });
+  };
+
+  // Highlights view mode (carousel vs grid)
+  const [highlightsView, setHighlightsView] = useState('grid');
+
+  // Highlights channel category filters
+  const allChannelCategories = [...new Set(highlightChannels.map(c => c.category))];
+  const [selectedChannelCats, setSelectedChannelCats] = useState(() => new Set(allChannelCategories));
+  const toggleChannelCat = (cat) => {
+    setSelectedChannelCats(prev => {
+      const next = new Set(prev);
+      if (next.has(cat)) { if (next.size > 1) next.delete(cat); } else { next.add(cat); }
+      return next;
+    });
+  };
+  const [priorityChannelCats, setPriorityChannelCats] = useState(() => new Set());
+  const togglePriorityChannel = (cat) => {
+    setPriorityChannelCats(prev => {
+      const next = new Set(prev);
+      next.has(cat) ? next.delete(cat) : next.add(cat);
+      return next;
+    });
+  };
 
   // Highlights carousel state
   const [carouselPage, setCarouselPage] = useState(0);
   const [carouselPaused, setCarouselPaused] = useState(false);
   const carouselRef = useRef(null);
   const channelsPerPage = 5;
-  const totalPages = Math.ceil(channelsWithRelevance.length / channelsPerPage);
+  // totalPages computed as filteredTotalPages after filter state
 
   // Auto-cycle carousel
   useEffect(() => {
     if (tab !== 'highlights' || carouselPaused) return;
     const interval = setInterval(() => {
-      setCarouselPage(p => (p + 1) % totalPages);
+      setCarouselPage(p => (p + 1) % (filteredTotalPages || 1));
     }, 8000);
     return () => clearInterval(interval);
-  }, [tab, carouselPaused, totalPages]);
+  }, [tab, carouselPaused, filteredTotalPages]);
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
@@ -327,9 +487,13 @@ const FixturesPage = () => {
     setExpandedLeagues(prev => ({ ...prev, [code]: !prev[code] }));
   };
 
-  // Group matches by league
-  const leagueOrder = ['PL', 'LL', 'SA', 'BL', 'PSL', 'UCL'];
-  const matchesByLeague = leagueOrder.reduce((acc, code) => {
+  // Group matches by league — respect selected & priority
+  const baseLeagueOrder = ['PL', 'LL', 'SA', 'BL', 'PSL', 'UCL'];
+  const leagueOrder = [
+    ...baseLeagueOrder.filter(c => priorityLeagues.has(c) && selectedLeagues.has(c)),
+    ...baseLeagueOrder.filter(c => !priorityLeagues.has(c) && selectedLeagues.has(c)),
+  ];
+  const matchesByLeague = baseLeagueOrder.reduce((acc, code) => {
     acc[code] = mockMatches.filter(m => m.league === code);
     return acc;
   }, {});
@@ -343,10 +507,31 @@ const FixturesPage = () => {
     { key: 'highlights', label: 'HIGHLIGHTS',    icon: <FaPlayCircle size={13} /> },
   ];
 
-  const currentChannels = channelsWithRelevance.slice(
-    carouselPage * channelsPerPage,
-    carouselPage * channelsPerPage + channelsPerPage
+  // Filter channels by selected categories and priority
+  const filteredChannels = channelsWithRelevance
+    .filter(c => selectedChannelCats.has(c.category))
+    .sort((a, b) => {
+      const aPri = priorityChannelCats.has(a.category) ? 1 : 0;
+      const bPri = priorityChannelCats.has(b.category) ? 1 : 0;
+      if (aPri !== bPri) return bPri - aPri;
+      return b.relevance - a.relevance;
+    });
+  const filteredTotalPages = Math.ceil(filteredChannels.length / channelsPerPage) || 1;
+  const safeCarouselPage = carouselPage >= filteredTotalPages ? 0 : carouselPage;
+  const currentChannels = filteredChannels.slice(
+    safeCarouselPage * channelsPerPage,
+    safeCarouselPage * channelsPerPage + channelsPerPage
   );
+
+  // Filter and sort news (by source + league)
+  const filteredNews = mockNews
+    .filter(n => selectedNewsSources.has(n.source))
+    .filter(n => newsLeagueFilter === 'ALL' || (n.leagues && n.leagues.includes(newsLeagueFilter)))
+    .sort((a, b) => {
+      const aPri = priorityNewsSources.has(a.source) ? 1 : 0;
+      const bPri = priorityNewsSources.has(b.source) ? 1 : 0;
+      return bPri - aPri;
+    });
 
   const CATEGORY_BADGE = {
     Broadcast: 'bg-red-600/20 text-red-400 border border-red-800/40',
@@ -373,64 +558,52 @@ const FixturesPage = () => {
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           />
           <div className="relative z-10">
-            <motion.div
-              className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-900/30 border border-green-800/50 mb-5"
-              animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <FaTrophy className="text-2xl text-green-400" />
-            </motion.div>
-            <h1
-              className="text-4xl md:text-5xl font-black uppercase tracking-widest text-white"
-              style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-            >
-              Live Fixtures
-            </h1>
-            <p className="text-gray-500 text-sm mt-2 max-w-lg mx-auto">
-              Premier League, La Liga, Serie A, Bundesliga, PSL &amp; Champions League
-            </p>
+            <AnimatedTitle
+              text={[{ text: 'Live ', highlight: false }, { text: 'Fixtures', highlight: true }]}
+              subtitle="Follow every goal, card and result across the world's biggest leagues — all in one place."
+              icon={<FaTrophy />}
+              size="xl"
+              align="center"
+            />
 
-            {/* Last updated + refresh */}
+            {/* Compact updated timer + auto-update note stacked */}
             <motion.div
-              className="mt-4 flex items-center justify-center gap-3 text-[10px] text-gray-600 uppercase tracking-wider"
+              className="mt-2 flex flex-col items-center gap-1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <FaClock size={9} />
-              <span>Updated: {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-              <motion.button
-                onClick={handleRefresh}
-                className="text-green-500 hover:text-green-400 transition-colors p-1"
-                animate={refreshing ? { rotate: 360 } : {}}
-                transition={{ duration: 0.8, ease: 'linear' }}
-                title="Refresh fixtures"
-              >
-                <FaSyncAlt size={11} />
-              </motion.button>
-            </motion.div>
-
-            {/* Info note */}
-            <motion.div
-              className="mt-3 inline-flex items-center gap-2 text-[10px] text-gray-600 bg-gray-900 border border-gray-800 rounded-full px-4 py-1.5"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-            >
-              <FaInfoCircle size={9} className="text-gray-500" />
-              Fixtures update automatically during match days
+              <div className="flex items-center gap-2 bg-green-900/30 border border-green-800/50 rounded-full px-4 py-1.5">
+                <FaClock size={9} className="text-green-400" />
+                <span className="text-[11px] text-green-300 font-bold uppercase tracking-wider">
+                  Updated: {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </span>
+                <motion.button
+                  onClick={handleRefresh}
+                  className="text-green-400 hover:text-green-300 transition-colors p-0.5"
+                  animate={refreshing ? { rotate: 360 } : {}}
+                  transition={{ duration: 0.8, ease: 'linear' }}
+                  title="Refresh fixtures"
+                >
+                  <FaSyncAlt size={10} />
+                </motion.button>
+              </div>
+              <div className="flex items-center gap-1.5 text-[9px] text-gray-600 uppercase tracking-wider">
+                <FaInfoCircle size={8} className="text-gray-600" />
+                Fixtures update automatically during match days
+              </div>
             </motion.div>
           </div>
         </motion.div>
 
-        {/* API banner */}
+        {/* API banner — subtle */}
         <motion.div
-          className="mb-6 bg-gray-900/60 border border-gray-800 rounded-xl px-4 py-2.5 text-center text-[10px] text-gray-500 uppercase tracking-widest"
+          className="mb-6 bg-green-900/10 border border-green-900/30 rounded-xl px-4 py-2 text-center text-[9px] text-green-600/60 uppercase tracking-widest"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: 0.7 }}
           transition={{ delay: 0.3 }}
         >
-          API integration coming soon &mdash; data shown is for preview purposes
+          Live data API integration in progress &mdash; preview mode active
         </motion.div>
 
         {/* ── Tabs ────────────────────────────────────────── */}
@@ -469,6 +642,75 @@ const FixturesPage = () => {
               exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
               transition={{ duration: 0.4 }}
             >
+              {/* ── My Leagues Dropdown ── */}
+              <div className="mb-6 relative">
+                <motion.button
+                  onClick={() => setMyLeaguesOpen(v => !v)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest bg-gray-900 border border-gray-800 hover:border-green-800 text-gray-400 hover:text-green-400 transition-colors cursor-pointer"
+                >
+                  <FaHeart size={10} className="text-green-500" />
+                  My Leagues
+                  {priorityLeagues.size > 0 && (
+                    <span className="bg-green-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">{priorityLeagues.size}</span>
+                  )}
+                  <FaChevronDown size={8} className={`transition-transform ${myLeaguesOpen ? 'rotate-180' : ''}`} />
+                </motion.button>
+
+                <AnimatePresence>
+                  {myLeaguesOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: 'auto' }}
+                      exit={{ opacity: 0, y: -8, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="mt-2 bg-gray-900 border border-gray-800 rounded-xl p-3 overflow-hidden"
+                    >
+                      <p className="text-[9px] text-gray-600 uppercase tracking-widest mb-3">
+                        <FaFilter size={7} className="inline mr-1" />
+                        Tick to show &middot; Star to prioritise (push to top)
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {Object.entries(LEAGUE_META).map(([code, meta]) => (
+                          <div
+                            key={code}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer ${
+                              selectedLeagues.has(code)
+                                ? 'bg-gray-800 border-gray-700 text-white'
+                                : 'bg-gray-950 border-gray-900 text-gray-600'
+                            }`}
+                          >
+                            <button
+                              onClick={() => toggleSelectedLeague(code)}
+                              className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-all ${
+                                selectedLeagues.has(code)
+                                  ? 'bg-green-600 border-green-500'
+                                  : 'bg-gray-800 border-gray-700'
+                              }`}
+                            >
+                              {selectedLeagues.has(code) && <FaCheck size={8} className="text-white" />}
+                            </button>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider flex-1 ${meta.textColor}`}>
+                              {meta.name}
+                            </span>
+                            <button
+                              onClick={() => togglePriorityLeague(code)}
+                              className={`transition-colors ${
+                                priorityLeagues.has(code) ? 'text-yellow-400' : 'text-gray-700 hover:text-gray-500'
+                              }`}
+                              title="Prioritise this league"
+                            >
+                              <FaStar size={10} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               {/* Featured Matches */}
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
@@ -488,7 +730,7 @@ const FixturesPage = () => {
                   className="space-y-3"
                 >
                   {featuredMatches.map((match, i) => (
-                    <MatchCard key={`feat-${match.id}`} match={match} i={i} />
+                    <MatchCard key={`feat-${match.id}`} match={match} i={i} expanded={expandedMatch === match.id} onToggle={toggleMatchDetail} />
                   ))}
                 </motion.div>
               </div>
@@ -548,9 +790,14 @@ const FixturesPage = () => {
                             animate="visible"
                             className="space-y-2 pl-2"
                           >
-                            {matches.map((match, i) => (
-                              <MatchCard key={match.id} match={match} i={i} />
+                            {matches.slice(0, 5).map((match, i) => (
+                              <MatchCard key={match.id} match={match} i={i} expanded={expandedMatch === match.id} onToggle={toggleMatchDetail} />
                             ))}
+                            {matches.length > 5 && (
+                              <p className="text-center text-[10px] text-gray-600 py-2 uppercase tracking-widest">
+                                + {matches.length - 5} more matches
+                              </p>
+                            )}
                           </motion.div>
                         </motion.div>
                       )}
@@ -571,10 +818,99 @@ const FixturesPage = () => {
               transition={{ duration: 0.4 }}
             >
               {/* Powered by note */}
-              <div className="text-center mb-6">
+              <div className="text-center mb-4">
                 <p className="text-[10px] text-gray-600 uppercase tracking-widest">
                   Powered by live football news feeds &mdash; Full API integration in development
                 </p>
+              </div>
+
+              {/* ── My News Dropdown ── */}
+              <div className="mb-6 relative">
+                <motion.button
+                  onClick={() => setMyNewsOpen(v => !v)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest bg-gray-900 border border-gray-800 hover:border-green-800 text-gray-400 hover:text-green-400 transition-colors cursor-pointer"
+                >
+                  <FaHeart size={10} className="text-green-500" />
+                  My News Sources
+                  {priorityNewsSources.size > 0 && (
+                    <span className="bg-green-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">{priorityNewsSources.size}</span>
+                  )}
+                  <FaChevronDown size={8} className={`transition-transform ${myNewsOpen ? 'rotate-180' : ''}`} />
+                </motion.button>
+
+                <AnimatePresence>
+                  {myNewsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: 'auto' }}
+                      exit={{ opacity: 0, y: -8, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="mt-2 bg-gray-900 border border-gray-800 rounded-xl p-3 overflow-hidden"
+                    >
+                      <p className="text-[9px] text-gray-600 uppercase tracking-widest mb-3">
+                        <FaFilter size={7} className="inline mr-1" />
+                        Tick to show &middot; Star to prioritise (push to top)
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                        {allNewsSources.map((src) => (
+                          <div
+                            key={src}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer ${
+                              selectedNewsSources.has(src)
+                                ? 'bg-gray-800 border-gray-700 text-white'
+                                : 'bg-gray-950 border-gray-900 text-gray-600'
+                            }`}
+                          >
+                            <button
+                              onClick={() => toggleNewsSource(src)}
+                              className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-all ${
+                                selectedNewsSources.has(src)
+                                  ? 'bg-green-600 border-green-500'
+                                  : 'bg-gray-800 border-gray-700'
+                              }`}
+                            >
+                              {selectedNewsSources.has(src) && <FaCheck size={8} className="text-white" />}
+                            </button>
+                            <span className="text-[10px] font-bold tracking-wider flex-1 truncate">
+                              {src}
+                            </span>
+                            <button
+                              onClick={() => togglePriorityNews(src)}
+                              className={`transition-colors flex-shrink-0 ${
+                                priorityNewsSources.has(src) ? 'text-yellow-400' : 'text-gray-700 hover:text-gray-500'
+                              }`}
+                              title="Prioritise this source"
+                            >
+                              <FaStar size={10} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* League filter chips */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="text-[9px] text-gray-600 uppercase tracking-widest font-bold">By League:</span>
+                {[{ code: 'ALL', name: 'All Leagues' }, ...Object.entries(LEAGUE_META).map(([code, meta]) => ({ code, name: meta.name }))].map(({ code, name }) => (
+                  <motion.button
+                    key={code}
+                    onClick={() => setNewsLeagueFilter(code)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                      newsLeagueFilter === code
+                        ? 'bg-green-900/40 text-green-400 border border-green-700'
+                        : 'bg-gray-900 text-gray-500 border border-gray-800 hover:border-gray-700'
+                    }`}
+                  >
+                    {name}
+                  </motion.button>
+                ))}
               </div>
 
               <motion.div
@@ -583,7 +919,7 @@ const FixturesPage = () => {
                 animate="visible"
                 className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
               >
-                {mockNews.map((article, i) => (
+                {filteredNews.map((article, i) => (
                   <motion.div
                     key={article.id}
                     variants={staggerItem}
@@ -593,11 +929,16 @@ const FixturesPage = () => {
                     {/* Gradient thumbnail */}
                     <div className={`h-36 bg-gradient-to-br ${article.gradient} relative overflow-hidden`}>
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                      {/* Category badge */}
-                      <div className="absolute top-3 left-3">
+                      {/* Category + league badges */}
+                      <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
                         <span className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border ${CATEGORY_COLORS[article.category] || 'bg-gray-700 text-gray-300'}`}>
                           {article.category}
                         </span>
+                        {article.leagues?.map((lc) => (
+                          <span key={lc} className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-black/40 backdrop-blur border border-white/10 ${LEAGUE_META[lc]?.textColor || 'text-gray-400'}`}>
+                            {lc}
+                          </span>
+                        ))}
                       </div>
                       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
                         <span className="text-[9px] font-bold uppercase tracking-widest text-white/70 bg-black/30 px-2 py-1 rounded">
@@ -636,7 +977,7 @@ const FixturesPage = () => {
               exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
               transition={{ duration: 0.4 }}
             >
-              {/* Channel carousel header */}
+              {/* Channel header + view toggle */}
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2
@@ -646,129 +987,270 @@ const FixturesPage = () => {
                     Football Highlights Channels
                   </h2>
                   <p className="text-[10px] text-gray-600 mt-1 uppercase tracking-wider">
-                    {channelsWithRelevance.length} channels &mdash; ranked by global team relevance
+                    {filteredChannels.length} channels &mdash; ranked by global team relevance
                   </p>
                 </div>
-                {/* Navigation arrows */}
+                <div className="flex items-center gap-3">
+                  {/* View toggle */}
+                  <div className="flex items-center bg-gray-900 border border-gray-800 rounded-lg p-0.5">
+                    <button
+                      onClick={() => setHighlightsView('grid')}
+                      className={`p-1.5 rounded transition-all ${highlightsView === 'grid' ? 'bg-red-900/40 text-red-400' : 'text-gray-600 hover:text-gray-400'}`}
+                    >
+                      <FaTh size={12} />
+                    </button>
+                    <button
+                      onClick={() => setHighlightsView('carousel')}
+                      className={`p-1.5 rounded transition-all ${highlightsView === 'carousel' ? 'bg-red-900/40 text-red-400' : 'text-gray-600 hover:text-gray-400'}`}
+                    >
+                      <FaList size={12} />
+                    </button>
+                  </div>
+                  {/* Navigation arrows (carousel only) */}
+                  {highlightsView === 'carousel' && (
                 <div className="flex items-center gap-2">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setCarouselPage(p => (p - 1 + totalPages) % totalPages)}
+                    onClick={() => setCarouselPage(p => (p - 1 + filteredTotalPages) % filteredTotalPages)}
                     className="w-9 h-9 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors cursor-pointer"
                   >
                     <FaChevronLeft size={12} />
                   </motion.button>
                   <span className="text-[10px] text-gray-500 font-bold tabular-nums min-w-[40px] text-center">
-                    {carouselPage + 1}/{totalPages}
+                    {safeCarouselPage + 1}/{filteredTotalPages}
                   </span>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setCarouselPage(p => (p + 1) % totalPages)}
+                    onClick={() => setCarouselPage(p => (p + 1) % filteredTotalPages)}
                     className="w-9 h-9 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors cursor-pointer"
                   >
                     <FaChevronRight size={12} />
                   </motion.button>
                 </div>
+                  )}
+                </div>
               </div>
 
-              {/* Auto-cycle indicator */}
-              <div className="flex items-center gap-2 mb-4 text-[10px] text-gray-600 uppercase tracking-wider">
-                <div className={`w-2 h-2 rounded-full ${carouselPaused ? 'bg-yellow-500' : 'bg-green-500'}`} />
-                {carouselPaused ? 'Paused' : 'Auto-cycling every 8s'} &mdash; hover to pause
-              </div>
+              {/* ── My Highlights Dropdown ── */}
+              <div className="mb-6 relative">
+                <motion.button
+                  onClick={() => setMyHighlightsOpen(v => !v)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest bg-gray-900 border border-gray-800 hover:border-red-800 text-gray-400 hover:text-red-400 transition-colors cursor-pointer"
+                >
+                  <FaHeart size={10} className="text-red-500" />
+                  My Highlights
+                  {priorityChannelCats.size > 0 && (
+                    <span className="bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">{priorityChannelCats.size}</span>
+                  )}
+                  <FaChevronDown size={8} className={`transition-transform ${myHighlightsOpen ? 'rotate-180' : ''}`} />
+                </motion.button>
 
-              {/* Channel Cards */}
-              <div
-                ref={carouselRef}
-                onMouseEnter={() => setCarouselPaused(true)}
-                onMouseLeave={() => setCarouselPaused(false)}
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={carouselPage}
-                    variants={staggerContainer}
-                    initial="hidden"
-                    animate="visible"
-                    exit={{ opacity: 0, x: -40, transition: { duration: 0.2 } }}
-                    className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
-                  >
-                    {currentChannels.map((channel) => (
-                      <motion.div
-                        key={channel.id}
-                        variants={staggerItem}
-                        whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.2 } }}
-                        className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-lg group hover:border-red-800/40 transition-colors"
-                      >
-                        {/* Channel header with YouTube red accent */}
-                        <div className="h-20 bg-gradient-to-br from-red-900/40 to-gray-900 relative flex items-center justify-center border-b border-red-900/20">
-                          <FaYoutube size={28} className="text-red-500 opacity-30 group-hover:opacity-60 transition-opacity" />
-                          {/* Relevance badge */}
-                          <div className="absolute top-2 right-2">
-                            <div className={`text-[8px] font-black px-2 py-0.5 rounded-full border ${
-                              channel.relevance >= 80 ? 'bg-green-900/40 text-green-400 border-green-700/50' :
-                              channel.relevance >= 50 ? 'bg-yellow-900/40 text-yellow-400 border-yellow-700/50' :
-                              'bg-gray-800 text-gray-500 border-gray-700'
-                            }`}>
-                              {channel.relevance}% match
-                            </div>
-                          </div>
-                          {/* Category badge */}
-                          <div className="absolute bottom-2 left-2">
-                            <span className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${CATEGORY_BADGE[channel.category]}`}>
-                              {channel.category}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Channel info */}
-                        <div className="p-3">
-                          <h3 className="text-xs font-bold text-white mb-1 leading-snug group-hover:text-red-400 transition-colors truncate">
-                            {channel.name}
-                          </h3>
-                          <p className="text-[10px] text-gray-500 mb-3">
-                            {channel.subs} subscribers
-                          </p>
-
-                          {/* Relevance bar */}
-                          <div className="mb-3">
-                            <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden">
-                              <motion.div
-                                className="h-full rounded-full bg-gradient-to-r from-red-600 to-red-400"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${channel.relevance}%` }}
-                                transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
-                              />
-                            </div>
-                          </div>
-
-                          <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-white bg-red-600 hover:bg-red-500 rounded-lg transition-colors cursor-pointer"
+                <AnimatePresence>
+                  {myHighlightsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: 'auto' }}
+                      exit={{ opacity: 0, y: -8, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="mt-2 bg-gray-900 border border-gray-800 rounded-xl p-3 overflow-hidden"
+                    >
+                      <p className="text-[9px] text-gray-600 uppercase tracking-widest mb-3">
+                        <FaFilter size={7} className="inline mr-1" />
+                        Filter by channel type &middot; Star to prioritise
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {allChannelCategories.map((cat) => (
+                          <div
+                            key={cat}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-pointer ${
+                              selectedChannelCats.has(cat)
+                                ? 'bg-gray-800 border-gray-700 text-white'
+                                : 'bg-gray-950 border-gray-900 text-gray-600'
+                            }`}
                           >
-                            <FaYoutube size={11} /> Watch on YouTube &rarr;
-                          </motion.button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
+                            <button
+                              onClick={() => toggleChannelCat(cat)}
+                              className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-all ${
+                                selectedChannelCats.has(cat)
+                                  ? 'bg-red-600 border-red-500'
+                                  : 'bg-gray-800 border-gray-700'
+                              }`}
+                            >
+                              {selectedChannelCats.has(cat) && <FaCheck size={8} className="text-white" />}
+                            </button>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider flex-1 ${CATEGORY_BADGE[cat]?.split(' ')[1] || ''}`}>
+                              {cat}
+                            </span>
+                            <button
+                              onClick={() => togglePriorityChannel(cat)}
+                              className={`transition-colors ${
+                                priorityChannelCats.has(cat) ? 'text-yellow-400' : 'text-gray-700 hover:text-gray-500'
+                              }`}
+                              title="Prioritise this category"
+                            >
+                              <FaStar size={10} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
                 </AnimatePresence>
               </div>
 
-              {/* Dot indicators */}
-              <div className="flex items-center justify-center gap-1.5 mt-6">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCarouselPage(i)}
-                    className={`w-2 h-2 rounded-full transition-all cursor-pointer ${
-                      i === carouselPage ? 'bg-red-500 w-6' : 'bg-gray-700 hover:bg-gray-600'
-                    }`}
-                  />
-                ))}
-              </div>
+              {/* ═══ CAROUSEL VIEW ═══ */}
+              {highlightsView === 'carousel' && (
+                <>
+                  {/* Auto-cycle indicator */}
+                  <div className="flex items-center gap-2 mb-4 text-[10px] text-gray-600 uppercase tracking-wider">
+                    <div className={`w-2 h-2 rounded-full ${carouselPaused ? 'bg-yellow-500' : 'bg-green-500'}`} />
+                    {carouselPaused ? 'Paused' : 'Auto-cycling every 8s'} &mdash; hover to pause
+                  </div>
+
+                  {/* Channel Cards */}
+                  <div
+                    ref={carouselRef}
+                    onMouseEnter={() => setCarouselPaused(true)}
+                    onMouseLeave={() => setCarouselPaused(false)}
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={safeCarouselPage}
+                        variants={staggerContainer}
+                        initial="hidden"
+                        animate="visible"
+                        exit={{ opacity: 0, x: -40, transition: { duration: 0.2 } }}
+                        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+                      >
+                        {currentChannels.map((channel) => (
+                          <motion.div
+                            key={channel.id}
+                            variants={staggerItem}
+                            whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.2 } }}
+                            className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-lg group hover:border-red-800/40 transition-colors"
+                          >
+                            <div className="h-20 bg-gradient-to-br from-red-900/40 to-gray-900 relative flex items-center justify-center border-b border-red-900/20">
+                              <FaYoutube size={28} className="text-red-500 opacity-30 group-hover:opacity-60 transition-opacity" />
+                              <div className="absolute top-2 right-2">
+                                <div className={`text-[8px] font-black px-2 py-0.5 rounded-full border ${
+                                  channel.relevance >= 80 ? 'bg-green-900/40 text-green-400 border-green-700/50' :
+                                  channel.relevance >= 50 ? 'bg-yellow-900/40 text-yellow-400 border-yellow-700/50' :
+                                  'bg-gray-800 text-gray-500 border-gray-700'
+                                }`}>
+                                  {channel.relevance}% match
+                                </div>
+                              </div>
+                              <div className="absolute bottom-2 left-2">
+                                <span className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${CATEGORY_BADGE[channel.category]}`}>
+                                  {channel.category}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-3">
+                              <h3 className="text-xs font-bold text-white mb-1 leading-snug group-hover:text-red-400 transition-colors truncate">{channel.name}</h3>
+                              <p className="text-[10px] text-gray-500 mb-3">{channel.subs} subscribers</p>
+                              <div className="mb-3">
+                                <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden">
+                                  <motion.div className="h-full rounded-full bg-gradient-to-r from-red-600 to-red-400" initial={{ width: 0 }} animate={{ width: `${channel.relevance}%` }} transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }} />
+                                </div>
+                              </div>
+                              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-white bg-red-600 hover:bg-red-500 rounded-lg transition-colors cursor-pointer">
+                                <FaYoutube size={11} /> Watch on YouTube &rarr;
+                              </motion.button>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Dot indicators */}
+                  <div className="flex items-center justify-center gap-1.5 mt-6">
+                    {Array.from({ length: filteredTotalPages }, (_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCarouselPage(i)}
+                        className={`w-2 h-2 rounded-full transition-all cursor-pointer ${
+                          i === safeCarouselPage ? 'bg-red-500 w-6' : 'bg-gray-700 hover:bg-gray-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* ═══ 4x4 GRID VIEW ═══ */}
+              {highlightsView === 'grid' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
+                >
+                  {filteredChannels.map((channel, i) => (
+                    <motion.div
+                      key={channel.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.03, duration: 0.3 }}
+                      whileHover={{ y: -4, scale: 1.03 }}
+                      className="relative bg-gray-900 border border-gray-800 rounded-xl overflow-hidden group hover:border-red-800/40 transition-all cursor-pointer"
+                    >
+                      {/* Video preview area */}
+                      <div className="aspect-video bg-gradient-to-br from-red-950/60 to-gray-900 relative flex items-center justify-center overflow-hidden">
+                        {/* Play button overlay */}
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                        <motion.div
+                          className="relative z-10 w-10 h-10 rounded-full bg-red-600 flex items-center justify-center opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all"
+                          whileHover={{ scale: 1.2 }}
+                        >
+                          <FaPlayCircle size={20} className="text-white" />
+                        </motion.div>
+                        {/* Channel initials watermark */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-5 group-hover:opacity-10 transition-opacity">
+                          <span className="text-6xl font-black text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                            {channel.name.split(' ').map(w => w[0]).join('').substring(0, 2)}
+                          </span>
+                        </div>
+                        {/* Relevance badge */}
+                        <div className="absolute top-1.5 right-1.5">
+                          <div className={`text-[7px] font-black px-1.5 py-0.5 rounded-full border ${
+                            channel.relevance >= 80 ? 'bg-green-900/60 text-green-400 border-green-700/50' :
+                            channel.relevance >= 50 ? 'bg-yellow-900/60 text-yellow-400 border-yellow-700/50' :
+                            'bg-gray-800/80 text-gray-500 border-gray-700'
+                          }`}>
+                            {channel.relevance}%
+                          </div>
+                        </div>
+                        {/* Category */}
+                        <div className="absolute bottom-1.5 left-1.5">
+                          <span className={`text-[7px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full ${CATEGORY_BADGE[channel.category]}`}>
+                            {channel.category}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Channel info */}
+                      <div className="p-2.5">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <FaYoutube size={10} className="text-red-500 flex-shrink-0" />
+                          <h3 className="text-[11px] font-bold text-white leading-tight truncate group-hover:text-red-400 transition-colors">{channel.name}</h3>
+                        </div>
+                        <p className="text-[9px] text-gray-500">{channel.subs} subs</p>
+                        {/* Relevance bar */}
+                        <div className="mt-1.5">
+                          <div className="w-full h-0.5 bg-gray-800 rounded-full overflow-hidden">
+                            <motion.div className="h-full rounded-full bg-gradient-to-r from-red-600 to-red-400" initial={{ width: 0 }} animate={{ width: `${channel.relevance}%` }} transition={{ delay: 0.2 + i * 0.02, duration: 0.5 }} />
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
