@@ -36,9 +36,6 @@ const RootLayout = ({ children }) => {
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap" rel="stylesheet" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/images/logo.jpg" />
       </head>
@@ -47,7 +44,7 @@ const RootLayout = ({ children }) => {
           <AnalyticsTracker />
           <ClientOnly />
           <Header />
-          <main className="px-4 sm:px-6 lg:px-8 py-6">
+          <main>
             <PageTransition>
               {children}
             </PageTransition>

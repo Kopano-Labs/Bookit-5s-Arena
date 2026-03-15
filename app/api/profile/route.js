@@ -20,6 +20,8 @@ export async function GET(request) {
     role: user.role,
     username: user.username || '',
     newsletterOptIn: user.newsletterOptIn || false,
+    birthDate: user.birthDate || null,
+    birthdayClaimedYear: user.birthdayClaimedYear || null,
   });
 }
 
@@ -29,7 +31,7 @@ export async function PUT(request) {
   if (!session) return Response.json({ error: 'Unauthorised' }, { status: 401 });
 
   const body = await request.json();
-  const { name, username, newsletterOptIn, currentPassword, newPassword } = body;
+  const { name, username, newsletterOptIn, birthDate, currentPassword, newPassword } = body;
 
   // Validate types to prevent NoSQL injection
   if (typeof name !== 'string') {
@@ -53,6 +55,25 @@ export async function PUT(request) {
   user.name = name.trim();
   if (username !== undefined) user.username = username.trim() || null;
   if (typeof newsletterOptIn === 'boolean') user.newsletterOptIn = newsletterOptIn;
+
+  // Update birth date if provided
+  if (birthDate !== undefined) {
+    if (birthDate === null) {
+      user.birthDate = null;
+    } else {
+      const parsed = new Date(birthDate);
+      if (isNaN(parsed.getTime())) {
+        return Response.json({ error: 'Invalid birth date.' }, { status: 400 });
+      }
+      // Must be in the past and person must be at least 5 years old
+      const fiveYearsAgo = new Date();
+      fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+      if (parsed > fiveYearsAgo) {
+        return Response.json({ error: 'Please enter a valid birth date.' }, { status: 400 });
+      }
+      user.birthDate = parsed;
+    }
+  }
 
   // Update password only if a new one was provided
   if (newPassword) {

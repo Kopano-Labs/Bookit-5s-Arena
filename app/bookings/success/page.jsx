@@ -1,11 +1,11 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { FaCheckCircle, FaFutbol, FaCalendarAlt, FaClock, FaArrowRight, FaCreditCard } from 'react-icons/fa';
 
-const BookingSuccessPage = () => {
+const BookingSuccessContent = () => {
   const searchParams = useSearchParams();
   const bookingId = searchParams.get('bookingId');
 
@@ -178,4 +178,10 @@ const BookingSuccessPage = () => {
   );
 };
 
-export default BookingSuccessPage;
+export default function BookingSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-950 flex items-center justify-center"><div className="text-gray-500">Loading...</div></div>}>
+      <BookingSuccessContent />
+    </Suspense>
+  );
+}

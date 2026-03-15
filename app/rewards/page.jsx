@@ -280,6 +280,28 @@ export default function RewardsPage() {
                 <StatCard icon={<FaMapMarkerAlt />} label="Courts Visited" value={data.courtsVisited} color="text-purple-400" delay={0.21} tooltip="Unique courts booked" />
               </div>
 
+              {/* Top Court */}
+              {data.topCourt && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.28 }}
+                  className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex items-center gap-4"
+                >
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-600 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                    <FaStar className="text-white text-2xl" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-500 uppercase tracking-widest">Highest Earning Court</p>
+                    <p className="text-white font-black text-lg">{data.topCourt.name}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-yellow-400 font-black text-xl">{data.topCourt.points.toLocaleString()}</p>
+                    <p className="text-gray-600 text-[10px] uppercase tracking-widest">points</p>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Achievement preview */}
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -379,7 +401,16 @@ export default function RewardsPage() {
                           </span>
                         </div>
                         <p className="text-gray-400 text-xs">{a.desc}</p>
-                        {a.unlocked && (
+                        {a.unlocked && a.unlockedBy && (
+                          <div className="mt-1.5 flex items-center gap-2 text-[10px] flex-wrap">
+                            <span className="text-green-400 font-bold">✓ Unlocked</span>
+                            <span className="text-gray-600">•</span>
+                            <span className="text-gray-500">
+                              {a.unlockedBy.court} on {a.unlockedBy.date}
+                            </span>
+                          </div>
+                        )}
+                        {a.unlocked && !a.unlockedBy && (
                           <p className="text-green-400 text-[10px] mt-1 font-bold">✓ Unlocked</p>
                         )}
                         {!a.unlocked && (

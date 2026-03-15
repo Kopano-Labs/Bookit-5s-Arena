@@ -57,7 +57,7 @@ const Header = () => {
 
   /* ── Auth tabs (user-only, alphabetical) ── */
   const userTabs = [
-    { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings' },
+    { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings', hideAdmin: true },
     { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards', hideAdmin: true },
   ];
 

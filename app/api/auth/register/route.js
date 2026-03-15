@@ -77,7 +77,8 @@ export async function POST(request) {
     }
 
     // Only pass whitelisted fields — prevent mass-assignment (e.g. injecting role: 'admin')
-    const user = await User.create({ name: name.trim(), email: email.trim().toLowerCase(), password });
+    // Auto-subscribe to newsletter for all new users
+    const user = await User.create({ name: name.trim(), email: email.trim().toLowerCase(), password, newsletterOptIn: true });
 
     return NextResponse.json(
       { message: 'Account created successfully', userId: user._id },

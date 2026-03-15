@@ -8,7 +8,7 @@ import {
   FaUserEdit, FaEnvelope, FaArrowLeft, FaCheckCircle,
   FaCamera, FaAt,
   FaUser, FaLock, FaBell, FaBellSlash, FaTrophy, FaChevronDown, FaLink,
-  FaShareAlt, FaGift,
+  FaShareAlt, FaGift, FaBirthdayCake,
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import InfoTooltip from '@/components/InfoTooltip';
@@ -92,6 +92,9 @@ const ProfilePage = () => {
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState('');
   const [avatarPreview, setAvatarPreview] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [birthdayClaimedYear, setBirthdayClaimedYear] = useState(null);
+  const [birthdayClaiming, setBirthdayClaiming] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNew, setConfirmNew] = useState('');
@@ -101,7 +104,7 @@ const ProfilePage = () => {
   const [error, setError] = useState('');
 
   // Which accordion sections are open — all start collapsed; user clicks to expand
-  const [openSections, setOpenSections] = useState({ profile: false, security: false, comms: false, benefits: false, refer: false });
+  const [openSections, setOpenSections] = useState({ profile: false, birthday: false, security: false, comms: false, benefits: false, refer: false });
 
   const toggleSection = (id) =>
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -121,6 +124,8 @@ const ProfilePage = () => {
         setEmail(data.email || '');
         setUsername(data.username || '');
         setNewsletterOptIn(data.newsletterOptIn || false);
+        setBirthDate(data.birthDate ? new Date(data.birthDate).toISOString().split('T')[0] : '');
+        setBirthdayClaimedYear(data.birthdayClaimedYear || null);
         setAvatarUrl(data.image || '');
       }
     };
@@ -185,6 +190,7 @@ const ProfilePage = () => {
           name,
           username: username.trim(),
           newsletterOptIn,
+          birthDate: birthDate || null,
           currentPassword: currentPassword || undefined,
           newPassword: newPassword || undefined,
         }),
@@ -384,6 +390,126 @@ const ProfilePage = () => {
                 className="block w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-500 text-sm cursor-not-allowed"
               />
             </Field>
+
+            {/* Birth Date */}
+            <Field
+              label={<><FaBirthdayCake size={11} /> Birth Date</>}
+              labelExtra={
+                <InfoTooltip text="Get a free 1-hour court booking every year on your birthday! You can claim it within 7 days of the date." position="right" />
+              }
+              hint="We'll celebrate your birthday with a free booking!"
+            >
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className={inputCls}
+                max={new Date(new Date().setFullYear(new Date().getFullYear() - 5)).toISOString().split('T')[0]}
+              />
+            </Field>
+          </AccordionSection>
+          </motion.div>
+
+          {/* 1b. Birthday */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          >
+          <AccordionSection
+            id="birthday"
+            icon={FaBirthdayCake}
+            iconColor="text-pink-400"
+            title="Birthday"
+            summary={birthDate ? new Date(birthDate + 'T00:00:00').toLocaleDateString('en-ZA', { day: 'numeric', month: 'long' }) : 'Add your birthday for a free booking!'}
+            isOpen={openSections.birthday}
+            onToggle={toggleSection}
+          >
+            {/* Birthday celebration & claim */}
+            {birthDate && (() => {
+              const bd = new Date(birthDate + 'T00:00:00');
+              const now = new Date();
+              const birthdayThisYear = new Date(now.getFullYear(), bd.getMonth(), bd.getDate());
+              const diffDays = Math.round((now - birthdayThisYear) / (1000 * 60 * 60 * 24));
+              const isBirthdayWindow = diffDays >= -7 && diffDays <= 7;
+              const alreadyClaimed = birthdayClaimedYear === now.getFullYear();
+              const daysUntil = diffDays < -7 ? Math.abs(diffDays) : diffDays > 7 ? (365 - diffDays) : 0;
+
+              return (
+                <div className="space-y-3">
+                  {isBirthdayWindow && !alreadyClaimed && (
+                    <motion.div
+                      className="bg-gradient-to-r from-pink-900/30 to-purple-900/30 border border-pink-500/40 rounded-xl p-5 text-center"
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 200 }}
+                    >
+                      <motion.div
+                        className="text-4xl mb-3"
+                        animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        🎂
+                      </motion.div>
+                      <h4 className="text-white font-black text-lg uppercase tracking-wide mb-1"
+                        style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                        Happy Birthday!
+                      </h4>
+                      <p className="text-pink-300 text-sm mb-4">
+                        Claim your FREE 1-hour court booking + 500 bonus points!
+                      </p>
+                      <motion.button
+                        type="button"
+                        onClick={async () => {
+                          setBirthdayClaiming(true);
+                          setError('');
+                          try {
+                            const res = await fetch('/api/profile/birthday-claim', { method: 'POST' });
+                            const data = await res.json();
+                            if (!res.ok) {
+                              setError(data.error);
+                            } else {
+                              setSuccess(data.message);
+                              setBirthdayClaimedYear(now.getFullYear());
+                            }
+                          } catch {
+                            setError('Failed to claim birthday reward.');
+                          } finally {
+                            setBirthdayClaiming(false);
+                          }
+                        }}
+                        disabled={birthdayClaiming}
+                        className="px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white font-black rounded-xl uppercase tracking-wider transition-colors disabled:opacity-50"
+                        whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(236,72,153,0.5)' }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {birthdayClaiming ? 'Claiming...' : '🎁 Claim Birthday Reward'}
+                      </motion.button>
+                    </motion.div>
+                  )}
+
+                  {alreadyClaimed && (
+                    <div className="bg-green-900/20 border border-green-700/40 rounded-xl p-4 text-center">
+                      <p className="text-green-400 text-sm font-bold flex items-center justify-center gap-2">
+                        <FaCheckCircle /> Birthday reward claimed for {now.getFullYear()}!
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">Use code <span className="text-green-300 font-mono font-bold">BDAY{now.getFullYear()}</span> when booking</p>
+                    </div>
+                  )}
+
+                  {!isBirthdayWindow && !alreadyClaimed && (
+                    <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4 text-center">
+                      <p className="text-gray-400 text-sm">
+                        🎂 Your birthday reward will be available {daysUntil} days before your birthday
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">
+                        Free 1-hour booking + 500 bonus points
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </AccordionSection>
           </motion.div>
 

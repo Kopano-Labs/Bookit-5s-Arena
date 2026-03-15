@@ -88,15 +88,15 @@ const Footer = () => {
             >
               Quick Links
             </motion.h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {QUICK_LINKS.map((link) => (
                 <li key={link.href}>
-                  <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.15 }}>
+                  <motion.div whileHover={{ x: 3, scale: 1.02 }} transition={{ duration: 0.15 }}>
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-green-400 text-sm transition-colors flex items-center gap-2"
+                      className="text-gray-400 hover:text-white text-sm transition-all flex items-center gap-2 bg-gray-800/40 hover:bg-green-600/20 px-3 py-2 rounded-lg border border-gray-800/60 hover:border-green-500/30"
                     >
-                      <span className="text-green-600 text-xs">→</span>
+                      <span className="text-green-500 text-xs">→</span>
                       {link.label}
                     </Link>
                   </motion.div>

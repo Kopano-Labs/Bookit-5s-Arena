@@ -35,10 +35,20 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
-    // Newsletter opt-in
+    // Newsletter opt-in — defaults to true for new users (auto-subscribe)
     newsletterOptIn: {
       type: Boolean,
-      default: false,
+      default: true,
+    },
+    // Birthday — for celebrations & free booking claim
+    birthDate: {
+      type: Date,
+      default: null,
+    },
+    // Has the user claimed their free birthday booking this year?
+    birthdayClaimedYear: {
+      type: Number,
+      default: null,
     },
     // 'user' = regular user, 'admin' = can add/edit/delete courts
     role: {

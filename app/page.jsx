@@ -4,6 +4,7 @@ import StatsBar         from '@/components/home/StatsBar';
 import CourtsSection    from '@/components/home/CourtsSection';
 import AmenitiesStrip   from '@/components/home/AmenitiesStrip';
 import EventsSection    from '@/components/home/EventsSection';
+import FixturesPromo    from '@/components/home/FixturesPromo';
 import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
 import ContactSection   from '@/components/home/ContactSection';
@@ -45,6 +46,9 @@ const HomePage = async () => {
 
       {/* ══ EVENTS — staggered cards + coloured glows ════════════ */}
       <EventsSection />
+
+      {/* ══ FIXTURES PROMO — live scores ticker + CTA ═══════════ */}
+      <FixturesPromo />
 
       {/* ══ ABOUT — slide in from sides ══════════════════════════ */}
       <AboutSection courtsCount={courts.length || 4} />

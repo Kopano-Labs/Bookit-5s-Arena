@@ -1,189 +1,106 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
-// DVD-screensaver style: bounces off all 4 walls, changes green shade on each hit
-const COLORS = ['#22c55e', '#16a34a', '#4ade80', '#15803d', '#86efac', '#34d399'];
-
-const ArenaBackground = () => {
-  const textRef = useRef(null);
-  const frameRef = useRef(null);
-
-  useEffect(() => {
-    const el = textRef.current;
-    if (!el) return;
-
-    // Wait one frame so offsetWidth is measured after font loads
-    let x = 60;
-    let y = 60;
-    let colorIdx = 0;
-
-    // Speed proportional to viewport size
-    const base = Math.min(window.innerWidth, window.innerHeight) * 0.0028;
-    let vx = base * 1.0;
-    let vy = base * 0.72; // slightly off-45° so it hits corners rarely (true DVD effect)
-
-    const tick = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const tw = el.offsetWidth;
-      const th = el.offsetHeight;
-
-      x += vx;
-      y += vy;
-
-      let bounced = false;
-
-      if (x <= 0) {
-        x = 0;
-        vx = Math.abs(vx);
-        bounced = true;
-      }
-      if (x + tw >= vw) {
-        x = vw - tw;
-        vx = -Math.abs(vx);
-        bounced = true;
-      }
-      if (y <= 0) {
-        y = 0;
-        vy = Math.abs(vy);
-        bounced = true;
-      }
-      if (y + th >= vh) {
-        y = vh - th;
-        vy = -Math.abs(vy);
-        bounced = true;
-      }
-
-      if (bounced) {
-        colorIdx = (colorIdx + 1) % COLORS.length;
-        const c = COLORS[colorIdx];
-        el.style.color = c;
-        el.style.textShadow = `0 0 40px ${c}, 0 0 90px ${c}55, 0 0 160px ${c}22`;
-        el.style.webkitTextStroke = `1px ${c}88`;
-      }
-
-      // Direct DOM transform — zero React re-renders
-      el.style.transform = `translate(${x}px, ${y}px)`;
-
-      frameRef.current = requestAnimationFrame(tick);
-    };
-
-    frameRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    };
-  }, []);
-
+/**
+ * ArenaBackground — immersive stadium atmosphere
+ * Liquid gradient mesh, geometric pitch lines, spotlight beams, particle field
+ * No bouncing text. No moving footballs.
+ */
+export default function ArenaBackground() {
   return (
-    <div
-      className="fixed inset-0 -z-10 overflow-hidden"
-      style={{ background: '#030508' }}
-    >
-      {/* ── Perspective pitch-floor grid ── */}
-      <div
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-gray-950">
+
+      {/* ── 1. Liquid gradient mesh (3 animated layers) ── */}
+      <motion.div
+        className="absolute w-[140%] h-[140%] -top-[20%] -left-[20%]"
         style={{
-          position: 'absolute',
-          bottom: '-5%',
-          left: '50%',
-          width: '320%',
-          height: '75%',
-          transform: 'translateX(-50%) perspective(650px) rotateX(68deg)',
-          transformOrigin: 'center bottom',
-          backgroundImage: `
-            linear-gradient(rgba(34,197,94,0.18) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(34,197,94,0.18) 1px, transparent 1px)
+          background: `
+            radial-gradient(ellipse at 25% 30%, rgba(16,185,129,0.12) 0%, transparent 50%),
+            radial-gradient(ellipse at 75% 70%, rgba(99,102,241,0.10) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, rgba(34,197,94,0.05) 0%, transparent 60%)
           `,
-          backgroundSize: '90px 90px',
-          animation: 'pitchGridPulse 5s ease-in-out infinite',
-          pointerEvents: 'none',
         }}
+        animate={{
+          x: [0, 30, -20, 0],
+          y: [0, -20, 15, 0],
+          rotate: [0, 2, -1, 0],
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute w-[120%] h-[120%] -top-[10%] -left-[10%]"
+        style={{
+          background: `
+            radial-gradient(ellipse at 60% 20%, rgba(129,140,248,0.08) 0%, transparent 45%),
+            radial-gradient(ellipse at 30% 80%, rgba(52,211,153,0.06) 0%, transparent 45%)
+          `,
+        }}
+        animate={{
+          x: [0, -25, 15, 0],
+          y: [0, 15, -25, 0],
+          rotate: [0, -1.5, 2, 0],
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      {/* ── Centre circle on pitch ── */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '2%',
-          left: '50%',
-          width: '260px',
-          height: '260px',
-          borderRadius: '50%',
-          border: '2px solid rgba(34,197,94,0.2)',
-          transform: 'translateX(-50%) perspective(650px) rotateX(68deg)',
-          transformOrigin: 'center bottom',
-          animation: 'pitchGridPulse 5s ease-in-out infinite',
-          pointerEvents: 'none',
-        }}
+      {/* ── 2. Geometric pitch lines ── */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="pitch-grid" width="80" height="80" patternUnits="userSpaceOnUse">
+            <rect width="80" height="80" fill="none" stroke="white" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#pitch-grid)" />
+        <circle cx="50%" cy="50%" r="120" fill="none" stroke="rgba(34,197,94,0.08)" strokeWidth="1.5" />
+        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="rgba(34,197,94,0.05)" strokeWidth="1" />
+        <line x1="0" y1="50%" x2="100%" y2="50%" stroke="rgba(34,197,94,0.05)" strokeWidth="1" />
+      </svg>
+
+      {/* ── 3. Spotlight beams (corners) ── */}
+      <motion.div
+        className="absolute -top-20 -left-20 w-[500px] h-[500px] pointer-events-none"
+        style={{ background: 'conic-gradient(from 135deg, transparent 0deg, rgba(34,197,94,0.04) 15deg, transparent 30deg)' }}
+        animate={{ rotate: [0, 360] }}
+        transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+      />
+      <motion.div
+        className="absolute -bottom-20 -right-20 w-[500px] h-[500px] pointer-events-none"
+        style={{ background: 'conic-gradient(from 315deg, transparent 0deg, rgba(99,102,241,0.04) 15deg, transparent 30deg)' }}
+        animate={{ rotate: [360, 0] }}
+        transition={{ duration: 80, repeat: Infinity, ease: 'linear' }}
       />
 
-      {/* ── Stadium spotlights ── */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0, left: '-5%',
-          width: '55%', height: '100%',
-          background: 'linear-gradient(168deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 25%, transparent 55%)',
-          animation: 'spotlightSway 8s ease-in-out infinite',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: 0, right: '-5%',
-          width: '55%', height: '100%',
-          background: 'linear-gradient(192deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 25%, transparent 55%)',
-          animation: 'spotlightSway 8s ease-in-out infinite 4s',
-          pointerEvents: 'none',
-        }}
-      />
+      {/* ── 4. Floating particles (stadium atmosphere) ── */}
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: 2 + (i % 3),
+            height: 2 + (i % 3),
+            background: i % 2 === 0 ? 'rgba(34,197,94,0.3)' : 'rgba(129,140,248,0.3)',
+            left: `${8 + (i * 7.5) % 85}%`,
+            top: `${5 + (i * 11) % 90}%`,
+          }}
+          animate={{
+            y: [0, -(15 + i * 3), 0],
+            x: [0, (i % 2 === 0 ? 8 : -8), 0],
+            opacity: [0.2, 0.6, 0.2],
+          }}
+          transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: 'easeInOut', delay: i * 0.3 }}
+        />
+      ))}
 
-      {/* ── Ambient green glows ── */}
-      <div
-        style={{
-          position: 'absolute', top: '5%', left: '-8%',
-          width: '500px', height: '500px', borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(22,163,74,0.18) 0%, transparent 65%)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute', bottom: '-8%', right: '-5%',
-          width: '450px', height: '450px', borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(21,128,61,0.15) 0%, transparent 65%)',
-          pointerEvents: 'none',
-        }}
-      />
+      {/* ── 5. Stadium vignette ── */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%)' }} />
 
-      {/* ══ DVD-bounce "5S ARENA" ══ */}
-      <div
-        ref={textRef}
+      {/* ── 6. Subtle noise texture ── */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.015]"
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          whiteSpace: 'nowrap',
-          userSelect: 'none',
-          pointerEvents: 'none',
-          fontFamily: "'Rubik Dirt', Impact, Arial Black, sans-serif",
-          fontSize: 'clamp(42px, 7vw, 100px)',
-          fontWeight: 900,
-          letterSpacing: '0.04em',
-          lineHeight: 1,
-          color: COLORS[0],
-          textShadow: `0 0 40px ${COLORS[0]}, 0 0 90px ${COLORS[0]}55, 0 0 160px ${COLORS[0]}22`,
-          WebkitTextStroke: `1px ${COLORS[0]}88`,
-          willChange: 'transform',
-          // Start translated so rAF picks up immediately
-          transform: 'translate(60px, 60px)',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
         }}
-      >
-        5S ARENA
-      </div>
+      />
     </div>
   );
-};
-
-export default ArenaBackground;
+}

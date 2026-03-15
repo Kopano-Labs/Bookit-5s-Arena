@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaWhatsapp } from 'react-icons/fa';
+import { FaCalendarCheck, FaArrowRight } from 'react-icons/fa';
 
 const EVENTS = [
   {
@@ -36,87 +37,120 @@ const EVENTS = [
 
 export default function EventsSection() {
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-6xl mx-auto px-6">
+    <Link href="/events" className="block">
+      <section className="py-20 relative overflow-hidden cursor-pointer group/section" style={{ background: 'linear-gradient(180deg, #0f172a 0%, #111827 50%, #0f172a 100%)' }}>
+        {/* Decorative glows */}
+        <div className="absolute top-10 right-10 w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-10 left-10 w-[350px] h-[350px] rounded-full blur-3xl pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)' }} />
 
-        {/* Header */}
-        <motion.div
-          className="text-center mb-14"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <p className="text-green-600 font-bold tracking-widest uppercase text-sm mb-2">
-            More than just football
-          </p>
-          <h2
-            className="font-black uppercase text-gray-900"
-            style={{
-              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-              fontFamily: 'Impact, Arial Black, sans-serif',
-            }}
+        <div className="max-w-6xl mx-auto px-6 relative">
+
+          {/* Header */}
+          <motion.div
+            className="text-center mb-14"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            EVENTS &amp; SERVICES
-          </h2>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {EVENTS.map((e, i) => (
-            <motion.div
-              key={i}
-              className={`group bg-white overflow-hidden border-t-4 ${e.border} flex flex-col shadow-sm rounded-2xl`}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.55, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{
-                y: -8,
-                boxShadow: `0 20px 50px -10px ${e.glow}, 0 8px 20px rgba(0,0,0,0.1)`,
-                transition: { duration: 0.25 },
+            <motion.p
+              className="text-green-400 font-bold tracking-widest uppercase text-sm mb-2 flex items-center justify-center gap-2"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <motion.span
+                animate={{ rotate: [0, 15, -15, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              >
+                🎉
+              </motion.span>
+              More than just football
+            </motion.p>
+            <h2
+              className="font-black uppercase"
+              style={{
+                fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                fontFamily: 'Impact, Arial Black, sans-serif',
+                background: 'linear-gradient(135deg, #ffffff 0%, #4ade80 50%, #22c55e 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
               }}
             >
-              <div className="p-6">
-                <h3
-                  className="font-black uppercase text-xl mb-3 text-gray-900"
-                  style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                >
-                  {e.title}
-                </h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{e.desc}</p>
-              </div>
-              <div className="h-48 overflow-hidden mt-auto rounded-b-2xl">
-                <img
-                  src={e.image}
-                  alt={e.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              EVENTS &amp; SERVICES
+            </h2>
+            <div className="h-1 w-24 bg-gradient-to-r from-green-500 via-emerald-400 to-green-500 rounded-full mx-auto mt-3" />
+          </motion.div>
 
-        {/* CTA */}
-        <motion.div
-          className="text-center mt-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <motion.a
-            href="https://wa.me/27637820245"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 border-2 border-gray-900 hover:bg-gray-900 hover:text-white text-gray-900 font-bold px-8 py-4 uppercase tracking-wide transition-all"
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {EVENTS.map((e, i) => (
+              <motion.div
+                key={i}
+                className={`group bg-gray-800/50 overflow-hidden border-t-4 ${e.border} flex flex-col rounded-2xl border border-gray-700/50 backdrop-blur-sm`}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.55, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{
+                  y: -10,
+                  boxShadow: `0 20px 50px -10px ${e.glow}, 0 0 30px ${e.glow}`,
+                  borderColor: 'rgba(74,222,128,0.3)',
+                  transition: { duration: 0.25 },
+                }}
+              >
+                <div className="h-48 overflow-hidden rounded-t-2xl">
+                  <img
+                    src={e.image}
+                    alt={e.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                </div>
+                <div className="p-6 flex-1 flex flex-col">
+                  <h3
+                    className="font-black uppercase text-xl mb-3 text-white"
+                    style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+                  >
+                    {e.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed flex-1">{e.desc}</p>
+                  <motion.span
+                    className="inline-flex items-center gap-2 mt-4 text-white font-black px-5 py-2.5 rounded-full text-xs uppercase tracking-widest self-start"
+                    whileHover={{ scale: 1.08, boxShadow: '0 0 24px rgba(34,197,94,0.65)' }}
+                    style={{
+                      background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+                      boxShadow: '0 0 18px rgba(34,197,94,0.45)',
+                    }}
+                  >
+                    <FaCalendarCheck size={12} /> BOOK EVENT <FaArrowRight size={9} />
+                  </motion.span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <motion.div
+            className="text-center mt-10"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <FaWhatsapp /> Contact Us for More Info
-          </motion.a>
-        </motion.div>
-      </div>
-    </section>
+            <motion.span
+              className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-4 rounded-xl uppercase tracking-wide transition-all shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:shadow-[0_0_30px_rgba(34,197,94,0.6)]"
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              animate={{ boxShadow: ['0 0 20px rgba(34,197,94,0.3)', '0 0 30px rgba(34,197,94,0.5)', '0 0 20px rgba(34,197,94,0.3)'] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <FaCalendarCheck /> View All Events & Book <FaArrowRight size={12} />
+            </motion.span>
+          </motion.div>
+        </div>
+      </section>
+    </Link>
   );
 }
