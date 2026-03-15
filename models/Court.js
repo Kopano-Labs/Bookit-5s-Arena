@@ -20,4 +20,11 @@ const CourtSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ── Indexes ─────────────────────────────────────────────────────────────────
+// Public court listing sorted by manual order then creation date
+CourtSchema.index({ sortOrder: 1, createdAt: 1 });
+
+// Admin "my courts" — filter by owner, ordered by sortOrder
+CourtSchema.index({ owner: 1, sortOrder: 1 });
+
 export default mongoose.models.Court || mongoose.model('Court', CourtSchema);

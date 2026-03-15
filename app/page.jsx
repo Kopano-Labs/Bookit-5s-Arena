@@ -1,6 +1,7 @@
 // Server Component — keeps ISR data fetching; passes data to client components for animations
 import HeroSection      from '@/components/home/HeroSection';
 import StatsBar         from '@/components/home/StatsBar';
+import WeatherWidget    from '@/components/home/WeatherWidget';
 import CourtsSection    from '@/components/home/CourtsSection';
 import AmenitiesStrip   from '@/components/home/AmenitiesStrip';
 import EventsSection    from '@/components/home/EventsSection';
@@ -37,6 +38,9 @@ const HomePage = async () => {
 
       {/* ══ STATS BAR — count-up animations ════════════════════ */}
       <StatsBar courtsCount={courts.length || 4} />
+
+      {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}
+      <WeatherWidget />
 
       {/* ══ COURTS — staggered scroll-reveal + hover glow ═══════ */}
       <CourtsSection courts={courts} />

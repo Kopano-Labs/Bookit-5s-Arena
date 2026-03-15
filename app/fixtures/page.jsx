@@ -246,16 +246,23 @@ const TEAM_LOGOS = {
   'Richards Bay': 'https://upload.wikimedia.org/wikipedia/en/7/72/Richards_Bay_FC_logo.png',
 };
 
-const TeamBadge = ({ team, size = 'md' }) => {
+const TeamBadge = ({ team, size = 'md', liveLogoUrl = null }) => {
   const color = getTeamColor(team);
-  const logo = TEAM_LOGOS[team];
+  // Prefer: live logo from TheSportsDB → our static logo map → colour initial
+  const logo = liveLogoUrl || TEAM_LOGOS[team];
   const dims = size === 'lg' ? 'w-14 h-14' : size === 'sm' ? 'w-9 h-9' : 'w-12 h-12';
   const textSize = size === 'lg' ? 'text-sm' : size === 'sm' ? 'text-[9px]' : 'text-xs';
 
   if (logo) {
     return (
       <div className={`${dims} rounded-full flex items-center justify-center flex-shrink-0 bg-white/10 border border-white/20 shadow-md overflow-hidden p-1`}>
-        <img src={logo} alt={team} className="w-full h-full object-contain" loading="lazy" />
+        <img
+          src={logo}
+          alt={team}
+          className="w-full h-full object-contain"
+          loading="lazy"
+          onError={(e) => { e.target.style.display = 'none'; }}
+        />
       </div>
     );
   }
@@ -339,7 +346,7 @@ const MatchCard = ({ match, i, expanded, onToggle }) => {
             <div className="flex items-center justify-between gap-2">
               <div className="flex-1 flex items-center justify-end gap-2">
                 <p className="text-sm md:text-base font-bold text-white truncate text-right">{match.home}</p>
-                <TeamBadge team={match.home} size="sm" />
+                <TeamBadge team={match.home} size="sm" liveLogoUrl={match.homeLogo || null} />
               </div>
               <div className="flex-shrink-0 mx-2 md:mx-4">
                 {match.status === 'TIMED' ? (
@@ -353,7 +360,7 @@ const MatchCard = ({ match, i, expanded, onToggle }) => {
                 )}
               </div>
               <div className="flex-1 flex items-center gap-2">
-                <TeamBadge team={match.away} size="sm" />
+                <TeamBadge team={match.away} size="sm" liveLogoUrl={match.awayLogo || null} />
                 <p className="text-sm md:text-base font-bold text-white truncate">{match.away}</p>
               </div>
             </div>
@@ -433,6 +440,127 @@ const MatchCard = ({ match, i, expanded, onToggle }) => {
           </motion.div>
         )}
       </AnimatePresence>
+    </motion.div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// JOKE WIDGET — via JokeAPI (free, no auth)
+// ═══════════════════════════════════════════════════════════════
+
+const JOKE_API = 'https://v2.jokeapi.dev/joke/Pun,Misc?blacklistFlags=nsfw,racist,sexist,explicit,religious,political&type=twopart';
+
+const JokeWidget = () => {
+  const [joke, setJoke] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [fetchCount, setFetchCount] = useState(0);
+
+  const fetchJoke = useCallback(() => {
+    setLoading(true);
+    setRevealed(false);
+    fetch(JOKE_API)
+      .then(r => r.json())
+      .then(data => {
+        if (!data.error) {
+          setJoke(data);
+          setFetchCount(c => c + 1);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Fetch on first render
+  useEffect(() => { fetchJoke(); }, [fetchJoke]);
+
+  if (!joke && !loading) return null;
+
+  return (
+    <motion.div
+      className="mt-10 bg-gradient-to-br from-gray-900 via-gray-900 to-green-950/30 border border-gray-800 rounded-2xl p-6 relative overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4, duration: 0.5 }}
+    >
+      {/* Subtle background glow */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/5 rounded-full blur-2xl pointer-events-none" />
+
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xl">😄</span>
+          <div>
+            <p className="text-green-400 font-black text-xs uppercase tracking-widest leading-none">
+              Joke of the Match
+            </p>
+            <p className="text-[9px] text-gray-700 uppercase tracking-wider">Powered by JokeAPI · family-friendly mode</p>
+          </div>
+          <motion.button
+            onClick={fetchJoke}
+            disabled={loading}
+            className="ml-auto flex items-center gap-1.5 text-[10px] text-gray-500 hover:text-green-400 transition-colors uppercase tracking-wider font-bold disabled:opacity-40 cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            title="New joke"
+          >
+            <motion.span animate={loading ? { rotate: 360 } : {}} transition={{ duration: 0.8, ease: 'linear' }}>
+              <FaSyncAlt size={9} />
+            </motion.span>
+            New Joke
+          </motion.button>
+        </div>
+
+        {/* Joke content */}
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div key="jloading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
+              <div className="h-4 bg-gray-800 rounded animate-pulse w-3/4" />
+              <div className="h-4 bg-gray-800 rounded animate-pulse w-1/2" />
+            </motion.div>
+          ) : joke ? (
+            <motion.div
+              key={`joke-${fetchCount}`}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.35 }}
+            >
+              {/* Setup */}
+              <p className="text-white font-semibold text-sm leading-relaxed mb-3">
+                {joke.setup}
+              </p>
+
+              {/* Punchline — reveal on click */}
+              <AnimatePresence>
+                {!revealed ? (
+                  <motion.button
+                    key="reveal-btn"
+                    onClick={() => setRevealed(true)}
+                    className="flex items-center gap-2 text-[10px] text-green-500 hover:text-green-400 border border-green-800/50 hover:border-green-700/70 bg-green-900/20 hover:bg-green-900/30 rounded-lg px-4 py-2 transition-all uppercase tracking-wider font-bold cursor-pointer"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <FaChevronDown size={9} /> Reveal punchline
+                  </motion.button>
+                ) : (
+                  <motion.p
+                    key="punchline"
+                    className="text-green-400 font-black text-base leading-relaxed"
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                  >
+                    🥁 {joke.delivery}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 };
@@ -524,6 +652,25 @@ const FixturesPage = () => {
     });
   };
 
+  // ── GeoJS auto-location detection ──────────────────────────
+  const [userCity, setUserCity] = useState(null);
+  const [geoBannerVisible, setGeoBannerVisible] = useState(false);
+
+  useEffect(() => {
+    fetch('https://get.geojs.io/v1/ip/geo.json')
+      .then(r => r.json())
+      .then(data => {
+        if (data.country_code === 'ZA') {
+          // Auto-prioritise PSL for South African users
+          setUserCity(data.city || data.region || null);
+          setPriorityLeagues(prev => new Set([...prev, 'PSL']));
+          setGeoBannerVisible(true);
+        }
+      })
+      .catch(() => {}); // Fail silently
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Highlights carousel state
   const [carouselPage, setCarouselPage] = useState(0);
   const [carouselPaused, setCarouselPaused] = useState(false);
@@ -531,13 +678,71 @@ const FixturesPage = () => {
   const channelsPerPage = 5;
   // totalPages computed as filteredTotalPages after filter state
 
+  // ── TheSportsDB real fixture data ──────────────────────────
+  const [liveData, setLiveData] = useState(null);   // { PL: [...], PSL: [...], ... }
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [useLiveData, setUseLiveData] = useState(false);
+
+  const fetchLiveData = useCallback(async () => {
+    if (liveData) return; // Already fetched
+    setLiveLoading(true);
+    try {
+      const res = await fetch('/api/fixtures');
+      if (res.ok) {
+        const json = await res.json();
+        setLiveData(json.leagues || null);
+      }
+    } catch {}
+    setLiveLoading(false);
+  }, [liveData]);
+
+  // Merge real upcoming matches into mock data when live toggle is on
+  const buildLiveMatches = useCallback(() => {
+    if (!liveData) return {};
+    const merged = {};
+    const baseLeagueCodes = ['PL', 'LL', 'SA', 'BL', 'PSL', 'UCL'];
+    baseLeagueCodes.forEach(code => {
+      const upcoming = (liveData[code] || []).map((e, idx) => ({
+        id:        `live_${code}_${idx}`,
+        league:    code,
+        home:      e.home,
+        away:      e.away,
+        homeScore: e.homeScore,
+        awayScore: e.awayScore,
+        status:    e.status || 'TIMED',
+        kickoff:   e.time || 'TBC',
+        date:      e.date,
+        homeLogo:  e.homeLogo,
+        awayLogo:  e.awayLogo,
+      }));
+      merged[code] = upcoming.length ? upcoming : mockMatches.filter(m => m.league === code);
+    });
+    return merged;
+  }, [liveData]);
+
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setLastUpdated(new Date());
-      setRefreshing(false);
-    }, 800);
-  }, []);
+    if (useLiveData) {
+      // Force re-fetch live data
+      setLiveData(null);
+      fetchLiveData().then(() => {
+        setLastUpdated(new Date());
+        setRefreshing(false);
+      });
+    } else {
+      setTimeout(() => {
+        setLastUpdated(new Date());
+        setRefreshing(false);
+      }, 800);
+    }
+  }, [useLiveData, fetchLiveData]);
+
+  const handleToggleLiveData = () => {
+    if (!useLiveData && !liveData) {
+      fetchLiveData();
+    }
+    setUseLiveData(v => !v);
+  };
 
   const toggleLeague = (code) => {
     setExpandedLeagues(prev => ({ ...prev, [code]: !prev[code] }));
@@ -549,8 +754,12 @@ const FixturesPage = () => {
     ...baseLeagueOrder.filter(c => priorityLeagues.has(c) && selectedLeagues.has(c)),
     ...baseLeagueOrder.filter(c => !priorityLeagues.has(c) && selectedLeagues.has(c)),
   ];
+
+  const liveMatchesByLeague = useLiveData ? buildLiveMatches() : null;
   const matchesByLeague = baseLeagueOrder.reduce((acc, code) => {
-    acc[code] = mockMatches.filter(m => m.league === code);
+    acc[code] = liveMatchesByLeague
+      ? (liveMatchesByLeague[code] || mockMatches.filter(m => m.league === code))
+      : mockMatches.filter(m => m.league === code);
     return acc;
   }, {});
 
@@ -661,15 +870,84 @@ const FixturesPage = () => {
           </div>
         </motion.div>
 
-        {/* API banner — subtle */}
+        {/* TheSportsDB Live Data Toggle */}
         <motion.div
-          className="mb-6 bg-green-900/10 border border-green-900/30 rounded-xl px-4 py-2 text-center text-[9px] text-green-600/60 uppercase tracking-widest"
+          className="mb-4 flex items-center justify-center gap-3"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.7 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          Live data API integration in progress &mdash; preview mode active
+          <button
+            onClick={handleToggleLiveData}
+            disabled={liveLoading}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-300 cursor-pointer disabled:opacity-50 ${
+              useLiveData
+                ? 'bg-green-900/40 border-green-600 text-green-300 shadow-[0_0_12px_rgba(34,197,94,0.2)]'
+                : 'bg-gray-900 border-gray-700 text-gray-500 hover:border-gray-600 hover:text-gray-400'
+            }`}
+          >
+            {liveLoading ? (
+              <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}>
+                <FaSyncAlt size={8} />
+              </motion.span>
+            ) : (
+              <span className={`w-2 h-2 rounded-full ${useLiveData ? 'bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.8)]' : 'bg-gray-600'}`} />
+            )}
+            {useLiveData ? '🟢 Live Data — TheSportsDB' : 'Enable Live Fixtures'}
+          </button>
+          {!useLiveData && (
+            <span className="text-[9px] text-gray-700 uppercase tracking-wider">
+              Preview mode &mdash; click to load real upcoming fixtures
+            </span>
+          )}
+          {useLiveData && liveData && (
+            <span className="text-[9px] text-green-700 uppercase tracking-wider">
+              Real upcoming fixtures via TheSportsDB
+            </span>
+          )}
         </motion.div>
+
+        {/* GeoJS Location Detection Banner */}
+        <AnimatePresence>
+          {geoBannerVisible && (
+            <motion.div
+              className="mb-6 relative overflow-hidden bg-gradient-to-r from-green-900/40 via-yellow-900/20 to-green-900/40 border border-green-700/50 rounded-2xl px-5 py-3"
+              initial={{ opacity: 0, y: -20, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.97 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* Subtle shimmer */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/5 to-transparent"
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 3, repeat: Infinity, repeatDelay: 4 }}
+              />
+              <div className="relative flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl leading-none">🇿🇦</span>
+                  <div>
+                    <p className="text-green-300 font-black text-sm uppercase tracking-wider leading-none mb-0.5">
+                      South Africa Detected{userCity ? ` — ${userCity}` : ''}
+                    </p>
+                    <p className="text-green-500/70 text-[10px] tracking-wide">
+                      PSL automatically pinned to the top of your fixtures · powered by GeoJS
+                    </p>
+                  </div>
+                </div>
+                <motion.button
+                  className="text-green-600 hover:text-green-400 transition-colors flex-shrink-0 p-1"
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setGeoBannerVisible(false)}
+                  title="Dismiss"
+                >
+                  <FaTimes size={12} />
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Tabs ────────────────────────────────────────── */}
         <motion.div
@@ -870,6 +1148,10 @@ const FixturesPage = () => {
                   </motion.div>
                 );
               })}
+
+              {/* ── Joke of the Match — JokeAPI ───────────────── */}
+              <JokeWidget />
+
             </motion.div>
           )}
 

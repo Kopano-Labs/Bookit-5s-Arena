@@ -17,9 +17,11 @@ export async function GET() {
 
     await connectDB();
 
+    // .lean() returns plain JS objects (no Mongoose overhead) — faster for read-only list views
     const bookings = await Booking.find({ user: session.user.id })
       .populate('court', 'name image address price_per_hour')
-      .sort({ date: 1 });
+      .sort({ date: 1 })
+      .lean();
 
     return NextResponse.json(bookings, { status: 200 });
   } catch (error) {
