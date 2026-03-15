@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -846,8 +847,9 @@ function MyBookingsTab({ bookings, loading, error, authStatus, viewMode, setView
 
 const BookingsPage = () => {
   const { data: session, status: authStatus } = useSession();
-  const [activeTab, setActiveTab] = useState(0);
-  const [prevTab, setPrevTab] = useState(0);
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState(2);
+  const [prevTab, setPrevTab] = useState(2);
 
   // My Bookings state
   const [bookings, setBookings] = useState([]);
@@ -917,6 +919,11 @@ const BookingsPage = () => {
   };
 
   const handleTabChange = (idx) => {
+    // BOOK COURT → navigate to homepage courts section
+    if (idx === 0) { router.push('/'); return; }
+    // BOOK EVENT → navigate to events page
+    if (idx === 1) { router.push('/events'); return; }
+    // MY BOOKINGS → show inline
     setPrevTab(activeTab);
     setActiveTab(idx);
   };

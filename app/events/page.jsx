@@ -86,10 +86,10 @@ const PHONE_NUMBER = '+27637820245';
 const EMAIL = 'fivearena@gmail.com';
 
 const EVENT_IMAGES = [
-  '/images/courts/court-1.jpg',
-  '/images/courts/court-2.jpg',
-  '/images/courts/court-3.jpg',
-  '/images/courts/court-4.jpg',
+  '/images/events/Birthday%20Parties.png',
+  '/images/events/Tournaments.png',
+  '/images/events/Corporate%20Events.png',
+  '/images/events/Holiday%20Clinics.png',
 ];
 
 // Football legends hero background — save image 2 provided by client as this file

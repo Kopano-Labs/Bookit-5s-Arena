@@ -9,8 +9,13 @@ import ClientOnly from '@/components/ClientOnly';
 import PageTransition from '@/components/PageTransition';
 import '@/assets/styles/globals.css';
 
+const SITE_URL =
+  process.env.NODE_ENV === 'production'
+    ? (process.env.NEXTAUTH_URL || 'https://5sarena.co.za')
+    : 'http://localhost:3000';
+
 export const metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL || 'https://5sarena.co.za'),
+  metadataBase: new URL(SITE_URL),
   title: { default: '5s Arena | 5-a-Side Football Cape Town', template: '%s | 5s Arena' },
   description: "Cape Town's premier 5-a-side football venue. Book floodlit courts at Hellenic Football Club, Milnerton. From R400/hour. Bar, restaurant & secure parking on site.",
   keywords: ['5-a-side football', 'Cape Town', 'Milnerton', 'court booking', 'football venue', 'Hellenic Football Club', '5s Arena'],

@@ -378,7 +378,7 @@ export default function CourtsSection({ courts = [] }) {
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
         >
-          <Link href="/courts/add">
+          <Link href="/bookings">
             <motion.span
               className="inline-flex items-center gap-3 text-white font-bold px-10 py-4 rounded-xl uppercase tracking-wide text-sm"
               style={{
