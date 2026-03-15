@@ -1,8 +1,6 @@
-import Heading from '@/components/Heading';
-import BookingForm from '@/components/BookingForm';
-import Image from 'next/image';
 import Link from 'next/link';
-import { FaChevronLeft } from 'react-icons/fa';
+import { FaFutbol } from 'react-icons/fa';
+import CourtDetailClient from './CourtDetailClient';
 
 // Fetch single court from our API
 const getCourt = async (id) => {
@@ -10,72 +8,60 @@ const getCourt = async (id) => {
     const res = await fetch(`${process.env.NEXTAUTH_URL}/api/courts/${id}`, {
       cache: 'no-store',
     });
-
     if (!res.ok) return null;
-
     return res.json();
-  } catch (error) {
-    console.error('Error fetching court:', error);
+  } catch {
     return null;
   }
 };
+
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const court = await getCourt(id);
+  if (!court) return { title: 'Court Not Found' };
+  return {
+    title: court.name,
+    description: court.description || `Book ${court.name} at 5s Arena — floodlit 5-a-side court in Milnerton, Cape Town.`,
+  };
+}
 
 const CourtPage = async ({ params }) => {
   const { id } = await params;
   const court = await getCourt(id);
 
   if (!court) {
-    return <Heading title="Court not found" />;
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-center">
+          <FaFutbol className="mx-auto text-5xl text-gray-700 mb-4" />
+          <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+            Court Not Found
+          </h1>
+          <Link href="/" className="mt-4 inline-block text-green-400 hover:text-green-300 text-sm">
+            ← Back to Courts
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <>
-      <Heading title={court.name} />
-      <div className="bg-white shadow rounded-lg p-6">
+    <div className="min-h-screen bg-gray-950 py-10 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Back link */}
         <Link
           href="/"
-          className="flex items-center text-gray-600 hover:text-gray-800 mb-4"
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-green-400 text-sm mb-8 transition-colors uppercase tracking-wide"
         >
-          <FaChevronLeft className="inline-block mr-1" />
-          <span className="ml-2">Back to Courts</span>
+          ‹ Back to Courts
         </Link>
 
-        <div className="flex flex-col sm:flex-row sm:space-x-6">
-          <Image
-            src={`/images/courts/${court.image}`}
-            alt={court.name}
-            width={400}
-            height={200}
-            className="w-full sm:w-1/3 h-64 object-cover rounded-lg"
-          />
-
-          <div className="mt-4 sm:mt-0 sm:flex-1">
-            <p className="text-gray-600 mb-4">{court.description}</p>
-
-            <ul className="space-y-2">
-              <li>
-                <span className="font-semibold text-gray-800">Amenities:</span>{' '}
-                {court.amenities}
-              </li>
-              <li>
-                <span className="font-semibold text-gray-800">Availability:</span>{' '}
-                {court.availability}
-              </li>
-              <li>
-                <span className="font-semibold text-gray-800">Price:</span>{' '}
-                R{court.price_per_hour}/hour
-              </li>
-              <li>
-                <span className="font-semibold text-gray-800">Address:</span>{' '}
-                {court.address}
-              </li>
-            </ul>
-          </div>
+        {/* Court card — tabs, info cards, booking all handled client-side */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+          <CourtDetailClient court={court} />
         </div>
-
-        <BookingForm courtId={court._id} courtName={court.name} pricePerHour={court.price_per_hour} />
       </div>
-    </>
+    </div>
   );
 };
 

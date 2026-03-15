@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Heading from '@/components/Heading';
 import { FaFutbol } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const AddCourtPage = () => {
   const router = useRouter();
@@ -38,203 +38,238 @@ const AddCourtPage = () => {
 
     setLoading(true);
 
-    const res = await fetch('/api/courts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
-        price_per_hour: Number(form.price_per_hour),
-        capacity: Number(form.capacity),
-      }),
-    });
+    try {
+      const res = await fetch('/api/courts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          price_per_hour: Number(form.price_per_hour),
+          capacity: Number(form.capacity),
+        }),
+      });
 
-    const data = await res.json();
-    setLoading(false);
+      const data = await res.json();
 
-    if (!res.ok) {
-      setError(data.error || 'Failed to add court. Please try again.');
-      return;
+      if (!res.ok) {
+        setError(data.error || 'Failed to add court. Please try again.');
+        return;
+      }
+
+      setSuccess(true);
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    setSuccess(true);
   };
+
+  const inputClass =
+    'bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none w-full placeholder-gray-500';
+  const labelClass = 'block text-gray-300 uppercase tracking-widest text-xs mb-2 font-semibold';
 
   if (success) {
     return (
-      <>
-        <Heading title="Add a Court" />
-        <div className="max-w-xl mx-auto bg-white shadow rounded-lg p-10 text-center mt-4">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center max-w-md w-full">
           <FaFutbol className="mx-auto text-4xl text-green-500 mb-4" />
-          <h2 className="text-xl font-bold text-gray-800">Court Added Successfully!</h2>
-          <p className="text-gray-500 mt-2 text-sm">Your new court has been submitted.</p>
-          <div className="mt-6 flex justify-center gap-4">
+          <h2 className="text-2xl font-bold text-white mb-2">Court Added!</h2>
+          <p className="text-gray-400 text-sm mb-8">Your new court has been submitted successfully.</p>
+          <div className="flex justify-center gap-4">
             <button
-              onClick={() => { setSuccess(false); setForm({ name: '', description: '', address: '', capacity: 10, amenities: '', availability: '', price_per_hour: '', image: '' }); }}
-              className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-700 text-sm"
+              onClick={() => {
+                setSuccess(false);
+                setForm({ name: '', description: '', address: '', capacity: 10, amenities: '', availability: '', price_per_hour: '', image: '' });
+              }}
+              className="px-5 py-2.5 bg-gray-800 text-white rounded-xl text-sm font-semibold hover:bg-gray-700 transition"
             >
-              Add Another Court
+              Add Another
             </button>
             <button
               onClick={() => router.push('/my-courts')}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 text-sm"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition"
+              style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
             >
               View My Courts
             </button>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <Heading title="Add a Court" />
-      <div className="max-w-2xl mx-auto bg-white shadow rounded-lg p-8 mt-4">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <FaFutbol /> Court Details
-        </h2>
+    <div className="min-h-screen bg-gray-950 px-4 py-12">
+      <div className="max-w-2xl mx-auto">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1
+            className="text-4xl uppercase text-white"
+            style={{ fontFamily: 'Impact, Arial Black, sans-serif', letterSpacing: '4px' }}
+          >
+            Add a Court
+          </h1>
+          <div className="mt-2 h-1 w-16 rounded-full" style={{ background: 'linear-gradient(135deg, #15803d, #22c55e)' }} />
+        </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Court Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-                placeholder="e.g. Premier Court"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                required
-                rows={3}
-                placeholder="Describe the court, surface type, ideal for..."
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Address <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-                required
-                placeholder="e.g. Pringle Rd, Milnerton, Cape Town"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price per Hour (R) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="price_per_hour"
-                value={form.price_per_hour}
-                onChange={handleChange}
-                required
-                min="0"
-                placeholder="e.g. 400"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Capacity (players)
-              </label>
-              <input
-                type="number"
-                name="capacity"
-                value={form.capacity}
-                onChange={handleChange}
-                min="2"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Availability Hours
-              </label>
-              <input
-                type="text"
-                name="availability"
-                value={form.availability}
-                onChange={handleChange}
-                placeholder="e.g. 10:00 AM - 22:00 PM"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amenities
-              </label>
-              <input
-                type="text"
-                name="amenities"
-                value={form.amenities}
-                onChange={handleChange}
-                placeholder="e.g. Floodlights, Change rooms, Secure Parking"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image Filename
-              </label>
-              <input
-                type="text"
-                name="image"
-                value={form.image}
-                onChange={handleChange}
-                placeholder="e.g. court-5.jpg (must be in /public/images/courts/)"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-              <p className="mt-1 text-xs text-gray-400">
-                Image upload will be available once the backend is connected.
-              </p>
-            </div>
+        {/* Form Card */}
+        <motion.div
+          className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <FaFutbol className="text-green-500 text-xl" />
+            <h2 className="text-white text-lg font-bold uppercase tracking-widest">Court Details</h2>
           </div>
 
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Adding Court...' : 'Add Court'}
-            </button>
-          </div>
-        </form>
+          {error && (
+            <div className="mb-6 p-4 bg-red-950 border border-red-800 rounded-xl text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {/* Court Name */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>
+                  Court Name <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. Premier Court"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Description */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>
+                  Description <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  required
+                  rows={3}
+                  placeholder="Describe the court, surface type, ideal for..."
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Address */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>
+                  Address <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. Pringle Rd, Milnerton, Cape Town"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Price */}
+              <div>
+                <label className={labelClass}>
+                  Price per Hour (R) <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="number"
+                  name="price_per_hour"
+                  value={form.price_per_hour}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  placeholder="e.g. 400"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Capacity */}
+              <div>
+                <label className={labelClass}>Capacity (players)</label>
+                <input
+                  type="number"
+                  name="capacity"
+                  value={form.capacity}
+                  onChange={handleChange}
+                  min="2"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Availability */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>Availability Hours</label>
+                <input
+                  type="text"
+                  name="availability"
+                  value={form.availability}
+                  onChange={handleChange}
+                  placeholder="e.g. 10:00 AM - 22:00 PM"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Amenities */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>Amenities</label>
+                <input
+                  type="text"
+                  name="amenities"
+                  value={form.amenities}
+                  onChange={handleChange}
+                  placeholder="e.g. Floodlights, Change rooms, Secure Parking"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Image */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>Image Filename</label>
+                <input
+                  type="text"
+                  name="image"
+                  value={form.image}
+                  onChange={handleChange}
+                  placeholder="e.g. court-5.jpg (must be in /public/images/courts/)"
+                  className={inputClass}
+                />
+                <p className="mt-2 text-xs text-gray-500">
+                  Place the image file in <code className="text-gray-400">/public/images/courts/</code> before adding.
+                </p>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="pt-2">
+              <motion.button
+                type="submit"
+                disabled={loading}
+                whileHover={{ scale: 1.02, boxShadow: '0 0 25px rgba(34,197,94,0.4)' }}
+                whileTap={{ scale: 0.97 }}
+                className="w-full py-3 px-6 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
+              >
+                {loading ? 'Adding Court...' : 'Add Court'}
+              </motion.button>
+            </div>
+          </form>
+        </motion.div>
       </div>
-    </>
+    </div>
   );
 };
 

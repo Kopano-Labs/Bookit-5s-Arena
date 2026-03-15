@@ -10,8 +10,13 @@ const BookingSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
+      default: null,
     },
+    // Guest booking fields (when user is not authenticated)
+    guestName:  { type: String, default: null },
+    guestEmail: { type: String, default: null },
+    guestPhone: { type: String, default: null },
     date: {
       type: String, // stored as 'YYYY-MM-DD'
       required: [true, 'Booking date is required'],
@@ -35,6 +40,15 @@ const BookingSchema = new mongoose.Schema(
       enum: ['pending', 'confirmed', 'cancelled'],
       default: 'pending',
     },
+    paymentStatus: {
+      type: String,
+      enum: ['unpaid', 'paid', 'refunded', 'reserved'],
+      default: 'unpaid',
+    },
+    stripeSessionId: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
@@ -42,4 +56,12 @@ const BookingSchema = new mongoose.Schema(
 // Prevent double bookings: same court, same date, overlapping time
 BookingSchema.index({ court: 1, date: 1, start_time: 1 }, { unique: true });
 
-export default mongoose.models.Booking || mongoose.model('Booking', BookingSchema);
+// In dev, hot-reload can leave a stale model in mongoose.models with the old schema.
+// Always delete and re-register so schema changes (new fields, new enum values) take effect immediately.
+if (mongoose.models.Booking) {
+  try { mongoose.deleteModel('Booking'); } catch { /* ignore */ }
+}
+if (mongoose.modelSchemas?.Booking) {
+  delete mongoose.modelSchemas.Booking;
+}
+export default mongoose.model('Booking', BookingSchema);

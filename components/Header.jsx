@@ -2,119 +2,294 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import logo from '@/assets/images/myLogo.svg';
-import { FaUser, FaSignOutAlt, FaSignInAlt, FaFutbol, FaCalendarAlt } from 'react-icons/fa';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  FaUser, FaSignOutAlt, FaSignInAlt, FaCalendarAlt,
+  FaBars, FaTimes, FaUserEdit, FaEnvelope, FaChartBar,
+  FaFutbol, FaTachometerAlt, FaListAlt, FaBookOpen,
+  FaGlassCheers, FaTrophy, FaStar, FaTv,
+} from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
+
+/* ── Animated nav icon wrapper ── */
+const NavIcon = ({ children }) => (
+  <motion.span
+    className="inline-flex"
+    whileHover={{ scale: 1.3, rotate: 12, transition: { type: 'spring', stiffness: 400, damping: 10 } }}
+    whileTap={{ scale: 0.7, rotate: -20, transition: { duration: 0.1 } }}
+  >
+    {children}
+  </motion.span>
+);
 
 const Header = () => {
   const { data: session } = useSession();
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navClass = (href) => {
+    const base = 'flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest';
+    const active = pathname === href || (href !== '/' && href !== '/#courts' && pathname?.startsWith(href))
+      ? 'text-white bg-gray-800 border-b-2 border-green-500 shadow-[0_2px_8px_rgba(34,197,94,0.25)]'
+      : 'text-gray-400 hover:text-white hover:bg-gray-800';
+    return `${base} ${active}`;
+  };
+
+  const mobileClass = (href) => {
+    const active = pathname === href || (href !== '/' && href !== '/#courts' && pathname?.startsWith(href));
+    return `flex items-center gap-2.5 px-3 py-3 text-sm font-bold rounded-xl uppercase tracking-widest transition-all ${
+      active
+        ? 'text-white bg-gray-800 border-l-2 border-green-500'
+        : 'text-gray-300 hover:text-white hover:bg-gray-800'
+    }`;
+  };
+
+  /* ── Public tabs (alphabetical) ── */
+  const publicTabs = [
+    { href: '/#courts',  icon: <FaFutbol size={11} className="text-green-400" />,   label: 'Courts' },
+    { href: '/events',   icon: <FaGlassCheers size={11} className="text-pink-400" />, label: 'Events' },
+    { href: '/fixtures', icon: <FaTv size={11} className="text-blue-400" />,         label: 'Fixtures' },
+    { href: '/leagues',  icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Leagues' },
+    { href: '/rules',    icon: <FaBookOpen size={11} className="text-orange-400" />, label: 'Rules' },
+  ];
+
+  /* ── Auth tabs (user-only, alphabetical) ── */
+  const userTabs = [
+    { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings' },
+    { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards', hideAdmin: true },
+  ];
+
+  /* ── Admin tabs ── */
+  const adminTabs = [
+    { href: '/admin/dashboard',  icon: <FaTachometerAlt size={11} className="text-purple-400" />, label: 'Dashboard' },
+    { href: '/admin/bookings',   icon: <FaListAlt size={11} className="text-teal-400" />,         label: 'Manage' },
+    { href: '/admin/newsletter', icon: <FaEnvelope size={11} className="text-rose-400" />,         label: 'Newsletter' },
+    { href: '/admin/analytics',  icon: <FaChartBar size={11} className="text-amber-400" />,        label: 'Analytics' },
+  ];
 
   return (
-    <header className="bg-gray-100">
+    <header className="bg-gray-950 border-b border-gray-800 sticky top-0 z-50 shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <Link href='/'>
-              <Image
-                className="h-16 w-16"
-                src={logo}
-                alt="5's Arena Logo"
-                priority={true}
-              />
-            </Link>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-3">
-                <Link
-                  href="/"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                >
-                  Courts
-                </Link>
-                {session && (
-                  <>
-                    <Link
-                      href="/bookings"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                    >
-                      <FaCalendarAlt className="inline mr-1" /> Bookings
+
+          {/* ── Logo ── */}
+          <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
+            <motion.div
+              className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)]"
+              whileHover={{ scale: 1.12, boxShadow: '0 0 22px rgba(34,197,94,0.75)' }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              <Image src="/images/logo.jpg" alt="5s Arena" fill sizes="44px" className="object-cover" priority />
+            </motion.div>
+            <span
+              className="hidden sm:block font-black text-white uppercase leading-tight text-sm tracking-widest"
+              style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+            >
+              5S<br /><span className="text-green-400">ARENA</span>
+            </span>
+          </Link>
+
+          {/* ── Desktop Nav ── */}
+          <div className="hidden md:flex items-center gap-0.5">
+            {/* Public tabs */}
+            {publicTabs.map((tab) => (
+              <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                <NavIcon>{tab.icon}</NavIcon> {tab.label}
+              </Link>
+            ))}
+
+            {/* Auth tabs */}
+            {session && (
+              <>
+                {userTabs
+                  .filter((t) => !(t.hideAdmin && session.user.role === 'admin'))
+                  .map((tab) => (
+                    <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                      <NavIcon>{tab.icon}</NavIcon> {tab.label}
                     </Link>
-                    {session.user.role === 'admin' && (
-                      <Link
-                        href="/courts/add"
-                        className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                      >
-                        Add Court
+                  ))}
+
+                {/* Admin tabs */}
+                {session.user.role === 'admin' && (
+                  <>
+                    {adminTabs.map((tab) => (
+                      <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                        <NavIcon>{tab.icon}</NavIcon> {tab.label}
                       </Link>
-                    )}
+                    ))}
+                    <Link href="/courts/add" className="flex items-center gap-1 px-3 py-2 text-[10px] font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-lg transition-all uppercase tracking-widest">
+                      + Court
+                    </Link>
                   </>
                 )}
-              </div>
-            </div>
+              </>
+            )}
           </div>
 
-          <div className="ml-auto">
-            <div className="ml-4 flex items-center md:ml-6">
-              {session ? (
-                <>
-                  <span className="mr-3 text-sm text-gray-600 hidden md:block">
-                    Hi, {session.user.name?.split(' ')[0]}!
-                  </span>
-                  {session.user.role === 'admin' && (
-                    <Link href="/my-courts" className="mr-3 text-gray-800 hover:text-gray-600">
-                      <FaFutbol className="inline mr-1" /> My Courts
-                    </Link>
+          {/* ── Auth Controls ── */}
+          <div className="flex items-center gap-2">
+            {session ? (
+              <>
+                <Link
+                  href="/profile"
+                  className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-800 transition-all group border border-transparent hover:border-gray-700"
+                >
+                  {session.user.image ? (
+                    <motion.div
+                      className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      <img src={session.user.image} alt={session.user.name || 'Profile'} className="w-full h-full object-cover" />
+                    </motion.div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-black shadow-inner border border-green-500 flex-shrink-0">
+                      {session.user.name?.[0]?.toUpperCase() || 'U'}
+                    </div>
                   )}
-                  <button
-                    onClick={() => signOut({ callbackUrl: '/' })}
-                    className="mx-3 text-gray-800 hover:text-gray-600"
+                  <div className="hidden lg:block text-left leading-tight">
+                    <p className="text-white text-xs font-bold">{session.user.name?.split(' ')[0]}</p>
+                    <p className="text-green-400 text-[10px] uppercase tracking-widest">
+                      {session.user.username ? `@${session.user.username}` : 'Profile'}
+                    </p>
+                  </div>
+                </Link>
+                <motion.button
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="hidden md:flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-green-700 rounded-lg transition-all uppercase tracking-widest"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <FaSignOutAlt size={12} /> Out
+                </motion.button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="hidden md:flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest"
+                >
+                  <FaSignInAlt size={12} /> Login
+                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    href="/register"
+                    className="hidden md:flex items-center gap-1.5 px-5 py-2 text-xs font-black text-white bg-green-600 hover:bg-green-500 rounded-lg transition-all uppercase tracking-widest shadow-[0_0_12px_rgba(34,197,94,0.4)] hover:shadow-[0_0_20px_rgba(34,197,94,0.7)]"
                   >
-                    <FaSignOutAlt className="inline mr-1" /> Sign Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" className="mr-3 text-gray-800 hover:text-gray-600">
-                    <FaSignInAlt className="inline mr-1" /> Login
+                    <FaUser size={11} /> Register
                   </Link>
-                  <Link href="/register" className="mr-3 text-gray-800 hover:text-gray-600">
-                    <FaUser className="inline mr-1" /> Register
-                  </Link>
-                </>
-              )}
-            </div>
+                </motion.div>
+              </>
+            )}
+
+            {/* Mobile toggle */}
+            <motion.button
+              className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Menu"
+              whileTap={{ scale: 0.85, rotate: 90 }}
+            >
+              {mobileOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
+            </motion.button>
           </div>
         </div>
       </nav>
 
-      {/* Mobile menu */}
-      <div className="md:hidden">
-        <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-          <Link
-            href="/"
-            className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
+      {/* ── Mobile Drawer ── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            className="md:hidden bg-gray-900 border-t border-gray-800 px-4 pb-5 pt-3 space-y-1 overflow-hidden"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
           >
-            Courts
-          </Link>
-          {session && (
-            <>
-              <Link
-                href="/bookings"
-                className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
+            {/* Mobile user identity strip */}
+            {session && (
+              <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-gray-800">
+                {session.user.image ? (
+                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0">
+                    <img src={session.user.image} alt={session.user.name || 'Profile'} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-black border border-green-500 flex-shrink-0">
+                    {session.user.name?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                )}
+                <div>
+                  <p className="text-white text-sm font-bold">{session.user.name}</p>
+                  {session.user.username && (
+                    <p className="text-green-400 text-xs font-mono">@{session.user.username}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Public tabs */}
+            {publicTabs.map((tab, i) => (
+              <motion.div
+                key={tab.href}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.04 }}
               >
-                Bookings
-              </Link>
-              {session.user.role === 'admin' && (
-                <Link
-                  href="/courts/add"
-                  className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                >
-                  Add Court
+                <Link href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                  {tab.icon} {tab.label}
                 </Link>
-              )}
-            </>
-          )}
-        </div>
-      </div>
+              </motion.div>
+            ))}
+
+            {session ? (
+              <>
+                {userTabs
+                  .filter((t) => !(t.hideAdmin && session.user.role === 'admin'))
+                  .map((tab, i) => (
+                    <motion.div
+                      key={tab.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: (publicTabs.length + i) * 0.04 }}
+                    >
+                      <Link href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                        {tab.icon} {tab.label}
+                      </Link>
+                    </motion.div>
+                  ))}
+                <Link href="/profile" onClick={() => setMobileOpen(false)} className={mobileClass('/profile')}>
+                  <FaUserEdit className="text-emerald-400" size={13} /> Edit Profile
+                </Link>
+                {session.user.role === 'admin' && (
+                  <>
+                    {adminTabs.map((tab) => (
+                      <Link key={tab.href} href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                        {tab.icon} {tab.label}
+                      </Link>
+                    ))}
+                    <Link href="/courts/add" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-green-400 hover:text-white hover:bg-green-600 rounded-xl">
+                      + Add Court
+                    </Link>
+                  </>
+                )}
+                <button onClick={() => signOut({ callbackUrl: '/' })} className="w-full text-left px-3 py-3 text-sm font-bold text-red-400 hover:bg-gray-800 rounded-xl uppercase tracking-widest">
+                  <FaSignOutAlt className="inline mr-2" size={13} />Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
+                  <FaSignInAlt className="inline mr-2" size={13} />Login
+                </Link>
+                <Link href="/register" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-sm font-black text-white bg-green-600 hover:bg-green-500 rounded-xl text-center uppercase tracking-widest">
+                  Register
+                </Link>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

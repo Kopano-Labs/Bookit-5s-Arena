@@ -1,7 +1,7 @@
 {
   "name": "bookit-5s-arena",
   "version": "0.1.0",
-  "type": "module", 
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,13 +12,19 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.3.1",
+    "framer-motion": "^12.36.0",
+    "gsap": "^3.14.2",
     "mongodb": "^7.1.0",
     "mongoose": "^9.3.0",
     "next": "16.1.6",
     "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.13",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-icons": "^5.5.0"
+    "react-google-recaptcha": "^3.1.0",
+    "react-icons": "^5.5.0",
+    "resend": "^6.9.3",
+    "stripe": "^20.4.1"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",

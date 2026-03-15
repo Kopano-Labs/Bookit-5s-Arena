@@ -42,4 +42,5 @@ next-env.d.ts
 
 .env.local
 MONGODB_URI passkey.txt
+
 *.txt

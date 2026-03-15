@@ -29,6 +29,25 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+...
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## 🏟️ Community & Support
+
+Got an idea for the arena or stuck on a Next.js error? Join the conversation!
+
+- **[Join our GitHub Discussions](https://github.com)**
+- **💡 [Pitch a Feature](https://github.com/new?category=feature-pitch)**
+- **❓ [Ask a Question](https://github.com/new?category=q-a)**
+- **🐛 [Report a Bug](https://github.com/new?category=bugs-unconfirmed)**
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

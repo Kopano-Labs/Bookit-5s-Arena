@@ -1,18 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Heading from '@/components/Heading';
-import { FaFutbol, FaCalendarAlt, FaClock, FaTrash } from 'react-icons/fa';
+import { FaFutbol, FaCalendarAlt, FaClock, FaTrash, FaArrowRight, FaUserPlus } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const statusStyles = {
-  confirmed: 'bg-green-100 text-green-700',
-  pending: 'bg-yellow-100 text-yellow-700',
-  cancelled: 'bg-red-100 text-red-700',
+  confirmed: 'bg-green-900/40 text-green-400 border border-green-800/60',
+  pending:   'bg-yellow-900/40 text-yellow-400 border border-yellow-800/60',
+  cancelled: 'bg-red-900/40 text-red-400 border border-red-800/60',
 };
 
 const BookingsPage = () => {
+  const { data: session, status: authStatus } = useSession();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,7 +25,7 @@ const BookingsPage = () => {
       if (!res.ok) throw new Error('Failed to fetch bookings');
       const data = await res.json();
       setBookings(data);
-    } catch (err) {
+    } catch {
       setError('Could not load bookings. Please try again.');
     } finally {
       setLoading(false);
@@ -32,9 +34,7 @@ const BookingsPage = () => {
 
   const handleCancel = async (bookingId) => {
     if (!confirm('Are you sure you want to cancel this booking?')) return;
-
     const res = await fetch(`/api/bookings/${bookingId}`, { method: 'DELETE' });
-
     if (res.ok) {
       setBookings((prev) =>
         prev.map((b) => (b._id === bookingId ? { ...b, status: 'cancelled' } : b))
@@ -49,47 +49,122 @@ const BookingsPage = () => {
   }, []);
 
   return (
-    <>
-      <Heading title="My Bookings" />
+    <div className="min-h-screen bg-gray-950 py-10 px-4">
       <div className="max-w-4xl mx-auto">
+
+        {/* Page header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+        >
+          <h1
+            className="text-3xl font-black uppercase tracking-widest text-white"
+            style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+          >
+            My Bookings
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">Manage your court reservations</p>
+        </motion.div>
+
+        {/* Unauthenticated prompt */}
+        {authStatus === 'unauthenticated' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center shadow-xl mb-6"
+          >
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-900/30 border border-green-800/50 mb-6">
+              <FaUserPlus className="text-3xl text-green-400" />
+            </div>
+            <h2 className="text-2xl font-black uppercase tracking-widest text-white mb-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+              Register to View Bookings
+            </h2>
+            <p className="text-gray-400 text-sm mb-2 max-w-sm mx-auto">
+              Create a free account to book courts, track your reservations, and unlock member benefits.
+            </p>
+            <ul className="text-gray-500 text-xs mb-8 space-y-1">
+              <li>⚽ Book and reserve courts online</li>
+              <li>📅 Full booking history &amp; management</li>
+              <li>🏆 Loyalty rewards &amp; member perks</li>
+              <li>🔔 Booking reminders &amp; confirmations</li>
+            </ul>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center gap-2 py-3 px-7 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all hover:scale-105"
+                style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)', boxShadow: '0 0 20px rgba(34,197,94,0.35)' }}
+              >
+                <FaUserPlus size={13} /> Create Free Account
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-2 py-3 px-7 rounded-xl text-sm font-semibold text-gray-300 bg-gray-800 border border-gray-700 hover:border-gray-600 hover:text-white transition-all"
+              >
+                Already have an account? Sign In
+              </Link>
+            </div>
+          </motion.div>
+        )}
+
         {loading ? (
-          <div className="text-center py-10 text-gray-500">Loading your bookings...</div>
+          <div className="text-center py-20 text-green-400 animate-pulse text-lg">
+            Loading your bookings...
+          </div>
         ) : error ? (
-          <div className="text-center py-10 text-red-500">{error}</div>
+          <div className="text-center py-20 text-red-400">{error}</div>
         ) : bookings.length === 0 ? (
-          <div className="bg-white shadow rounded-lg p-10 text-center">
-            <FaFutbol className="mx-auto text-4xl text-gray-300 mb-4" />
-            <p className="text-gray-500 text-lg">You have no bookings yet.</p>
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-16 text-center shadow-xl">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-800 border border-gray-700 mb-6">
+              <FaFutbol className="text-4xl text-gray-600" />
+            </div>
+            <p className="text-gray-400 text-lg font-semibold mb-2">No bookings yet</p>
+            <p className="text-gray-600 text-sm mb-8">Ready to hit the pitch? Book a court now.</p>
             <Link
               href="/"
-              className="mt-4 inline-block bg-black text-white px-6 py-2 rounded-md hover:bg-gray-700 text-sm"
+              className="inline-flex items-center gap-2 py-3 px-6 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)',
+                boxShadow: '0 0 20px rgba(34,197,94,0.35)',
+              }}
             >
-              Browse Courts
+              Browse Courts <FaArrowRight size={11} />
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <motion.div
+            className="space-y-4"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+            initial="hidden"
+            animate="visible"
+          >
             {bookings.map((booking) => (
-              <div
+              <motion.div
                 key={booking._id}
-                className="bg-white shadow rounded-lg p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
+                whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 shadow-lg hover:border-gray-700 transition-colors"
               >
                 <div className="flex items-start gap-4">
                   {booking.court?.image && (
-                    <Image
-                      src={`/images/courts/${booking.court.image}`}
-                      alt={booking.court.name}
-                      width={80}
-                      height={80}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
+                    <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-gray-700">
+                      <Image
+                        src={`/images/courts/${booking.court.image}`}
+                        alt={booking.court.name}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   )}
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-semibold text-gray-800">
+                  <div className="space-y-1.5">
+                    <h3 className="text-base font-bold text-white">
                       {booking.court?.name ?? 'Court'}
                     </h3>
-                    <p className="text-sm text-gray-600 flex items-center gap-1">
-                      <FaCalendarAlt className="text-gray-400" />
+                    <p className="text-sm text-gray-400 flex items-center gap-2">
+                      <FaCalendarAlt className="text-green-500 flex-shrink-0" size={11} />
                       {new Date(booking.date).toLocaleDateString('en-ZA', {
                         weekday: 'long',
                         year: 'numeric',
@@ -97,45 +172,43 @@ const BookingsPage = () => {
                         day: 'numeric',
                       })}
                     </p>
-                    <p className="text-sm text-gray-600 flex items-center gap-1">
-                      <FaClock className="text-gray-400" />
+                    <p className="text-sm text-gray-400 flex items-center gap-2">
+                      <FaClock className="text-green-500 flex-shrink-0" size={11} />
                       {booking.start_time} · {booking.duration} hour{booking.duration > 1 ? 's' : ''}
                     </p>
-                    <p className="text-sm font-semibold text-gray-800">
-                      Total: R{booking.total_price}
+                    <p className="text-sm font-bold text-green-400">
+                      R{booking.total_price}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-3">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${statusStyles[booking.status]}`}
-                  >
+                <div className="flex flex-col items-end gap-3 flex-shrink-0">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${statusStyles[booking.status] ?? statusStyles.pending}`}>
                     {booking.status}
                   </span>
                   <div className="flex gap-2">
                     <Link
-                      href={`/courts/${booking.court?._id}`}
-                      className="text-sm px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                      href={`/bookings/${booking._id}`}
+                      className="text-xs px-3 py-2 bg-gray-800 border border-gray-700 rounded-xl text-gray-300 hover:text-white hover:border-gray-600 transition-all flex items-center gap-1"
                     >
-                      View Court
+                      View <FaArrowRight size={9} />
                     </Link>
                     {booking.status !== 'cancelled' && (
                       <button
                         onClick={() => handleCancel(booking._id)}
-                        className="text-sm px-3 py-1 border border-red-200 text-red-500 rounded-md hover:bg-red-50 flex items-center gap-1"
+                        className="text-xs px-3 py-2 bg-red-950 border border-red-900 rounded-xl text-red-400 hover:bg-red-900/50 hover:border-red-700 transition-all flex items-center gap-1"
                       >
-                        <FaTrash className="text-xs" /> Cancel
+                        <FaTrash size={9} /> Cancel
                       </button>
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
