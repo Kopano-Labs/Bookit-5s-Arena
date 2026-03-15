@@ -13,7 +13,11 @@ function CourtCard({ court, index }) {
       initial={{ opacity: 0, y: 50, rotateX: 8 }}
       whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.7, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -8 }}
+      transition={{
+        default: { duration: 0.7, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
+        y: { type: 'spring', stiffness: 300, damping: 20 },
+      }}
     >
       <Link
         href={`/courts/${court._id}`}
@@ -32,9 +36,12 @@ function CourtCard({ court, index }) {
                 alt={court.name}
                 loading="lazy"
                 className="w-full h-full object-cover"
-                whileHover={{ scale: 1.12 }}
-                transition={{ duration: 0.8, ease: 'easeOut' }}
-                animate={{ scale: [1, 1.03, 1] }}
+                whileHover={{ scale: 1.1, filter: 'brightness(1.15)' }}
+                animate={{ scale: [1, 1.04, 1] }}
+                transition={{
+                  scale: { duration: 12, repeat: Infinity, ease: 'easeInOut', repeatType: 'loop' },
+                  filter: { duration: 0.8, ease: 'easeOut' },
+                }}
                 style={{ willChange: 'transform' }}
               />
               {/* Gradient overlays */}
@@ -96,17 +103,22 @@ function CourtCard({ court, index }) {
               </span>
               <span className="text-gray-500 text-sm"> /hour</span>
             </div>
-            <motion.span
-              className="inline-flex items-center gap-2 text-white font-black px-6 py-3 rounded-full text-xs uppercase tracking-widest"
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
-                boxShadow: '0 0 20px rgba(34,197,94,0.5), 0 4px 15px rgba(0,0,0,0.3)',
-              }}
+            <Link
+              href="/bookings"
+              onClick={(e) => e.stopPropagation()}
             >
-              BOOK NOW <FaArrowRight size={10} />
-            </motion.span>
+              <motion.span
+                className="inline-flex items-center gap-2 text-white font-black px-6 py-3 rounded-full text-xs uppercase tracking-widest"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+                  boxShadow: '0 0 20px rgba(34,197,94,0.5), 0 4px 15px rgba(0,0,0,0.3)',
+                }}
+              >
+                BOOK NOW <FaArrowRight size={10} />
+              </motion.span>
+            </Link>
           </div>
         </div>
 

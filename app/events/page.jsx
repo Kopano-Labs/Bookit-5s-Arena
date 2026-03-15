@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaBirthdayCake,
@@ -110,6 +110,15 @@ export default function EventsPage() {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showTerms, setShowTerms] = useState(false);
   const [contactMethod, setContactMethod] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Auto-cycle hero images every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % EVENT_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleSelectPackage = (pkg) => {
     setSelectedPackage(pkg);
@@ -126,18 +135,22 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Hero with football legends background */}
+      {/* Hero with auto-cycling Ken Burns court images */}
       <section className="relative py-28 px-4 overflow-hidden">
         <div className="absolute inset-0">
-          <motion.img
-            src={EVENTS_HERO_BG}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            initial={{ scale: 1 }}
-            animate={{ scale: 1.08, y: [0, -15, 0] }}
-            transition={{ duration: 25, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
-            onError={(e) => { e.target.src = EVENT_IMAGES[0]; }}
-          />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentImageIndex}
+              src={EVENT_IMAGES[currentImageIndex]}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{ opacity: 1, scale: 1.08 }}
+              exit={{ opacity: 0, scale: 1.04 }}
+              transition={{ duration: 1.2, ease: 'easeInOut' }}
+              onError={() => setCurrentImageIndex((prev) => (prev + 1) % EVENT_IMAGES.length)}
+            />
+          </AnimatePresence>
           <div className="absolute inset-0" style={{
             background: 'linear-gradient(180deg, rgba(2,6,23,0.75) 0%, rgba(2,6,23,0.85) 40%, rgba(2,6,23,0.95) 70%, rgba(2,6,23,1) 100%)',
           }} />

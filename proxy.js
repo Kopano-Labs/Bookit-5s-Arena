@@ -20,26 +20,22 @@ export function middleware(request) {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com https://www.youtube.com https://s.ytimg.com",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
       "font-src 'self' https://fonts.gstatic.com",
-      // broad https: covers team logos (crests.football-data.org, upload.wikimedia.org, thesportsdb.com badges)
       "img-src 'self' data: blob: https:",
-      // External APIs used by the app (GeoJS, Open-Meteo, JokeAPI, TheSportsDB, Groq, Anthropic, OpenMeteo)
       [
         "connect-src 'self'",
         "https://accounts.google.com",
         "https://www.googleapis.com",
-        "https://get.geojs.io",           // GeoJS geolocation
-        "https://api.open-meteo.com",     // Weather widget
-        "https://v2.jokeapi.dev",         // Football joke widget
-        "https://www.thesportsdb.com",    // Live fixtures + standings
-        "https://api.groq.com",           // Groq AI chat
-        "https://api.anthropic.com",      // Anthropic Claude fallback
+        "https://get.geojs.io",
+        "https://api.open-meteo.com",
+        "https://v2.jokeapi.dev",
+        "https://www.thesportsdb.com",
+        "https://api.groq.com",
+        "https://api.anthropic.com",
       ].join(' '),
-      // YouTube embeds + Google auth + Instagram deep links
       "frame-src 'self' https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com",
-      // YouTube thumbnail images
       "media-src 'self' https://www.youtube.com https://i.ytimg.com",
     ].join('; ')
   );

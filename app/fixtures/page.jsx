@@ -85,18 +85,18 @@ const mockMatches = [
 ];
 
 const mockNews = [
-  { id: 1,  title: 'Arsenal Close Gap on Man City After Dominant Derby Win',              source: 'Sky Sports',     timeAgo: '2 hours ago', category: 'Match Report', gradient: 'from-red-900 to-red-700',        leagues: ['PL'],       url: 'https://www.skysports.com/football', thumb: 'https://e0.365dm.com/24/01/768x432/skysports-arsenal-premier-league_6424001.jpg' },
-  { id: 2,  title: 'Barcelona Secure El Clasico Bragging Rights with 3-1 Triumph',         source: 'ESPN FC',        timeAgo: '3 hours ago', category: 'Match Report', gradient: 'from-blue-900 to-red-800',       leagues: ['LL'],       url: 'https://www.espn.com/soccer/', thumb: 'https://a.espncdn.com/photo/2024/0428/r1329567_1296x729_16-9.jpg' },
-  { id: 3,  title: 'BREAKING: Kylian Mbappe Agrees Personal Terms with Man City',          source: 'Fabrizio Romano',timeAgo: '45 min ago',  category: 'Breaking',     gradient: 'from-sky-900 to-sky-700',        leagues: ['PL'],       url: 'https://x.com/FabrizioRomano', thumb: 'https://pbs.twimg.com/profile_images/1459853898254688257/RxBRdXNP_400x400.jpg' },
-  { id: 4,  title: 'Liverpool Manager Addresses Champions League Knockout Strategy',       source: 'The Athletic',   timeAgo: '5 hours ago', category: 'Interview',    gradient: 'from-red-800 to-red-600',        leagues: ['PL', 'UCL'],url: 'https://theathletic.com/football/', thumb: 'https://cdn.theathletic.com/app/uploads/2024/03/06170859/GettyImages-2035846506-scaled.jpg' },
-  { id: 5,  title: 'La Liga Title Race: Three Teams Separated by Two Points',              source: 'Marca',          timeAgo: '6 hours ago', category: 'Analysis',     gradient: 'from-orange-900 to-yellow-800',  leagues: ['LL'],       url: 'https://www.marca.com/en/football/la-liga.html', thumb: 'https://phantom-marca.unidadeditorial.es/e86c6ab2c7c7d8c5b7e0e9e9e9e9e9e9/resize/1320/f/webp/assets/multimedia/imagenes/2024/01/08/17047553654891.jpg' },
-  { id: 6,  title: 'VAR Controversy Overshadows Soweto Derby as Pirates Edge Chiefs',       source: 'SuperSport',     timeAgo: '1 hour ago',  category: 'Match Report', gradient: 'from-yellow-900 to-gray-800',    leagues: ['PSL'],      url: 'https://supersport.com/football/psl', thumb: 'https://supersport.com/api/images/landscape/934223' },
-  { id: 7,  title: 'Sundowns Set New PSL Record with 15th Consecutive Win',                source: 'KickOff',        timeAgo: '4 hours ago', category: 'Match Report', gradient: 'from-yellow-800 to-green-900',   leagues: ['PSL'],      url: 'https://www.kickoff.com/psl/', thumb: 'https://www.kickoff.com/images/2024/mamelodi-sundowns-celebrate.jpg' },
-  { id: 8,  title: 'EXCLUSIVE: Chelsea Table R1.2 Billion Bid for Serie A Star',           source: 'Sky Sports',     timeAgo: '30 min ago',  category: 'Transfer',     gradient: 'from-blue-800 to-blue-600',      leagues: ['PL', 'SA'], url: 'https://www.skysports.com/transfer-centre', thumb: 'https://e0.365dm.com/24/02/768x432/skysports-chelsea-transfer_6453001.jpg' },
-  { id: 9,  title: 'Tactical Analysis: How Arteta Outclassed Pochettino',                  source: 'The Guardian',   timeAgo: '7 hours ago', category: 'Analysis',     gradient: 'from-gray-800 to-gray-600',      leagues: ['PL'],       url: 'https://www.theguardian.com/football', thumb: 'https://i.guim.co.uk/img/media/7d95c7beff8d82a8e9f9e9e9e9e9e9e9/0_0_5568_3712/master/5568.jpg' },
-  { id: 10, title: 'Bayern Munich Complete Signing of English Wonderkid for R850M',        source: 'BILD',           timeAgo: '2 hours ago', category: 'Transfer',     gradient: 'from-red-900 to-red-700',        leagues: ['BL'],       url: 'https://www.bild.de/sport/fussball/', thumb: 'https://images.bild.de/64e98d2897b4ba0001e60d89/0684e2f9d8e9e9e9e9e9/3/original.jpg' },
-  { id: 11, title: 'Real Madrid Injury Update: Vinicius Jr Faces Three Weeks Out',         source: 'AS',             timeAgo: '8 hours ago', category: 'Breaking',     gradient: 'from-yellow-900 to-white/10',    leagues: ['LL', 'UCL'],url: 'https://en.as.com/soccer/', thumb: 'https://as01.epimg.net/en/imagenes/2024/01/15/soccer/1705288454_544851_1705288559_noticia_normal.jpg' },
-  { id: 12, title: 'Premier League Top Scorers: Updated Golden Boot Race After Matchday 30',source: 'BBC Sport',     timeAgo: '1 hour ago',  category: 'Analysis',     gradient: 'from-purple-900 to-indigo-800',  leagues: ['PL'],       url: 'https://www.bbc.com/sport/football/premier-league', thumb: 'https://ichef.bbci.co.uk/onesport/cps/800/cpsprodpb/7E7C/production/_132441234_gettyimages-1905284752.jpg' },
+  { id: 1,  title: 'Arsenal Close Gap on Man City After Dominant Derby Win',               source: 'Sky Sports',     timeAgo: '2 hours ago', category: 'Match Report', gradient: 'from-red-900 to-red-700',        leagues: ['PL'],        url: 'https://www.skysports.com/football' },
+  { id: 2,  title: 'Barcelona Secure El Clasico Bragging Rights with 3-1 Triumph',          source: 'ESPN FC',        timeAgo: '3 hours ago', category: 'Match Report', gradient: 'from-blue-900 to-red-800',       leagues: ['LL'],        url: 'https://www.espn.com/soccer/' },
+  { id: 3,  title: 'BREAKING: Kylian Mbappe Agrees Personal Terms with Man City',           source: 'Fabrizio Romano',timeAgo: '45 min ago',  category: 'Breaking',     gradient: 'from-sky-900 to-sky-700',        leagues: ['PL'],        url: 'https://x.com/FabrizioRomano' },
+  { id: 4,  title: 'Liverpool Manager Addresses Champions League Knockout Strategy',        source: 'The Athletic',   timeAgo: '5 hours ago', category: 'Interview',    gradient: 'from-red-800 to-red-600',        leagues: ['PL', 'UCL'], url: 'https://theathletic.com/football/' },
+  { id: 5,  title: 'La Liga Title Race: Three Teams Separated by Two Points',               source: 'Marca',          timeAgo: '6 hours ago', category: 'Analysis',     gradient: 'from-orange-900 to-yellow-800',  leagues: ['LL'],        url: 'https://www.marca.com/en/football/la-liga.html' },
+  { id: 6,  title: 'VAR Controversy Overshadows Soweto Derby as Pirates Edge Chiefs',        source: 'SuperSport',     timeAgo: '1 hour ago',  category: 'Match Report', gradient: 'from-yellow-900 to-gray-800',    leagues: ['PSL'],       url: 'https://supersport.com/football/psl' },
+  { id: 7,  title: 'Sundowns Set New PSL Record with 15th Consecutive Win',                 source: 'KickOff',        timeAgo: '4 hours ago', category: 'Match Report', gradient: 'from-yellow-800 to-green-900',   leagues: ['PSL'],       url: 'https://www.kickoff.com/psl/' },
+  { id: 8,  title: 'EXCLUSIVE: Chelsea Table R1.2 Billion Bid for Serie A Star',            source: 'Sky Sports',     timeAgo: '30 min ago',  category: 'Transfer',     gradient: 'from-blue-800 to-blue-600',      leagues: ['PL', 'SA'],  url: 'https://www.skysports.com/transfer-centre' },
+  { id: 9,  title: 'Tactical Analysis: How Arteta Outclassed Pochettino',                   source: 'The Guardian',   timeAgo: '7 hours ago', category: 'Analysis',     gradient: 'from-gray-800 to-gray-600',      leagues: ['PL'],        url: 'https://www.theguardian.com/football' },
+  { id: 10, title: 'Bayern Munich Complete Signing of English Wonderkid for R850M',         source: 'BILD',           timeAgo: '2 hours ago', category: 'Transfer',     gradient: 'from-red-900 to-red-700',        leagues: ['BL'],        url: 'https://www.bild.de/sport/fussball/' },
+  { id: 11, title: 'Real Madrid Injury Update: Vinicius Jr Faces Three Weeks Out',          source: 'AS',             timeAgo: '8 hours ago', category: 'Breaking',     gradient: 'from-yellow-900 to-gray-900',    leagues: ['LL', 'UCL'], url: 'https://en.as.com/soccer/' },
+  { id: 12, title: 'Premier League Top Scorers: Updated Golden Boot Race After Matchday 30',source: 'BBC Sport',      timeAgo: '1 hour ago',  category: 'Analysis',     gradient: 'from-purple-900 to-indigo-800',  leagues: ['PL'],        url: 'https://www.bbc.com/sport/football/premier-league' },
 ];
 
 const CATEGORY_COLORS = {
@@ -105,6 +105,15 @@ const CATEGORY_COLORS = {
   'Analysis':     'bg-purple-600/20 text-purple-400 border-purple-700/50',
   'Breaking':     'bg-red-600/20 text-red-400 border-red-700/50',
   'Interview':    'bg-yellow-600/20 text-yellow-400 border-yellow-700/50',
+};
+
+// Category visual config for news card headers (no broken external images)
+const CATEGORY_VISUAL = {
+  'Transfer':     { emoji: '💰', icon: '↔',  pattern: 'radial-gradient(circle at 30% 70%, rgba(59,130,246,0.25) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(99,102,241,0.2) 0%, transparent 50%)' },
+  'Match Report': { emoji: '⚽', icon: '📋', pattern: 'radial-gradient(circle at 20% 80%, rgba(22,163,74,0.25) 0%, transparent 60%), radial-gradient(circle at 75% 25%, rgba(16,185,129,0.15) 0%, transparent 50%)' },
+  'Analysis':     { emoji: '📊', icon: '🔍', pattern: 'radial-gradient(circle at 60% 60%, rgba(139,92,246,0.25) 0%, transparent 60%), radial-gradient(circle at 20% 30%, rgba(167,139,250,0.15) 0%, transparent 50%)' },
+  'Breaking':     { emoji: '🚨', icon: '⚡', pattern: 'radial-gradient(circle at 50% 50%, rgba(239,68,68,0.3) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(220,38,38,0.2) 0%, transparent 50%)' },
+  'Interview':    { emoji: '🎙️', icon: '💬', pattern: 'radial-gradient(circle at 40% 40%, rgba(234,179,8,0.25) 0%, transparent 60%), radial-gradient(circle at 70% 75%, rgba(250,204,21,0.15) 0%, transparent 50%)' },
 };
 
 // 50 YouTube channels with relevance scoring
@@ -766,8 +775,67 @@ const FixturesPage = () => {
   // Featured matches (top 5)
   const featuredMatches = mockMatches.filter(m => m.featured).slice(0, 5);
 
+  // ── Standings state ─────────────────────────────────────────
+  const [standingsLeague, setStandingsLeague] = useState('PSL');
+  const [standingsData, setStandingsData] = useState({});
+  const [standingsLoading, setStandingsLoading] = useState(false);
+
+  const STANDINGS_LEAGUES = [
+    { code: 'PSL', name: 'Premier Soccer League', id: '4806', color: 'text-yellow-400', border: 'border-yellow-600/50', bg: 'bg-yellow-900/20' },
+    { code: 'PL',  name: 'Premier League',         id: '4406', color: 'text-purple-400', border: 'border-purple-600/50', bg: 'bg-purple-900/20' },
+    { code: 'LL',  name: 'La Liga',                id: '4480', color: 'text-orange-400', border: 'border-orange-600/50', bg: 'bg-orange-900/20' },
+    { code: 'SA',  name: 'Serie A',                id: '4332', color: 'text-blue-400',   border: 'border-blue-600/50',   bg: 'bg-blue-900/20' },
+    { code: 'BL',  name: 'Bundesliga',             id: '4331', color: 'text-red-400',    border: 'border-red-600/50',    bg: 'bg-red-900/20' },
+  ];
+
+  const fetchStandings = useCallback(async (code) => {
+    if (standingsData[code]) return; // Already cached
+    const league = STANDINGS_LEAGUES.find(l => l.code === code);
+    if (!league) return;
+    setStandingsLoading(true);
+    try {
+      const res = await fetch(
+        `https://www.thesportsdb.com/api/v1/json/3/lookuptable.php?l=${league.id}&s=2024-2025`
+      );
+      if (res.ok) {
+        const json = await res.json();
+        const table = (json?.table || []).map(t => ({
+          rank:   parseInt(t.intRank) || 0,
+          team:   t.strTeam,
+          logo:   t.strTeamBadge || null,
+          played: parseInt(t.intPlayed) || 0,
+          won:    parseInt(t.intWin) || 0,
+          drawn:  parseInt(t.intDraw) || 0,
+          lost:   parseInt(t.intLoss) || 0,
+          gf:     parseInt(t.intGoalsFor) || 0,
+          ga:     parseInt(t.intGoalsAgainst) || 0,
+          gd:     parseInt(t.intGoalDifference) || 0,
+          points: parseInt(t.intPoints) || 0,
+          form:   t.strForm || '',
+        }));
+        setStandingsData(prev => ({ ...prev, [code]: table }));
+      }
+    } catch {}
+    setStandingsLoading(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [standingsData]);
+
+  const handleStandingsLeague = (code) => {
+    setStandingsLeague(code);
+    fetchStandings(code);
+  };
+
+  // Fetch PSL standings when standings tab is first opened
+  useEffect(() => {
+    if (tab === 'standings' && !standingsData[standingsLeague]) {
+      fetchStandings(standingsLeague);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
   const tabs = [
     { key: 'scores',     label: 'LIVE FIXTURES', icon: <FaFutbol size={13} /> },
+    { key: 'standings',  label: 'STANDINGS',     icon: <FaTrophy size={13} /> },
     { key: 'news',       label: 'NEWS',          icon: <FaNewspaper size={13} /> },
     { key: 'highlights', label: 'HIGHLIGHTS',    icon: <FaPlayCircle size={13} /> },
   ];
@@ -1155,7 +1223,149 @@ const FixturesPage = () => {
             </motion.div>
           )}
 
-          {/* ══ TAB 2: NEWS ══════════════════════════════════ */}
+          {/* ══ TAB 2: STANDINGS ════════════════════════════ */}
+          {tab === 'standings' && (
+            <motion.div
+              key="standings"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
+              transition={{ duration: 0.4 }}
+            >
+              {/* League selector */}
+              <div className="flex flex-wrap justify-center gap-2 mb-6">
+                {STANDINGS_LEAGUES.map(lg => (
+                  <motion.button
+                    key={lg.code}
+                    onClick={() => handleStandingsLeague(lg.code)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.96 }}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border transition-all cursor-pointer ${
+                      standingsLeague === lg.code
+                        ? `${lg.bg} ${lg.color} ${lg.border} shadow-lg`
+                        : 'bg-gray-900 text-gray-500 border-gray-800 hover:border-gray-700'
+                    }`}
+                  >
+                    <FaTrophy size={10} className={standingsLeague === lg.code ? lg.color : 'text-gray-600'} />
+                    {lg.name}
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Attribution */}
+              <div className="text-center mb-4">
+                <p className="text-[9px] text-gray-700 uppercase tracking-widest">
+                  Data via TheSportsDB · Season 2024-2025
+                </p>
+              </div>
+
+              {/* Table */}
+              <AnimatePresence mode="wait">
+                {standingsLoading ? (
+                  <motion.div key="skel" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    className="space-y-2">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                      <div key={i} className="h-12 bg-gray-900 rounded-xl animate-pulse" />
+                    ))}
+                  </motion.div>
+                ) : standingsData[standingsLeague] ? (
+                  <motion.div
+                    key={`table-${standingsLeague}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden"
+                  >
+                    {/* Table header */}
+                    <div className="grid grid-cols-[2rem_1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_3rem] gap-1 px-4 py-2.5 bg-gray-800/50 text-[9px] text-gray-500 uppercase tracking-widest font-bold border-b border-gray-800">
+                      <span>#</span>
+                      <span>Team</span>
+                      <span className="text-center">P</span>
+                      <span className="text-center">W</span>
+                      <span className="text-center">D</span>
+                      <span className="text-center">L</span>
+                      <span className="text-center">GF</span>
+                      <span className="text-center">GD</span>
+                      <span className="text-center font-black text-white">PTS</span>
+                    </div>
+
+                    {/* Table rows */}
+                    <motion.div
+                      variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      {standingsData[standingsLeague].map((row, i) => {
+                        const league = STANDINGS_LEAGUES.find(l => l.code === standingsLeague);
+                        const isTop4 = i < 4;
+                        const isBottom3 = i >= standingsData[standingsLeague].length - 3;
+                        return (
+                          <motion.div
+                            key={row.team}
+                            variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0, transition: { duration: 0.3 } } }}
+                            whileHover={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
+                            className={`grid grid-cols-[2rem_1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_3rem] gap-1 px-4 py-2.5 border-b border-gray-800/50 last:border-0 items-center cursor-default transition-colors ${
+                              isTop4 ? 'border-l-2 border-l-green-600/60' :
+                              isBottom3 ? 'border-l-2 border-l-red-600/60' : ''
+                            }`}
+                          >
+                            {/* Rank */}
+                            <span className={`text-xs font-black tabular-nums ${
+                              isTop4 ? 'text-green-400' : isBottom3 ? 'text-red-400' : 'text-gray-500'
+                            }`}>
+                              {row.rank}
+                            </span>
+
+                            {/* Team */}
+                            <div className="flex items-center gap-2 min-w-0">
+                              {row.logo ? (
+                                <img src={row.logo} alt={row.team} className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
+                              ) : (
+                                <div className="w-5 h-5 rounded-full bg-gray-700 flex-shrink-0" />
+                              )}
+                              <span className="text-xs text-white font-semibold truncate">{row.team}</span>
+                            </div>
+
+                            {/* Stats */}
+                            <span className="text-[11px] text-gray-400 text-center tabular-nums">{row.played}</span>
+                            <span className="text-[11px] text-green-400 text-center tabular-nums font-bold">{row.won}</span>
+                            <span className="text-[11px] text-gray-400 text-center tabular-nums">{row.drawn}</span>
+                            <span className="text-[11px] text-red-400 text-center tabular-nums">{row.lost}</span>
+                            <span className="text-[11px] text-gray-400 text-center tabular-nums">{row.gf}</span>
+                            <span className={`text-[11px] text-center tabular-nums font-semibold ${row.gd > 0 ? 'text-green-400' : row.gd < 0 ? 'text-red-400' : 'text-gray-500'}`}>
+                              {row.gd > 0 ? `+${row.gd}` : row.gd}
+                            </span>
+                            <span className={`text-sm font-black text-center tabular-nums ${league?.color || 'text-white'}`}>
+                              {row.points}
+                            </span>
+                          </motion.div>
+                        );
+                      })}
+                    </motion.div>
+
+                    {/* Legend */}
+                    <div className="px-4 py-3 border-t border-gray-800 flex flex-wrap gap-4 text-[9px] text-gray-600 uppercase tracking-wider">
+                      <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-green-600/60" /> Champions / UCL Qualification</span>
+                      <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-red-600/60" /> Relegation Zone</span>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="no-data"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-16"
+                  >
+                    <FaTrophy size={32} className="text-gray-700 mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm">Standings unavailable for this league</p>
+                    <p className="text-gray-700 text-[10px] mt-1 uppercase tracking-wider">Try selecting a different league above</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+
+          {/* ══ TAB 3: NEWS ══════════════════════════════════ */}
           {tab === 'news' && (
             <motion.div
               key="news"
@@ -1276,19 +1486,35 @@ const FixturesPage = () => {
                     whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
                     className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-lg group cursor-pointer hover:border-green-700/50 transition-all block"
                   >
-                    {/* Thumbnail image */}
+                    {/* Designed card header — gradient + category visual (no broken external images) */}
                     <div className="h-44 relative overflow-hidden">
-                      <img
-                        src={article.thumb}
-                        alt={article.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        loading="lazy"
-                        onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                      {/* Base gradient */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${article.gradient}`} />
+                      {/* Radial colour accent layer */}
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: CATEGORY_VISUAL[article.category]?.pattern || 'none' }}
                       />
-                      <div className={`h-full bg-gradient-to-br ${article.gradient} items-center justify-center hidden`}>
-                        <FaNewspaper size={32} className="text-white/30" />
+                      {/* Dot grid texture */}
+                      <div
+                        className="absolute inset-0 opacity-[0.07]"
+                        style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '18px 18px' }}
+                      />
+                      {/* Giant decorative emoji — scales on hover */}
+                      <div className="absolute -right-3 -bottom-4 text-[80px] leading-none opacity-20 group-hover:opacity-30 group-hover:scale-110 transition-all duration-700 select-none pointer-events-none">
+                        {CATEGORY_VISUAL[article.category]?.emoji || '📰'}
                       </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                      {/* Source initial + name centred */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                        <div className="w-12 h-12 rounded-full bg-white/10 border border-white/25 flex items-center justify-center text-white font-black text-lg backdrop-blur-sm shadow-lg">
+                          {article.source.charAt(0)}
+                        </div>
+                        <span className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em]">
+                          {article.source}
+                        </span>
+                      </div>
+                      {/* Bottom scrim for badge legibility */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                       {/* Category + league badges */}
                       <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
                         <span className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border backdrop-blur-sm ${CATEGORY_COLORS[article.category] || 'bg-gray-700 text-gray-300'}`}>
@@ -1326,7 +1552,7 @@ const FixturesPage = () => {
             </motion.div>
           )}
 
-          {/* ══ TAB 3: HIGHLIGHTS ════════════════════════════ */}
+          {/* ══ TAB 4: HIGHLIGHTS ════════════════════════════ */}
           {tab === 'highlights' && (
             <motion.div
               key="highlights"
@@ -1335,6 +1561,94 @@ const FixturesPage = () => {
               exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
               transition={{ duration: 0.4 }}
             >
+              {/* ── Embedded YouTube Players ─────────────────── */}
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <FaYoutube size={16} className="text-red-500" />
+                  <h3 className="text-sm font-black text-white uppercase tracking-widest" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                    Watch Now
+                  </h3>
+                  <span className="text-[9px] text-gray-600 uppercase tracking-wider ml-1">Official channel embeds</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { name: 'Premier League',        playlistId: 'PLBcMpvmPEMTgG7x9kSXatnpCFSs9mBEcS', thumb: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+                    { name: 'UEFA Champions League', playlistId: 'PLDKVJFAQWzBxe_sn2o2rdVHBjAOz7B6wH', thumb: '⭐' },
+                    { name: 'LaLiga',                playlistId: 'PLyEm8dv1C4Bt_hQkoxkBVbE3tJiCFuuWC', thumb: '🇪🇸' },
+                    { name: 'Bundesliga',             playlistId: 'PLrPOBVxJYZrGhV4N2aLj_jDBbLjIgHn5X', thumb: '🇩🇪' },
+                    { name: 'Serie A',                playlistId: 'PLrPOBVxJYZrEnP7HB_mq_sLGQz3MpX9mL', thumb: '🇮🇹' },
+                    { name: 'PSL Goals & Highlights', playlistId: 'PLRw_7nUMLOT82B2bJFHYDl6W3kZeHLUSr', thumb: '🇿🇦' },
+                  ].map((ch, i) => (
+                    <motion.div
+                      key={ch.name}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.08 }}
+                      className="group relative bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-red-800/50 transition-colors"
+                    >
+                      {/* YouTube iframe */}
+                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                        <iframe
+                          src={`https://www.youtube.com/embed/videoseries?list=${ch.playlistId}&autoplay=0&rel=0&modestbranding=1`}
+                          title={`${ch.name} Highlights`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full border-0"
+                        />
+                      </div>
+                      <div className="p-3 flex items-center gap-2">
+                        <span className="text-lg leading-none">{ch.thumb}</span>
+                        <div>
+                          <p className="text-xs font-black text-white uppercase tracking-wider leading-none">{ch.name}</p>
+                          <p className="text-[9px] text-gray-600 mt-0.5 uppercase tracking-wider">Latest playlist · YouTube</p>
+                        </div>
+                        <a
+                          href={`https://www.youtube.com/playlist?list=${ch.playlistId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-auto text-[10px] text-red-400 hover:text-red-300 flex items-center gap-1 font-bold uppercase tracking-wider"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <FaYoutube size={10} /> Open
+                        </a>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Instagram note */}
+                <motion.div
+                  className="mt-4 bg-gray-900/60 border border-gray-800 rounded-xl px-4 py-3 flex items-start gap-3"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <span className="text-xl mt-0.5">📱</span>
+                  <div>
+                    <p className="text-xs font-bold text-gray-300 uppercase tracking-wider">Instagram Reels</p>
+                    <p className="text-[10px] text-gray-500 leading-relaxed mt-0.5">
+                      Instagram prohibits third-party embedding of Reels without Meta Business API approval.
+                      Follow football creators directly on Instagram:{' '}
+                      {[
+                        { handle: '@skysportsfootball', url: 'https://www.instagram.com/skysportsfootball' },
+                        { handle: '@espnfc',            url: 'https://www.instagram.com/espnfc' },
+                        { handle: '@psl_soccer',        url: 'https://www.instagram.com/psl_soccer' },
+                        { handle: '@premierleague',     url: 'https://www.instagram.com/premierleague' },
+                      ].map((a, i) => (
+                        <span key={a.handle}>
+                          <a href={a.url} target="_blank" rel="noopener noreferrer" className="text-pink-400 hover:text-pink-300 font-semibold">{a.handle}</a>
+                          {i < 3 ? ' · ' : ''}
+                        </span>
+                      ))}
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
+
+              <div className="border-t border-gray-800 mb-6" />
+
               {/* Channel header + view toggle */}
               <div className="flex items-center justify-between mb-6">
                 <div>
