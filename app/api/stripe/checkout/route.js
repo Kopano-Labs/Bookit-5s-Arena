@@ -26,6 +26,26 @@ export async function POST(request) {
       return Response.json({ error: 'Court, date, start time and duration are required' }, { status: 400 });
     }
 
+    // Validate ObjectId format to prevent NoSQL injection
+    if (!/^[a-fA-F0-9]{24}$/.test(courtId)) {
+      return Response.json({ error: 'Invalid court ID' }, { status: 400 });
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+      return Response.json({ error: 'Invalid date format' }, { status: 400 });
+    }
+
+    // Validate start_time format (HH:MM)
+    if (!/^\d{2}:\d{2}$/.test(start_time)) {
+      return Response.json({ error: 'Invalid start time format' }, { status: 400 });
+    }
+
+    // Validate duration is an integer in allowed range
+    if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
+      return Response.json({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
+    }
+
     await connectDB();
 
     const court = await Court.findById(courtId);

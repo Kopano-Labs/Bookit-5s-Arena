@@ -17,9 +17,10 @@ export async function POST(request) {
       return Response.json({ error: 'No file provided.' }, { status: 400 });
     }
 
-    // Validate mime type
-    if (!file.type.startsWith('image/')) {
-      return Response.json({ error: 'Only image files are allowed.' }, { status: 400 });
+    // Validate mime type — only allow safe raster image formats (no SVG to prevent XSS)
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedMimeTypes.includes(file.type)) {
+      return Response.json({ error: 'Only JPEG, PNG, GIF and WebP images are allowed.' }, { status: 400 });
     }
 
     // Validate size — 3 MB max

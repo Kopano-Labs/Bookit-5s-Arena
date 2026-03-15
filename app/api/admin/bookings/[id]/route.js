@@ -13,6 +13,12 @@
                         await dbConnect();
 
                         const { id } = await params;
+
+                        // Validate ObjectId format
+                        if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+                        return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+                        }
+
                         const { status } = await request.json();
 
                         const allowed = ['pending', 'confirmed', 'cancelled'];
@@ -30,6 +36,6 @@
                         return NextResponse.json(booking);
                     } catch (error) {
                 console.error('Update booking error:', error);
-                return NextResponse.json({ error: error.message }, { status: 500 });
+                return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
             }
             }

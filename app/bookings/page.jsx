@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaFutbol, FaCalendarAlt, FaClock, FaTrash, FaArrowRight } from 'react-icons/fa';
+import { FaFutbol, FaCalendarAlt, FaClock, FaTrash, FaArrowRight, FaUserPlus } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const statusStyles = {
   confirmed: 'bg-green-900/40 text-green-400 border border-green-800/60',
@@ -12,6 +14,7 @@ const statusStyles = {
 };
 
 const BookingsPage = () => {
+  const { data: session, status: authStatus } = useSession();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -50,7 +53,12 @@ const BookingsPage = () => {
       <div className="max-w-4xl mx-auto">
 
         {/* Page header */}
-        <div className="mb-8">
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+        >
           <h1
             className="text-3xl font-black uppercase tracking-widest text-white"
             style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
@@ -58,7 +66,48 @@ const BookingsPage = () => {
             My Bookings
           </h1>
           <p className="text-gray-500 text-sm mt-1">Manage your court reservations</p>
-        </div>
+        </motion.div>
+
+        {/* Unauthenticated prompt */}
+        {authStatus === 'unauthenticated' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center shadow-xl mb-6"
+          >
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-900/30 border border-green-800/50 mb-6">
+              <FaUserPlus className="text-3xl text-green-400" />
+            </div>
+            <h2 className="text-2xl font-black uppercase tracking-widest text-white mb-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+              Register to View Bookings
+            </h2>
+            <p className="text-gray-400 text-sm mb-2 max-w-sm mx-auto">
+              Create a free account to book courts, track your reservations, and unlock member benefits.
+            </p>
+            <ul className="text-gray-500 text-xs mb-8 space-y-1">
+              <li>⚽ Book and reserve courts online</li>
+              <li>📅 Full booking history &amp; management</li>
+              <li>🏆 Loyalty rewards &amp; member perks</li>
+              <li>🔔 Booking reminders &amp; confirmations</li>
+            </ul>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center gap-2 py-3 px-7 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all hover:scale-105"
+                style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)', boxShadow: '0 0 20px rgba(34,197,94,0.35)' }}
+              >
+                <FaUserPlus size={13} /> Create Free Account
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-2 py-3 px-7 rounded-xl text-sm font-semibold text-gray-300 bg-gray-800 border border-gray-700 hover:border-gray-600 hover:text-white transition-all"
+              >
+                Already have an account? Sign In
+              </Link>
+            </div>
+          </motion.div>
+        )}
 
         {loading ? (
           <div className="text-center py-20 text-green-400 animate-pulse text-lg">
@@ -85,10 +134,17 @@ const BookingsPage = () => {
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <motion.div
+            className="space-y-4"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+            initial="hidden"
+            animate="visible"
+          >
             {bookings.map((booking) => (
-              <div
+              <motion.div
                 key={booking._id}
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
+                whileHover={{ y: -3, transition: { duration: 0.2 } }}
                 className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 shadow-lg hover:border-gray-700 transition-colors"
               >
                 <div className="flex items-start gap-4">
@@ -147,9 +203,9 @@ const BookingsPage = () => {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

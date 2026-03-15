@@ -31,6 +31,11 @@ export async function POST(request) {
       return Response.json({ error: 'Invalid message.' }, { status: 400 });
     }
 
+    // Limit message length to prevent abuse (large prompts = high API cost)
+    if (message.length > 1000) {
+      return Response.json({ error: 'Message is too long. Please keep it under 1000 characters.' }, { status: 400 });
+    }
+
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       // Return a fallback without crashing — chat still works via FAQ

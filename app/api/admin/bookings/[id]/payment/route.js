@@ -10,8 +10,22 @@ export async function PATCH(request, { params }) {
   }
   await dbConnect();
   const { paymentStatus } = await request.json();
+
+  // Validate paymentStatus against allowed enum values
+  const allowedStatuses = ['unpaid', 'paid', 'refunded', 'reserved'];
+  if (!paymentStatus || !allowedStatuses.includes(paymentStatus)) {
+    return Response.json({ error: 'Invalid payment status' }, { status: 400 });
+  }
+
+  const { id } = await params;
+
+  // Validate ObjectId format
+  if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+    return Response.json({ error: 'Invalid booking ID' }, { status: 400 });
+  }
+
   const booking = await Booking.findByIdAndUpdate(
-    params.id,
+    id,
     { paymentStatus },
     { new: true }
   );

@@ -37,13 +37,28 @@ export async function POST(request) {
       return NextResponse.json({ error: 'You must be logged in to book a court' }, { status: 401 });
     }
 
-    const { courtId, date, start_time, duration } = await request.json();
+    const { courtId, date, start_time, duration, payAtVenue } = await request.json();
 
     if (!courtId || !date || !start_time || !duration) {
       return NextResponse.json(
         { error: 'Court, date, start time and duration are required' },
         { status: 400 }
       );
+    }
+
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(courtId)) {
+      return NextResponse.json({ error: 'Invalid court ID' }, { status: 400 });
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+      return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+    }
+
+    // Validate duration is a number in allowed range
+    if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
+      return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
     }
 
     await connectDB();
@@ -108,6 +123,8 @@ if (hasOverlap) {
   start_time,
   duration,
   total_price,
+  status: 'pending',
+  paymentStatus: payAtVenue ? 'reserved' : 'unpaid',
 });
 
     // Send confirmation email (non-blocking — won't fail the booking if email fails)

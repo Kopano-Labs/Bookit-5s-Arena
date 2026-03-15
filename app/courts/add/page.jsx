@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaFutbol } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const AddCourtPage = () => {
   const router = useRouter();
@@ -112,7 +113,12 @@ const AddCourtPage = () => {
         </div>
 
         {/* Form Card */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        <motion.div
+          className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="flex items-center gap-3 mb-6">
             <FaFutbol className="text-green-500 text-xl" />
             <h2 className="text-white text-lg font-bold uppercase tracking-widest">Court Details</h2>
@@ -249,17 +255,19 @@ const AddCourtPage = () => {
 
             {/* Submit */}
             <div className="pt-2">
-              <button
+              <motion.button
                 type="submit"
                 disabled={loading}
+                whileHover={{ scale: 1.02, boxShadow: '0 0 25px rgba(34,197,94,0.4)' }}
+                whileTap={{ scale: 0.97 }}
                 className="w-full py-3 px-6 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
               >
                 {loading ? 'Adding Court...' : 'Add Court'}
-              </button>
+              </motion.button>
             </div>
           </form>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

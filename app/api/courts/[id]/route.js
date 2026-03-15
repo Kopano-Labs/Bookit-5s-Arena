@@ -8,6 +8,12 @@ import Court from '@/models/Court';
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
+
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid court ID' }, { status: 400 });
+    }
+
     await connectDB();
     const court = await Court.findById(id);
 
@@ -22,10 +28,16 @@ export async function GET(request, { params }) {
   }
 }
 
-// PUT /api/courts/:id — update a court (owner only)
+// PUT /api/courts/:id — update a court (owner or admin)
 export async function PUT(request, { params }) {
   try {
     const { id } = await params;
+
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid court ID' }, { status: 400 });
+    }
+
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -39,12 +51,23 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
     }
 
-    if (court.owner.toString() !== session.user.id) {
+    // Allow court owner or admin to edit
+    const isOwner = court.owner && court.owner.toString() === session.user.id;
+    const isAdmin = session.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: 'You are not authorised to edit this court' }, { status: 403 });
     }
 
     const body = await request.json();
-    const updatedCourt = await Court.findByIdAndUpdate(id, body, {
+
+    // Whitelist allowed fields to prevent mass-assignment (e.g. overwriting `owner`)
+    const allowedFields = ['name', 'description', 'address', 'location', 'capacity', 'amenities', 'availability', 'price_per_hour', 'image', 'sortOrder'];
+    const sanitised = {};
+    for (const key of allowedFields) {
+      if (body[key] !== undefined) sanitised[key] = body[key];
+    }
+
+    const updatedCourt = await Court.findByIdAndUpdate(id, sanitised, {
       new: true,
       runValidators: true,
     });
@@ -56,10 +79,16 @@ export async function PUT(request, { params }) {
   }
 }
 
-// DELETE /api/courts/:id — delete a court (owner only)
+// DELETE /api/courts/:id — delete a court (owner or admin)
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
+
+    // Validate ObjectId format
+    if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid court ID' }, { status: 400 });
+    }
+
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -73,7 +102,10 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
     }
 
-    if (court.owner.toString() !== session.user.id) {
+    // Allow court owner or admin to delete
+    const isOwner = court.owner && court.owner.toString() === session.user.id;
+    const isAdmin = session.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: 'You are not authorised to delete this court' }, { status: 403 });
     }
 

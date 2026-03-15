@@ -9,6 +9,7 @@ import {
   FaCopy as FaClone, FaPlay, FaClock, FaSave, FaTimes, FaPlus,
   FaBold, FaItalic, FaLink, FaList, FaHeading,
 } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -123,14 +124,14 @@ function SubscribersTab({ data, loading }) {
 
       {/* Actions */}
       <div className="flex gap-3 justify-end">
-        <button onClick={copyEmails} className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:border-gray-600 transition-all">
+        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={copyEmails} className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:border-gray-600 transition-all">
           {copied ? <FaCheck className="text-green-400" /> : <FaCopy />}
           {copied ? 'Copied!' : 'Copy Emails'}
-        </button>
-        <button onClick={downloadCsv} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:scale-105"
+        </motion.button>
+        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={downloadCsv} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
           style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)', boxShadow: '0 0 15px rgba(34,197,94,0.3)' }}>
           <FaDownload size={12} /> Export CSV
-        </button>
+        </motion.button>
       </div>
 
       {/* Table */}
@@ -409,29 +410,35 @@ function ComposeTab({ editingId, onSaved }) {
 
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-2">
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => doSave('draft', null)}
           disabled={saving}
           className="flex items-center gap-2 px-5 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:border-gray-600 transition-all disabled:opacity-50"
         >
           <FaSave size={12} /> {saving ? 'Saving…' : 'Save Draft'}
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => setScheduleOpen((v) => !v)}
           className="flex items-center gap-2 px-5 py-2.5 bg-blue-900/30 border border-blue-700 rounded-xl text-sm font-semibold text-blue-300 hover:text-white transition-all"
         >
           <FaClock size={12} /> Schedule
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
           onClick={handleSendNow}
           disabled={sending}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:scale-105 disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-50"
           style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)', boxShadow: '0 0 15px rgba(34,197,94,0.3)' }}
         >
           <FaPlay size={11} /> {sending ? 'Sending…' : 'Send Now'}
-        </button>
+        </motion.button>
       </div>
 
       {/* Schedule picker */}
@@ -445,13 +452,15 @@ function ComposeTab({ editingId, onSaved }) {
             className="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-600 w-full"
           />
           <div className="flex gap-2">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => { doSave('scheduled', scheduledAt); setScheduleOpen(false); }}
               disabled={!scheduledAt || saving}
               className="px-4 py-2 bg-blue-800 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all disabled:opacity-50"
             >
               Confirm Schedule
-            </button>
+            </motion.button>
             <button onClick={() => setScheduleOpen(false)} className="px-4 py-2 text-gray-400 hover:text-white text-sm">Cancel</button>
           </div>
         </div>
@@ -539,9 +548,17 @@ function CampaignsTab({ newsletters, loading, onEdit, onRefresh }) {
                   <th className="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-widest">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <motion.tbody
+                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+                initial="hidden"
+                animate="visible"
+              >
                 {newsletters.map((nl) => (
-                  <tr key={nl._id} className="border-b border-gray-800 last:border-0 hover:bg-gray-800/30 transition-colors">
+                  <motion.tr
+                    key={nl._id}
+                    variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } } }}
+                    className="border-b border-gray-800 last:border-0 hover:bg-gray-800/30 transition-colors"
+                  >
                     <td className="px-5 py-4">
                       <p className="font-semibold text-white">{nl.title}</p>
                       <p className="text-gray-500 text-xs mt-0.5 truncate max-w-[200px]">{nl.subject}</p>
@@ -574,9 +591,9 @@ function CampaignsTab({ newsletters, loading, onEdit, onRefresh }) {
                         </button>
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
-              </tbody>
+              </motion.tbody>
             </table>
           </div>
         )}
@@ -722,13 +739,15 @@ function CalendarTab({ newsletters, onCompose }) {
             ) : (
               <p className="text-gray-600 text-sm">Nothing scheduled.</p>
             )}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => onCompose(selectedDate, viewMonth, viewYear)}
               className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
               style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
             >
               <FaPlus size={11} /> Schedule New
-            </button>
+            </motion.button>
           </div>
         ) : (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center">
@@ -836,7 +855,12 @@ export default function NewsletterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 py-10 px-4">
+    <motion.div
+      className="min-h-screen bg-gray-950 py-10 px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* Page header */}
@@ -889,6 +913,6 @@ export default function NewsletterPage() {
         </div>
 
       </div>
-    </div>
+    </motion.div>
   );
 }

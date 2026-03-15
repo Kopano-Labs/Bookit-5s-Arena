@@ -9,6 +9,8 @@ import {
   FaFilter, FaTimes, FaUsers, FaCheckCircle, FaHourglassHalf,
   FaBan, FaArrowUp, FaChartBar, FaStar,
 } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import InfoTooltip from '@/components/InfoTooltip';
 
 const statusBadge = (status) => {
   const map = {
@@ -17,15 +19,6 @@ const statusBadge = (status) => {
     cancelled: 'bg-red-900/40 text-red-400 border-red-700/50',
   };
   return map[status] || 'bg-gray-800 text-gray-400 border-gray-700';
-};
-
-const payBadge = (ps) => {
-  const map = {
-    paid: 'text-green-400',
-    unpaid: 'text-gray-500',
-    refunded: 'text-blue-400',
-  };
-  return map[ps] || 'text-gray-500';
 };
 
 const AdminDashboard = () => {
@@ -77,6 +70,7 @@ const AdminDashboard = () => {
       icon: <FaCalendarAlt className="text-2xl text-blue-400" />,
       bg: 'bg-blue-900/20 border-blue-800/40',
       sub: `${stats.upcomingBookings} upcoming`,
+      tip: 'All bookings across all statuses (confirmed, pending and cancelled) for the selected date range.',
     },
     {
       label: 'Total Revenue',
@@ -85,6 +79,7 @@ const AdminDashboard = () => {
       bg: 'bg-green-900/20 border-green-800/40',
       sub: `Avg R${stats.avgBookingValue}/booking`,
       sub2: stats.paidCount > 0 ? `R${(stats.paidRevenue ?? 0).toLocaleString()} confirmed paid` : null,
+      tip: 'Total revenue across confirmed bookings. "Confirmed paid" reflects only those with payment verified via Stripe or manually marked paid.',
     },
     {
       label: 'Total Courts',
@@ -92,6 +87,7 @@ const AdminDashboard = () => {
       icon: <FaFutbol className="text-2xl text-yellow-400" />,
       bg: 'bg-yellow-900/20 border-yellow-800/40',
       sub: stats.mostBookedCourt ? `⭐ ${stats.mostBookedCourt.name}` : 'No data yet',
+      tip: 'Number of active courts on the platform. ⭐ indicates your most popular court by booking count.',
     },
     {
       label: 'Registered Users',
@@ -99,11 +95,17 @@ const AdminDashboard = () => {
       icon: <FaUsers className="text-2xl text-purple-400" />,
       bg: 'bg-purple-900/20 border-purple-800/40',
       sub: 'Total accounts',
+      tip: 'Total registered member accounts. Guest bookings (pay at venue) are not counted here.',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 py-10 px-4">
+    <motion.div
+      className="min-h-screen bg-gray-950 py-10 px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* Header */}
@@ -115,12 +117,16 @@ const AdminDashboard = () => {
             <p className="text-gray-500 text-sm mt-1">Revenue, bookings &amp; business insights</p>
           </div>
           <div className="flex gap-2">
-            <Link href="/admin/bookings" className="px-4 py-2 text-xs font-bold text-gray-400 bg-gray-800 border border-gray-700 rounded-xl hover:text-white hover:border-gray-600 transition-all uppercase tracking-widest">
-              Manage Bookings
-            </Link>
-            <Link href="/admin/analytics" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 bg-gray-800 border border-gray-700 rounded-xl hover:text-white hover:border-gray-600 transition-all uppercase tracking-widest">
-              <FaChartBar size={11} /> Analytics
-            </Link>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link href="/admin/bookings" className="px-4 py-2 text-xs font-bold text-gray-400 bg-gray-800 border border-gray-700 rounded-xl hover:text-white hover:border-gray-600 transition-all uppercase tracking-widest">
+                Manage Bookings
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link href="/admin/analytics" className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 bg-gray-800 border border-gray-700 rounded-xl hover:text-white hover:border-gray-600 transition-all uppercase tracking-widest">
+                <FaChartBar size={11} /> Analytics
+              </Link>
+            </motion.div>
           </div>
         </div>
 
@@ -158,17 +164,29 @@ const AdminDashboard = () => {
         </div>
 
         {/* Top stat cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+          initial="hidden"
+          animate="visible"
+        >
           {topCards.map((card) => (
-            <div key={card.label} className={`border rounded-2xl p-5 flex flex-col items-center text-center gap-2 shadow-lg ${card.bg}`}>
+            <motion.div
+              key={card.label}
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } } }}
+              whileHover={{ y: -4, scale: 1.01, transition: { duration: 0.2 } }}
+              className={`border rounded-2xl p-5 flex flex-col items-center text-center gap-2 shadow-lg ${card.bg}`}
+            >
               <div className="p-3 rounded-xl bg-gray-900/60">{card.icon}</div>
               <p className="text-2xl font-black text-white">{card.value}</p>
-              <p className="text-xs text-gray-500 uppercase tracking-wide leading-tight">{card.label}</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wide leading-tight flex items-center gap-1">
+                {card.label} <InfoTooltip text={card.tip} position="bottom" size={12} />
+              </p>
               <p className="text-xs text-gray-600">{card.sub}</p>
               {card.sub2 && <p className="text-xs text-green-500 font-semibold">{card.sub2}</p>}
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Revenue trend + Status breakdown row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -190,19 +208,23 @@ const AdminDashboard = () => {
                 return (
                   <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
                     <span className="text-[10px] text-gray-600">{day.revenue > 0 ? `R${day.revenue}` : ''}</span>
-                    <div className="w-full rounded-t-lg transition-all duration-500 relative group"
+                    <motion.div
+                      className="w-full rounded-t-lg transition-all duration-500 relative group"
+                      initial={{ scaleY: 0 }}
+                      animate={{ scaleY: 1 }}
                       style={{
                         height: `${Math.max(heightPct, day.revenue > 0 ? 8 : 2)}%`,
                         background: day.revenue > 0
                           ? 'linear-gradient(to top, #15803d, #22c55e)'
                           : 'rgba(55,65,81,0.5)',
                         minHeight: '4px',
+                        transformOrigin: 'bottom',
                       }}
                     >
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-gray-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                         {day.bookings} booking{day.bookings !== 1 ? 's' : ''} · R{day.revenue}
                       </div>
-                    </div>
+                    </motion.div>
                     <span className="text-[10px] text-gray-500">{label}</span>
                   </div>
                 );
@@ -242,6 +264,7 @@ const AdminDashboard = () => {
               <div className="mt-6 pt-5 border-t border-gray-800">
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                   <FaClock size={10} /> Peak Booking Hours
+                  <InfoTooltip text="The most popular start times based on confirmed bookings. Use this to plan staffing and promotions during quieter periods." position="left" size={12} />
                 </p>
                 {stats.peakHours.slice(0, 3).map((h, i) => (
                   <div key={h.hour} className="flex items-center justify-between py-1.5">
@@ -258,6 +281,7 @@ const AdminDashboard = () => {
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
           <h3 className="text-sm font-black uppercase tracking-widest text-white mb-5 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
             <FaMoneyBillWave className="text-green-400" /> Payment Status
+            <InfoTooltip text="Paid = Stripe payment verified or manually marked paid. Confirmed Unpaid = booking is confirmed but payment not yet received — action may be needed. Refunded = Stripe refund processed." position="right" />
           </h3>
           <div className="space-y-4">
             {[
@@ -289,10 +313,15 @@ const AdminDashboard = () => {
 
           {/* Court Breakdown */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
-            <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-2">
-              <FaStar className="text-yellow-400" />
-              <h3 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+            <div
+              className={`px-6 py-4 border-b border-gray-800 flex items-center gap-2 ${selectedCourt ? 'cursor-pointer hover:bg-gray-800/40 transition-colors' : ''}`}
+              onClick={() => selectedCourt && setSelectedCourt(null)}
+              title={selectedCourt ? 'Click to view all courts' : ''}
+            >
+              <FaStar className={`${selectedCourt ? 'text-green-400' : 'text-yellow-400'} transition-colors`} />
+              <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${selectedCourt ? 'text-green-400' : 'text-white'}`} style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 Court Performance
+                {selectedCourt && <span className="text-[10px] text-green-500 font-normal normal-case tracking-normal">(click to reset view)</span>}
               </h3>
             </div>
             {stats.courtBreakdown.length === 0 ? (
@@ -303,10 +332,11 @@ const AdminDashboard = () => {
                   const pct = stats.totalBookings > 0 ? Math.round((c.bookings / stats.totalBookings) * 100) : 0;
                   const isSelected = selectedCourt === c.name;
                   return (
-                    <div
+                    <motion.div
                       key={c._id}
                       onClick={() => setSelectedCourt(isSelected ? null : c.name)}
                       className={`px-6 py-4 cursor-pointer transition-colors ${isSelected ? 'bg-green-900/20 border-l-2 border-green-500' : 'hover:bg-gray-800/40'}`}
+                      whileHover={{ backgroundColor: 'rgba(31,41,55,0.6)', x: 2, transition: { duration: 0.15 } }}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
@@ -321,7 +351,7 @@ const AdminDashboard = () => {
                       <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
                         <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #15803d, #22c55e)' }} />
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -382,7 +412,7 @@ const AdminDashboard = () => {
         </div>
 
       </div>
-    </div>
+    </motion.div>
   );
 };
 

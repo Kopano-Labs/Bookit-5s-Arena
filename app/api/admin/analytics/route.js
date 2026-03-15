@@ -13,7 +13,8 @@ export async function GET(request) {
     await dbConnect();
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') || '30', 10);
+    const rawDays = parseInt(searchParams.get('days') || '30', 10);
+    const days = Math.min(Math.max(isNaN(rawDays) ? 30 : rawDays, 1), 365); // Clamp 1-365
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
     const baseFilter = { timestamp: { $gte: since } };

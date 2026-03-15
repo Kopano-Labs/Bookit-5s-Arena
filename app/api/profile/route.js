@@ -20,6 +20,8 @@ export async function GET(request) {
     role: user.role,
     username: user.username || '',
     newsletterOptIn: user.newsletterOptIn || false,
+    birthDate: user.birthDate || null,
+    birthdayClaimedYear: user.birthdayClaimedYear || null,
   });
 }
 
@@ -29,15 +31,20 @@ export async function PUT(request) {
   if (!session) return Response.json({ error: 'Unauthorised' }, { status: 401 });
 
   const body = await request.json();
-  const { name, username, newsletterOptIn, currentPassword, newPassword } = body;
+  const { name, username, newsletterOptIn, birthDate, currentPassword, newPassword } = body;
 
-  if (!name || name.trim().length < 2) {
-    return Response.json({ error: 'Name must be at least 2 characters.' }, { status: 400 });
+  // Validate types to prevent NoSQL injection
+  if (typeof name !== 'string') {
+    return Response.json({ error: 'Invalid input.' }, { status: 400 });
+  }
+
+  if (!name || name.trim().length < 2 || name.trim().length > 100) {
+    return Response.json({ error: 'Name must be between 2 and 100 characters.' }, { status: 400 });
   }
 
   // Validate username if provided
-  if (username && !/^[a-z0-9_]{3,30}$/.test(username)) {
-    return Response.json({ error: 'Username must be 3–30 characters: lowercase letters, numbers, underscores only.' }, { status: 400 });
+  if (username && !/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+    return Response.json({ error: 'Username must be 3–30 characters: letters, numbers, underscores only.' }, { status: 400 });
   }
 
   await connectDB();
@@ -48,6 +55,25 @@ export async function PUT(request) {
   user.name = name.trim();
   if (username !== undefined) user.username = username.trim() || null;
   if (typeof newsletterOptIn === 'boolean') user.newsletterOptIn = newsletterOptIn;
+
+  // Update birth date if provided
+  if (birthDate !== undefined) {
+    if (birthDate === null) {
+      user.birthDate = null;
+    } else {
+      const parsed = new Date(birthDate);
+      if (isNaN(parsed.getTime())) {
+        return Response.json({ error: 'Invalid birth date.' }, { status: 400 });
+      }
+      // Must be in the past and person must be at least 5 years old
+      const fiveYearsAgo = new Date();
+      fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+      if (parsed > fiveYearsAgo) {
+        return Response.json({ error: 'Please enter a valid birth date.' }, { status: 400 });
+      }
+      user.birthDate = parsed;
+    }
+  }
 
   // Update password only if a new one was provided
   if (newPassword) {
