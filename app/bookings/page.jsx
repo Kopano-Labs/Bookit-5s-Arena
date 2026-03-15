@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  FaFutbol, FaCalendarAlt, FaClock, FaTrash, FaArrowRight, FaUserPlus,
+  FaFutbol, FaCalendarAlt, FaClock, FaTrash, FaArrowRight, FaUserPlus, FaCheck,
   FaTh, FaCircle, FaSquare, FaPlay, FaInstagram, FaWhatsapp,
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,6 +34,7 @@ const BookingsPage = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [showTutorial, setShowTutorial] = useState(false);
   const [neverShowAgain, setNeverShowAgain] = useState(false);
+  const [bookingType, setBookingType] = useState(null); // null = welcome, 'courts' or 'events'
 
   // Show tutorial on first visit (check localStorage)
   useEffect(() => {
@@ -79,17 +80,140 @@ const BookingsPage = () => {
     fetchBookings();
   }, []);
 
+  // ═══ WELCOME PAGE — choose between Courts and Events ═══
+  if (!bookingType) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-12">
+        <div className="max-w-4xl w-full">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <AnimatedTitle
+              text={[{ text: 'Book ', highlight: false }, { text: 'Your Experience', highlight: true }]}
+              subtitle="Choose what you'd like to book today"
+              icon={<FaCalendarAlt />}
+              size="xl"
+              align="center"
+            />
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Courts option */}
+            <motion.button
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.25 } }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setBookingType('courts')}
+              className="relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-8 text-left group cursor-pointer hover:border-green-500/50 hover:shadow-[0_0_50px_rgba(34,197,94,0.15)] transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-green-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <motion.div
+                  className="w-16 h-16 rounded-2xl bg-green-900/30 border border-green-800/50 flex items-center justify-center mb-5"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                >
+                  <FaFutbol className="text-green-400 text-2xl" />
+                </motion.div>
+                <h3 className="text-2xl font-black uppercase tracking-wider text-white mb-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                  Court Booking
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                  Reserve a 5-a-side pitch for your team. Choose your preferred date, time, and duration.
+                </p>
+                <ul className="space-y-2 text-xs text-gray-500">
+                  <li className="flex items-center gap-2"><FaCheck className="text-green-500" size={10} /> View available courts</li>
+                  <li className="flex items-center gap-2"><FaCheck className="text-green-500" size={10} /> Select date &amp; time</li>
+                  <li className="flex items-center gap-2"><FaCheck className="text-green-500" size={10} /> Instant confirmation</li>
+                  <li className="flex items-center gap-2"><FaCheck className="text-green-500" size={10} /> Earn loyalty rewards</li>
+                </ul>
+                <div className="mt-6 inline-flex items-center gap-2 text-green-400 font-bold text-sm uppercase tracking-widest group-hover:gap-3 transition-all">
+                  Book a Court <FaArrowRight size={11} />
+                </div>
+              </div>
+            </motion.button>
+
+            {/* Events option */}
+            <motion.button
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.25 } }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => { window.location.href = '/events'; }}
+              className="relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-8 text-left group cursor-pointer hover:border-amber-500/50 hover:shadow-[0_0_50px_rgba(245,158,11,0.15)] transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <motion.div
+                  className="w-16 h-16 rounded-2xl bg-amber-900/30 border border-amber-800/50 flex items-center justify-center mb-5"
+                  animate={{ rotate: [0, -5, 5, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+                >
+                  <FaCalendarAlt className="text-amber-400 text-2xl" />
+                </motion.div>
+                <h3 className="text-2xl font-black uppercase tracking-wider text-white mb-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                  Event Booking
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                  Plan your next birthday, corporate event, or tournament at 5s Arena with a custom package.
+                </p>
+                <ul className="space-y-2 text-xs text-gray-500">
+                  <li className="flex items-center gap-2"><FaCheck className="text-amber-500" size={10} /> Birthday parties</li>
+                  <li className="flex items-center gap-2"><FaCheck className="text-amber-500" size={10} /> Corporate team building</li>
+                  <li className="flex items-center gap-2"><FaCheck className="text-amber-500" size={10} /> Social tournaments</li>
+                  <li className="flex items-center gap-2"><FaCheck className="text-amber-500" size={10} /> Custom packages available</li>
+                </ul>
+                <div className="mt-6 inline-flex items-center gap-2 text-amber-400 font-bold text-sm uppercase tracking-widest group-hover:gap-3 transition-all">
+                  Book an Event <FaArrowRight size={11} />
+                </div>
+              </div>
+            </motion.button>
+          </div>
+
+          {/* Back to existing bookings link */}
+          {bookings.length > 0 && (
+            <motion.div
+              className="text-center mt-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <button
+                onClick={() => setBookingType('courts')}
+                className="text-sm text-gray-500 hover:text-green-400 transition-colors cursor-pointer underline underline-offset-4"
+              >
+                View my existing bookings ({bookings.length})
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 py-10 px-4">
       <div className="max-w-4xl mx-auto">
 
-        {/* Page header */}
+        {/* Back to welcome + Page header */}
         <motion.div
           className="mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
         >
+          <button
+            onClick={() => setBookingType(null)}
+            className="text-xs text-gray-500 hover:text-green-400 transition-colors mb-4 flex items-center gap-1.5 cursor-pointer"
+          >
+            ← Back to booking options
+          </button>
           <AnimatedTitle
             text={[{ text: 'My ', highlight: false }, { text: 'Bookings', highlight: true }]}
             subtitle="Manage your court reservations"

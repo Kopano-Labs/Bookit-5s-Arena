@@ -8,7 +8,6 @@ import FixturesPromo    from '@/components/home/FixturesPromo';
 import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
 import ContactSection   from '@/components/home/ContactSection';
-import FixturesPromo    from '@/components/FixturesPromo';
 
 export const revalidate = 60; // ISR — revalidate every 60 seconds
 
@@ -48,16 +47,13 @@ const HomePage = async () => {
       {/* ══ EVENTS — staggered cards + coloured glows ════════════ */}
       <EventsSection />
 
-      {/* ══ FIXTURES PROMO — live scores ticker + CTA ═══════════ */}
-      <FixturesPromo />
-
       {/* ══ ABOUT — slide in from sides ══════════════════════════ */}
       <AboutSection courtsCount={courts.length || 4} />
 
       {/* ══ SOCIAL — staggered slide reveal ═════════════════════ */}
       <SocialSection />
 
-      {/* ══ FIXTURES PROMO — between contact & footer ════════════ */}
+      {/* ══ FIXTURES PROMO — massive CTA after social ════════════ */}
       <FixturesPromo />
 
       {/* ══ CONTACT + FOOTER — animated cards ═══════════════════ */}

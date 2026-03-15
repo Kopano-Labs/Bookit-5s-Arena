@@ -62,19 +62,17 @@ const Header = () => {
     }`;
   };
 
-  /* ── Public tabs (alphabetical) — shown to regular users only ── */
+  /* ── Public tabs — shown to regular users only ── */
   const publicTabs = [
-    { href: '/#courts',  icon: <FaFutbol size={11} className="text-green-400" />,   label: 'Courts' },
-    { href: '/events',   icon: <FaGlassCheers size={11} className="text-pink-400" />, label: 'Events' },
     { href: '/fixtures', icon: <FaTv size={11} className="text-blue-400" />,         label: 'Fixtures' },
     { href: '/leagues',  icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Leagues' },
     { href: '/rules',    icon: <FaBookOpen size={11} className="text-orange-400" />, label: 'Rules' },
+    { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings' },
+    { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards' },
   ];
 
-  /* ── Auth tabs (user-only, alphabetical) ── */
+  /* ── Auth tabs (user-only) ── */
   const userTabs = [
-    { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings', hideAdmin: true },
-    { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards', hideAdmin: true },
   ];
 
   /* ── Admin tabs ── */

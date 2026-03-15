@@ -48,25 +48,25 @@ function StatCard({ icon, label, value, color, delay, tooltip }) {
   );
 }
 
-// ── Confetti Celebration Component ──
-function ConfettiCelebration({ active, onComplete }) {
+// ── Confetti Celebration Component — drops emojis + coloured shapes ──
+function ConfettiCelebration({ active, onComplete, emoji }) {
   const [particles, setParticles] = useState([]);
 
   useEffect(() => {
     if (!active) return;
     const colors = ['#22c55e', '#f59e0b', '#3b82f6', '#a855f7', '#ef4444', '#06b6d4', '#f97316', '#ec4899'];
-    const newParticles = Array.from({ length: 80 }, (_, i) => ({
+    const newParticles = Array.from({ length: 100 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       color: colors[Math.floor(Math.random() * colors.length)],
-      delay: Math.random() * 0.5,
-      duration: 2 + Math.random() * 2,
+      delay: Math.random() * 0.8,
+      duration: 2.5 + Math.random() * 2.5,
       size: 4 + Math.random() * 8,
       rotation: Math.random() * 360,
-      shape: Math.random() > 0.5 ? 'circle' : 'rect',
+      shape: Math.random() > 0.6 ? 'emoji' : Math.random() > 0.5 ? 'circle' : 'rect',
     }));
     setParticles(newParticles);
-    const timer = setTimeout(() => { setParticles([]); onComplete?.(); }, 4000);
+    const timer = setTimeout(() => { setParticles([]); onComplete?.(); }, 5000);
     return () => clearTimeout(timer);
   }, [active, onComplete]);
 
@@ -77,23 +77,29 @@ function ConfettiCelebration({ active, onComplete }) {
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          initial={{ y: -20, x: `${p.x}vw`, opacity: 1, rotate: 0, scale: 1 }}
+          initial={{ y: -30, x: `${p.x}vw`, opacity: 1, rotate: 0, scale: 1 }}
           animate={{
             y: '110vh',
             x: `${p.x + (Math.random() - 0.5) * 30}vw`,
             opacity: [1, 1, 0.8, 0],
             rotate: p.rotation + 720,
-            scale: [1, 1.2, 0.8, 0.4],
+            scale: [1, 1.3, 0.8, 0.3],
           }}
           transition={{ duration: p.duration, delay: p.delay, ease: 'easeOut' }}
           className="absolute"
-          style={{
-            width: p.size,
-            height: p.shape === 'rect' ? p.size * 0.6 : p.size,
-            backgroundColor: p.color,
-            borderRadius: p.shape === 'circle' ? '50%' : '2px',
-          }}
-        />
+          style={
+            p.shape === 'emoji'
+              ? { fontSize: 16 + Math.random() * 16, lineHeight: 1 }
+              : {
+                  width: p.size,
+                  height: p.shape === 'rect' ? p.size * 0.6 : p.size,
+                  backgroundColor: p.color,
+                  borderRadius: p.shape === 'circle' ? '50%' : '2px',
+                }
+          }
+        >
+          {p.shape === 'emoji' ? (emoji || '🏆') : null}
+        </motion.div>
       ))}
     </div>
   );
@@ -222,7 +228,7 @@ export default function RewardsPage() {
   return (
     <div className="min-h-screen bg-gray-950 py-10 px-4">
       {/* Confetti celebration */}
-      <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
+      <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} emoji={celebratedAchievement?.icon} />
 
       {/* Achievement celebration modal */}
       <AnimatePresence>
@@ -501,9 +507,15 @@ export default function RewardsPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.06, duration: 0.4 }}
                       whileHover={a.unlocked ? { y: -3, transition: { duration: 0.2 } } : {}}
+                      onClick={() => {
+                        if (a.unlocked) {
+                          setCelebratedAchievement(a);
+                          setShowConfetti(true);
+                        }
+                      }}
                       className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all ${
                         a.unlocked
-                          ? `bg-gray-900 ${rs.border} ${rs.glow}`
+                          ? `bg-gray-900 ${rs.border} ${rs.glow} cursor-pointer`
                           : 'bg-gray-900/40 border-gray-800 opacity-50 grayscale'
                       }`}
                     >

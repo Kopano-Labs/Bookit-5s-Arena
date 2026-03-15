@@ -90,6 +90,8 @@ const ProfilePage = () => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [communicationPreference, setCommunicationPreference] = useState('email');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [avatarPreview, setAvatarPreview] = useState('');
   const [birthDate, setBirthDate] = useState('');
@@ -123,6 +125,8 @@ const ProfilePage = () => {
         setName(data.name || '');
         setEmail(data.email || '');
         setUsername(data.username || '');
+        setPhone(data.phone || '');
+        setCommunicationPreference(data.communicationPreference || 'email');
         setNewsletterOptIn(data.newsletterOptIn || false);
         setBirthDate(data.birthDate ? new Date(data.birthDate).toISOString().split('T')[0] : '');
         setBirthdayClaimedYear(data.birthdayClaimedYear || null);
@@ -153,6 +157,8 @@ const ProfilePage = () => {
         setAvatarPreview('');
       } else {
         setAvatarUrl(data.imageUrl);
+        // Update the NextAuth session so the new avatar appears immediately everywhere
+        await update({ image: data.imageUrl });
         setSuccess('Profile picture updated!');
         setTimeout(() => setSuccess(''), 3000);
       }
@@ -189,6 +195,8 @@ const ProfilePage = () => {
         body: JSON.stringify({
           name,
           username: username.trim(),
+          phone: phone.trim() || null,
+          communicationPreference,
           newsletterOptIn,
           birthDate: birthDate || null,
           currentPassword: currentPassword || undefined,
@@ -585,6 +593,53 @@ const ProfilePage = () => {
             isOpen={openSections.comms}
             onToggle={toggleSection}
           >
+            {/* Phone number */}
+            <Field label="Cellphone Number" hint="Required for WhatsApp or SMS communication">
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+27 63 782 0245"
+                className={inputCls}
+              />
+            </Field>
+
+            {/* Communication preference — mandatory pick one */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">
+                Preferred Communication
+                <span className="text-red-400 ml-1">*</span>
+              </label>
+              <p className="text-gray-600 text-xs mb-3">Choose how you want to receive booking confirmations and reminders</p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { key: 'email', label: 'Email', icon: <FaEnvelope size={14} />, color: 'green' },
+                  { key: 'whatsapp', label: 'WhatsApp', icon: <FaLink size={14} />, color: 'green' },
+                  { key: 'sms', label: 'SMS', icon: <FaBell size={14} />, color: 'green' },
+                ].map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => {
+                      if ((opt.key === 'whatsapp' || opt.key === 'sms') && !phone) {
+                        setError('Please add your phone number first to use WhatsApp or SMS.');
+                        return;
+                      }
+                      setCommunicationPreference(opt.key);
+                    }}
+                    className={`flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all ${
+                      communicationPreference === opt.key
+                        ? 'bg-green-900/40 border-green-600 text-green-400 shadow-[0_0_12px_rgba(34,197,94,0.2)]'
+                        : 'bg-gray-800 border-gray-700 text-gray-500 hover:border-gray-600 hover:text-gray-300'
+                    }`}
+                  >
+                    {opt.icon}
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Newsletter toggle */}
             <div
               className="flex items-center justify-between bg-gray-800 border border-gray-700 rounded-xl px-5 py-4 cursor-pointer hover:border-green-700 transition-colors"

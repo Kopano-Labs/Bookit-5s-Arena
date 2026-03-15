@@ -92,6 +92,9 @@ const EVENT_IMAGES = [
   '/images/courts/court-4.jpg',
 ];
 
+// Football legends hero background — save image 2 provided by client as this file
+const EVENTS_HERO_BG = '/images/events/football-legends.png';
+
 const TERMS = [
   'All event bookings must be confirmed via phone call, WhatsApp, or email.',
   'A 50% deposit is required to secure your booking date.',
@@ -123,18 +126,23 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Hero with animated court image background */}
-      <section className="relative py-24 px-4 overflow-hidden">
+      {/* Hero with football legends background */}
+      <section className="relative py-28 px-4 overflow-hidden">
         <div className="absolute inset-0">
           <motion.img
-            src={EVENT_IMAGES[0]}
+            src={EVENTS_HERO_BG}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             initial={{ scale: 1 }}
-            animate={{ scale: 1.15, x: [0, -20, 0], y: [0, -10, 0] }}
-            transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+            animate={{ scale: 1.08, y: [0, -15, 0] }}
+            transition={{ duration: 25, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+            onError={(e) => { e.target.src = EVENT_IMAGES[0]; }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/80 to-gray-950" />
+          <div className="absolute inset-0" style={{
+            background: 'linear-gradient(180deg, rgba(2,6,23,0.75) 0%, rgba(2,6,23,0.85) 40%, rgba(2,6,23,0.95) 70%, rgba(2,6,23,1) 100%)',
+          }} />
+          {/* Green accent overlay */}
+          <div className="absolute inset-0 bg-green-900/10 mix-blend-overlay" />
         </div>
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
