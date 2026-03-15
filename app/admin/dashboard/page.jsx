@@ -133,15 +133,24 @@ const AdminDashboard = () => {
         {/* Filters */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-wrap gap-4 items-end shadow-lg">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">From</label>
+            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+              From{' '}
+              <InfoTooltip text="Start date for the dashboard data range. All stats, charts, and tables will reflect bookings from this date." size={12} />
+            </label>
             <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className={inputClass} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">To</label>
+            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+              To{' '}
+              <InfoTooltip text="End date for the dashboard data range. Leave blank to include all bookings up to today." size={12} />
+            </label>
             <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className={inputClass} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">Period</label>
+            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+              Period{' '}
+              <InfoTooltip text="Quick filter: 'Upcoming' shows only future bookings, 'Past' shows completed bookings. 'All' shows everything." size={12} />
+            </label>
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={inputClass}>
               <option value="">All Bookings</option>
               <option value="upcoming">Upcoming</option>
@@ -196,6 +205,7 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 <FaArrowUp className="text-green-400" /> Revenue — Last 7 Days
+                <InfoTooltip text="Daily revenue breakdown for the past week. Hover over each bar to see booking count and revenue. Taller bars = higher revenue days — use this to spot trends." size={12} />
               </h3>
               <span className="text-xs text-gray-600">
                 R{(stats.revenueTrend?.reduce((a, d) => a + d.revenue, 0) || 0).toLocaleString()} total
@@ -236,6 +246,7 @@ const AdminDashboard = () => {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
             <h3 className="text-sm font-black uppercase tracking-widest text-white mb-5 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
               <FaChartBar className="text-blue-400" /> Booking Status
+              <InfoTooltip text="Breakdown of all bookings by status. A high 'Pending' rate may mean bookings need attention. A 'Cancelled' rate above 20% could indicate pricing or availability issues." size={12} />
             </h3>
             <div className="space-y-4">
               {[
@@ -321,6 +332,7 @@ const AdminDashboard = () => {
               <FaStar className={`${selectedCourt ? 'text-green-400' : 'text-yellow-400'} transition-colors`} />
               <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${selectedCourt ? 'text-green-400' : 'text-white'}`} style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 Court Performance
+                <InfoTooltip text="Click a court to filter recent bookings for that court only. Revenue and booking count shown per court — use this to identify your top performers and underperformers." size={12} />
                 {selectedCourt && <span className="text-[10px] text-green-500 font-normal normal-case tracking-normal">(click to reset view)</span>}
               </h3>
             </div>
@@ -363,6 +375,7 @@ const AdminDashboard = () => {
             <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
               <h3 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 <FaCalendarAlt className="text-blue-400" /> Recent Bookings
+                <InfoTooltip text="The latest bookings across all courts. Click a court in 'Court Performance' to filter this list. Click 'View All' to go to the full Manage Bookings page." size={12} />
               </h3>
               <Link href="/admin/bookings" className="text-xs text-green-400 hover:text-green-300 transition-colors uppercase tracking-wide">
                 View All →

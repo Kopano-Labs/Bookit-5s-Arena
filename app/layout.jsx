@@ -2,6 +2,7 @@ import AuthProvider from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookNowFloat from '@/components/BookNowFloat';
+import SupportChatbot from '@/components/SupportChatbot';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import CookieBanner from '@/components/CookieBanner';
 import ClientOnly from '@/components/ClientOnly';
@@ -52,6 +53,7 @@ const RootLayout = ({ children }) => {
           <Footer />
           {/* Fixed floating elements — outside main so they overlay everything */}
           <BookNowFloat />
+          <SupportChatbot />
           <CookieBanner />
         </AuthProvider>
       </body>

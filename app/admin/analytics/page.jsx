@@ -1,12 +1,15 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import {
   FaChartBar, FaUsers, FaGlobe, FaDesktop, FaMobile, FaTablet,
   FaExternalLinkAlt, FaRobot, FaSpinner, FaMousePointer,
+  FaPaperPlane, FaLightbulb, FaExclamationTriangle, FaCheckCircle, FaInfoCircle,
 } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import InfoTooltip from '@/components/InfoTooltip';
 
 // ─── Stat Card ───────────────────────────────────────────────────────────────
 
@@ -77,6 +80,14 @@ function ProgressBar({ value, max, color = '#22c55e' }) {
   );
 }
 
+// ─── Insight Icon Styles ──────────────────────────────────────────────────────
+
+const insightStyles = {
+  success: { icon: <FaCheckCircle />, color: 'text-green-400', bg: 'bg-green-900/30 border-green-800/50' },
+  warning: { icon: <FaExclamationTriangle />, color: 'text-amber-400', bg: 'bg-amber-900/30 border-amber-800/50' },
+  info: { icon: <FaInfoCircle />, color: 'text-blue-400', bg: 'bg-blue-900/30 border-blue-800/50' },
+};
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function AnalyticsPage() {
@@ -86,9 +97,17 @@ export default function AnalyticsPage() {
   const [days, setDays] = useState(30);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [aiInsight, setAiInsight] = useState(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState(null);
+
+  // AI state
+  const [insights, setInsights] = useState([]);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatEndRef = useRef(null);
+
+  // Booking stats for AI
+  const [bookingStats, setBookingStats] = useState(null);
 
   // Auth guard
   useEffect(() => {
@@ -99,40 +118,69 @@ export default function AnalyticsPage() {
   const fetchData = useCallback(() => {
     if (status !== 'authenticated') return;
     setLoading(true);
-    setAiInsight(null);
-    fetch(`/api/admin/analytics?days=${days}`)
-      .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+    setInsights([]);
+    setChatMessages([]);
+
+    Promise.all([
+      fetch(`/api/admin/analytics?days=${days}`).then((r) => r.json()),
+      fetch('/api/admin/stats').then((r) => r.json()).catch(() => null),
+    ]).then(([analyticsData, stats]) => {
+      setData(analyticsData);
+      setBookingStats(stats);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, [status, days]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleAiInsights = async () => {
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
+  const handleGenerateInsights = async () => {
     if (!data) return;
-    setAiLoading(true);
-    setAiError(null);
-    setAiInsight(null);
+    setInsightsLoading(true);
     try {
       const res = await fetch('/api/admin/analytics/insights', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ analyticsData: data, bookingStats }),
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Failed');
-      setAiInsight(result.insight);
-    } catch (e) {
-      setAiError(e.message);
+      setInsights(result.insights || []);
+    } catch {
+      setInsights([{ type: 'warning', title: 'Error', message: 'Failed to generate insights. Please try again.' }]);
     } finally {
-      setAiLoading(false);
+      setInsightsLoading(false);
+    }
+  };
+
+  const handleChatSend = async () => {
+    if (!chatInput.trim() || chatLoading) return;
+    const question = chatInput.trim();
+    setChatInput('');
+    setChatMessages((prev) => [...prev, { role: 'user', text: question }]);
+    setChatLoading(true);
+
+    try {
+      const res = await fetch('/api/admin/analytics/insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, analyticsData: data, bookingStats }),
+      });
+      const result = await res.json();
+      setChatMessages((prev) => [...prev, { role: 'ai', text: result.answer || 'Sorry, I could not process that.' }]);
+    } catch {
+      setChatMessages((prev) => [...prev, { role: 'ai', text: 'Connection error. Please try again.' }]);
+    } finally {
+      setChatLoading(false);
     }
   };
 
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-green-400 animate-pulse text-lg">Loading analytics…</div>
+        <div className="text-green-400 animate-pulse text-lg">Loading analytics...</div>
       </div>
     );
   }
@@ -151,10 +199,12 @@ export default function AnalyticsPage() {
             <h1 className="text-3xl font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
               Analytics
             </h1>
-            <p className="text-gray-500 text-sm mt-1">Website traffic and engagement for the last {days} days</p>
+            <p className="text-gray-500 text-sm mt-1">
+              Website traffic and engagement for the last {days} days{' '}
+              <InfoTooltip text="This page shows website traffic, visitor behaviour, and booking performance. Use the AI assistant below for insights and to ask questions about your data." size={14} />
+            </p>
           </div>
 
-          {/* Date range selector */}
           <div className="flex gap-2 bg-gray-900 border border-gray-800 rounded-xl p-1">
             {[7, 30, 90].map((d) => (
               <button
@@ -173,48 +223,28 @@ export default function AnalyticsPage() {
 
         {/* Top stat cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={<FaChartBar />}
-            label="Page Views"
-            value={data?.totalPageViews?.toLocaleString() ?? '0'}
-            color="text-green-400"
-          />
-          <StatCard
-            icon={<FaUsers />}
-            label="Unique Visitors"
-            value={data?.totalVisitors?.toLocaleString() ?? '0'}
-            color="text-blue-400"
-          />
-          <StatCard
-            icon={<FaExternalLinkAlt />}
-            label="Top Page"
-            value={topPage}
-            sub={`${data?.topPages?.[0]?.views ?? 0} views`}
-            color="text-purple-400"
-          />
-          <StatCard
-            icon={<FaGlobe />}
-            label="Top Source"
-            value={topReferrer}
-            sub={`${data?.topReferrers?.[0]?.visits ?? 0} visits`}
-            color="text-yellow-400"
-          />
+          <StatCard icon={<FaChartBar />} label="Page Views" value={data?.totalPageViews?.toLocaleString() ?? '0'} color="text-green-400" />
+          <StatCard icon={<FaUsers />} label="Unique Visitors" value={data?.totalVisitors?.toLocaleString() ?? '0'} color="text-blue-400" />
+          <StatCard icon={<FaExternalLinkAlt />} label="Top Page" value={topPage} sub={`${data?.topPages?.[0]?.views ?? 0} views`} color="text-purple-400" />
+          <StatCard icon={<FaGlobe />} label="Top Source" value={topReferrer} sub={`${data?.topReferrers?.[0]?.visits ?? 0} visits`} color="text-yellow-400" />
         </div>
 
         {/* Page Views Chart */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-          <h2 className="text-sm font-black uppercase tracking-widest text-white mb-6" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-            Page Views — Last {days} Days
+          <h2 className="text-sm font-black uppercase tracking-widest text-white mb-6 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+            Page Views — Last {days} Days{' '}
+            <InfoTooltip text="Daily page view count. Hover over each bar for exact numbers. Spikes may indicate successful social media posts or promotions." size={12} />
           </h2>
           <BarChart data={data?.pageViewsByDay || []} />
         </div>
 
-        {/* Two-column: Top Pages + Traffic Sources */}
+        {/* Top Pages + Traffic Sources */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top Pages */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-800">
-              <h2 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>Top Pages</h2>
+              <h2 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                Top Pages <InfoTooltip text="Most visited pages. If the booking page isn't here, visitors may browse without converting — add more booking CTAs." size={12} />
+              </h2>
             </div>
             <table className="w-full text-sm">
               <thead>
@@ -239,10 +269,11 @@ export default function AnalyticsPage() {
             </table>
           </div>
 
-          {/* Traffic Sources */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-800">
-              <h2 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>Traffic Sources</h2>
+              <h2 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                Traffic Sources <InfoTooltip text="Where visitors come from. 'direct' = typed URL or bookmark. Other sources show which channels drive traffic to your site." size={12} />
+              </h2>
             </div>
             <table className="w-full text-sm">
               <thead>
@@ -268,8 +299,8 @@ export default function AnalyticsPage() {
 
         {/* Device Breakdown */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-          <h2 className="text-sm font-black uppercase tracking-widest text-white mb-5" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-            Device Breakdown
+          <h2 className="text-sm font-black uppercase tracking-widest text-white mb-5 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+            Device Breakdown <InfoTooltip text="How visitors access your site. High mobile usage = make sure booking flow is mobile-friendly. Consider a sticky 'Book Now' button on mobile." size={12} />
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
@@ -299,7 +330,9 @@ export default function AnalyticsPage() {
         {/* Event Tracking */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-800">
-            <h2 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>Event Tracking</h2>
+            <h2 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+              Event Tracking <InfoTooltip text="Custom events tracked on your site (button clicks, form submissions, etc). Shows which features users interact with most." size={12} />
+            </h2>
           </div>
           <table className="w-full text-sm">
             <thead>
@@ -331,47 +364,149 @@ export default function AnalyticsPage() {
           </table>
         </div>
 
-        {/* AI Insights */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-                AI Insights
-              </h2>
-              <p className="text-gray-600 text-xs mt-1">Claude analyses your data and suggests improvements</p>
+        {/* ─── AI Analytics Assistant ─────────────────────────────────────────── */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+          <div className="px-6 py-5 border-b border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}>
+                <FaRobot className="text-white text-lg" />
+              </div>
+              <div>
+                <h2 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                  AI Analytics Assistant{' '}
+                  <InfoTooltip text="Your free AI analytics advisor. It reads your real booking and traffic data to provide actionable insights. Click 'Generate Insights' for a full analysis, or type a question below." size={14} />
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">Free -- analyses your data in real-time, no API key needed</p>
+              </div>
             </div>
-            <button
-              onClick={handleAiInsights}
-              disabled={aiLoading}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:scale-105 disabled:opacity-60 disabled:cursor-wait"
+            <motion.button
+              onClick={handleGenerateInsights}
+              disabled={insightsLoading}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-60 disabled:cursor-wait"
               style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)', boxShadow: '0 0 15px rgba(34,197,94,0.3)' }}
             >
-              {aiLoading ? <FaSpinner className="animate-spin" size={13} /> : <FaRobot size={13} />}
-              {aiLoading ? 'Generating…' : 'Generate AI Insights'}
-            </button>
+              {insightsLoading ? <FaSpinner className="animate-spin" size={13} /> : <FaLightbulb size={13} />}
+              {insightsLoading ? 'Analysing...' : 'Generate Insights'}
+            </motion.button>
           </div>
 
-          {aiError && (
-            <div className="bg-red-900/20 border border-red-700 rounded-xl px-4 py-3 text-sm text-red-300">
-              {aiError}
-            </div>
-          )}
+          {/* AI Insight Cards */}
+          <AnimatePresence>
+            {insights.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="px-6 py-5 border-b border-gray-800"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {insights.map((insight, i) => {
+                    const style = insightStyles[insight.type] || insightStyles.info;
+                    return (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.08 }}
+                        className={`border rounded-xl p-4 ${style.bg}`}
+                      >
+                        <div className={`flex items-center gap-2 mb-2 ${style.color}`}>
+                          {style.icon}
+                          <span className="text-xs font-bold uppercase tracking-widest">{insight.title}</span>
+                        </div>
+                        <p className="text-sm text-gray-300 leading-relaxed">{insight.message}</p>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {aiInsight && (
-            <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <FaRobot className="text-green-400" size={14} />
-                <span className="text-xs font-bold text-green-400 uppercase tracking-widest">Claude Analysis</span>
-              </div>
-              <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{aiInsight}</div>
-            </div>
-          )}
+          {/* Chat Interface */}
+          <div className="px-6 py-4">
+            <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-3 flex items-center gap-1.5">
+              <FaRobot size={10} className="text-green-400" /> Ask the AI{' '}
+              <InfoTooltip text="Type a question about your data — revenue, cancellations, peak hours, popular courts, device usage, or how to grow bookings." size={12} />
+            </p>
 
-          {!aiInsight && !aiError && !aiLoading && (
-            <div className="text-center py-6 text-gray-700 text-sm">
-              Click the button above to get AI-powered insights about your traffic and how to improve bookings.
+            {/* Chat messages */}
+            <div className="max-h-64 overflow-y-auto space-y-3 mb-4">
+              {chatMessages.length === 0 && (
+                <div className="text-center py-6 text-gray-700 text-sm">
+                  Ask me anything about your analytics — revenue, peak hours, popular courts, or how to grow bookings.
+                </div>
+              )}
+              {chatMessages.map((msg, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`max-w-[85%] rounded-xl px-4 py-3 text-sm leading-relaxed ${
+                    msg.role === 'user'
+                      ? 'bg-green-900/30 border border-green-800/50 text-green-200'
+                      : 'bg-gray-800 border border-gray-700 text-gray-300'
+                  }`}>
+                    {msg.role === 'ai' && (
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <FaRobot className="text-green-400" size={10} />
+                        <span className="text-[10px] font-bold text-green-400 uppercase tracking-widest">AI Assistant</span>
+                      </div>
+                    )}
+                    <div className="whitespace-pre-wrap">{msg.text}</div>
+                  </div>
+                </motion.div>
+              ))}
+              {chatLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 flex items-center gap-2">
+                    <FaSpinner className="animate-spin text-green-400" size={12} />
+                    <span className="text-xs text-gray-400">Thinking...</span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
             </div>
-          )}
+
+            {/* Chat input */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleChatSend()}
+                placeholder="e.g. How is my revenue doing? What are my peak hours?"
+                className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none placeholder-gray-600"
+              />
+              <motion.button
+                onClick={handleChatSend}
+                disabled={!chatInput.trim() || chatLoading}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-4 py-3 rounded-xl text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
+              >
+                <FaPaperPlane size={14} />
+              </motion.button>
+            </div>
+
+            {/* Quick question chips */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {['How is my revenue?', 'Peak hours?', 'Most popular court?', 'How to grow bookings?', 'Device breakdown?'].map((q) => (
+                <button
+                  key={q}
+                  onClick={() => { setChatInput(q); }}
+                  className="text-[10px] font-bold text-gray-500 hover:text-green-400 bg-gray-800 hover:bg-gray-800/80 border border-gray-700 hover:border-green-800 rounded-lg px-2.5 py-1.5 transition-all"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
       </div>

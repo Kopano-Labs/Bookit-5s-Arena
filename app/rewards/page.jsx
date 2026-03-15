@@ -9,9 +9,10 @@ import {
   FaTrophy, FaStar, FaArrowRight, FaLock, FaUserPlus,
   FaFire, FaGift, FaChartLine, FaShareAlt, FaCopy,
   FaWhatsapp, FaTwitter, FaFacebook, FaUser, FaUsers,
-  FaGlobeAfrica, FaCheck,
+  FaGlobeAfrica, FaCheck, FaCalendarAlt,
 } from 'react-icons/fa';
 import InfoTooltip from '@/components/InfoTooltip';
+import AnimatedTitle from '@/components/AnimatedTitle';
 
 const RARITY_STYLES = {
   common:    { border: 'border-gray-700',    glow: '',                              badge: 'bg-gray-800 text-gray-400',    label: 'Common'    },
@@ -47,6 +48,57 @@ function StatCard({ icon, label, value, color, delay, tooltip }) {
   );
 }
 
+// ── Confetti Celebration Component ──
+function ConfettiCelebration({ active, onComplete }) {
+  const [particles, setParticles] = useState([]);
+
+  useEffect(() => {
+    if (!active) return;
+    const colors = ['#22c55e', '#f59e0b', '#3b82f6', '#a855f7', '#ef4444', '#06b6d4', '#f97316', '#ec4899'];
+    const newParticles = Array.from({ length: 80 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      delay: Math.random() * 0.5,
+      duration: 2 + Math.random() * 2,
+      size: 4 + Math.random() * 8,
+      rotation: Math.random() * 360,
+      shape: Math.random() > 0.5 ? 'circle' : 'rect',
+    }));
+    setParticles(newParticles);
+    const timer = setTimeout(() => { setParticles([]); onComplete?.(); }, 4000);
+    return () => clearTimeout(timer);
+  }, [active, onComplete]);
+
+  if (particles.length === 0) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          initial={{ y: -20, x: `${p.x}vw`, opacity: 1, rotate: 0, scale: 1 }}
+          animate={{
+            y: '110vh',
+            x: `${p.x + (Math.random() - 0.5) * 30}vw`,
+            opacity: [1, 1, 0.8, 0],
+            rotate: p.rotation + 720,
+            scale: [1, 1.2, 0.8, 0.4],
+          }}
+          transition={{ duration: p.duration, delay: p.delay, ease: 'easeOut' }}
+          className="absolute"
+          style={{
+            width: p.size,
+            height: p.shape === 'rect' ? p.size * 0.6 : p.size,
+            backgroundColor: p.color,
+            borderRadius: p.shape === 'circle' ? '50%' : '2px',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function RewardsPage() {
   const { data: session, status } = useSession();
   const [data, setData] = useState(null);
@@ -56,6 +108,8 @@ export default function RewardsPage() {
   const [referralLoading, setReferralLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [celebratedAchievement, setCelebratedAchievement] = useState(null);
 
   // Fetch referral data when the referrals tab is active
   useEffect(() => {
@@ -72,7 +126,22 @@ export default function RewardsPage() {
     if (status === 'authenticated') {
       fetch('/api/rewards')
         .then((r) => r.json())
-        .then((d) => { setData(d); setLoading(false); });
+        .then((d) => {
+          setData(d);
+          setLoading(false);
+          // Check for newly unlocked achievements (compare with localStorage)
+          if (typeof window !== 'undefined') {
+            const prev = JSON.parse(localStorage.getItem('rewards_unlocked') || '[]');
+            const current = d.achievements.filter((a) => a.unlocked).map((a) => a.id);
+            const newlyUnlocked = current.filter((id) => !prev.includes(id));
+            if (newlyUnlocked.length > 0) {
+              const achievement = d.achievements.find((a) => a.id === newlyUnlocked[0]);
+              setCelebratedAchievement(achievement);
+              setShowConfetti(true);
+            }
+            localStorage.setItem('rewards_unlocked', JSON.stringify(current));
+          }
+        });
     }
   }, [status]);
 
@@ -152,7 +221,77 @@ export default function RewardsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 py-10 px-4">
+      {/* Confetti celebration */}
+      <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
+
+      {/* Achievement celebration modal */}
+      <AnimatePresence>
+        {celebratedAchievement && (
+          <motion.div
+            className="fixed inset-0 z-40 flex items-center justify-center px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setCelebratedAchievement(null)} />
+            <motion.div
+              className="relative bg-gray-900 border-2 border-yellow-600/60 rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center"
+              initial={{ scale: 0.5, y: 40 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.5, y: 40 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+              style={{ boxShadow: '0 0 60px rgba(245,158,11,0.3)' }}
+            >
+              <motion.div
+                className="text-6xl mb-4"
+                animate={{ scale: [1, 1.3, 1], rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                {celebratedAchievement.icon}
+              </motion.div>
+              <h3 className="text-xl font-black uppercase tracking-widest text-yellow-400 mb-1" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                Achievement Unlocked!
+              </h3>
+              <p className="text-white font-bold text-lg mb-1">{celebratedAchievement.name}</p>
+              <p className="text-gray-400 text-sm mb-1">{celebratedAchievement.desc}</p>
+              {celebratedAchievement.unlockedCourt && (
+                <p className="text-[10px] text-gray-500 mt-2">
+                  <FaMapMarkerAlt className="inline mr-1 text-green-500" size={9} />
+                  {celebratedAchievement.unlockedCourt}
+                  {celebratedAchievement.unlockedAt && (
+                    <> &middot; <FaCalendarAlt className="inline mx-0.5 text-green-500" size={9} />{new Date(celebratedAchievement.unlockedAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</>
+                  )}
+                </p>
+              )}
+              <span className={`inline-block mt-3 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${RARITY_STYLES[celebratedAchievement.rarity]?.badge || ''}`}>
+                {RARITY_STYLES[celebratedAchievement.rarity]?.label}
+              </span>
+              <motion.button
+                onClick={() => setCelebratedAchievement(null)}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="mt-5 w-full py-2.5 rounded-xl text-sm font-bold uppercase tracking-widest text-white cursor-pointer"
+                style={{ background: 'linear-gradient(135deg, #92400e 0%, #f59e0b 100%)', boxShadow: '0 0 20px rgba(245,158,11,0.3)' }}
+              >
+                Awesome!
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="max-w-4xl mx-auto space-y-6">
+
+        {/* ── Animated Title ── */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+          <AnimatedTitle
+            text={[{ text: '5S ', highlight: false }, { text: 'Rewards', highlight: true }]}
+            subtitle="Earn points, unlock achievements and climb the ranks"
+            icon={<FaTrophy />}
+            size="lg"
+            align="left"
+          />
+        </motion.div>
 
         {/* ── Hero Header ── */}
         <motion.div
@@ -280,28 +419,6 @@ export default function RewardsPage() {
                 <StatCard icon={<FaMapMarkerAlt />} label="Courts Visited" value={data.courtsVisited} color="text-purple-400" delay={0.21} tooltip="Unique courts booked" />
               </div>
 
-              {/* Top Court */}
-              {data.topCourt && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.28 }}
-                  className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex items-center gap-4"
-                >
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-600 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                    <FaStar className="text-white text-2xl" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 uppercase tracking-widest">Highest Earning Court</p>
-                    <p className="text-white font-black text-lg">{data.topCourt.name}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-yellow-400 font-black text-xl">{data.topCourt.points.toLocaleString()}</p>
-                    <p className="text-gray-600 text-[10px] uppercase tracking-widest">points</p>
-                  </div>
-                </motion.div>
-              )}
-
               {/* Achievement preview */}
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -401,17 +518,20 @@ export default function RewardsPage() {
                           </span>
                         </div>
                         <p className="text-gray-400 text-xs">{a.desc}</p>
-                        {a.unlocked && a.unlockedBy && (
-                          <div className="mt-1.5 flex items-center gap-2 text-[10px] flex-wrap">
-                            <span className="text-green-400 font-bold">✓ Unlocked</span>
-                            <span className="text-gray-600">•</span>
-                            <span className="text-gray-500">
-                              {a.unlockedBy.court} on {a.unlockedBy.date}
-                            </span>
+                        {a.unlocked && (
+                          <div className="mt-1 space-y-0.5">
+                            <p className="text-green-400 text-[10px] font-bold">✓ Unlocked</p>
+                            {(a.unlockedCourt || a.unlockedAt) && (
+                              <p className="text-[9px] text-gray-500 flex items-center gap-1.5 flex-wrap">
+                                {a.unlockedCourt && (
+                                  <span className="flex items-center gap-0.5"><FaMapMarkerAlt size={8} className="text-green-600" />{a.unlockedCourt}</span>
+                                )}
+                                {a.unlockedAt && (
+                                  <span className="flex items-center gap-0.5"><FaCalendarAlt size={8} className="text-green-600" />{new Date(a.unlockedAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                )}
+                              </p>
+                            )}
                           </div>
-                        )}
-                        {a.unlocked && !a.unlockedBy && (
-                          <p className="text-green-400 text-[10px] mt-1 font-bold">✓ Unlocked</p>
                         )}
                         {!a.unlocked && (
                           <p className="text-gray-600 text-[10px] mt-1">Keep booking to unlock</p>

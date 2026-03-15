@@ -8,6 +8,7 @@ import FixturesPromo    from '@/components/home/FixturesPromo';
 import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
 import ContactSection   from '@/components/home/ContactSection';
+import FixturesPromo    from '@/components/FixturesPromo';
 
 export const revalidate = 60; // ISR — revalidate every 60 seconds
 
@@ -55,6 +56,9 @@ const HomePage = async () => {
 
       {/* ══ SOCIAL — staggered slide reveal ═════════════════════ */}
       <SocialSection />
+
+      {/* ══ FIXTURES PROMO — between contact & footer ════════════ */}
+      <FixturesPromo />
 
       {/* ══ CONTACT + FOOTER — animated cards ═══════════════════ */}
       <ContactSection />

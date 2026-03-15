@@ -2,25 +2,33 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaFutbol } from 'react-icons/fa';
+import { FaCalendarAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import InfoTooltip from '@/components/InfoTooltip';
 
-const AddCourtPage = () => {
+const EVENT_TYPES = [
+  { value: 'birthday', label: 'Birthday Party' },
+  { value: 'corporate', label: 'Corporate Event' },
+  { value: 'tournament', label: 'Tournament' },
+  { value: 'social', label: 'Social Gathering' },
+];
+
+const AddEventPage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const [form, setForm] = useState({
-    name: '',
-    description: '',
-    address: '',
-    capacity: 10,
-    amenities: '',
-    availability: '',
-    price_per_hour: '',
-    image: '',
+    type: '',
+    packageName: '',
+    contactName: '',
+    contactEmail: '',
+    contactPhone: '',
+    preferredDate: '',
+    preferredTime: '',
+    guestCount: '',
+    message: '',
   });
 
   const handleChange = (e) => {
@@ -32,7 +40,7 @@ const AddCourtPage = () => {
     e.preventDefault();
     setError('');
 
-    if (!form.name || !form.description || !form.address || !form.price_per_hour) {
+    if (!form.type || !form.packageName || !form.contactName || !form.contactEmail || !form.contactPhone || !form.preferredDate || !form.guestCount) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -40,20 +48,19 @@ const AddCourtPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/courts', {
+      const res = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          price_per_hour: Number(form.price_per_hour),
-          capacity: Number(form.capacity),
+          guestCount: Number(form.guestCount),
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Failed to add court. Please try again.');
+        setError(data.error || 'Failed to add event. Please try again.');
         return;
       }
 
@@ -73,25 +80,25 @@ const AddCourtPage = () => {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center max-w-md w-full">
-          <FaFutbol className="mx-auto text-4xl text-green-500 mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Court Added!</h2>
-          <p className="text-gray-400 text-sm mb-8">Your new court has been submitted successfully.</p>
+          <FaCalendarAlt className="mx-auto text-4xl text-green-500 mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">Event Created!</h2>
+          <p className="text-gray-400 text-sm mb-8">Your event booking request has been submitted successfully.</p>
           <div className="flex justify-center gap-4">
             <button
               onClick={() => {
                 setSuccess(false);
-                setForm({ name: '', description: '', address: '', capacity: 10, amenities: '', availability: '', price_per_hour: '', image: '' });
+                setForm({ type: '', packageName: '', contactName: '', contactEmail: '', contactPhone: '', preferredDate: '', preferredTime: '', guestCount: '', message: '' });
               }}
               className="px-5 py-2.5 bg-gray-800 text-white rounded-xl text-sm font-semibold hover:bg-gray-700 transition"
             >
               Add Another
             </button>
             <button
-              onClick={() => router.push('/my-courts')}
+              onClick={() => router.push('/events')}
               className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition"
               style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
             >
-              View My Courts
+              View Events
             </button>
           </div>
         </div>
@@ -108,7 +115,7 @@ const AddCourtPage = () => {
             className="text-4xl uppercase text-white"
             style={{ fontFamily: 'Impact, Arial Black, sans-serif', letterSpacing: '4px' }}
           >
-            Add a Court
+            Add an Event
           </h1>
           <div className="mt-2 h-1 w-16 rounded-full" style={{ background: 'linear-gradient(135deg, #15803d, #22c55e)' }} />
         </div>
@@ -121,8 +128,8 @@ const AddCourtPage = () => {
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="flex items-center gap-3 mb-6">
-            <FaFutbol className="text-green-500 text-xl" />
-            <h2 className="text-white text-lg font-bold uppercase tracking-widest">Court Details</h2>
+            <FaCalendarAlt className="text-green-500 text-xl" />
+            <h2 className="text-white text-lg font-bold uppercase tracking-widest">Event Details</h2>
           </div>
 
           {error && (
@@ -133,140 +140,159 @@ const AddCourtPage = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* Court Name */}
+              {/* Event Type */}
               <div className="sm:col-span-2">
                 <label className={labelClass}>
-                  Court Name <span className="text-red-400">*</span>{' '}
-                  <InfoTooltip text="A unique, recognisable name for your court. This is what players will see when browsing available courts." size={14} />
+                  Event Type <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Select the type of event you want to host. This helps us prepare the right setup and amenities for your group." size={14} />
+                </label>
+                <select
+                  name="type"
+                  value={form.type}
+                  onChange={handleChange}
+                  required
+                  className={inputClass}
+                >
+                  <option value="">Select event type...</option>
+                  {EVENT_TYPES.map((t) => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Package Name */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>
+                  Package Name <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Give your event package a name, e.g. 'Gold Birthday Package' or 'Team Building Day'. This appears on your booking confirmation." size={14} />
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={form.name}
+                  name="packageName"
+                  value={form.packageName}
                   onChange={handleChange}
                   required
-                  placeholder="e.g. Premier Court"
+                  placeholder="e.g. Gold Birthday Package"
                   className={inputClass}
                 />
               </div>
 
-              {/* Description */}
+              {/* Contact Name */}
+              <div>
+                <label className={labelClass}>
+                  Contact Name <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Full name of the person responsible for the booking. We'll use this for all event correspondence." size={14} />
+                </label>
+                <input
+                  type="text"
+                  name="contactName"
+                  value={form.contactName}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. John Smith"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Contact Email */}
+              <div>
+                <label className={labelClass}>
+                  Contact Email <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Email address for booking confirmation and event updates. Double-check this is correct!" size={14} />
+                </label>
+                <input
+                  type="email"
+                  name="contactEmail"
+                  value={form.contactEmail}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. john@example.com"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Contact Phone */}
+              <div>
+                <label className={labelClass}>
+                  Contact Phone <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="South African phone number (e.g. 0821234567 or +27821234567). We may call to confirm event details." size={14} />
+                </label>
+                <input
+                  type="tel"
+                  name="contactPhone"
+                  value={form.contactPhone}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. 0821234567"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Guest Count */}
+              <div>
+                <label className={labelClass}>
+                  Guest Count <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Total number of guests expected (1–100). This helps us allocate the right space and resources for your event." size={14} />
+                </label>
+                <input
+                  type="number"
+                  name="guestCount"
+                  value={form.guestCount}
+                  onChange={handleChange}
+                  required
+                  min="1"
+                  max="100"
+                  placeholder="e.g. 20"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Preferred Date */}
+              <div>
+                <label className={labelClass}>
+                  Preferred Date <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Choose your preferred event date. Must be a future date. We'll confirm availability within 24 hours." size={14} />
+                </label>
+                <input
+                  type="date"
+                  name="preferredDate"
+                  value={form.preferredDate}
+                  onChange={handleChange}
+                  required
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Preferred Time */}
+              <div>
+                <label className={labelClass}>
+                  Preferred Time{' '}
+                  <InfoTooltip text="Optional — specify a start time if you have a preference. Our operating hours are typically 10:00–22:00." size={14} />
+                </label>
+                <input
+                  type="time"
+                  name="preferredTime"
+                  value={form.preferredTime}
+                  onChange={handleChange}
+                  placeholder="e.g. 14:00"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Message */}
               <div className="sm:col-span-2">
                 <label className={labelClass}>
-                  Description <span className="text-red-400">*</span>{' '}
-                  <InfoTooltip text="Describe the court surface (grass, turf, indoor), size, and what it's best suited for. This helps players pick the right court." size={14} />
+                  Additional Message{' '}
+                  <InfoTooltip text="Any special requests, dietary requirements, decorations, or other details we should know about for your event." size={14} />
                 </label>
                 <textarea
-                  name="description"
-                  value={form.description}
+                  name="message"
+                  value={form.message}
                   onChange={handleChange}
-                  required
                   rows={3}
-                  placeholder="Describe the court, surface type, ideal for..."
+                  placeholder="Any special requests, dietary needs, or notes..."
                   className={inputClass}
                 />
-              </div>
-
-              {/* Address */}
-              <div className="sm:col-span-2">
-                <label className={labelClass}>
-                  Address <span className="text-red-400">*</span>{' '}
-                  <InfoTooltip text="The full street address of the court. Include suburb and city so players can find it easily on maps." size={14} />
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={form.address}
-                  onChange={handleChange}
-                  required
-                  placeholder="e.g. Pringle Rd, Milnerton, Cape Town"
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Price */}
-              <div>
-                <label className={labelClass}>
-                  Price per Hour (R) <span className="text-red-400">*</span>{' '}
-                  <InfoTooltip text="Hourly rental rate in South African Rand. This is what players will be charged per hour when they book this court." size={14} />
-                </label>
-                <input
-                  type="number"
-                  name="price_per_hour"
-                  value={form.price_per_hour}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                  placeholder="e.g. 400"
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Capacity */}
-              <div>
-                <label className={labelClass}>
-                  Capacity (players){' '}
-                  <InfoTooltip text="Maximum number of players allowed on this court at one time. Default is 10 for 5-a-side. Adjust for larger or smaller formats." size={14} />
-                </label>
-                <input
-                  type="number"
-                  name="capacity"
-                  value={form.capacity}
-                  onChange={handleChange}
-                  min="2"
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Availability */}
-              <div className="sm:col-span-2">
-                <label className={labelClass}>
-                  Availability Hours{' '}
-                  <InfoTooltip text="The hours this court is open for bookings, e.g. '10:00 AM - 22:00 PM'. Players won't be able to book outside these hours." size={14} />
-                </label>
-                <input
-                  type="text"
-                  name="availability"
-                  value={form.availability}
-                  onChange={handleChange}
-                  placeholder="e.g. 10:00 AM - 22:00 PM"
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Amenities */}
-              <div className="sm:col-span-2">
-                <label className={labelClass}>
-                  Amenities{' '}
-                  <InfoTooltip text="List the facilities available at this court — floodlights, change rooms, parking, water, etc. Separate with commas." size={14} />
-                </label>
-                <input
-                  type="text"
-                  name="amenities"
-                  value={form.amenities}
-                  onChange={handleChange}
-                  placeholder="e.g. Floodlights, Change rooms, Secure Parking"
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Image */}
-              <div className="sm:col-span-2">
-                <label className={labelClass}>
-                  Image Filename{' '}
-                  <InfoTooltip text="The filename of the court photo (e.g. court-5.jpg). Upload the image to /public/images/courts/ first, then enter the filename here." size={14} />
-                </label>
-                <input
-                  type="text"
-                  name="image"
-                  value={form.image}
-                  onChange={handleChange}
-                  placeholder="e.g. court-5.jpg (must be in /public/images/courts/)"
-                  className={inputClass}
-                />
-                <p className="mt-2 text-xs text-gray-500">
-                  Place the image file in <code className="text-gray-400">/public/images/courts/</code> before adding.
-                </p>
               </div>
             </div>
 
@@ -280,7 +306,7 @@ const AddCourtPage = () => {
                 className="w-full py-3 px-6 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
               >
-                {loading ? 'Adding Court...' : 'Add Court'}
+                {loading ? 'Submitting Event...' : 'Submit Event'}
               </motion.button>
             </div>
           </form>
@@ -290,4 +316,4 @@ const AddCourtPage = () => {
   );
 };
 
-export default AddCourtPage;
+export default AddEventPage;

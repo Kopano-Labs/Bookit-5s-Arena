@@ -12,39 +12,51 @@ const getTier = (count) => {
   return { name: 'Bronze', icon: '🥉', color: '#d97706', next: 'Silver', nextAt: 5 };
 };
 
-// Check achievements based on booking history — includes which bookings unlocked them
+// Check achievements based on booking history
 const getAchievements = (bookings) => {
   const confirmed = bookings.filter((b) => b.status === 'confirmed');
-  const courtSet = new Set(bookings.map((b) => b.court?.toString()));
-  const totalHours = confirmed.reduce((s, b) => s + (b.duration || 0), 0);
-  const totalSpent = confirmed.reduce((s, b) => s + (b.total_price || 0), 0);
+  const courts = new Set(bookings.map((b) => b.court?.toString()));
+  const sortedByDate = [...bookings].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // Helper: get the Nth booking (sorted oldest first)
-  const sortedAsc = [...bookings].reverse();
-  const nthBooking = (n) => sortedAsc[n - 1];
-  const bookingInfo = (b) => b ? { court: b.court?.name || 'Court', date: b.date, time: b.start_time } : null;
+  // Helper to find the Nth booking (sorted by date)
+  const nthBooking = (n) => sortedByDate[n - 1];
+  const formatUnlockInfo = (booking) => {
+    if (!booking) return {};
+    return {
+      unlockedAt: booking.date,
+      unlockedCourt: booking.court?.name || 'Court',
+    };
+  };
 
-  // Find the 2nd unique court booking
-  const firstCourts = [];
-  const secondCourtBooking = sortedAsc.find((b) => {
-    const cid = b.court?.toString();
-    if (!firstCourts.includes(cid)) firstCourts.push(cid);
-    return firstCourts.length >= 2;
-  });
+  // Find the booking that caused explorer unlock (2nd unique court)
+  const explorerBooking = (() => {
+    const seen = new Set();
+    for (const b of sortedByDate) {
+      seen.add(b.court?.toString());
+      if (seen.size >= 2) return b;
+    }
+    return null;
+  })();
 
-  // Find the booking that crossed 10 hours
-  let runningHours = 0;
-  const marathonBooking = [...confirmed].reverse().find((b) => {
-    runningHours += b.duration || 0;
-    return runningHours >= 10;
-  });
+  // Find when total hours crossed 10
+  const marathonBooking = (() => {
+    let total = 0;
+    for (const b of confirmed.sort((a, b) => new Date(a.date) - new Date(b.date))) {
+      total += b.duration || 0;
+      if (total >= 10) return b;
+    }
+    return null;
+  })();
 
-  // Find the booking that crossed R5000
-  let runningSpent = 0;
-  const spenderBooking = [...confirmed].reverse().find((b) => {
-    runningSpent += b.total_price || 0;
-    return runningSpent >= 5000;
-  });
+  // Find when total spent crossed R5000
+  const spenderBooking = (() => {
+    let total = 0;
+    for (const b of confirmed.sort((a, b) => new Date(a.date) - new Date(b.date))) {
+      total += b.total_price || 0;
+      if (total >= 5000) return b;
+    }
+    return null;
+  })();
 
   const achievements = [
     {
@@ -54,7 +66,7 @@ const getAchievements = (bookings) => {
       icon: '⚽',
       unlocked: bookings.length >= 1,
       rarity: 'common',
-      unlockedBy: bookingInfo(nthBooking(1)),
+      ...formatUnlockInfo(nthBooking(1)),
     },
     {
       id: 'hat_trick',
@@ -63,7 +75,7 @@ const getAchievements = (bookings) => {
       icon: '🎯',
       unlocked: bookings.length >= 3,
       rarity: 'common',
-      unlockedBy: bookingInfo(nthBooking(3)),
+      ...formatUnlockInfo(nthBooking(3)),
     },
     {
       id: 'regular',
@@ -72,25 +84,25 @@ const getAchievements = (bookings) => {
       icon: '🏃',
       unlocked: bookings.length >= 5,
       rarity: 'uncommon',
-      unlockedBy: bookingInfo(nthBooking(5)),
+      ...formatUnlockInfo(nthBooking(5)),
     },
     {
       id: 'explorer',
       name: 'Court Explorer',
       desc: 'Booked 2 different courts',
       icon: '🗺️',
-      unlocked: courtSet.size >= 2,
+      unlocked: courts.size >= 2,
       rarity: 'uncommon',
-      unlockedBy: secondCourtBooking ? bookingInfo(secondCourtBooking) : null,
+      ...formatUnlockInfo(explorerBooking),
     },
     {
       id: 'marathon',
       name: 'Marathon Man',
       desc: 'Accumulated 10+ hours on the pitch',
       icon: '⏱️',
-      unlocked: totalHours >= 10,
+      unlocked: confirmed.reduce((s, b) => s + (b.duration || 0), 0) >= 10,
       rarity: 'rare',
-      unlockedBy: marathonBooking ? bookingInfo(marathonBooking) : null,
+      ...formatUnlockInfo(marathonBooking),
     },
     {
       id: 'veteran',
@@ -99,16 +111,16 @@ const getAchievements = (bookings) => {
       icon: '🏆',
       unlocked: bookings.length >= 10,
       rarity: 'rare',
-      unlockedBy: bookingInfo(nthBooking(10)),
+      ...formatUnlockInfo(nthBooking(10)),
     },
     {
       id: 'big_spender',
       name: 'Big Spender',
       desc: 'Spent over R5,000 at the arena',
       icon: '💸',
-      unlocked: totalSpent >= 5000,
+      unlocked: confirmed.reduce((s, b) => s + (b.total_price || 0), 0) >= 5000,
       rarity: 'epic',
-      unlockedBy: spenderBooking ? bookingInfo(spenderBooking) : null,
+      ...formatUnlockInfo(spenderBooking),
     },
     {
       id: 'legend',
@@ -117,7 +129,7 @@ const getAchievements = (bookings) => {
       icon: '👑',
       unlocked: bookings.length >= 20,
       rarity: 'legendary',
-      unlockedBy: bookingInfo(nthBooking(20)),
+      ...formatUnlockInfo(nthBooking(20)),
     },
   ];
 
@@ -145,16 +157,6 @@ export async function GET() {
   // Points: 100 per confirmed booking + 50 per hour + bonus for tier
   const points = confirmed.length * 100 + totalHours * 50;
 
-  // Find highest point-earning court
-  const courtPoints = {};
-  confirmed.forEach((b) => {
-    const courtName = b.court?.name || 'Unknown';
-    const bookingPoints = 100 + (b.duration || 0) * 50;
-    courtPoints[courtName] = (courtPoints[courtName] || 0) + bookingPoints;
-  });
-  const topCourt = Object.entries(courtPoints).sort(([, a], [, b]) => b - a)[0];
-  const topCourtData = topCourt ? { name: topCourt[0], points: topCourt[1] } : null;
-
   // Recent bookings (last 5)
   const recent = bookings.slice(0, 5).map((b) => ({
     _id: b._id,
@@ -177,6 +179,5 @@ export async function GET() {
     unlockedCount,
     recent,
     memberSince: bookings.length > 0 ? bookings[bookings.length - 1].createdAt : null,
-    topCourt: topCourtData,
   });
 }
