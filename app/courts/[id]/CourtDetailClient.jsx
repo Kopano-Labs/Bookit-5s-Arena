@@ -86,7 +86,7 @@ export default function CourtDetailClient({ court }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6"
+            className="mt-6 px-6 pb-6"
           >
             {court.description && (
               <p className="text-gray-400 text-sm leading-relaxed mb-6">{court.description}</p>

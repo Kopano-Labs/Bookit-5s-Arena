@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaBirthdayCake,
@@ -10,9 +10,11 @@ import {
   FaWhatsapp,
   FaPhone,
   FaEnvelope,
-  FaCalendarAlt,
   FaCheck,
   FaStar,
+  FaChevronDown,
+  FaExclamationTriangle,
+  FaInfoCircle,
 } from 'react-icons/fa';
 
 const packages = [
@@ -20,43 +22,43 @@ const packages = [
     id: 'birthday',
     type: 'birthday',
     name: 'Kids Birthday',
-    price: 'R2,500',
     icon: FaBirthdayCake,
     color: 'from-pink-500 to-rose-600',
+    accent: 'pink',
     features: [
       'Up to 15 kids',
       '2hrs court time',
-      '1 coach',
-      'Equipment + bibs',
-      'Setup included',
+      '1 dedicated coach',
+      'Equipment + bibs provided',
+      'Setup & cleanup included',
     ],
   },
   {
     id: 'premium-birthday',
     type: 'birthday',
     name: 'Premium Birthday',
-    price: 'R3,500',
     icon: FaStar,
     color: 'from-amber-500 to-orange-600',
+    accent: 'amber',
     features: [
       'Up to 30 kids',
       '2hrs court time',
       '2 coaches',
       'Equipment + bibs + trophies',
-      'Setup + party area',
+      'Setup + dedicated party area',
     ],
   },
   {
     id: 'corporate',
     type: 'corporate',
     name: 'Corporate Team Building',
-    price: 'R4,500',
     icon: FaBuilding,
     color: 'from-blue-500 to-indigo-600',
+    accent: 'blue',
     features: [
       'Up to 20 players',
-      '3hrs',
-      '2 courts',
+      '3hrs total',
+      '2 courts available',
       'Referee + bibs',
       'Tournament format',
     ],
@@ -65,21 +67,22 @@ const packages = [
     id: 'social',
     type: 'social',
     name: 'Social Tournament',
-    price: 'R1,200',
     icon: FaTrophy,
     color: 'from-green-500 to-emerald-600',
+    accent: 'green',
     features: [
       'Per team entry',
       'League format',
-      'Prizes',
+      'Prizes for winners',
       'Referee included',
     ],
   },
 ];
 
 const WHATSAPP_NUMBER = '27637820245';
+const PHONE_NUMBER = '+27637820245';
+const EMAIL = 'fivearena@gmail.com';
 
-/* Court images used as event backgrounds */
 const EVENT_IMAGES = [
   '/images/courts/court-1.jpg',
   '/images/courts/court-2.jpg',
@@ -87,93 +90,39 @@ const EVENT_IMAGES = [
   '/images/courts/court-4.jpg',
 ];
 
-export default function EventsPage() {
-  const formRef = useRef(null);
-  const [selectedPackage, setSelectedPackage] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
+const TERMS = [
+  'All event bookings must be confirmed via phone call, WhatsApp, or email.',
+  'A 50% deposit is required to secure your booking date.',
+  'Full payment is due 48 hours before the event.',
+  'Cancellations made less than 72 hours before the event are non-refundable.',
+  'The venue reserves the right to reschedule in case of severe weather.',
+  'All participants must sign a waiver before the event.',
+  'Event times are subject to court availability.',
+  'Catering and refreshments are not included unless specified.',
+];
 
-  const [form, setForm] = useState({
-    contactName: '',
-    contactEmail: '',
-    contactPhone: '',
-    preferredDate: '',
-    preferredTime: '',
-    guestCount: '',
-    message: '',
-  });
+export default function EventsPage() {
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [showTerms, setShowTerms] = useState(false);
+  const [contactMethod, setContactMethod] = useState(null);
 
   const handleSelectPackage = (pkg) => {
     setSelectedPackage(pkg);
-    setSubmitted(false);
-    setError('');
+    setContactMethod(null);
     setTimeout(() => {
-      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
 
-  const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSubmitting(true);
-
-    try {
-      const res = await fetch('/api/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: selectedPackage.type,
-          packageName: selectedPackage.name,
-          contactName: form.contactName,
-          contactEmail: form.contactEmail,
-          contactPhone: form.contactPhone,
-          preferredDate: form.preferredDate,
-          preferredTime: form.preferredTime || null,
-          guestCount: parseInt(form.guestCount, 10),
-          message: form.message,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Something went wrong. Please try again.');
-        return;
-      }
-
-      setSubmitted(true);
-      setForm({
-        contactName: '',
-        contactEmail: '',
-        contactPhone: '',
-        preferredDate: '',
-        preferredTime: '',
-        guestCount: '',
-        message: '',
-      });
-    } catch {
-      setError('Network error. Please check your connection and try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const whatsappMessage = selectedPackage
-    ? encodeURIComponent(
-        `Hi! I'd like to enquire about the ${selectedPackage.name} package at 5s Arena.`
-      )
-    : encodeURIComponent("Hi! I'd like to enquire about event packages at 5s Arena.");
+  const pkgMessage = (pkg) =>
+    encodeURIComponent(
+      `Hi! I'd like to book the ${pkg.name} package at 5s Arena. Could you please let me know about availability and pricing?`
+    );
 
   return (
     <div className="min-h-screen bg-gray-950">
       {/* Hero with animated court image background */}
       <section className="relative py-24 px-4 overflow-hidden">
-        {/* Animated background — Ken Burns on court images */}
         <div className="absolute inset-0">
           <motion.img
             src={EVENT_IMAGES[0]}
@@ -206,13 +155,22 @@ export default function EventsPage() {
             Events & <span className="text-green-400">Parties</span>
           </h1>
           <motion.p
-            className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto"
+            className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
             From kids birthdays to corporate team building — we have the perfect package for your next event at 5s Arena.
           </motion.p>
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-900/30 border border-amber-700/50 rounded-full text-amber-400 text-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            <FaInfoCircle />
+            All bookings are made via Call, WhatsApp, or Email — contact us to get a custom quote
+          </motion.div>
         </motion.div>
       </section>
 
@@ -237,7 +195,6 @@ export default function EventsPage() {
                     alt={pkg.name}
                     className="absolute inset-0 w-full h-full object-cover"
                     initial={{ scale: 1 }}
-                    whileHover={{ scale: 1.12 }}
                     animate={{ scale: [1, 1.08, 1] }}
                     transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
                   />
@@ -251,15 +208,12 @@ export default function EventsPage() {
                     >
                       <Icon className="text-white text-xl" />
                     </motion.div>
-                    <div>
-                      <h3
-                        className="text-lg font-black text-white uppercase tracking-wider drop-shadow-lg"
-                        style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                      >
-                        {pkg.name}
-                      </h3>
-                      <p className="text-green-400 text-xl font-black">{pkg.price}</p>
-                    </div>
+                    <h3
+                      className="text-lg font-black text-white uppercase tracking-wider drop-shadow-lg"
+                      style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+                    >
+                      {pkg.name}
+                    </h3>
                   </div>
                 </div>
 
@@ -280,6 +234,10 @@ export default function EventsPage() {
                     ))}
                   </ul>
 
+                  <p className="text-gray-500 text-xs mb-4 italic">
+                    Contact us for pricing — packages are customised to your needs
+                  </p>
+
                   <motion.button
                     onClick={() => handleSelectPackage(pkg)}
                     className="w-full py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer"
@@ -295,235 +253,189 @@ export default function EventsPage() {
         </div>
       </section>
 
-      {/* Booking Form */}
-      {selectedPackage && (
-        <section ref={formRef} className="max-w-2xl mx-auto px-4 pb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
-          >
-            {submitted ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-8"
-              >
-                <div className="w-20 h-20 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FaCheck className="text-green-400 text-3xl" />
-                </div>
-                <h3
-                  className="text-2xl font-black text-white uppercase tracking-wider mb-3"
-                  style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+      {/* Booking Contact Section */}
+      <AnimatePresence>
+        {selectedPackage && (
+          <section id="booking-section" className="max-w-2xl mx-auto px-4 pb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
+            >
+              {contactMethod === 'sent' ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-8"
                 >
-                  Booking Request Sent!
-                </h3>
-                <p className="text-gray-400 mb-6">
-                  Thank you for your interest in our {selectedPackage.name} package. Our team will be in touch within 24 hours to confirm your booking.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a
-                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold transition-colors"
+                  <div className="w-20 h-20 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <FaCheck className="text-green-400 text-3xl" />
+                  </div>
+                  <h3
+                    className="text-2xl font-black text-white uppercase tracking-wider mb-3"
+                    style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
                   >
-                    <FaWhatsapp className="text-xl" />
-                    Chat on WhatsApp
-                  </a>
-                  <button
+                    Reservation Started!
+                  </h3>
+                  <p className="text-gray-400 mb-4">
+                    Our team will respond within 24 hours to finalise your <span className="text-green-400 font-bold">{selectedPackage.name}</span> booking.
+                  </p>
+                  <p className="text-amber-400 text-sm mb-6 flex items-center justify-center gap-2">
+                    <FaExclamationTriangle />
+                    Please check your email for a confirmation — get in contact to finalise your booking
+                  </p>
+                  <motion.button
                     onClick={() => {
-                      setSubmitted(false);
                       setSelectedPackage(null);
+                      setContactMethod(null);
                     }}
                     className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-bold transition-colors cursor-pointer"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                   >
                     Browse Packages
-                  </button>
+                  </motion.button>
+                </motion.div>
+              ) : (
+                <>
+                  <h2
+                    className="text-2xl font-black text-white uppercase tracking-wider mb-2"
+                    style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+                  >
+                    Book: {selectedPackage.name}
+                  </h2>
+                  <p className="text-gray-400 text-sm mb-6">
+                    Choose how you&apos;d like to get in touch. Our team will confirm availability and provide a custom quote for your event.
+                  </p>
+
+                  {/* Contact Method Buttons */}
+                  <div className="space-y-4 mb-8">
+                    {/* WhatsApp */}
+                    <motion.a
+                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${pkgMessage(selectedPackage)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setTimeout(() => setContactMethod('sent'), 500)}
+                      className="flex items-center gap-4 w-full p-5 rounded-xl bg-green-600/10 border border-green-600/30 hover:border-green-500 hover:bg-green-600/20 text-white transition-all group cursor-pointer"
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 group-hover:shadow-[0_0_20px_rgba(37,211,102,0.5)] transition-shadow">
+                        <FaWhatsapp className="text-white text-2xl" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-bold text-lg">WhatsApp Us</p>
+                        <p className="text-gray-400 text-sm">Instant response · Message pre-filled with your package</p>
+                      </div>
+                    </motion.a>
+
+                    {/* Phone Call */}
+                    <motion.a
+                      href={`tel:${PHONE_NUMBER}`}
+                      onClick={() => setTimeout(() => setContactMethod('sent'), 500)}
+                      className="flex items-center gap-4 w-full p-5 rounded-xl bg-blue-600/10 border border-blue-600/30 hover:border-blue-500 hover:bg-blue-600/20 text-white transition-all group cursor-pointer"
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-shadow">
+                        <FaPhone className="text-white text-xl" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-bold text-lg">Call Us</p>
+                        <p className="text-gray-400 text-sm">Speak to Mashoto · 063 782 0245</p>
+                      </div>
+                    </motion.a>
+
+                    {/* Email */}
+                    <motion.a
+                      href={`mailto:${EMAIL}?subject=${encodeURIComponent(`Event Booking: ${selectedPackage.name}`)}&body=${encodeURIComponent(`Hi 5s Arena,\n\nI'd like to enquire about the ${selectedPackage.name} package.\n\nPlease let me know about availability and pricing.\n\nThank you!`)}`}
+                      onClick={() => setTimeout(() => setContactMethod('sent'), 500)}
+                      className="flex items-center gap-4 w-full p-5 rounded-xl bg-purple-600/10 border border-purple-600/30 hover:border-purple-500 hover:bg-purple-600/20 text-white transition-all group cursor-pointer"
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 group-hover:shadow-[0_0_20px_rgba(147,51,234,0.5)] transition-shadow">
+                        <FaEnvelope className="text-white text-xl" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-bold text-lg">Email Us</p>
+                        <p className="text-gray-400 text-sm">fivearena@gmail.com · We reply within 24hrs</p>
+                      </div>
+                    </motion.a>
+                  </div>
+
+                  {/* T&Cs Notice */}
+                  <div className="border-t border-gray-800 pt-6">
+                    <p className="text-amber-400 text-sm flex items-start gap-2 mb-4">
+                      <FaExclamationTriangle className="flex-shrink-0 mt-0.5" />
+                      By contacting us to book, you agree to our Terms & Conditions below.
+                      A confirmation email will be sent once your reservation is processed.
+                    </p>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </section>
+        )}
+      </AnimatePresence>
+
+      {/* Terms & Conditions */}
+      <section className="max-w-2xl mx-auto px-4 pb-20">
+        <motion.div
+          className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          <motion.button
+            onClick={() => setShowTerms(!showTerms)}
+            className="w-full flex items-center justify-between p-6 text-left cursor-pointer"
+            whileHover={{ backgroundColor: 'rgba(31,41,55,0.5)' }}
+          >
+            <div className="flex items-center gap-3">
+              <FaInfoCircle className="text-gray-500" />
+              <span className="text-gray-300 font-bold uppercase tracking-wider text-sm">
+                Terms & Conditions — Event Bookings
+              </span>
+            </div>
+            <motion.div
+              animate={{ rotate: showTerms ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FaChevronDown className="text-gray-500" />
+            </motion.div>
+          </motion.button>
+
+          <AnimatePresence>
+            {showTerms && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="px-6 pb-6 space-y-3">
+                  {TERMS.map((term, i) => (
+                    <motion.div
+                      key={i}
+                      className="flex items-start gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <span className="text-green-400 text-sm font-bold mt-0.5">{i + 1}.</span>
+                      <p className="text-gray-400 text-sm">{term}</p>
+                    </motion.div>
+                  ))}
                 </div>
               </motion.div>
-            ) : (
-              <>
-                <h2
-                  className="text-2xl font-black text-white uppercase tracking-wider mb-2"
-                  style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                >
-                  Book: {selectedPackage.name}
-                </h2>
-                <p className="text-gray-400 text-sm mb-6">
-                  Fill in your details and we will get back to you within 24 hours to confirm availability.
-                </p>
-
-                {error && (
-                  <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-400 text-sm">
-                    {error}
-                  </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* Package type (read-only) */}
-                  <div>
-                    <label className="flex items-center gap-2 text-gray-400 text-sm font-semibold mb-1">
-                      <FaCalendarAlt />
-                      Package
-                    </label>
-                    <input
-                      type="text"
-                      value={`${selectedPackage.name} — ${selectedPackage.price}`}
-                      readOnly
-                      className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-gray-300 cursor-not-allowed"
-                    />
-                  </div>
-
-                  {/* Contact Name */}
-                  <div>
-                    <label className="flex items-center gap-2 text-gray-400 text-sm font-semibold mb-1">
-                      <FaUsers />
-                      Your Name
-                    </label>
-                    <input
-                      type="text"
-                      name="contactName"
-                      value={form.contactName}
-                      onChange={handleChange}
-                      required
-                      minLength={2}
-                      maxLength={100}
-                      placeholder="Full name"
-                      className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-colors"
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="flex items-center gap-2 text-gray-400 text-sm font-semibold mb-1">
-                      <FaEnvelope />
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="contactEmail"
-                      value={form.contactEmail}
-                      onChange={handleChange}
-                      required
-                      placeholder="you@example.com"
-                      className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-colors"
-                    />
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="flex items-center gap-2 text-gray-400 text-sm font-semibold mb-1">
-                      <FaPhone />
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="contactPhone"
-                      value={form.contactPhone}
-                      onChange={handleChange}
-                      required
-                      placeholder="082 123 4567"
-                      className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-colors"
-                    />
-                  </div>
-
-                  {/* Date & Time row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="flex items-center gap-2 text-gray-400 text-sm font-semibold mb-1">
-                        <FaCalendarAlt />
-                        Preferred Date
-                      </label>
-                      <input
-                        type="date"
-                        name="preferredDate"
-                        value={form.preferredDate}
-                        onChange={handleChange}
-                        required
-                        min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-gray-400 text-sm font-semibold mb-1 block">
-                        Preferred Time
-                      </label>
-                      <input
-                        type="time"
-                        name="preferredTime"
-                        value={form.preferredTime}
-                        onChange={handleChange}
-                        min="08:00"
-                        max="20:00"
-                        className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Guest Count */}
-                  <div>
-                    <label className="text-gray-400 text-sm font-semibold mb-1 block">
-                      Number of Guests
-                    </label>
-                    <input
-                      type="number"
-                      name="guestCount"
-                      value={form.guestCount}
-                      onChange={handleChange}
-                      required
-                      min={1}
-                      max={100}
-                      placeholder="e.g. 15"
-                      className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-colors"
-                    />
-                  </div>
-
-                  {/* Message */}
-                  <div>
-                    <label className="text-gray-400 text-sm font-semibold mb-1 block">
-                      Additional Message (optional)
-                    </label>
-                    <textarea
-                      name="message"
-                      value={form.message}
-                      onChange={handleChange}
-                      rows={3}
-                      placeholder="Any special requests or questions..."
-                      className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-colors resize-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-4 rounded-lg bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-bold uppercase tracking-wider text-lg transition-colors duration-200 cursor-pointer"
-                  >
-                    {submitting ? 'Sending...' : 'Submit Booking Request'}
-                  </button>
-                </form>
-
-                {/* WhatsApp fallback */}
-                <div className="mt-6 pt-6 border-t border-gray-800 text-center">
-                  <p className="text-gray-500 text-sm mb-3">
-                    Prefer to chat? Reach us directly on WhatsApp:
-                  </p>
-                  <a
-                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 font-semibold transition-colors"
-                  >
-                    <FaWhatsapp className="text-xl" />
-                    WhatsApp Us
-                  </a>
-                </div>
-              </>
             )}
-          </motion.div>
-        </section>
-      )}
+          </AnimatePresence>
+        </motion.div>
+      </section>
     </div>
   );
 }

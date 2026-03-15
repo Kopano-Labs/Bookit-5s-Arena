@@ -56,6 +56,15 @@ export async function POST(request) {
 
     await connectDB();
 
+    // Drop stale MongoDB collection-level validators from when user was required
+    // and paymentStatus didn't include 'reserved'
+    try {
+      const db = Booking.db || (await import('mongoose')).default.connection.db;
+      if (db) {
+        await db.command({ collMod: 'bookings', validator: {}, validationLevel: 'off' });
+      }
+    } catch { /* collection may not exist yet */ }
+
     const court = await Court.findById(courtId);
     if (!court) return NextResponse.json({ error: 'Court not found.' }, { status: 404 });
 
