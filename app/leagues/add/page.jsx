@@ -2,11 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaFutbol } from 'react-icons/fa';
+import { FaTrophy } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import InfoTooltip from '@/components/InfoTooltip';
 
-const AddCourtPage = () => {
+const LEAGUE_FORMATS = [
+  { value: 'round-robin', label: 'Round Robin' },
+  { value: 'knockout', label: 'Knockout' },
+  { value: 'group-stage', label: 'Group Stage + Knockout' },
+  { value: 'league', label: 'League (Home & Away)' },
+];
+
+const AddLeaguePage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -15,11 +22,14 @@ const AddCourtPage = () => {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    address: '',
-    capacity: 10,
-    amenities: '',
-    availability: '',
-    price_per_hour: '',
+    format: '',
+    maxTeams: '',
+    entryFee: '',
+    startDate: '',
+    endDate: '',
+    registrationDeadline: '',
+    prizePool: '',
+    rules: '',
     image: '',
   });
 
@@ -32,7 +42,7 @@ const AddCourtPage = () => {
     e.preventDefault();
     setError('');
 
-    if (!form.name || !form.description || !form.address || !form.price_per_hour) {
+    if (!form.name || !form.description || !form.format || !form.maxTeams || !form.entryFee || !form.startDate || !form.registrationDeadline) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -40,20 +50,21 @@ const AddCourtPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/courts', {
+      const res = await fetch('/api/leagues', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          price_per_hour: Number(form.price_per_hour),
-          capacity: Number(form.capacity),
+          maxTeams: Number(form.maxTeams),
+          entryFee: Number(form.entryFee),
+          prizePool: form.prizePool ? Number(form.prizePool) : 0,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Failed to add court. Please try again.');
+        setError(data.error || 'Failed to add league. Please try again.');
         return;
       }
 
@@ -73,25 +84,25 @@ const AddCourtPage = () => {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center max-w-md w-full">
-          <FaFutbol className="mx-auto text-4xl text-green-500 mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Court Added!</h2>
-          <p className="text-gray-400 text-sm mb-8">Your new court has been submitted successfully.</p>
+          <FaTrophy className="mx-auto text-4xl text-green-500 mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">League Created!</h2>
+          <p className="text-gray-400 text-sm mb-8">Your new league has been added successfully.</p>
           <div className="flex justify-center gap-4">
             <button
               onClick={() => {
                 setSuccess(false);
-                setForm({ name: '', description: '', address: '', capacity: 10, amenities: '', availability: '', price_per_hour: '', image: '' });
+                setForm({ name: '', description: '', format: '', maxTeams: '', entryFee: '', startDate: '', endDate: '', registrationDeadline: '', prizePool: '', rules: '', image: '' });
               }}
               className="px-5 py-2.5 bg-gray-800 text-white rounded-xl text-sm font-semibold hover:bg-gray-700 transition"
             >
               Add Another
             </button>
             <button
-              onClick={() => router.push('/my-courts')}
+              onClick={() => router.push('/leagues')}
               className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition"
               style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
             >
-              View My Courts
+              View Leagues
             </button>
           </div>
         </div>
@@ -108,7 +119,7 @@ const AddCourtPage = () => {
             className="text-4xl uppercase text-white"
             style={{ fontFamily: 'Impact, Arial Black, sans-serif', letterSpacing: '4px' }}
           >
-            Add a Court
+            Add a League
           </h1>
           <div className="mt-2 h-1 w-16 rounded-full" style={{ background: 'linear-gradient(135deg, #15803d, #22c55e)' }} />
         </div>
@@ -121,8 +132,8 @@ const AddCourtPage = () => {
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="flex items-center gap-3 mb-6">
-            <FaFutbol className="text-green-500 text-xl" />
-            <h2 className="text-white text-lg font-bold uppercase tracking-widest">Court Details</h2>
+            <FaTrophy className="text-green-500 text-xl" />
+            <h2 className="text-white text-lg font-bold uppercase tracking-widest">League Details</h2>
           </div>
 
           {error && (
@@ -133,11 +144,11 @@ const AddCourtPage = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* Court Name */}
+              {/* League Name */}
               <div className="sm:col-span-2">
                 <label className={labelClass}>
-                  Court Name <span className="text-red-400">*</span>{' '}
-                  <InfoTooltip text="A unique, recognisable name for your court. This is what players will see when browsing available courts." size={14} />
+                  League Name <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="The official name for your league. This will be displayed on the fixtures page and all league-related communications." size={14} />
                 </label>
                 <input
                   type="text"
@@ -145,7 +156,7 @@ const AddCourtPage = () => {
                   value={form.name}
                   onChange={handleChange}
                   required
-                  placeholder="e.g. Premier Court"
+                  placeholder="e.g. Cape Town 5s Premier League"
                   className={inputClass}
                 />
               </div>
@@ -154,7 +165,7 @@ const AddCourtPage = () => {
               <div className="sm:col-span-2">
                 <label className={labelClass}>
                   Description <span className="text-red-400">*</span>{' '}
-                  <InfoTooltip text="Describe the court surface (grass, turf, indoor), size, and what it's best suited for. This helps players pick the right court." size={14} />
+                  <InfoTooltip text="A brief overview of the league — skill level, who it's for, what makes it unique. This helps teams decide whether to register." size={14} />
                 </label>
                 <textarea
                   name="description"
@@ -162,90 +173,143 @@ const AddCourtPage = () => {
                   onChange={handleChange}
                   required
                   rows={3}
-                  placeholder="Describe the court, surface type, ideal for..."
+                  placeholder="Describe the league, skill level, schedule..."
                   className={inputClass}
                 />
               </div>
 
-              {/* Address */}
-              <div className="sm:col-span-2">
-                <label className={labelClass}>
-                  Address <span className="text-red-400">*</span>{' '}
-                  <InfoTooltip text="The full street address of the court. Include suburb and city so players can find it easily on maps." size={14} />
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={form.address}
-                  onChange={handleChange}
-                  required
-                  placeholder="e.g. Pringle Rd, Milnerton, Cape Town"
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Price */}
+              {/* Format */}
               <div>
                 <label className={labelClass}>
-                  Price per Hour (R) <span className="text-red-400">*</span>{' '}
-                  <InfoTooltip text="Hourly rental rate in South African Rand. This is what players will be charged per hour when they book this court." size={14} />
+                  Format <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Round Robin: every team plays each other. Knockout: single elimination. Group Stage: groups then knockout. League: full home & away season." size={14} />
+                </label>
+                <select
+                  name="format"
+                  value={form.format}
+                  onChange={handleChange}
+                  required
+                  className={inputClass}
+                >
+                  <option value="">Select format...</option>
+                  {LEAGUE_FORMATS.map((f) => (
+                    <option key={f.value} value={f.value}>{f.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Max Teams */}
+              <div>
+                <label className={labelClass}>
+                  Max Teams <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Maximum number of teams that can register. Registration closes automatically when this limit is reached." size={14} />
                 </label>
                 <input
                   type="number"
-                  name="price_per_hour"
-                  value={form.price_per_hour}
+                  name="maxTeams"
+                  value={form.maxTeams}
+                  onChange={handleChange}
+                  required
+                  min="2"
+                  placeholder="e.g. 16"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Entry Fee */}
+              <div>
+                <label className={labelClass}>
+                  Entry Fee (R) <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Per-team entry fee in South African Rand. Set to 0 for a free league. This is charged once per team upon registration." size={14} />
+                </label>
+                <input
+                  type="number"
+                  name="entryFee"
+                  value={form.entryFee}
                   onChange={handleChange}
                   required
                   min="0"
-                  placeholder="e.g. 400"
+                  placeholder="e.g. 500"
                   className={inputClass}
                 />
               </div>
 
-              {/* Capacity */}
+              {/* Prize Pool */}
               <div>
                 <label className={labelClass}>
-                  Capacity (players){' '}
-                  <InfoTooltip text="Maximum number of players allowed on this court at one time. Default is 10 for 5-a-side. Adjust for larger or smaller formats." size={14} />
+                  Prize Pool (R){' '}
+                  <InfoTooltip text="Total prize money for the league (optional). This is split among top finishers. Leave blank or set to 0 if there's no cash prize." size={14} />
                 </label>
                 <input
                   type="number"
-                  name="capacity"
-                  value={form.capacity}
+                  name="prizePool"
+                  value={form.prizePool}
                   onChange={handleChange}
-                  min="2"
+                  min="0"
+                  placeholder="e.g. 5000"
                   className={inputClass}
                 />
               </div>
 
-              {/* Availability */}
-              <div className="sm:col-span-2">
+              {/* Start Date */}
+              <div>
                 <label className={labelClass}>
-                  Availability Hours{' '}
-                  <InfoTooltip text="The hours this court is open for bookings, e.g. '10:00 AM - 22:00 PM'. Players won't be able to book outside these hours." size={14} />
+                  Start Date <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="The date the first matches of the league will be played. Must be after the registration deadline." size={14} />
                 </label>
                 <input
-                  type="text"
-                  name="availability"
-                  value={form.availability}
+                  type="date"
+                  name="startDate"
+                  value={form.startDate}
                   onChange={handleChange}
-                  placeholder="e.g. 10:00 AM - 22:00 PM"
+                  required
                   className={inputClass}
                 />
               </div>
 
-              {/* Amenities */}
-              <div className="sm:col-span-2">
+              {/* End Date */}
+              <div>
                 <label className={labelClass}>
-                  Amenities{' '}
-                  <InfoTooltip text="List the facilities available at this court — floodlights, change rooms, parking, water, etc. Separate with commas." size={14} />
+                  End Date{' '}
+                  <InfoTooltip text="Estimated end date for the league (optional). Useful for teams planning their availability over the season." size={14} />
                 </label>
                 <input
-                  type="text"
-                  name="amenities"
-                  value={form.amenities}
+                  type="date"
+                  name="endDate"
+                  value={form.endDate}
                   onChange={handleChange}
-                  placeholder="e.g. Floodlights, Change rooms, Secure Parking"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Registration Deadline */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>
+                  Registration Deadline <span className="text-red-400">*</span>{' '}
+                  <InfoTooltip text="Last date teams can register. After this date, no new teams will be accepted. Should be before the league start date." size={14} />
+                </label>
+                <input
+                  type="date"
+                  name="registrationDeadline"
+                  value={form.registrationDeadline}
+                  onChange={handleChange}
+                  required
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Rules */}
+              <div className="sm:col-span-2">
+                <label className={labelClass}>
+                  Rules & Regulations{' '}
+                  <InfoTooltip text="Key rules for the league — match duration, squad size, substitution rules, yellow/red card policies, etc." size={14} />
+                </label>
+                <textarea
+                  name="rules"
+                  value={form.rules}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="e.g. 5-a-side, 20 min halves, max 3 subs per match..."
                   className={inputClass}
                 />
               </div>
@@ -254,18 +318,18 @@ const AddCourtPage = () => {
               <div className="sm:col-span-2">
                 <label className={labelClass}>
                   Image Filename{' '}
-                  <InfoTooltip text="The filename of the court photo (e.g. court-5.jpg). Upload the image to /public/images/courts/ first, then enter the filename here." size={14} />
+                  <InfoTooltip text="A banner or logo image for the league. Place the file in /public/images/leagues/ before adding. Supported formats: JPG, PNG, WebP." size={14} />
                 </label>
                 <input
                   type="text"
                   name="image"
                   value={form.image}
                   onChange={handleChange}
-                  placeholder="e.g. court-5.jpg (must be in /public/images/courts/)"
+                  placeholder="e.g. premier-league.jpg (must be in /public/images/leagues/)"
                   className={inputClass}
                 />
                 <p className="mt-2 text-xs text-gray-500">
-                  Place the image file in <code className="text-gray-400">/public/images/courts/</code> before adding.
+                  Place the image file in <code className="text-gray-400">/public/images/leagues/</code> before adding.
                 </p>
               </div>
             </div>
@@ -280,7 +344,7 @@ const AddCourtPage = () => {
                 className="w-full py-3 px-6 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)' }}
               >
-                {loading ? 'Adding Court...' : 'Add Court'}
+                {loading ? 'Creating League...' : 'Create League'}
               </motion.button>
             </div>
           </form>
@@ -290,4 +354,4 @@ const AddCourtPage = () => {
   );
 };
 
-export default AddCourtPage;
+export default AddLeaguePage;
