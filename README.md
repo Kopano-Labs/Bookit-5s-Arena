@@ -1,4 +1,6 @@
-![Logo](public\images\logo.png)
+<p align="center">
+  <img src="public/images/logo.png" alt="Bookit 5's Arena Logo" width="200"/>
+</p>
 
 # ⚽ Bookit 5's Arena | Full-Stack Management System
 
