@@ -1,6 +1,6 @@
 
 
-![Logo](https://raw.githubusercontent.com/RobynAwesome/Bookit-5s-Arena/main/public/images/logo.png)
+![Logo](main/public/images/logo.png)
 
 
 # ⚽ Bookit 5's Arena | Full-Stack Management System
