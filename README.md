@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="images/logo.png" alt="5's Arena Blog Logo" width="200">
-</p>
+![5's Arena Blog Logo](https://raw.githubusercontent.com/RobynAwesome/5-s-Arena-Blog/main/images/logo.png)
 
 # ⚽ Bookit 5's Arena | Full-Stack Management System
 
@@ -28,38 +26,8 @@
 
 ---
 
-## 🏟️ Community & Support
-
-Got an idea for the arena or stuck on a Next.js error? Join the conversation!
-
-- **[Join our GitHub Discussions](https://github.com)**
-- **💡 [Pitch a Feature](https://github.com/new?category=feature-pitch)**
-- **❓ [Ask a Question](https://github.com/new?category=q-a)**
-- **🐛 [Report a Bug](https://github.com/new?category=bugs-unconfirmed)**
-
-## Deploy on Vercel
-
-The easiest way to dep
-
----
-
 ## 🛠️ Tech Stack
 * **Backend:** PHP 8.x (Procedural & Secure)
 * **Database:** MySQL (Relational Schema)
 * **Frontend:** HTML5, CSS3 (Custom Flexbox/Grid Layouts), JavaScript
-* **Design Assets:** IconScout Unicons, Google Fonts (Montserrat)
-
----
-
-## ⚙️ Installation & Setup
-
-**Clone the Repository:**
-```bash
-
-
-git clone https://github.com/RobynAwesome/5-s-Arena-Blog.git
-
-
-loy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Design Assets:** IconScout Un
