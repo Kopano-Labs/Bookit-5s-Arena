@@ -1,4 +1,4 @@
-![Logo](\images\logo.png)
+![Logo](public/images/logo.png)
 
 # ⚽ Bookit 5's Arena | Full-Stack Management System
 
