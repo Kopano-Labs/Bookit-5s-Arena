@@ -56,20 +56,40 @@ export default function HeroSection() {
         {/* Hero title — WELCOME TO + FIVES ARENA */}
         <motion.h1
           variants={item}
-          className="hero-title text-white font-black uppercase leading-none mb-6"
+          className="hero-title text-white font-black uppercase leading-none mb-6 cursor-default"
           style={{
             fontSize: 'clamp(3rem, 9vw, 7.5rem)',
             fontFamily: 'Impact, Arial Black, sans-serif',
             textShadow: '0 4px 32px rgba(0,0,0,0.6)',
           }}
+          whileHover={{
+            textShadow: '0 0 40px rgba(34,197,94,0.6), 0 0 80px rgba(34,197,94,0.3), 0 4px 32px rgba(0,0,0,0.6)',
+            transition: { duration: 0.3 },
+          }}
         >
-          WELCOME TO
+          <motion.span
+            className="inline-block"
+            whileHover={{
+              scale: 1.05,
+              color: '#4ade80',
+              textShadow: '0 0 30px rgba(74,222,128,0.5)',
+              transition: { type: 'spring', stiffness: 300, damping: 15 },
+            }}
+          >
+            WELCOME TO
+          </motion.span>
           <br />
           <motion.span
             className="text-green-400 inline-block"
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.75, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{
+              scale: 1.08,
+              textShadow: '0 0 60px rgba(34,197,94,0.8), 0 0 120px rgba(34,197,94,0.4)',
+              filter: 'brightness(1.3)',
+              transition: { type: 'spring', stiffness: 400, damping: 12 },
+            }}
           >
             FIVES ARENA
           </motion.span>
@@ -86,20 +106,47 @@ export default function HeroSection() {
 
         {/* CTA buttons */}
         <motion.div variants={item} className="flex flex-wrap gap-4">
-          <Link
-            href="#courts"
-            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-bold text-lg px-8 py-4 uppercase tracking-wide transition-all duration-300 hover:scale-105 hover:shadow-[0_0_35px_rgba(34,197,94,0.55)]"
+          <motion.div
+            whileHover={{
+              scale: 1.08,
+              boxShadow: '0 0 50px rgba(34,197,94,0.7), 0 0 100px rgba(34,197,94,0.3)',
+            }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
           >
-            <FaFutbol /> Book A Court
-          </Link>
-          <a
+            <Link
+              href="/bookings"
+              className="inline-flex items-center gap-3 text-white font-black text-lg px-10 py-5 uppercase tracking-widest rounded-xl relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #15803d 0%, #22c55e 50%, #16a34a 100%)',
+                boxShadow: '0 0 30px rgba(34,197,94,0.45)',
+              }}
+            >
+              <motion.span
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                className="inline-flex"
+              >
+                <FaFutbol size={18} />
+              </motion.span>
+              <span>BOOK NOW</span>
+              <motion.span
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
+              />
+            </Link>
+          </motion.div>
+          <motion.a
             href="https://wa.me/27637820245"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 border-2 border-white hover:border-green-400 hover:text-green-400 text-white font-bold text-lg px-8 py-4 uppercase tracking-wide transition-all duration-300 hover:scale-105"
+            className="inline-flex items-center gap-2 border-2 border-white hover:border-green-400 hover:text-green-400 text-white font-bold text-lg px-8 py-4 uppercase tracking-wide rounded-xl transition-colors duration-300"
+            whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(37,211,102,0.4)' }}
+            whileTap={{ scale: 0.95 }}
           >
             <FaWhatsapp /> WhatsApp Us
-          </a>
+          </motion.a>
         </motion.div>
 
         {/* Scroll indicator */}

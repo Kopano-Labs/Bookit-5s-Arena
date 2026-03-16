@@ -19,6 +19,8 @@ export async function GET(request) {
     image: user.profileImage || user.image,
     role: user.role,
     username: user.username || '',
+    phone: user.phone || '',
+    communicationPreference: user.communicationPreference || 'email',
     newsletterOptIn: user.newsletterOptIn || false,
     birthDate: user.birthDate || null,
     birthdayClaimedYear: user.birthdayClaimedYear || null,
@@ -31,7 +33,7 @@ export async function PUT(request) {
   if (!session) return Response.json({ error: 'Unauthorised' }, { status: 401 });
 
   const body = await request.json();
-  const { name, username, newsletterOptIn, birthDate, currentPassword, newPassword } = body;
+  const { name, username, phone, communicationPreference, newsletterOptIn, birthDate, currentPassword, newPassword } = body;
 
   // Validate types to prevent NoSQL injection
   if (typeof name !== 'string') {
@@ -55,6 +57,20 @@ export async function PUT(request) {
   user.name = name.trim();
   if (username !== undefined) user.username = username.trim() || null;
   if (typeof newsletterOptIn === 'boolean') user.newsletterOptIn = newsletterOptIn;
+
+  // Update phone number
+  if (phone !== undefined) {
+    user.phone = typeof phone === 'string' ? phone.trim() || null : null;
+  }
+  // Update communication preference (mandatory: email, whatsapp, or sms)
+  if (communicationPreference && ['email', 'whatsapp', 'sms'].includes(communicationPreference)) {
+    // If choosing whatsapp/sms, phone must be provided
+    const effectivePhone = phone !== undefined ? phone : user.phone;
+    if ((communicationPreference === 'whatsapp' || communicationPreference === 'sms') && !effectivePhone) {
+      return Response.json({ error: 'Please add a phone number to use WhatsApp or SMS communication.' }, { status: 400 });
+    }
+    user.communicationPreference = communicationPreference;
+  }
 
   // Update birth date if provided
   if (birthDate !== undefined) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaBirthdayCake,
@@ -86,11 +86,14 @@ const PHONE_NUMBER = '+27637820245';
 const EMAIL = 'fivearena@gmail.com';
 
 const EVENT_IMAGES = [
-  '/images/courts/court-1.jpg',
-  '/images/courts/court-2.jpg',
-  '/images/courts/court-3.jpg',
-  '/images/courts/court-4.jpg',
+  '/images/events/Birthday%20Parties.png',
+  '/images/events/Tournaments.png',
+  '/images/events/Corporate%20Events.png',
+  '/images/events/Holiday%20Clinics.png',
 ];
+
+// Football legends hero background — save image 2 provided by client as this file
+const EVENTS_HERO_BG = '/images/events/football-legends.png';
 
 const TERMS = [
   'All event bookings must be confirmed via phone call, WhatsApp, or email.',
@@ -107,6 +110,15 @@ export default function EventsPage() {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showTerms, setShowTerms] = useState(false);
   const [contactMethod, setContactMethod] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Auto-cycle hero images every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % EVENT_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleSelectPackage = (pkg) => {
     setSelectedPackage(pkg);
@@ -123,18 +135,27 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Hero with animated court image background */}
-      <section className="relative py-24 px-4 overflow-hidden">
+      {/* Hero with auto-cycling Ken Burns court images */}
+      <section className="relative py-28 px-4 overflow-hidden">
         <div className="absolute inset-0">
-          <motion.img
-            src={EVENT_IMAGES[0]}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            initial={{ scale: 1 }}
-            animate={{ scale: 1.15, x: [0, -20, 0], y: [0, -10, 0] }}
-            transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/80 to-gray-950" />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentImageIndex}
+              src={EVENT_IMAGES[currentImageIndex]}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{ opacity: 1, scale: 1.08 }}
+              exit={{ opacity: 0, scale: 1.04 }}
+              transition={{ duration: 1.2, ease: 'easeInOut' }}
+              onError={() => setCurrentImageIndex((prev) => (prev + 1) % EVENT_IMAGES.length)}
+            />
+          </AnimatePresence>
+          <div className="absolute inset-0" style={{
+            background: 'linear-gradient(180deg, rgba(2,6,23,0.75) 0%, rgba(2,6,23,0.85) 40%, rgba(2,6,23,0.95) 70%, rgba(2,6,23,1) 100%)',
+          }} />
+          {/* Green accent overlay */}
+          <div className="absolute inset-0 bg-green-900/10 mix-blend-overlay" />
         </div>
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.95 }}

@@ -53,8 +53,18 @@ const BookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Prevent double bookings: same court, same date, overlapping time
+// ── Indexes ─────────────────────────────────────────────────────────────────
+// Prevent double bookings: same court, same date, same start_time
 BookingSchema.index({ court: 1, date: 1, start_time: 1 }, { unique: true });
+
+// Fast lookup of all bookings for a user (GET /api/bookings sorts by date asc)
+BookingSchema.index({ user: 1, date: 1 });
+
+// Fast overlap check: given court + date, filter only non-cancelled slots
+BookingSchema.index({ court: 1, date: 1, status: 1 });
+
+// Admin dashboard — newest bookings first
+BookingSchema.index({ createdAt: -1 });
 
 // In dev, hot-reload can leave a stale model in mongoose.models with the old schema.
 // Always delete and re-register so schema changes (new fields, new enum values) take effect immediately.

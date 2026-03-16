@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaComments, FaTimes, FaPaperPlane, FaFutbol, FaRobot } from 'react-icons/fa';
+import Link from 'next/link';
+import { FaComments, FaTimes, FaPaperPlane, FaFutbol, FaRobot, FaCalendarAlt, FaArrowRight } from 'react-icons/fa';
 
 const QUICK_QUESTIONS = [
   'How do I book a court?',
@@ -118,6 +119,16 @@ export default function SupportChatbot() {
               >
                 <FaTimes size={14} />
               </button>
+            </div>
+
+            {/* Quick booking links */}
+            <div className="px-3 py-2 flex gap-2 border-b border-gray-800/50 flex-shrink-0">
+              <Link href="/bookings" className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-green-900/30 border border-green-800/40 text-green-400 text-[10px] font-bold uppercase tracking-wider hover:bg-green-900/50 transition-colors">
+                <FaFutbol size={9} /> Courts
+              </Link>
+              <Link href="/events" className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-amber-900/30 border border-amber-800/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider hover:bg-amber-900/50 transition-colors">
+                <FaCalendarAlt size={9} /> Events
+              </Link>
             </div>
 
             {/* Messages */}

@@ -27,8 +27,20 @@ export async function GET(request) {
 
 
     await connectDB();
-    const courts = await Court.find(filter).sort({ sortOrder: 1, createdAt: 1 });
-    return NextResponse.json(courts, { status: 200 });
+
+    // .lean() returns plain JS objects instead of Mongoose Documents — ~3× faster for read-only routes
+    const courts = await Court.find(filter)
+      .sort({ sortOrder: 1, createdAt: 1 })
+      .lean();
+
+    const res = NextResponse.json(courts, { status: 200 });
+
+    // Public court list changes rarely — cache 60 s at edge, serve stale while revalidating
+    if (!mine) {
+      res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+    }
+
+    return res;
   } catch (error) {
     console.error('GET /api/courts error:', error);
     return NextResponse.json({ error: 'Failed to fetch courts' }, { status: 500 });

@@ -39,24 +39,24 @@ const InfoTooltip = ({ text, position = 'top', size = 14 }) => {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <motion.span
             initial={{ opacity: 0, scale: 0.88, y: position === 'top' ? 4 : -4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.88 }}
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className={`absolute z-50 w-52 ${posClasses[position]}`}
+            className={`absolute z-50 w-52 block ${posClasses[position]}`}
             style={{ pointerEvents: 'none' }}
           >
-            <div className="bg-gray-900 border border-green-800/60 rounded-xl px-3 py-2.5 text-xs text-gray-300 leading-relaxed shadow-[0_0_20px_rgba(0,0,0,0.6)]">
+            <span className="block bg-gray-900 border border-green-800/60 rounded-xl px-3 py-2.5 text-xs text-gray-300 leading-relaxed shadow-[0_0_20px_rgba(0,0,0,0.6)]">
               {text}
-              <div className={`absolute w-2 h-2 bg-gray-900 border-gray-800 rotate-45 ${
+              <span className={`absolute w-2 h-2 bg-gray-900 border-gray-800 rotate-45 ${
                 position === 'top' ? 'top-full left-1/2 -translate-x-1/2 -translate-y-1/2 border-b border-r' :
                 position === 'bottom' ? 'bottom-full left-1/2 -translate-x-1/2 translate-y-1/2 border-t border-l' :
                 position === 'left' ? 'left-full top-1/2 -translate-y-1/2 -translate-x-1/2 border-t border-r' :
                 'right-full top-1/2 -translate-y-1/2 translate-x-1/2 border-b border-l'
               }`} />
-            </div>
-          </motion.div>
+            </span>
+          </motion.span>
         )}
       </AnimatePresence>
     </span>

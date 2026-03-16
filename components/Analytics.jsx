@@ -16,12 +16,12 @@ export const trackEvent = (event, extra = {}) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      path: window.location.pathname,
       event,
-      page: window.location.pathname,
-      referrer: document.referrer || 'direct',
-      userAgent: navigator.userAgent,
-      sessionId: getSession(),
-      ...extra,
+      meta: {
+        referrer: document.referrer || 'direct',
+        ...extra,
+      },
     }),
   }).catch(() => {});
 };
@@ -34,7 +34,7 @@ export default function Analytics() {
   const pathname = usePathname();
 
   useEffect(() => {
-    trackEvent('page_view', { page: pathname, referrer: document.referrer || 'direct' });
+    trackEvent('page_view', { referrer: document.referrer || 'direct' });
   }, [pathname]);
 
   return null;

@@ -101,11 +101,13 @@ export default function EventsSection() {
                 }}
               >
                 <div className="h-48 overflow-hidden rounded-t-2xl">
-                  <img
+                  <motion.img
                     src={e.image}
                     alt={e.title}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    animate={{ scale: [1, 1.04, 1], x: [0, 3, 0] }}
+                    transition={{ duration: 12 + i * 2, repeat: Infinity, ease: 'easeInOut' }}
                   />
                 </div>
                 <div className="p-6 flex-1 flex flex-col">

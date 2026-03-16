@@ -146,10 +146,10 @@ const AdminBookings = () => {
           >
             Manage Bookings
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <span className="block text-gray-500 text-sm mt-1">
             View and update all court reservations and event bookings{' '}
             <InfoTooltip text="Use the tabs below to switch between court bookings and event bookings. You can filter, update statuses, and manage payments from here." size={14} />
-          </p>
+          </span>
         </motion.div>
 
         {/* Tabs */}

@@ -1,6 +1,7 @@
 // Server Component — keeps ISR data fetching; passes data to client components for animations
 import HeroSection      from '@/components/home/HeroSection';
 import StatsBar         from '@/components/home/StatsBar';
+import WeatherWidget    from '@/components/home/WeatherWidget';
 import CourtsSection    from '@/components/home/CourtsSection';
 import AmenitiesStrip   from '@/components/home/AmenitiesStrip';
 import EventsSection    from '@/components/home/EventsSection';
@@ -8,7 +9,6 @@ import FixturesPromo    from '@/components/home/FixturesPromo';
 import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
 import ContactSection   from '@/components/home/ContactSection';
-import FixturesPromo    from '@/components/FixturesPromo';
 
 export const revalidate = 60; // ISR — revalidate every 60 seconds
 
@@ -39,6 +39,9 @@ const HomePage = async () => {
       {/* ══ STATS BAR — count-up animations ════════════════════ */}
       <StatsBar courtsCount={courts.length || 4} />
 
+      {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}
+      <WeatherWidget />
+
       {/* ══ COURTS — staggered scroll-reveal + hover glow ═══════ */}
       <CourtsSection courts={courts} />
 
@@ -48,16 +51,13 @@ const HomePage = async () => {
       {/* ══ EVENTS — staggered cards + coloured glows ════════════ */}
       <EventsSection />
 
-      {/* ══ FIXTURES PROMO — live scores ticker + CTA ═══════════ */}
-      <FixturesPromo />
-
       {/* ══ ABOUT — slide in from sides ══════════════════════════ */}
       <AboutSection courtsCount={courts.length || 4} />
 
       {/* ══ SOCIAL — staggered slide reveal ═════════════════════ */}
       <SocialSection />
 
-      {/* ══ FIXTURES PROMO — between contact & footer ════════════ */}
+      {/* ══ FIXTURES PROMO — massive CTA after social ════════════ */}
       <FixturesPromo />
 
       {/* ══ CONTACT + FOOTER — animated cards ═══════════════════ */}

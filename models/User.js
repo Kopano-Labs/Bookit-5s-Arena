@@ -35,6 +35,18 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+    // Phone number for WhatsApp/SMS communication
+    phone: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    // Communication preference: 'email' | 'whatsapp' | 'sms' — mandatory pick one
+    communicationPreference: {
+      type: String,
+      enum: ['email', 'whatsapp', 'sms'],
+      default: 'email',
+    },
     // Newsletter opt-in — defaults to true for new users (auto-subscribe)
     newsletterOptIn: {
       type: Boolean,
