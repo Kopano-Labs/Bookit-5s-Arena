@@ -1,4 +1,4 @@
-![5's Arena Blog Logo](https://raw.githubusercontent.com/RobynAwesome/5s-Arena-Blog-v2/images/logo.png)
+![5's Arena Blog Logo](https://raw.githubusercontent.com/RobynAwesome/5s-Arena-Blog-v2/ASSETS/logo.png)
 
 # ⚽ Bookit 5's Arena | Full-Stack Management System
 
