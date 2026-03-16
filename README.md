@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/images/logo.png" alt="Bookit 5's Arena Logo" width="200"/>
+  <img src="[public/images/logo.png](https://raw.githubusercontent.com/RobynAwesome/Bookit-5s-Arena/main/public/images/logo.png)" alt="Bookit 5's Arena Logo" width="200"/>
 </p>
 
 # ⚽ Bookit 5's Arena | Full-Stack Management System
