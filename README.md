@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/logo.png" alt="5's Arena Blog Logo" width="100%">
+  <img src="images/logo.png" alt="5's Arena Blog Logo" width="200">
 </p>
 
 # ⚽ Bookit 5's Arena | Full-Stack Management System
