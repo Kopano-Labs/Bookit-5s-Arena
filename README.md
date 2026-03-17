@@ -73,7 +73,7 @@
 
 ## 🚀 Usage
 ### For user's
-- Register/Login to your student account  
+- Register/Login to your user account  
 - Browse available appointment slots  
 - Select your preferred date and time  
 - Confirm your appointment booking  
