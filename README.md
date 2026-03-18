@@ -2,7 +2,7 @@
 ![Logo](/public/images/logo.png)
 
 
-# ⚽ *Bookit 5's Arena | Full-Stack Management System*
+# ⚽ *Bookit 5's Arena* | *Full-Stack Management System*
 
 **Bookit 5's Arena** is a professional-grade, custom-built CMS and business engine designed specifically for the South African 5-a-side football industry. It goes far beyond a simple blog, offering a full suite of tools for pitch management, league tracking, and player engagement.
 
