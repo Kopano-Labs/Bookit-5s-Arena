@@ -21,7 +21,7 @@
 * **Dynamic Standings:** Live-updating league tables with Points (PTS), Played (P), and Win/Loss tracking.
 * **MOTM Voting:** Fan engagement system allowing users to vote for "Man of the Match" on match recaps.
 
-### 🛠️ *Admin Suite (The "Robyn" Console)*
+### 🛠️ *Admin Suite (The Console)*
 * **Centralized Dashboard:** One-click access to manage Bookings (with notification badges), Players, Fixtures, and Stats.
 * **Content CMS:** Full CRUD functionality for high-quality match reports and news articles.
 * **Multimedia Gallery:** Image upload system for showcasing arena facilities and event nights.
