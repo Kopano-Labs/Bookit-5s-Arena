@@ -9,32 +9,23 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 
 /* Floating particle */
 function Particle({ delay, color }) {
-  const [styles, setStyles] = useState(null);
-
-  useEffect(() => {
-    setStyles({
-      x: (Math.random() - 0.5) * 800,
-      y: (Math.random() - 0.5) * 600,
-      size: Math.random() * 6 + 2,
-    });
-  }, []);
-
-  if (!styles) return null;
-
+  const x = (Math.random() - 0.5) * 800;
+  const y = (Math.random() - 0.5) * 600;
+  const size = Math.random() * 6 + 2;
   return (
     <motion.div
       className="absolute rounded-full pointer-events-none"
       style={{
-        width: styles.size,
-        height: styles.size,
+        width: size,
+        height: size,
         background: color,
         left: "50%",
         top: "50%",
         opacity: 0,
       }}
       animate={{
-        x: [0, styles.x * 0.3, styles.x],
-        y: [0, styles.y * 0.3, styles.y],
+        x: [0, x * 0.3, x],
+        y: [0, y * 0.3, y],
         opacity: [0, 0.9, 0],
         scale: [0, 1.5, 0],
       }}
