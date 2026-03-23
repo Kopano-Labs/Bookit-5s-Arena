@@ -97,7 +97,7 @@ export default function SocialSection() {
             <div className="px-6 pb-6 pt-4 flex flex-col gap-3 flex-1">
               <div className="flex items-center gap-4 -mt-10">
                 <img
-                  src="/images/logo.jpg"
+                  src="/images/logo.png"
                   alt="Fives Arena"
                   className="w-16 h-16 rounded-full border-4 border-gray-800 object-cover flex-shrink-0"
                 />
