@@ -58,6 +58,13 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
     }
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const bookingDate = new Date(date);
+    if (bookingDate < today) {
+      return NextResponse.json({ error: 'Bookings cannot be in the past.' }, { status: 400 });
+    }
+
     // Validate duration is a number in allowed range
     if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
       return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
@@ -72,62 +79,61 @@ export async function POST(request) {
     }
 
     // Validate time window
-const toMinutes = (t) => {
-  const [h, m] = t.split(':').map(Number);
-  return h * 60 + m;
-};
+    const toMinutes = (t) => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    };
 
-const OPEN_MINUTES = 10 * 60;   // 10:00
-const CLOSE_MINUTES = 22 * 60;  // 22:00
+    const OPEN_MINUTES = 10 * 60;   // 10:00
+    const CLOSE_MINUTES = 22 * 60;  // 22:00
 
-const timeRegex = /^\d{2}:\d{2}$/;
-if (!timeRegex.test(start_time)) {
-  return NextResponse.json({ error: 'Invalid start time format' }, { status: 400 });
-}
+    const timeRegex = /^\d{2}:\d{2}$/;
+    if (!timeRegex.test(start_time)) {
+      return NextResponse.json({ error: 'Invalid start time format' }, { status: 400 });
+    }
 
-const newStart = toMinutes(start_time);
-const newEnd = newStart + duration * 60;
+    const newStart = toMinutes(start_time);
+    const newEnd = newStart + duration * 60;
 
-if (newStart < OPEN_MINUTES || newEnd > CLOSE_MINUTES) {
-  return NextResponse.json(
-    { error: 'Bookings must start at 10:00 and end by 22:00.' },
-    { status: 400 }
-  );
-}
+    if (newStart < OPEN_MINUTES || newEnd > CLOSE_MINUTES) {
+      return NextResponse.json(
+        { error: 'Bookings must start at 10:00 and end by 22:00.' },
+        { status: 400 }
+      );
+    }
 
-// Check for overlapping bookings on the same court and date
-const sameDayBookings = await Booking.find({
-  court: courtId,
-  date,
-  status: { $ne: 'cancelled' },
-}).select('start_time duration');
+    // Check for overlapping bookings on the same court and date
+    const sameDayBookings = await Booking.find({
+      court: courtId,
+      date,
+      status: { $ne: 'cancelled' },
+    }).select('start_time duration');
 
-const hasOverlap = sameDayBookings.some((b) => {
-  const existStart = toMinutes(b.start_time);
-  const existEnd = existStart + b.duration * 60;
-  return newStart < existEnd && newEnd > existStart;
-});
+    const hasOverlap = sameDayBookings.some((b) => {
+      const existStart = toMinutes(b.start_time);
+      const existEnd = existStart + b.duration * 60;
+      return newStart < existEnd && newEnd > existStart;
+    });
 
-if (hasOverlap) {
-  return NextResponse.json(
-    { error: 'This court is already booked during that time. Please choose a different slot.' },
-    { status: 409 }
-  );
-}
-
+    if (hasOverlap) {
+      return NextResponse.json(
+        { error: 'This court is already booked during that time. Please choose a different slot.' },
+        { status: 409 }
+      );
+    }
 
     const total_price = court.price_per_hour * duration;
 
     const booking = await Booking.create({
-  court: courtId,
-  user: session.user.id,
-  date,
-  start_time,
-  duration,
-  total_price,
-  status: 'pending',
-  paymentStatus: payAtVenue ? 'reserved' : 'unpaid',
-});
+      court: courtId,
+      user: session.user.id,
+      date,
+      start_time,
+      duration,
+      total_price,
+      status: 'pending',
+      paymentStatus: payAtVenue ? 'reserved' : 'unpaid',
+    });
 
     // Send confirmation email (non-blocking — won't fail the booking if email fails)
     try {
