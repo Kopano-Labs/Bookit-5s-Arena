@@ -9,19 +9,25 @@ import FixturesPromo    from '@/components/home/FixturesPromo';
 import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
 import ContactSection   from '@/components/home/ContactSection';
+import connectDB        from '@/lib/mongodb';
+import Court            from '@/models/Court';
 
 export const revalidate = 60; // ISR — revalidate every 60 seconds
 
 // ─── server-side fetch ────────────────────────────────────────
 const getCourts = async () => {
   try {
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/courts`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-  } catch {
+    await connectDB();
+    const data = await Court.find().sort({ sortOrder: 1 }).lean();
+    return data.map(doc => ({ 
+      ...doc, 
+      _id: doc._id.toString(),
+      owner: doc.owner.toString(),
+      createdAt: doc.createdAt?.toISOString(),
+      updatedAt: doc.updatedAt?.toISOString()
+    }));
+  } catch (err) {
+    console.error('Failed to get courts:', err);
     return [];
   }
 };
