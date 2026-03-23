@@ -174,16 +174,19 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
           className="mb-5 space-y-3"
         >
           {/* Auth options */}
-          <div className="p-4 bg-yellow-900/30 border border-yellow-700/40 rounded-xl text-yellow-300 text-sm">
-            <div className="flex items-center gap-2 mb-3">
-              <FaLock className="flex-shrink-0" />
-              <span className="font-bold">Sign in for full booking access.</span>
+          <div className="p-4 bg-gradient-to-r from-yellow-900/40 to-amber-900/40 border border-amber-500/50 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.2)] text-yellow-200 text-sm">
+            <div className="flex flex-col gap-1 mb-4">
+              <div className="flex items-center gap-2">
+                <FaLock className="text-amber-400 flex-shrink-0" />
+                <span className="font-black tracking-widest uppercase text-amber-400">Unlock Full Access</span>
+              </div>
+              <p className="text-xs text-amber-200/80">Sign up to pay securely online via Stripe, track your booking history, and earn exclusive loyalty rewards.</p>
             </div>
             <div className="flex gap-2">
-              <Link href="/login" className="flex-1 text-center py-2 px-3 rounded-lg bg-green-700 text-white text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors">
+              <Link href="/login" className="flex-1 text-center py-2.5 px-3 rounded-lg bg-green-700 hover:bg-green-600 text-white text-xs font-black uppercase tracking-widest transition-colors shadow-lg shadow-green-900/50">
                 Sign In
               </Link>
-              <Link href="/register" className="flex-1 text-center py-2 px-3 rounded-lg bg-gray-700 text-white text-xs font-semibold hover:bg-gray-600 transition-colors">
+              <Link href="/register" className="flex-1 text-center py-2.5 px-3 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white text-xs font-bold uppercase tracking-widest transition-colors">
                 Create Account
               </Link>
             </div>
@@ -291,8 +294,8 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
             <input type="date" id="date" value={date} onChange={(e) => setDate(e.target.value)} min={new Date().toISOString().split('T')[0]} className={inputClass} required />
           </div>
           <div>
-            <label htmlFor="start_time" className={labelClass}><FaClock className="inline mr-1.5 mb-0.5" />Start Time <InfoTooltip text="Courts are open 10:00 AM – 9:00 PM. Book at least 1 day in advance." position="top" /></label>
-            <input type="time" id="start_time" value={startTime} onChange={(e) => setStartTime(e.target.value)} min="10:00" max="21:00" className={inputClass} required />
+            <label htmlFor="start_time" className={labelClass}><FaClock className="inline mr-1.5 mb-0.5" />Start Time <InfoTooltip text="Courts are open 10:00 AM – 10:00 PM. Book at least 1 day in advance." position="top" /></label>
+            <input type="time" id="start_time" value={startTime} onChange={(e) => setStartTime(e.target.value)} min="10:00" max="22:00" className={inputClass} required />
           </div>
           <div>
             <label htmlFor="duration" className={labelClass}>Duration <InfoTooltip text="Minimum 1 hour, maximum 3 hours per booking. Extra time can be arranged on-site if the court is free." position="top" /></label>
