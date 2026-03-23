@@ -1,114 +1,115 @@
-
-![Logo](/public/images/logo.png)
-
-
-# ⚽ *Bookit 5's Arena* | *Full-Stack Management System*
-
-**Bookit 5's Arena** is a professional-grade, custom-built CMS and business engine designed specifically for the South African 5-a-side football industry. It goes far beyond a simple blog, offering a full suite of tools for pitch management, league tracking, and player engagement.
+<div align="center">
+  <img src="public/images/logo.png" alt="Bookit 5s Arena Logo" width="200"/>
+  <h1>⚽ Bookit 5's Arena | Next.js Full-Stack App</h1>
+  <p><strong>A professional-grade, custom-built court management system and booking engine designed specifically for the South African 5-a-side football industry.</strong></p>
+</div>
 
 ---
 
-## 🚀 *Pro-Level Features*
+## 🚀 **Pro-Level Features**
 
-### 🏟️ *Arena Management*
-* **Live Pitch Status:** A real-time availability widget on the homepage showing which pitches are currently in play.
-* **Conflict-Free Bookings:** A smart booking engine that prevents double-booking approved slots.
-* **Tournament Registry:** Full registration system for team captains to enter upcoming cups.
+### 🏟️ **Arena Booking & Management**
+* **Instant Court Bookings:** Real-time scheduling that automatically prevents double-booking. Choose from 1hr, 2hr, or 3hr slots.
+* **Online Payments:** Fully integrated **Stripe Checkout** for fast, secure credit card transactions.
+* **Guest Reservation:** Allow guests to hold their slots and pay on arrival (cash or card) directly at the venue.
+* **Intelligent AI Integration:** Built-in AI support bot powered by Anthropic's Claude to handle user queries about hours, pricing, and bookings.
 
-### 🏆 *League & Player Engine*
-* **Golden Boot Leaderboard:** Automated tracking of top goal scorers across the arena.
-* **Interactive Player Cards:** Deep-dive profiles for every player showing their team history and season form.
-* **Dynamic Standings:** Live-updating league tables with Points (PTS), Played (P), and Win/Loss tracking.
-* **MOTM Voting:** Fan engagement system allowing users to vote for "Man of the Match" on match recaps.
+### 🏆 **Admin Suite (The Dashboard)**
+* **Centralized Command:** Manage all bookings, cancel appointments, and oversee finances from a secure admin dashboard.
+* **AI Venue Analytics:** Automatically gain insights into peak hours, user engagement, and revenue trends via AI.
+* **Automated Confirmations:** Email confirmations sent via **Nodemailer** instantly upon successful booking.
+* **Data-driven CMS:** Add, edit, or remove courts, update pricing dynamically, and manage newsletters.
 
-### 🛠️ *Admin Suite (The Console)*
-* **Centralized Dashboard:** One-click access to manage Bookings (with notification badges), Players, Fixtures, and Stats.
-* **Content CMS:** Full CRUD functionality for high-quality match reports and news articles.
-* **Multimedia Gallery:** Image upload system for showcasing arena facilities and event nights.
-
----
-
-## 🏟️ *Community & Support*
-
-* **Got an idea for the arena or stuck on a Next.js error? Join the conversation!**
-
-- **[Join our GitHub Discussions](https://github.com)**
-- **💡 [Pitch a Feature](https://github.com/new?category=feature-pitch)**
-- **❓ [Ask a Question](https://github.com/new?category=q-a)**
-- **🐛 [Report a Bug](https://github.com/new?category=bugs-unconfirmed)**
-
-## Deploy on Vercel
-
-* **The easiest way to dep**
+### 🌟 **User Experience & Rewards**
+* **Modern Interface:** Highly interactive UI built with **Framer Motion** and **Tailwind CSS**.
+* **Referral System & Loyalty Points:** Dedicated user portal for tracking historical bookings.
+* **Secure Authentication:** Integrated **NextAuth.js** supporting Google, Facebook, and local password logins.
 
 ---
 
-## 🛠️ *Tech Stack*
-* **Backend:** PHP 8.x (Procedural & Secure)
-* **Database:** MySQL (Relational Schema)
-* **Frontend:** HTML5, CSS3 (Custom Flexbox/Grid Layouts), JavaScript
-* **Design Assets:** IconScout Unicons, Google Fonts (Montserrat)
+## 🛠️ **Tech Stack (MERN / Next.js)**
+
+### Frontend
+- **Framework:** Next.js 15 (App Router, Server Components, ISR)
+- **Library:** React 19
+- **Styling:** Tailwind CSS + PostCSS
+- **Animations:** Framer Motion & GSAP
+
+### Backend
+- **Environment:** Node.js API Routes (Next.js server)
+- **Database:** MongoDB & Mongoose (Schema validation, connection pooling)
+- **Authentication:** NextAuth.js (v4) with JWT sessions
+- **Payments:** Stripe API
+- **Emails:** Nodemailer / Resend
 
 ---
 
-## 🔮 *Features*
-- Email & SMS notification system  
-- Secure payment integration for consultation fees  
-- Patient medical history tracking  
-- Multi-language support for global accessibility  
-- Mobile app development roadmap  
-- Integration with hospital management systems
+## ⚙️ **Installation & Setup**
 
----
-
-## 🤝 *Contributing*
-* **We welcome contributions from the community!**  
-1. Fork the repository  
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)  
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)  
-4. Push to the branch (`git push origin feature/AmazingFeature`)  
-5. Open a Pull Request  
-
----
-
-## 🚀 *Usage*
-### For user's
-- Register/Login to your user account  
-- Browse available appointment slots  
-- Select your preferred date and time  
-- Confirm your appointment booking  
-- Receive confirmation details instantly  
-
----
-
-### 🔊 *For 5's Arena stuff (Admin)*
-- Login with your admin email  
-- View all scheduled appointments  
-- Manage appointment availability  
-- Update appointment status  
-
----
-
-## 📞 *Support*
-If you have any questions or need assistance, please [open an issue](https://github.com/your-repo/issues) or contact the development team.  
-You can also support ongoing development here: [ko-fi.com/robynawesome](https://ko-fi.com/robynawesome)  
-
----
-
-## ⭐ *Show Your Support*
-Star this repository if you found it helpful!
-
----
-
-## ⚙️ *Installation & Setup*
-
-**Clone the Repository:**
+**1. Clone the Repository:**
 ```bash
-
-
 git clone https://github.com/RobynAwesome/Bookit-5s-Arena.git
+cd Bookit-5s-Arena
+```
 
+**2. Install Dependencies:**
+```bash
+npm install
+# or
+yarn install
+```
 
-loy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**3. Configure Environment Variables:**
+Rename `.env.example` to `.env.local` (create one if missing) and provide your keys:
+```env
+# Database
+MONGODB_URI=your_mongodb_connection_string
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Authentication
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_id
+GOOGLE_CLIENT_SECRET=your_google_secret
+
+# Payments
+STRIPE_SECRET_KEY=your_stripe_secret
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_pub_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+
+# AI Providers
+ANTHROPIC_API_KEY=your_anthropic_key
+GROQ_API_KEY=your_groq_key
+
+# Email
+GMAIL_USER=your_gmail_address
+GMAIL_APP_PASSWORD=your_app_password
+```
+
+**4. Run the Development Server:**
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the application running.
+
+---
+
+## 🤝 **Contributing**
+
+We welcome contributions from the community!
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📞 **Support The Creator**
+
+Built with ❤️ by **Kholofelo Robyn Rababalela**.
+If you found this project useful or have any questions:
+* [Buy me a coffee on Ko-fi](https://ko-fi.com/robynawesome)
+* [Support via PayPal](https://www.paypal.me/osheenviews)
+
+⭐⭐⭐ **Don't forget to star this repository!** ⭐⭐⭐
