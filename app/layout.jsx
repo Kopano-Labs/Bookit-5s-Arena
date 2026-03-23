@@ -3,6 +3,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SupportChatbot from '@/components/SupportChatbot';
 import BottomNavBar from '@/components/BottomNavBar';
+import SoccerBallMenu from '@/components/SoccerBallMenu';
+import NewsletterPopup from '@/components/NewsletterPopup';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import CookieBanner from '@/components/CookieBanner';
 import ClientOnly from '@/components/ClientOnly';
@@ -61,6 +63,8 @@ const RootLayout = ({ children }) => {
             <Footer />
             {/* Fixed floating elements */}
             <BottomNavBar />
+            <SoccerBallMenu />
+            <NewsletterPopup />
             <SupportChatbot />
             <CookieBanner />
           </ThemeProvider>

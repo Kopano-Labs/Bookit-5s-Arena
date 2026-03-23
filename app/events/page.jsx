@@ -196,18 +196,14 @@ export default function EventsPage() {
                 whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.25 } }}
                 className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-green-500/50 hover:shadow-[0_0_40px_rgba(34,197,94,0.15)] transition-all duration-300 group"
               >
-                {/* Card header with court image */}
+                {/* Card header with court image — hover zoom only */}
                 <div className="relative h-44 overflow-hidden">
                   <motion.img
                     src={EVENT_IMAGES[i % EVENT_IMAGES.length]}
                     alt={pkg.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.08, 1] }}
-                    transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.15]"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-t ${pkg.color} opacity-60`} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/30 to-transparent" />
                   <div className="absolute bottom-4 left-5 flex items-center gap-3">
                     <motion.div
                       className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20"

@@ -144,6 +144,20 @@ const LeaguesPage = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-900/30 border border-yellow-800/50 mb-5">
             <FaTrophy className="text-2xl text-yellow-400" />
           </div>
+
+          {/* Coming Soon badge */}
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-900/30 border border-red-700/50 text-red-400 text-xs font-bold uppercase tracking-widest mb-4"
+            animate={{
+              opacity: [1, 0.5, 1],
+              boxShadow: ['0 0 0px rgba(239,68,68,0)', '0 0 15px rgba(239,68,68,0.4)', '0 0 0px rgba(239,68,68,0)'],
+            }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+            Coming Soon — Season 1
+          </motion.div>
+
           <h1
             className="text-4xl md:text-5xl font-black uppercase tracking-widest text-white"
             style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
