@@ -154,6 +154,31 @@ const Header = () => {
             ))}
           </div>
 
+          {/* ── Blog Promo Button ── */}
+          <motion.a
+            href="https://5s-arena-blog.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-green-400 border border-green-500/50 mx-2"
+            animate={{
+              boxShadow: [
+                '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
+                '0 0 12px rgba(34,197,94,0.6), inset 0 0 8px rgba(34,197,94,0.2)',
+                '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
+              ],
+              borderColor: [
+                'rgba(34,197,94,0.5)',
+                'rgba(34,197,94,0.9)',
+                'rgba(34,197,94,0.5)',
+              ],
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span>⚽</span> Visit our Blog!
+          </motion.a>
+
           {/* ── Desktop Nav ── */}
           <div className="hidden md:flex items-center gap-0.5">
             {/* Public tabs — HIDDEN for admin, shown for regular users, hidden for guests */}
