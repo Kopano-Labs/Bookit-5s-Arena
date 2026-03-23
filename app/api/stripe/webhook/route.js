@@ -3,7 +3,6 @@ import { headers } from 'next/headers';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Court from '@/models/Court';
-import User from '@/models/User';
 import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
