@@ -27,7 +27,7 @@ export const metadata = {
     siteName: '5s Arena',
     title: '5s Arena | 5-a-Side Football Cape Town',
     description: "Cape Town's premier 5-a-side football venue in Milnerton. Floodlit courts, bar & restaurant. Book online from R400/hour.",
-    images: [{ url: '/images/logo.jpg', width: 512, height: 512, alt: '5s Arena Logo' }],
+    images: [{ url: '/images/logo.png', width: 512, height: 512, alt: '5s Arena Logo' }],
   },
   twitter: { card: 'summary', title: '5s Arena | Cape Town Football', description: 'Book 5-a-side courts in Milnerton, Cape Town. From R400/hour.' },
   robots: { index: true, follow: true },
@@ -44,7 +44,7 @@ const RootLayout = ({ children }) => {
     <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/images/logo.jpg" />
+        <link rel="apple-touch-icon" href="/images/logo.png" />
       </head>
       <body>
         <AuthProvider>
