@@ -104,7 +104,7 @@ const Header = () => {
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              <Image src="/images/logo.jpg" alt="5s Arena" fill sizes="44px" className="object-cover" priority />
+              <Image src="/images/logo.png" alt="5s Arena" fill sizes="44px" className="object-cover" priority />
             </motion.div>
             <span
               className="hidden sm:block font-black text-white uppercase leading-tight text-sm tracking-widest"
@@ -116,8 +116,8 @@ const Header = () => {
 
           {/* ── Desktop Nav ── */}
           <div className="hidden md:flex items-center gap-0.5">
-            {/* Public tabs — HIDDEN for admin, shown for regular users */}
-            {!isAdmin && publicTabs.map((tab) => (
+            {/* Public tabs — HIDDEN for admin, shown for regular users, hidden for guests */}
+            {session && !isAdmin && publicTabs.map((tab) => (
               <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
                 <NavIcon>{tab.icon}</NavIcon> {tab.label}
               </Link>
@@ -212,7 +212,7 @@ const Header = () => {
                       className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
                       whileHover={{ scale: 1.1 }}
                     >
-                      <img src={session.user.image} alt={session.user.name || 'Profile'} className="w-full h-full object-cover" />
+                      <Image src={session.user.image} alt={session.user.name || 'Profile'} width={32} height={32} className="w-full h-full object-cover" />
                     </motion.div>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-black shadow-inner border border-green-500 flex-shrink-0">
@@ -282,7 +282,7 @@ const Header = () => {
               <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-gray-800">
                 {session.user.image ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0">
-                    <img src={session.user.image} alt={session.user.name || 'Profile'} className="w-full h-full object-cover" />
+                    <Image src={session.user.image} alt={session.user.name || 'Profile'} width={40} height={40} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-black border border-green-500 flex-shrink-0">
@@ -298,8 +298,8 @@ const Header = () => {
               </div>
             )}
 
-            {/* Public tabs — HIDDEN for admin on mobile too */}
-            {!isAdmin && publicTabs.map((tab, i) => (
+            {/* Public tabs — HIDDEN for admin on mobile too, hidden for guests */}
+            {session && !isAdmin && publicTabs.map((tab, i) => (
               <motion.div
                 key={tab.href}
                 initial={{ opacity: 0, x: -20 }}
