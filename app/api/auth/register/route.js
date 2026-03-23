@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import { rateLimit } from '@/lib/rateLimit';
 
 // POST /api/auth/register
 export async function POST(request) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    if (rateLimit(ip, 5, 60000)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
+
     const { name, email, password, recaptchaToken } = await request.json();
 
     if (!name || !email || !password) {
