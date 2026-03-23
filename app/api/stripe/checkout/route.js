@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/authOptions';
 import connectDB from '@/lib/mongodb';
@@ -34,6 +35,13 @@ export async function POST(request) {
     // Validate date format (YYYY-MM-DD)
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
       return Response.json({ error: 'Invalid date format' }, { status: 400 });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const bookingDate = new Date(date);
+    if (bookingDate < today) {
+      return Response.json({ error: 'Bookings cannot be in the past' }, { status: 400 });
     }
 
     // Validate start_time format (HH:MM)
