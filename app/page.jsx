@@ -8,6 +8,7 @@ import EventsSection    from '@/components/home/EventsSection';
 import FixturesPromo    from '@/components/home/FixturesPromo';
 import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
+import TournamentSection from '@/components/home/TournamentSection';
 import ContactSection   from '@/components/home/ContactSection';
 import connectDB        from '@/lib/mongodb';
 import Court            from '@/models/Court';
@@ -62,6 +63,9 @@ const HomePage = async () => {
 
       {/* ══ SOCIAL — staggered slide reveal ═════════════════════ */}
       <SocialSection />
+
+      {/* ══ TOURNAMENT — showstopper World Cup section ══════════ */}
+      <TournamentSection />
 
       {/* ══ FIXTURES PROMO — massive CTA after social ════════════ */}
       <FixturesPromo />

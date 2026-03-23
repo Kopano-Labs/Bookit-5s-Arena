@@ -2,10 +2,12 @@ import AuthProvider from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SupportChatbot from '@/components/SupportChatbot';
+import BottomNavBar from '@/components/BottomNavBar';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import CookieBanner from '@/components/CookieBanner';
 import ClientOnly from '@/components/ClientOnly';
 import PageTransition from '@/components/PageTransition';
+import { ThemeProvider } from '@/context/ThemeContext';
 import '@/assets/styles/globals.css';
 
 const SITE_URL =
@@ -47,18 +49,21 @@ const RootLayout = ({ children }) => {
       </head>
       <body>
         <AuthProvider>
-          <AnalyticsTracker />
-          <ClientOnly />
-          <Header />
-          <main>
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </main>
-          <Footer />
-          {/* Fixed floating elements — outside main so they overlay everything */}
-          <SupportChatbot />
-          <CookieBanner />
+          <ThemeProvider>
+            <AnalyticsTracker />
+            <ClientOnly />
+            <Header />
+            <main>
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </main>
+            <Footer />
+            {/* Fixed floating elements */}
+            <BottomNavBar />
+            <SupportChatbot />
+            <CookieBanner />
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>
