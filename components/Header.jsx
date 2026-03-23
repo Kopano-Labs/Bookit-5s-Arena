@@ -10,9 +10,11 @@ import {
   FaFutbol, FaTachometerAlt, FaListAlt, FaBookOpen,
   FaGlassCheers, FaTrophy, FaStar, FaTv,
   FaPlus, FaChevronDown, FaNewspaper,
+  FaTiktok, FaInstagram, FaFacebook, FaPaintBrush,
 } from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
+import SearchModal from '@/components/SearchModal';
 
 /* ── Animated nav icon wrapper ── */
 const NavIcon = ({ children }) => (
@@ -63,12 +65,21 @@ const Header = () => {
   };
 
   /* ── Public tabs — shown to regular users only ── */
+  /* ── Online status ── */
+  const [userStatus, setUserStatus] = useState('online');
+  useEffect(() => {
+    const saved = localStorage.getItem('5s_user_status');
+    if (saved) setUserStatus(saved);
+  }, []);
+  const statusColors = { online: '#22c55e', busy: '#eab308', offline: '#ef4444' };
+
   const publicTabs = [
     { href: '/fixtures', icon: <FaTv size={11} className="text-blue-400" />,         label: 'Fixtures' },
     { href: '/leagues',  icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Leagues' },
-    { href: '/rules',    icon: <FaBookOpen size={11} className="text-orange-400" />, label: 'Rules' },
+    { href: '/rules-of-the-game', icon: <FaBookOpen size={11} className="text-orange-400" />, label: 'Rules' },
     { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings' },
     { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards' },
+    { href: '/creator',  icon: <FaPaintBrush size={11} className="text-pink-400" />, label: 'Creator' },
   ];
 
   /* ── Auth tabs (user-only) ── */
@@ -113,6 +124,28 @@ const Header = () => {
               5S<br /><span className="text-green-400">ARENA</span>
             </span>
           </Link>
+
+          {/* ── Search + Social Icons ── */}
+          <div className="hidden md:flex items-center gap-2 mx-3">
+            <SearchModal />
+            {[{ icon: FaTiktok, href: 'https://www.tiktok.com/@fivesarena', label: 'TikTok', color: '#ffffff' },
+              { icon: FaInstagram, href: 'https://www.instagram.com/fivesarena', label: 'Instagram', color: '#e1306c' },
+              { icon: FaFacebook, href: 'https://www.facebook.com/profile.php?id=61588019843126', label: 'Facebook', color: '#1877f2' },
+            ].map(({ icon: Icon, href, label, color }) => (
+              <motion.a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, color }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Icon size={14} />
+              </motion.a>
+            ))}
+          </div>
 
           {/* ── Desktop Nav ── */}
           <div className="hidden md:flex items-center gap-0.5">
@@ -207,18 +240,26 @@ const Header = () => {
                   href="/profile"
                   className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-800 transition-all group border border-transparent hover:border-gray-700"
                 >
-                  {session.user.image ? (
-                    <motion.div
-                      className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
-                      whileHover={{ scale: 1.1 }}
-                    >
-                      <Image src={session.user.image} alt={session.user.name || 'Profile'} width={32} height={32} className="w-full h-full object-cover" />
-                    </motion.div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-black shadow-inner border border-green-500 flex-shrink-0">
-                      {session.user.name?.[0]?.toUpperCase() || 'U'}
-                    </div>
-                  )}
+                  <div className="relative flex-shrink-0">
+                    {session.user.image ? (
+                      <motion.div
+                        className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
+                        whileHover={{ scale: 1.1 }}
+                      >
+                        <Image src={session.user.image} alt={session.user.name || 'Profile'} width={32} height={32} className="w-full h-full object-cover" />
+                      </motion.div>
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-black shadow-inner border border-green-500">
+                        {session.user.name?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    {/* Online status dot */}
+                    <span
+                      className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-gray-950"
+                      style={{ backgroundColor: statusColors[userStatus] || '#22c55e' }}
+                      title={userStatus}
+                    />
+                  </div>
                   <div className="hidden lg:block text-left leading-tight">
                     <p className="text-white text-xs font-bold">{session.user.name?.split(' ')[0]}</p>
                     <p className="text-green-400 text-[10px] uppercase tracking-widest">

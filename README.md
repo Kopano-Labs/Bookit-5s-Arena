@@ -27,20 +27,25 @@
 
 ---
 
-## 🛠️ **Tech Stack (MERN / Next.js)**
+## 🛠️ **Tech Stack**
 
-### Frontend
-- **Framework:** Next.js 15 (App Router, Server Components, ISR)
-- **Library:** React 19
-- **Styling:** Tailwind CSS + PostCSS
-- **Animations:** Framer Motion & GSAP
+<div align="center">
 
-### Backend
-- **Environment:** Node.js API Routes (Next.js server)
-- **Database:** MongoDB & Mongoose (Schema validation, connection pooling)
-- **Authentication:** NextAuth.js (v4) with JWT sessions
-- **Payments:** Stripe API
-- **Emails:** Nodemailer / Resend
+### ⚛️ Frontend
+![Next.js](https://img.shields.io/badge/Next.js-16.1.6-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19.2.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Framer Motion](https://img.shields.io/badge/Framer_Motion-12.36.0-0055FF?style=for-the-badge&logo=framer&logoColor=white)
+
+### 🔧 Backend & Services
+![MongoDB](https://img.shields.io/badge/MongoDB-8.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Mongoose](https://img.shields.io/badge/Mongoose-9.3.0-880000?style=for-the-badge&logo=mongoose&logoColor=white)
+![NextAuth.js](https://img.shields.io/badge/NextAuth.js-4.24.13-000000?style=for-the-badge&logo=auth0&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-20.4.1-635BFF?style=for-the-badge&logo=stripe&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+
+</div>
 
 ---
 

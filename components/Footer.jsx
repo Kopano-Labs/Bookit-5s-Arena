@@ -1,38 +1,170 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { FaTiktok, FaInstagram, FaFacebook, FaWhatsapp, FaPhone, FaEnvelope, FaMapMarkerAlt, FaArrowUp, FaFutbol } from 'react-icons/fa';
+import Image from 'next/image';
+import {
+  FaTiktok, FaInstagram, FaFacebook, FaWhatsapp,
+  FaPhone, FaEnvelope, FaMapMarkerAlt, FaArrowUp,
+  FaFutbol, FaLinkedinIn, FaShareAlt, FaRss,
+  FaCoffee, FaHeart, FaExternalLinkAlt
+} from 'react-icons/fa';
 
+/* ─── Social links ────────────────────────────────────────── */
 const SOCIALS = [
-  { icon: FaTiktok, href: 'https://www.tiktok.com/@fivesarena', label: 'TikTok', hoverColor: 'hover:text-white hover:bg-black' },
-  { icon: FaInstagram, href: 'https://www.instagram.com/fivesarena', label: 'Instagram', hoverColor: 'hover:text-white hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-pink-500 hover:to-purple-600' },
-  { icon: FaFacebook, href: 'https://www.facebook.com/profile.php?id=61588019843126', label: 'Facebook', hoverColor: 'hover:text-white hover:bg-blue-600' },
-  { icon: FaWhatsapp, href: 'https://wa.me/27637820245', label: 'WhatsApp', hoverColor: 'hover:text-white hover:bg-green-600' },
+  { icon: FaTiktok, href: 'https://www.tiktok.com/@fivesarena', label: 'TikTok', bg: '#010101' },
+  { icon: FaInstagram, href: 'https://www.instagram.com/fivesarena', label: 'Instagram', bg: '#e1306c' },
+  { icon: FaFacebook, href: 'https://www.facebook.com/profile.php?id=61588019843126', label: 'Facebook', bg: '#1877f2' },
+  { icon: FaWhatsapp, href: 'https://wa.me/27637820245', label: 'WhatsApp', bg: '#25d366' },
 ];
 
+/* ─── Quick links ─────────────────────────────────────────── */
 const QUICK_LINKS = [
   { label: 'Book a Court', href: '/#courts' },
-  { label: 'Events & Parties', href: '/events' },
-  { label: 'Leagues', href: '/leagues' },
+  { label: 'Events & Services', href: '/events-and-services' },
+  { label: 'Rules of the Game', href: '/rules-of-the-game' },
   { label: 'Live Fixtures', href: '/fixtures' },
-  { label: 'Rules', href: '/rules' },
   { label: 'Rewards', href: '/rewards' },
+  { label: 'Creator', href: '/creator' },
 ];
 
+/* ─── LinkedIn business cards ─────────────────────────────── */
+const TEAM_CARDS = [
+  {
+    name: 'Kholofelo Robyn Rababalela',
+    role: 'Founder & Lead Developer',
+    image: '/images/admin-photos/kholofelo-robyn-rababalela-footer-picture.png',
+    linkedin: 'https://www.linkedin.com/in/kholofelo-robyn-rababalela-7a26273b6/',
+    gradient: 'from-green-600/20 to-emerald-900/30',
+    glow: 'rgba(34,197,94,0.4)',
+  },
+  {
+    name: 'Mashoto Bayne Rababalela',
+    role: 'Co-Founder & Business Lead',
+    image: '/images/admin-photos/mashoto-rababalela-footer-picture.png',
+    linkedin: 'https://www.linkedin.com/in/mashoto-bayne-rababalela-836a47139/',
+    gradient: 'from-blue-600/20 to-indigo-900/30',
+    glow: 'rgba(59,130,246,0.4)',
+  },
+  {
+    name: 'Hellenic Football Club',
+    role: 'Venue Partner',
+    image: '/images/Hellenic-Football-Club-logo.png',
+    linkedin: 'https://www.linkedin.com/company/hellenicfc/',
+    gradient: 'from-amber-600/20 to-orange-900/30',
+    glow: 'rgba(245,158,11,0.4)',
+  },
+];
+
+/* ─── Bottom bar tabs ─────────────────────────────────────── */
+const BOTTOM_TABS = [
+  { label: 'Terms', href: '/rules-of-the-game' },
+  { label: 'Contact', href: '/#contact' },
+  { label: 'RSS', href: '/api/rss' },
+];
+
+/* ═══════════════════════════════════════════════════════════ */
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 300);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({ title: '5s Arena', url: shareUrl });
+    } else {
+      navigator.clipboard?.writeText(shareUrl);
+    }
   };
 
   return (
     <footer className="bg-gray-950 border-t border-gray-800 relative overflow-hidden">
-      {/* Subtle gradient glow */}
+      {/* Gradient glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-px bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+
+        {/* ─── LinkedIn Business Cards ─────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-16"
+        >
+          <motion.h3
+            className="text-center text-green-400 font-bold text-xs uppercase tracking-[0.3em] mb-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            The Team Behind 5s Arena
+          </motion.h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {TEAM_CARDS.map((card, i) => (
+              <motion.a
+                key={card.name}
+                href={card.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`relative group block rounded-2xl bg-gradient-to-br ${card.gradient} border border-gray-800/60 p-6 text-center overflow-hidden`}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.15, type: 'spring', stiffness: 200 }}
+                whileHover={{
+                  y: -8,
+                  scale: 1.03,
+                  boxShadow: `0 20px 60px ${card.glow}`,
+                  borderColor: 'rgba(74,222,128,0.4)',
+                }}
+                whileTap={{ scale: 0.97 }}
+              >
+                {/* Glow effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `radial-gradient(circle at 50% 0%, ${card.glow}, transparent 70%)`,
+                  }}
+                />
+                <div className="relative z-10">
+                  <motion.div
+                    className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-2 border-gray-700 group-hover:border-green-500 transition-colors duration-300"
+                    whileHover={{ scale: 1.1, rotate: 3 }}
+                  >
+                    <Image
+                      src={card.image}
+                      alt={card.name}
+                      width={80}
+                      height={80}
+                      className="w-full h-full object-cover"
+                    />
+                  </motion.div>
+                  <h4 className="text-white font-bold text-sm mb-1">{card.name}</h4>
+                  <p className="text-gray-400 text-xs mb-3">{card.role}</p>
+                  <motion.div
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-400 text-xs font-semibold"
+                    whileHover={{ scale: 1.08, boxShadow: '0 0 20px rgba(59,130,246,0.4)' }}
+                  >
+                    <FaLinkedinIn size={10} />
+                    Connect
+                    <FaExternalLinkAlt size={8} />
+                  </motion.div>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ─── Main Footer Grid ────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
 
           {/* Brand */}
@@ -60,21 +192,48 @@ const Footer = () => {
               Cape Town&apos;s premier 5-a-side football venue. Floodlit, all-weather synthetic turf at Hellenic Football Club, Milnerton.
             </p>
             {/* Social icons */}
-            <div className="flex gap-3">
-              {SOCIALS.map(({ icon: Icon, href, label, hoverColor }) => (
+            <div className="flex gap-3 mb-4">
+              {SOCIALS.map(({ icon: Icon, href, label, bg }) => (
                 <motion.a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className={`flex items-center justify-center w-10 h-10 rounded-full border border-gray-700 text-gray-400 transition-all duration-300 ${hoverColor}`}
-                  whileHover={{ scale: 1.15, y: -3 }}
+                  className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-700 text-gray-400 transition-all duration-300"
+                  whileHover={{
+                    scale: 1.15, y: -3,
+                    backgroundColor: bg,
+                    color: '#fff',
+                    boxShadow: `0 0 16px ${bg}80`,
+                    borderColor: bg,
+                  }}
                   whileTap={{ scale: 0.9 }}
                 >
                   <Icon size={16} />
                 </motion.a>
               ))}
+            </div>
+            {/* Share + Buy Me a Coffee */}
+            <div className="flex gap-2">
+              <motion.button
+                onClick={handleShare}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800/40 border border-gray-700 text-gray-400 text-xs hover:text-green-400 hover:border-green-500/30 transition-all cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FaShareAlt size={10} /> Share
+              </motion.button>
+              <motion.a
+                href="https://ko-fi.com/robynawesome"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-900/20 border border-amber-700/30 text-amber-400 text-xs font-semibold hover:bg-amber-800/30 transition-all"
+                whileHover={{ scale: 1.05, boxShadow: '0 0 16px rgba(245,158,11,0.3)' }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FaCoffee size={10} /> Buy us a coffee
+              </motion.a>
             </div>
           </div>
 
@@ -185,26 +344,69 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-gray-800/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-gray-600 text-xs">
-            <FaFutbol className="text-green-600" size={10} />
-            <p>&copy; {currentYear} Bookit 5s Arena. All rights reserved.</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <p className="text-gray-700 text-[10px] tracking-[0.15em] uppercase">Built with ⚽ in Cape Town</p>
-            <motion.button
-              onClick={scrollToTop}
-              className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-green-400 hover:border-green-500 transition-all cursor-pointer"
-              whileHover={{ y: -3, scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Scroll to top"
-            >
-              <FaArrowUp size={10} />
-            </motion.button>
+        {/* ─── Bottom bar ──────────────────────────────────── */}
+        <div className="border-t border-gray-800/60 pt-6">
+          {/* Built with ❤️ */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-gray-600 text-xs">
+              <FaFutbol className="text-green-600" size={10} />
+              <p>&copy; {currentYear} Bookit 5s Arena. All rights reserved.</p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Bottom tabs */}
+              {BOTTOM_TABS.map((tab) => (
+                <Link
+                  key={tab.label}
+                  href={tab.href}
+                  className="text-gray-600 hover:text-gray-400 text-[10px] tracking-wider uppercase transition-colors"
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Creator link */}
+              <Link href="/creator">
+                <motion.p
+                  className="text-gray-500 text-[10px] tracking-[0.15em] uppercase flex items-center gap-1 hover:text-green-400 transition-colors cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  animate={{
+                    textShadow: [
+                      '0 0 0px rgba(74,222,128,0)',
+                      '0 0 8px rgba(74,222,128,0.5)',
+                      '0 0 0px rgba(74,222,128,0)',
+                    ],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  Built with <FaHeart className="text-red-500" size={8} /> by Kholofelo Robyn Rababalela
+                </motion.p>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* ─── Back to Top ───────────────────────────────────── */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-green-600 border-2 border-green-400 flex items-center justify-center text-white shadow-lg cursor-pointer"
+            style={{ boxShadow: '0 0 20px rgba(34,197,94,0.5)' }}
+            initial={{ opacity: 0, y: 20, scale: 0 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0 }}
+            whileHover={{ scale: 1.15, y: -3, boxShadow: '0 0 30px rgba(34,197,94,0.7)' }}
+            whileTap={{ scale: 0.9 }}
+            aria-label="Scroll to top"
+          >
+            <FaArrowUp size={16} />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </footer>
   );
 };
