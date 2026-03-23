@@ -16,4 +16,7 @@ const PageViewSchema = new mongoose.Schema({
 PageViewSchema.index({ timestamp: -1 });
 PageViewSchema.index({ path: 1, timestamp: -1 });
 
-export default mongoose.models.PageView || mongoose.model('PageView', PageViewSchema);
+if (mongoose.models.PageView) {
+  try { mongoose.deleteModel('PageView'); } catch {}
+}
+export default mongoose.model('PageView', PageViewSchema);
