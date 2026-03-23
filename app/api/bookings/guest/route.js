@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Court from '@/models/Court';
+import { rateLimit } from '@/lib/rateLimit';
 
 const toMinutes = (t) => {
   const [h, m] = t.split(':').map(Number);
@@ -11,6 +12,11 @@ const toMinutes = (t) => {
 // POST /api/bookings/guest — reserve without login (pay at venue)
 export async function POST(request) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    if (rateLimit(ip, 5, 60000)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
+
     const { courtId, date, start_time, duration, guestName, guestEmail, guestPhone } = await request.json();
 
     if (!courtId || !date || !start_time || !duration) {
@@ -28,6 +34,13 @@ export async function POST(request) {
     // Validate date format (YYYY-MM-DD)
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
       return NextResponse.json({ error: 'Invalid date format.' }, { status: 400 });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const bookingDate = new Date(date);
+    if (bookingDate < today) {
+      return NextResponse.json({ error: 'Bookings cannot be in the past.' }, { status: 400 });
     }
 
     // Validate start_time format (HH:MM)
@@ -55,15 +68,6 @@ export async function POST(request) {
     }
 
     await connectDB();
-
-    // Drop stale MongoDB collection-level validators from when user was required
-    // and paymentStatus didn't include 'reserved'
-    try {
-      const db = Booking.db || (await import('mongoose')).default.connection.db;
-      if (db) {
-        await db.command({ collMod: 'bookings', validator: {}, validationLevel: 'off' });
-      }
-    } catch { /* collection may not exist yet */ }
 
     const court = await Court.findById(courtId);
     if (!court) return NextResponse.json({ error: 'Court not found.' }, { status: 404 });
