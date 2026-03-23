@@ -17,8 +17,6 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'img.youtube.com' },
       // Google user avatars (OAuth profile pictures)
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
-      // General HTTPS images (Unsplash, court photos, etc.)
-      { protocol: 'https', hostname: '**' },
     ],
   },
 };
