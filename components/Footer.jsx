@@ -45,7 +45,7 @@ const Footer = () => {
               transition={{ duration: 0.5 }}
             >
               <motion.img
-                src="/images/logo.jpg"
+                src="/images/logo.png"
                 alt="5s Arena"
                 className="w-12 h-12 rounded-full object-cover border-2 border-green-500"
                 whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(74,222,128,0.5)' }}
