@@ -19,9 +19,9 @@ function CourtCard({ court, index }) {
         y: { type: 'spring', stiffness: 300, damping: 20 },
       }}
     >
-      <Link
-        href={`/courts/${court._id}`}
-        className="group block relative overflow-hidden rounded-2xl border border-gray-700/50 backdrop-blur-sm
+      <div
+        onClick={() => window.location.href = `/courts/${court._id}`}
+        className="group block relative overflow-hidden rounded-2xl border border-gray-700/50 backdrop-blur-sm cursor-pointer
           transition-all duration-500
           hover:border-green-500/60
           hover:shadow-[0_0_0_1px_rgba(74,222,128,0.3),0_0_50px_rgba(74,222,128,0.25),0_20px_60px_rgba(0,0,0,0.5)]"
@@ -129,7 +129,7 @@ function CourtCard({ court, index }) {
           whileHover={{ width: '100%' }}
           transition={{ duration: 0.4 }}
         />
-      </Link>
+      </div>
     </motion.div>
   );
 }
