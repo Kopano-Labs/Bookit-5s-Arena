@@ -11,4 +11,7 @@ const NewsletterSchema = new mongoose.Schema({
   recipientCount: { type: Number, default: 0 },
 }, { timestamps: true });
 
-export default mongoose.models.Newsletter || mongoose.model('Newsletter', NewsletterSchema);
+if (mongoose.models.Newsletter) {
+  try { mongoose.deleteModel('Newsletter'); } catch {}
+}
+export default mongoose.model('Newsletter', NewsletterSchema);
