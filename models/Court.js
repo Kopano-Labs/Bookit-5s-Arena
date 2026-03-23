@@ -27,4 +27,7 @@ CourtSchema.index({ sortOrder: 1, createdAt: 1 });
 // Admin "my courts" — filter by owner, ordered by sortOrder
 CourtSchema.index({ owner: 1, sortOrder: 1 });
 
-export default mongoose.models.Court || mongoose.model('Court', CourtSchema);
+if (mongoose.models.Court) {
+  try { mongoose.deleteModel('Court'); } catch {}
+}
+export default mongoose.model('Court', CourtSchema);
