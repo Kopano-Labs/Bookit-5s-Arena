@@ -6,6 +6,7 @@ const TournamentTeamSchema = new mongoose.Schema(
     managerName: { type: String, required: true, trim: true },
     managerEmail: { type: String, required: true, trim: true, lowercase: true },
     managerPhone: { type: String, required: true, trim: true },
+    managerImage: { type: String }, // 1:1 format Profile Pic
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
     /* Team identity */
@@ -19,6 +20,7 @@ const TournamentTeamSchema = new mongoose.Schema(
         name: { type: String, required: true },
         position: { type: String, enum: ['GK', 'DEF', 'MID', 'FWD'], default: 'MID' },
         isReserve: { type: Boolean, default: false },
+        image: { type: String }, // 1:1 Player ID format
       },
     ],
 
@@ -27,6 +29,7 @@ const TournamentTeamSchema = new mongoose.Schema(
       {
         name: { type: String },
         role: { type: String }, // e.g. "Water Carrier", "Coach", "Physio"
+        image: { type: String }, // 1:1 Visual Identity
       },
     ],
 

@@ -16,7 +16,7 @@ const item = {
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-end pb-24 overflow-hidden">
+    <section className="relative z-0 min-h-screen flex items-center justify-center pt-24 pb-24 overflow-hidden">
 
       {/* Ken Burns background */}
       <div
@@ -40,7 +40,7 @@ export default function HeroSection() {
       />
 
       <motion.div
-        className="relative z-10 w-full max-w-6xl mx-auto px-6"
+        className="relative z-10 w-full max-w-6xl mx-auto px-6 text-center md:text-left"
         variants={container}
         initial="hidden"
         animate="visible"
@@ -48,7 +48,7 @@ export default function HeroSection() {
         {/* Location pill */}
         <motion.p
           variants={item}
-          className="text-green-400 font-bold uppercase tracking-widest text-sm mb-4"
+          className="text-green-400 font-bold uppercase tracking-widest text-[9px] sm:text-sm mb-4"
         >
           Milnerton · Cape Town · Hellenic Football Club
         </motion.p>
@@ -98,71 +98,47 @@ export default function HeroSection() {
         {/* Subtitle */}
         <motion.p
           variants={item}
-          className="text-gray-300 text-xl max-w-xl mb-10 leading-relaxed"
+          className="text-gray-300 text-xl max-w-xl mx-auto md:mx-0 mb-10 leading-relaxed"
         >
           Cape Town&apos;s premier 5-a-side football experience.
           Book a court, gather your squad, and play the beautiful game.
         </motion.p>
 
-        {/* CTA buttons */}
-        <motion.div variants={item} className="flex flex-wrap gap-4">
-          <motion.div
-            whileHover={{
-              scale: 1.08,
-              boxShadow: '0 0 50px rgba(34,197,94,0.7), 0 0 100px rgba(34,197,94,0.3)',
-            }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+        {/* Buttons */}
+        <motion.div
+          variants={item}
+          className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4"
+        >
+          <Link
+            href="/#courts"
+            className="w-full sm:w-auto px-8 py-4 bg-green-600 text-white rounded-xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(34,197,94,0.4)] hover:bg-green-500 hover:scale-105 active:scale-95 transition-all text-center"
           >
-            <Link
-              href="/bookings"
-              className="inline-flex items-center gap-3 text-white font-black text-lg px-10 py-5 uppercase tracking-widest rounded-xl relative overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, #15803d 0%, #22c55e 50%, #16a34a 100%)',
-                boxShadow: '0 0 30px rgba(34,197,94,0.45)',
-              }}
-            >
-              <motion.span
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                className="inline-flex"
-              >
-                <FaFutbol size={18} />
-              </motion.span>
-              <span>BOOK NOW</span>
-              <motion.span
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{ x: ['-100%', '200%'] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
-              />
-            </Link>
-          </motion.div>
-          <motion.a
-            href="https://wa.me/27637820245"
+            <FaFutbol size={16} /> Book Now
+          </Link>
+          <a
+            href="https://wa.me/+27653421629"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 border-2 border-white hover:border-green-400 hover:text-green-400 text-white font-bold text-lg px-8 py-4 uppercase tracking-wide rounded-xl transition-colors duration-300"
-            whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(37,211,102,0.4)' }}
-            whileTap={{ scale: 0.95 }}
+            className="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-white/80 text-white rounded-xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-all text-center"
           >
-            <FaWhatsapp /> WhatsApp Us
-          </motion.a>
+            <FaWhatsapp size={16} /> Whatsapp Us
+          </a>
         </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
-          className="absolute bottom-[-3.5rem] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
-          transition={{ delay: 2, duration: 1 }}
-        >
-          <span className="text-white text-xs uppercase tracking-widest">Scroll</span>
-          <motion.div
-            className="w-px h-10 bg-white origin-top"
-            animate={{ scaleY: [0, 1, 0] }}
-            transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-          />
-        </motion.div>
+           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50"
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 0.5 }}
+           transition={{ delay: 2, duration: 1 }}
+         >
+           <span className="text-white text-[10px] uppercase tracking-[0.3em]">Scroll</span>
+           <motion.div
+             className="w-px h-10 bg-green-500 origin-top"
+             animate={{ scaleY: [0, 1, 0] }}
+             transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+           />
+         </motion.div>
       </motion.div>
     </section>
   );

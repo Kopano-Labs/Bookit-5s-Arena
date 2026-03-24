@@ -15,14 +15,20 @@ import AnimatedTitle from '@/components/AnimatedTitle';
 // MOCK DATA
 // ═══════════════════════════════════════════════════════════════
 
+const API_KEY = process.env.NEXT_PUBLIC_APIFOOTBALL_KEY;
+const API_BASE = 'https://v3.football.api-sports.io';
+
 const LEAGUE_META = {
-  PL:  { name: 'Premier League',           color: 'border-purple-500', bg: 'bg-purple-700',  accent: 'purple', textColor: 'text-purple-400' },
-  LL:  { name: 'La Liga',                  color: 'border-orange-500', bg: 'bg-orange-600',  accent: 'orange', textColor: 'text-orange-400' },
-  SA:  { name: 'Serie A',                  color: 'border-blue-500',   bg: 'bg-blue-600',    accent: 'blue',   textColor: 'text-blue-400' },
-  BL:  { name: 'Bundesliga',               color: 'border-red-500',    bg: 'bg-red-600',     accent: 'red',    textColor: 'text-red-400' },
-  PSL: { name: 'Premier Soccer League',    color: 'border-yellow-500', bg: 'bg-yellow-600',  accent: 'yellow', textColor: 'text-yellow-400' },
-  UCL: { name: 'Champions League',         color: 'border-blue-900',   bg: 'bg-blue-900',    accent: 'navy',   textColor: 'text-blue-300' },
-  WC:  { name: 'World Cup 5s Arena',       color: 'border-green-500',  bg: 'bg-green-600',   accent: 'green',  textColor: 'text-green-400' },
+  // Global Leagues (API-Football IDs)
+  '39':  { name: 'Premier League',           color: 'border-purple-500', bg: 'bg-purple-700',  accent: 'purple', textColor: 'text-purple-400', type: 'global' },
+  '140': { name: 'La Liga',                  color: 'border-orange-500', bg: 'bg-orange-600',  accent: 'orange', textColor: 'text-orange-400', type: 'global' },
+  '135': { name: 'Serie A',                  color: 'border-blue-500',   bg: 'bg-blue-600',    accent: 'blue',   textColor: 'text-blue-400', type: 'global' },
+  '78':  { name: 'Bundesliga',               color: 'border-red-500',    bg: 'bg-red-600',     accent: 'red',    textColor: 'text-red-400', type: 'global' },
+  '288': { name: 'DStv Premiership',         color: 'border-yellow-500', bg: 'bg-yellow-600',  accent: 'yellow', textColor: 'text-yellow-400', type: 'global' },
+  '2':   { name: 'Champions League',         color: 'border-blue-900',   bg: 'bg-blue-900',    accent: 'navy',   textColor: 'text-blue-300', type: 'global' },
+  '1':   { name: 'World Cup',               color: 'border-green-500',  bg: 'bg-green-600',   accent: 'green',  textColor: 'text-green-400', type: 'global' },
+  // Local League (MongoDB)
+  'local-5s': { name: '5s Arena Masters',   color: 'border-emerald-500', bg: 'bg-emerald-600', accent: 'emerald', textColor: 'text-emerald-400', type: 'local' },
 };
 
 const TEAM_COLORS = {
@@ -588,7 +594,11 @@ const JokeWidget = () => {
 const FixturesPage = () => {
   const [tab, setTab] = useState('scores');
   const [expandedLeagues, setExpandedLeagues] = useState({ PL: true, LL: true, SA: true, BL: true, PSL: true, UCL: true });
-  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [lastUpdated, setLastUpdated] = useState(null);
+  
+  useEffect(() => {
+    setLastUpdated(new Date());
+  }, []);
   const [refreshing, setRefreshing] = useState(false);
   const [expandedMatch, setExpandedMatch] = useState(null);
 
@@ -699,124 +709,112 @@ const FixturesPage = () => {
   const [liveLoading, setLiveLoading] = useState(false);
   const [useLiveData, setUseLiveData] = useState(false);
 
-  const fetchLiveData = useCallback(async (force = false) => {
-    if (liveData && !force) return; // Prevent unnecessary fetches if data exists and not forced
-    
-    // Only show loading spinner on initial fetch or manual refresh
-    if (!liveData) setLiveLoading(true);
-    
-    try {
-      const res = await fetch('/api/fixtures');
-      if (res.ok) {
-        const json = await res.json();
-        setLiveData(json.leagues || null);
-        
-        // Map WC standings if they exist in the hybrid feed
-        if (json.wc_standings) {
-           const wcTable = json.wc_standings.map((t, i) => ({
-             rank: i + 1,
-             team: t.name,
-             logo: t.logo,
-             played: t.stats.mp,
-             won: t.stats.w,
-             drawn: t.stats.d,
-             lost: t.stats.l,
-             gf: t.stats.gf,
-             ga: t.stats.ga,
-             gd: t.stats.gd,
-             points: t.stats.pts,
-           }));
-           setStandingsData(prev => ({ ...prev, WC: wcTable }));
-        }
+  // ── Hybrid Fixtures Hub Logic (API-Football + Local MongoDB) ──
+  const [fixturesData, setFixturesData] = useState({});
+  const [fixturesLoading, setFixturesLoading] = useState(false);
+  const [activeView, setActiveView] = useState('global'); // 'global' or 'local'
 
-        setLastUpdated(new Date());
+  const fetchGlobalFixtures = useCallback(async () => {
+    if (!API_KEY) return;
+    setFixturesLoading(true);
+    try {
+      // Fetching sample of major leagues by ID
+      const leagueIds = Object.keys(LEAGUE_META).filter(k => LEAGUE_META[k].type === 'global').join(',');
+      const response = await fetch(`${API_BASE}/fixtures?league=${leagueIds}&season=2024&date=${new Date().toISOString().split('T')[0]}`, {
+        headers: { 'x-apisports-key': API_KEY }
+      });
+      const data = await response.json();
+      
+      const mapped = {};
+      data.response?.forEach(f => {
+        const lid = f.league.id.toString();
+        if (!mapped[lid]) mapped[lid] = [];
+        mapped[lid].push({
+          id: f.fixture.id,
+          league: lid,
+          home: f.teams.home.name,
+          away: f.teams.away.name,
+          homeScore: f.goals.home,
+          awayScore: f.goals.away,
+          status: f.fixture.status.short === 'FT' ? 'FINISHED' : (f.fixture.status.short === 'NS' ? 'TIMED' : 'IN_PLAY'),
+          minute: f.fixture.status.elapsed,
+          kickoff: f.fixture.date.split('T')[1].substring(0, 5),
+          date: f.fixture.date.split('T')[0],
+          homeLogo: f.teams.home.logo,
+          awayLogo: f.teams.away.logo,
+        });
+      });
+      setFixturesData(prev => ({ ...prev, global: mapped }));
+      setLastUpdated(new Date());
+    } catch (err) {
+      console.error('API-Football Refresh Failed:', err);
+    }
+    setFixturesLoading(false);
+  }, []);
+
+  const fetchLocalFixtures = useCallback(async () => {
+    setFixturesLoading(true);
+    try {
+      const res = await fetch('/api/tournament'); // Live MongoDB Tournament API
+      if (res.ok) {
+        const data = await res.json();
+        const teams = data.teams || [];
+        
+        // Map TournamentTeam documents to match cards
+        const localFixtures = teams.map((team, idx) => ({
+          id: `local_${team._id || idx}`,
+          league: 'local-5s',
+          home: team.teamName,
+          away: 'QUEUED', // Team status usually 'confirmed' or 'pending'
+          homeScore: team.pts || 0,
+          awayScore: 0,
+          status: team.status === 'confirmed' ? 'LIVE' : 'TIMED',
+          kickoff: 'TBD',
+          date: 'Tournament Match',
+          homeLogo: team.worldCupTeamLogo || '/images/logo.png',
+          awayLogo: '/images/logo.png',
+        }));
+        setFixturesData(prev => ({ ...prev, local: { 'local-5s': localFixtures } }));
       }
     } catch (err) {
-      console.error('Failed to fetch live fixtures:', err);
+      console.error('Local Sync Failed:', err);
     }
-    setLiveLoading(false);
-  }, [liveData]);
+    setFixturesLoading(false);
+  }, []);
 
-  // Silent background refresh every 15 seconds
   useEffect(() => {
-    if (!useLiveData) return;
-    
-    const interval = setInterval(() => {
-      fetchLiveData(true); // Forced background fetch
-    }, 15000); // 15 seconds as requested
-    
-    return () => clearInterval(interval);
-  }, [useLiveData, fetchLiveData]);
-
-  // Merge real upcoming matches into mock data when live toggle is on
-  const buildLiveMatches = useCallback(() => {
-    if (!liveData) return {};
-    const merged = {};
-    const baseLeagueCodes = ['PL', 'LL', 'SA', 'BL', 'PSL', 'UCL', 'WC'];
-    baseLeagueCodes.forEach(code => {
-      const upcoming = (liveData[code] || []).map((e, idx) => ({
-        id:        `live_${code}_${idx}`,
-        league:    code,
-        home:      e.home,
-        away:      e.away,
-        homeScore: e.homeScore,
-        awayScore: e.awayScore,
-        status:    e.status || 'TIMED',
-        kickoff:   e.time || 'TBC',
-        date:      e.date,
-        homeLogo:  e.homeLogo,
-        awayLogo:  e.awayLogo,
-      }));
-      merged[code] = upcoming.length ? upcoming : mockMatches.filter(m => m.league === code);
-    });
-    return merged;
-  }, [liveData]);
+    if (activeView === 'global') fetchGlobalFixtures();
+    else fetchLocalFixtures();
+  }, [activeView, fetchGlobalFixtures, fetchLocalFixtures]);
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    if (useLiveData) {
-      // Force re-fetch live data
-      setLiveData(null);
-      fetchLiveData().then(() => {
-        setLastUpdated(new Date());
-        setRefreshing(false);
-      });
-    } else {
-      setTimeout(() => {
-        setLastUpdated(new Date());
-        setRefreshing(false);
-      }, 800);
-    }
-  }, [useLiveData, fetchLiveData]);
-
-  const handleToggleLiveData = () => {
-    if (!useLiveData && !liveData) {
-      fetchLiveData();
-    }
-    setUseLiveData(v => !v);
-  };
+    if (activeView === 'global') fetchGlobalFixtures().then(() => setRefreshing(false));
+    else fetchLocalFixtures().then(() => setRefreshing(false));
+  }, [activeView, fetchGlobalFixtures, fetchLocalFixtures]);
 
   const toggleLeague = (code) => {
     setExpandedLeagues(prev => ({ ...prev, [code]: !prev[code] }));
   };
 
   // Group matches by competition — respect selected & priority
-  const baseLeagueOrder = ['WC', 'PL', 'LL', 'SA', 'BL', 'PSL', 'UCL'];
-  const leagueOrder = [
-    ...baseLeagueOrder.filter(c => priorityLeagues.has(c) && selectedLeagues.has(c)),
-    ...baseLeagueOrder.filter(c => !priorityLeagues.has(c) && selectedLeagues.has(c)),
-  ];
+  const currentFixtures = fixturesData[activeView] || {};
+  const leagueOrder = activeView === 'global' 
+    ? [
+        // Prioritize favorited leagues, then show all available global leagues from the metadata
+        ...Object.keys(LEAGUE_META).filter(c => LEAGUE_META[c].type === 'global' && priorityLeagues.has(c)),
+        ...Object.keys(LEAGUE_META).filter(c => LEAGUE_META[c].type === 'global' && !priorityLeagues.has(c) && selectedLeagues.has(c)),
+      ].filter(c => currentFixtures[c] && currentFixtures[c].length > 0)
+    : ['local-5s'];
 
-  const liveMatchesByLeague = useLiveData ? buildLiveMatches() : null;
-  const matchesByLeague = baseLeagueOrder.reduce((acc, code) => {
-    acc[code] = (liveMatchesByLeague && liveMatchesByLeague[code])
-      ? liveMatchesByLeague[code]
-      : mockMatches.filter(m => m.league === code);
+  const matchesByLeague = leagueOrder.reduce((acc, code) => {
+    acc[code] = currentFixtures[code] || [];
     return acc;
   }, {});
 
-  // Featured matches (top 5)
-  const featuredMatches = mockMatches.filter(m => m.featured).slice(0, 5);
+  // Featured matches (top 3 from the active view)
+  const allMatches = Object.values(currentFixtures).flat();
+  const featuredMatches = allMatches.length > 0 ? allMatches.slice(0, 3) : [];
 
   // ── Standings state ─────────────────────────────────────────
   const [standingsLeague, setStandingsLeague] = useState('WC');
@@ -959,6 +957,50 @@ const FixturesPage = () => {
               align="center"
             />
 
+            {/* ── Hybrid View Toggle (Global vs Local) ── */}
+            <motion.div
+              className="flex flex-col items-center gap-3 mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <div className="bg-gray-900/80 p-1 rounded-2xl border border-gray-800 flex items-center gap-1 shadow-2xl backdrop-blur-md">
+                <button
+                  onClick={() => setActiveView('global')}
+                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 cursor-pointer ${
+                    activeView === 'global'
+                      ? 'bg-green-600 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  <FaFutbol size={12} /> Global Hub
+                </button>
+                <button
+                  onClick={() => setActiveView('local')}
+                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 cursor-pointer ${
+                    activeView === 'local'
+                      ? 'bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  <FaTrophy size={12} /> Local Arena
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {fixturesLoading ? (
+                  <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                    <FaSyncAlt size={10} className="text-green-500" />
+                  </motion.span>
+                ) : (
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,1)]" />
+                )}
+                <span className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
+                  {activeView === 'global' ? 'Live API-Football Feed Active' : 'Real-time MongoDB Sync Active'}
+                </span>
+              </div>
+            </motion.div>
+
             {/* Compact updated timer + auto-update note stacked */}
             <motion.div
               className="mt-2 flex flex-col items-center gap-1"
@@ -969,7 +1011,7 @@ const FixturesPage = () => {
               <div className="flex items-center gap-2 bg-green-900/30 border border-green-800/50 rounded-full px-4 py-1.5">
                 <FaClock size={9} className="text-green-400" />
                 <span className="text-[11px] text-green-300 font-bold uppercase tracking-wider">
-                  Updated: {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  Updated: {lastUpdated ? lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--:--:--'}
                 </span>
                 <motion.button
                   onClick={handleRefresh}
@@ -987,43 +1029,6 @@ const FixturesPage = () => {
               </div>
             </motion.div>
           </div>
-        </motion.div>
-
-        {/* TheSportsDB Live Data Toggle */}
-        <motion.div
-          className="mb-4 flex items-center justify-center gap-3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <button
-            onClick={handleToggleLiveData}
-            disabled={liveLoading}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-300 cursor-pointer disabled:opacity-50 ${
-              useLiveData
-                ? 'bg-green-900/40 border-green-600 text-green-300 shadow-[0_0_12px_rgba(34,197,94,0.2)]'
-                : 'bg-gray-900 border-gray-700 text-gray-500 hover:border-gray-600 hover:text-gray-400'
-            }`}
-          >
-            {liveLoading ? (
-              <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}>
-                <FaSyncAlt size={8} />
-              </motion.span>
-            ) : (
-              <span className={`w-2 h-2 rounded-full ${useLiveData ? 'bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.8)]' : 'bg-gray-600'}`} />
-            )}
-            {useLiveData ? '🟢 Live Data — TheSportsDB' : 'Enable Live Fixtures'}
-          </button>
-          {!useLiveData && (
-            <span className="text-[9px] text-gray-700 uppercase tracking-wider">
-              Preview mode &mdash; click to load real upcoming fixtures
-            </span>
-          )}
-          {useLiveData && liveData && (
-            <span className="text-[9px] text-green-700 uppercase tracking-wider">
-              Real upcoming fixtures via TheSportsDB
-            </span>
-          )}
         </motion.div>
 
         {/* GeoJS Location Detection Banner */}

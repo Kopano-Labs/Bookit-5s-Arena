@@ -40,6 +40,8 @@ export const viewport = {
   themeColor: '#15803d',
 };
 
+import ScrollToTop from '@/components/ScrollToTop';
+
 const RootLayout = ({ children }) => {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -62,6 +64,7 @@ const RootLayout = ({ children }) => {
             </main>
             <Footer />
             {/* Fixed floating elements */}
+            <ScrollToTop />
             <SoccerBallMenu />
             <NewsletterPopup />
             <CookieBanner />

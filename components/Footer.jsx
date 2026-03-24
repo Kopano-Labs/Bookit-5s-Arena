@@ -77,16 +77,11 @@ const BOTTOM_TABS = [
 const Footer = () => {
   const { data: session, status } = useSession();
   const currentYear = new Date().getFullYear();
-  const [showBackToTop, setShowBackToTop] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
 
   useEffect(() => {
     // Set shareUrl on mount (client-only) to avoid hydration mismatch
     setShareUrl(window.location.href);
-
-    const onScroll = () => setShowBackToTop(window.scrollY > 300);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -403,24 +398,6 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* ─── Back to Top ───────────────────────────────────── */}
-      <AnimatePresence>
-        {showBackToTop && (
-          <motion.button
-            onClick={scrollToTop}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-green-600 border-2 border-green-400 flex items-center justify-center text-white shadow-lg cursor-pointer"
-            style={{ boxShadow: '0 0 20px rgba(34,197,94,0.5)' }}
-            initial={{ opacity: 0, y: 20, scale: 0 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0 }}
-            whileHover={{ scale: 1.15, y: -3, boxShadow: '0 0 30px rgba(34,197,94,0.7)' }}
-            whileTap={{ scale: 0.9 }}
-            aria-label="Scroll to top"
-          >
-            <FaArrowUp size={16} />
-          </motion.button>
-        )}
-      </AnimatePresence>
     </footer>
   );
 };

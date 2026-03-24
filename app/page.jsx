@@ -39,7 +39,7 @@ const HomePage = async () => {
   const courts = await getCourts();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <WelcomePopup />
 
       {/* ══ HERO — animated entrance + particle background ══════ */}

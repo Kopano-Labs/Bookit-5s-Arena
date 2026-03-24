@@ -1,4 +1,13 @@
-@import "tailwindcss";
+@layer base {
+  :root {
+    --bg-primary: #030712;
+    --text-primary: #f9fafb;
+    --accent: #22c55e;
+    --card-bg: #111827;
+    --border: #1f2937;
+    --glow: rgba(34,197,94,0.4);
+  }
+}
 
 @layer utilities {
   .line-clamp-2 {
@@ -11,6 +20,22 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* ── Crazy Mode: Pulse Neon ── */
+@keyframes pulse-neon {
+  0%, 100% { 
+    box-shadow: 0 0 15px var(--glow), 0 0 30px var(--glow);
+    border-color: var(--accent);
+  }
+  50% { 
+    box-shadow: 0 0 30px var(--glow), 0 0 60px var(--glow);
+    border-color: #fff;
+  }
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s infinite ease-in-out;
 }
 
 /* ── Hero Ken Burns animation — GPU-accelerated via transform ── */

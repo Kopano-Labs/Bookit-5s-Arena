@@ -44,7 +44,7 @@ export default function SoccerBallMenu() {
   };
 
   return (
-    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-[100]">
+    <div className="fixed left-0 top-[60%] sm:top-1/2 -translate-y-1/2 z-[100]">
       {/* Expanded menu */}
       <AnimatePresence>
         {isOpen && (
@@ -89,46 +89,52 @@ export default function SoccerBallMenu() {
         )}
       </AnimatePresence>
 
-      {/* Main trigger button — FIXED RECTANGLE ON LEFT EDGE */}
+      {/* Main trigger button — FIXED RECTANGLE ON LEFT EDGE WITH LED PULSE */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="w-14 h-20 rounded-r-2xl flex items-center justify-center text-white cursor-pointer border-2 border-l-0"
+        className="w-12 sm:w-14 h-28 rounded-r-2xl flex items-center justify-center text-white cursor-pointer border-2 border-l-0 relative min-w-[3rem]"
         style={{
           background: isOpen
             ? 'linear-gradient(135deg, #ef4444, #b91c1c)'
             : 'linear-gradient(135deg, #22c55e, #15803d)',
           borderColor: isOpen ? '#fca5a5' : '#4ade80',
-          boxShadow: isOpen
-            ? '0 0 30px rgba(239,68,68,0.5)'
-            : '0 0 30px rgba(34,197,94,0.5)',
         }}
-        animate={
-          isOpen
-            ? { x: 0 }
-            : {
-                x: [0, 8, 0],
-                boxShadow: [
-                  '0 0 15px rgba(34,197,94,0.3)',
-                  '0 0 30px rgba(34,197,94,0.6)',
-                  '0 0 15px rgba(34,197,94,0.3)',
-                ],
-              }
-        }
-        transition={
-          isOpen
-            ? { duration: 0.3 }
-            : { x: { duration: 3, repeat: Infinity, ease: 'easeInOut' }, boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }
-        }
-        whileHover={{ scale: 1.05, x: 5 }}
+        animate={{
+          boxShadow: isOpen
+            ? '0 0 40px rgba(239,68,68,0.7)'
+            : [
+                '0 0 15px rgba(34,197,94,0.3)',
+                '0 0 45px rgba(34,197,94,0.8)',
+                '0 0 15px rgba(34,197,94,0.3)',
+              ],
+          scale: isOpen ? 1 : [1, 1.03, 1],
+        }}
+        transition={{
+          boxShadow: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+          scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' }
+        }}
+        whileHover={{ x: 8, transition: { duration: 0.2 } }}
         whileTap={{ scale: 0.9 }}
         aria-label={isOpen ? 'Close menu' : 'Quick booking'}
       >
-        <div className="flex flex-col items-center gap-1">
-          {isOpen ? <FaTimes size={20} /> : <FaPen size={20} />}
-          {!isOpen && <span className="text-[8px] font-black uppercase tracking-tighter">BOOK</span>}
+        <div className="flex flex-col items-center gap-3">
+          {isOpen ? <FaTimes size={20} /> : <FaPen size={20} className="animate-pulse" />}
+          {!isOpen && (
+             <span className="text-[9px] font-black uppercase tracking-[0.2em] [writing-mode:vertical-lr] rotate-180 opacity-80">
+               QUICK BOOK
+             </span>
+          )}
         </div>
+        
+        {/* LED Glow Overlay Segment */}
+        {!isOpen && (
+           <motion.div 
+             animate={{ opacity: [0.3, 1, 0.3] }}
+             transition={{ duration: 1, repeat: Infinity }}
+           />
+        )}
       </motion.button>
     </div>
   );

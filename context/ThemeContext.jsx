@@ -13,33 +13,28 @@ const THEMES = {
     accent: '#22c55e',
     card: '#111827',
     border: '#1f2937',
+    glow: 'rgba(34,197,94,0.4)',
   },
   light: {
     name: 'Light',
     emoji: '☀️',
-    bg: '#ffffff',
-    text: '#111827',
+    bg: '#f8fafc',
+    text: '#0f172a',
     accent: '#16a34a',
-    card: '#f9fafb',
-    border: '#e5e7eb',
+    card: '#ffffff',
+    border: '#e2e8f0',
+    glow: 'rgba(22,163,74,0.2)',
   },
-  reading: {
-    name: 'Reading',
-    emoji: '📖',
-    bg: '#fef3c7',
-    text: '#451a03',
-    accent: '#d97706',
-    card: '#fffbeb',
-    border: '#fde68a',
-  },
-  wild: {
-    name: 'Wild',
+  crazy: {
+    name: 'Crazy',
     emoji: '🔥',
-    bg: '#0f0a1e',
-    text: '#e0d4ff',
+    bg: '#000000',
+    text: '#ffffff',
     accent: '#a855f7',
-    card: '#1a1130',
-    border: '#4c1d95',
+    card: '#0f172a',
+    border: '#a855f7',
+    glow: 'rgba(168,85,247,0.8)',
+    animation: 'pulse-neon',
   },
 };
 
@@ -51,15 +46,20 @@ export function ThemeProvider({ children }) {
     if (saved && THEMES[saved]) {
       setTheme(saved);
     } else {
-      // Respect system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(prefersDark ? 'dark' : 'light');
+      // Force 'dark' as the absolute default for the "God-Mode" aesthetic
+      setTheme('dark');
     }
   }, []);
 
   useEffect(() => {
     localStorage.setItem('5s_theme', theme);
     const t = THEMES[theme];
+    
+    // Sync theme class to html element for Tailwind/CSS scoping
+    const html = document.documentElement;
+    html.classList.remove('dark', 'light', 'crazy');
+    html.classList.add(theme);
+
     document.documentElement.style.setProperty('--bg-primary', t.bg);
     document.documentElement.style.setProperty('--text-primary', t.text);
     document.documentElement.style.setProperty('--accent', t.accent);

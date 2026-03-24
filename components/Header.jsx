@@ -27,8 +27,11 @@ const NavIcon = ({ children }) => (
   </motion.span>
 );
 
+import { useTheme } from '@/context/ThemeContext';
+
 const Header = () => {
   const { data: session } = useSession();
+  const { theme, themes, cycleTheme } = useTheme();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dashboardOpen, setDashboardOpen] = useState(false);
@@ -44,8 +47,22 @@ const Header = () => {
         setDashboardOpen(false);
       }
     };
+    
+    // ── Alt + F5 God-Mode Refresh ──
+    const handleKeyDown = (e) => {
+      if (e.altKey && e.key === 'F5') {
+        e.preventDefault();
+        console.log('⚡ God-Mode Global Refresh Triggered');
+        window.location.reload(); 
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const navClass = (href) => {
@@ -103,6 +120,7 @@ const Header = () => {
     { href: '/leagues/add',       icon: <FaTrophy size={12} className="text-yellow-400" />,      label: '+ Add League' },
     { href: '/tournament',         icon: <FaTrophy size={12} className="text-green-400" />,       label: '+ Add Tournament' },
   ];
+  const [imgError, setImgError] = useState(false);
 
   return (
     <header className="bg-gray-950/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
@@ -110,9 +128,9 @@ const Header = () => {
         <div className="flex h-16 items-center justify-between">
 
           {/* ── Logo Container (Centered Content) ── */}
-          <Link href="/#about" className="flex items-center gap-3 group flex-shrink-0">
+          <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
             <motion.div
-              className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)] flex items-center justify-center"
+              className="relative relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)] flex items-center justify-center"
               whileHover={{ scale: 1.12, boxShadow: '0 0 22px rgba(34,197,94,0.75)', rotate: 5 }}
               whileTap={{ scale: 0.95 }}
               animate={{
@@ -135,92 +153,112 @@ const Header = () => {
              {/* Search Hub */}
              <SearchModal />
 
-             {/* GUEST: Public Tabs ONLY */}
-             {!session && publicTabs.map((tab) => (
+             {/* GUEST: Public Tabs */}
+             {!session && publicTabs.filter(t => t.label !== 'Tournament').map((tab) => (
                 <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
                   <NavIcon>{tab.icon}</NavIcon> {tab.label}
                 </Link>
               ))}
 
-             {/* USER: Public + User Tabs */}
-             {session && !isAdmin && !isManager && (
+             {/* USER/ADMIN/MANAGER: Shared Base + Role Specific */}
+             {session && (
                <>
-                 {publicTabs.map((tab) => (
+                 {/* Shared for all logged in */}
+                 {userTabs.slice(0, 3).map((tab) => (
                     <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
                       <NavIcon>{tab.icon}</NavIcon> {tab.label}
                     </Link>
                   ))}
-                  {userTabs.map((tab) => (
-                    <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
-                      <NavIcon>{tab.icon}</NavIcon> {tab.label}
-                    </Link>
-                  ))}
-               </>
-             )}
 
-             {/* MANAGER: Manager Tabs ONLY */}
-             {session && isManager && managerTabs.map((tab) => (
-                <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
-                  <NavIcon>{tab.icon}</NavIcon> {tab.label}
-                </Link>
-              ))}
-
-             {/* ADMIN: Admin Tabs ONLY + God-Mode Dropdown */}
-             {session && isAdmin && (
-               <>
-                 {adminTabs.map((tab) => (
+                 {/* MANAGER SPECIFIC */}
+                 {isManager && managerTabs.slice(2).map((tab) => (
                     <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
                       <NavIcon>{tab.icon}</NavIcon> {tab.label}
                     </Link>
                   ))}
-                  
-                  {/* God-Mode Quick Actions */}
-                  <div className="relative" ref={dropdownRef}>
-                    <motion.button
-                      onClick={() => setDashboardOpen(!dashboardOpen)}
-                      className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold text-green-400 hover:text-white hover:bg-green-700/20 rounded-lg transition-all uppercase tracking-widest border border-green-500/20 ml-2"
-                      whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <FaPlus size={10} /> God-Mode
-                    </motion.button>
-                    <AnimatePresence>
-                      {dashboardOpen && (
-                        <motion.div
-                          className="absolute right-0 top-full mt-2 w-60 bg-gray-950 border border-green-500/30 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-[60] backdrop-blur-xl"
-                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        >
-                           <div className="px-4 py-3 bg-green-500/10 border-b border-green-500/20">
-                             <p className="text-[10px] text-green-400 uppercase tracking-widest font-black">⚡ Dispatch Center</p>
-                           </div>
-                           <div className="p-2 grid grid-cols-1 gap-1">
-                             {dashboardDropdownItems.map((item) => (
-                               <Link key={item.href} href={item.href} onClick={() => setDashboardOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-xs text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all group">
-                                 <span className="group-hover:scale-125 transition-transform">{item.icon}</span>
-                                 <span className="font-bold uppercase tracking-widest">{item.label}</span>
-                               </Link>
-                             ))}
-                           </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+
+                 {/* ADMIN SPECIFIC */}
+                 {isAdmin && adminTabs.slice(0, 3).map((tab) => (
+                    <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                      <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                    </Link>
+                  ))}
+
+                 {/* Shared functional tabs */}
+                 {userTabs.slice(3).map((tab) => (
+                    <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                      <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                    </Link>
+                  ))}
+
+                  {/* God-Mode Quick Actions (Admin Only) */}
+                  {isAdmin && (
+                    <div className="relative" ref={dropdownRef}>
+                      <motion.button
+                        onClick={() => setDashboardOpen(!dashboardOpen)}
+                        className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold text-green-400 hover:text-white hover:bg-green-700/20 rounded-lg transition-all uppercase tracking-widest border border-green-500/20 ml-2"
+                        whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <FaPlus size={10} /> God-Mode
+                      </motion.button>
+                      <AnimatePresence>
+                        {dashboardOpen && (
+                          <motion.div
+                            className="absolute right-0 top-full mt-2 w-60 bg-gray-950 border border-green-500/30 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-[60] backdrop-blur-xl"
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                          >
+                             <div className="px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                               <p className="text-[10px] text-green-400 uppercase tracking-widest font-black">⚡ Dispatch Center</p>
+                             </div>
+                             <div className="p-2 grid grid-cols-1 gap-1">
+                               {dashboardDropdownItems.map((item) => (
+                                 <Link key={item.href} href={item.href} onClick={() => setDashboardOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-xs text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all group">
+                                   <span className="group-hover:scale-125 transition-transform">{item.icon}</span>
+                                   <span className="font-bold uppercase tracking-widest">{item.label}</span>
+                                 </Link>
+                               ))}
+                             </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
                </>
              )}
           </div>
 
-          {/* ── Actions (Profile, Logout, Mobile Toggle) ── */}
+          {/* ── Actions (Profile, Logout, Theme, Mobile Toggle) ── */}
           <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <motion.button
+              onClick={cycleTheme}
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all border border-gray-800/50"
+              whileHover={{ scale: 1.1, rotate: [0, -10, 10, 0] }}
+              whileTap={{ scale: 0.9 }}
+              title={`Switch to ${theme === 'dark' ? 'Light' : theme === 'light' ? 'Crazy' : 'Dark'} mode`}
+            >
+              <span className="text-sm">{themes[theme].emoji}</span>
+            </motion.button>
+
             {session ? (
               <div className="flex items-center gap-3">
                 <Link href="/profile" className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-gray-800 transition-all border border-transparent hover:border-gray-800">
-                   <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-green-500">
-                     {session.user.image ? (
-                        <Image src={session.user.image} alt="Profile" fill className="object-cover" />
+                   <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 bg-gray-900">
+                     {session.user.image && !imgError ? (
+                        <Image 
+                          src={session.user.image} 
+                          alt="Profile" 
+                          fill 
+                          className="object-cover" 
+                          onError={() => setImgError(true)}
+                        />
                      ) : (
-                        <div className="w-full h-full bg-green-600 flex items-center justify-center text-white text-[10px] font-black">{session.user.name?.[0] || 'U'}</div>
+                        <div className="w-full h-full bg-gradient-to-br from-green-600 to-emerald-800 flex items-center justify-center text-white text-[10px] font-black">
+                          {session.user.name?.[0]?.toUpperCase() || 'P'}
+                        </div>
                      )}
                    </div>
                    <div className="hidden lg:block text-left leading-none">
