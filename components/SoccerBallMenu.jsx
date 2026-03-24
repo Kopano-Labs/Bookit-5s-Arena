@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { FaFutbol, FaCalendarAlt, FaTrophy, FaTimes } from 'react-icons/fa';
+import { FaCalendarAlt, FaTrophy, FaTimes, FaPen, FaFutbol } from 'react-icons/fa';
 
 const MENU_ITEMS = [
   {
@@ -22,10 +22,10 @@ const MENU_ITEMS = [
   },
   {
     icon: FaTrophy,
-    label: 'Tournament',
-    href: '/tournament',
+    label: 'Competitions',
+    href: '/leagues',
     color: '#eab308',
-    desc: 'Register your team',
+    desc: 'Leagues & Tournament',
   },
 ];
 
@@ -44,12 +44,12 @@ export default function SoccerBallMenu() {
   };
 
   return (
-    <div className="fixed bottom-24 right-6 z-40">
+    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40">
       {/* Expanded menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute bottom-16 right-0 flex flex-col gap-2 mb-2"
+            className="absolute left-16 top-1/2 -translate-y-1/2 flex flex-col gap-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -61,14 +61,15 @@ export default function SoccerBallMenu() {
                   key={item.href}
                   onClick={() => navigate(item.href)}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700 shadow-lg cursor-pointer whitespace-nowrap"
-                  initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                  initial={{ opacity: 0, x: -20, scale: 0.8 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 20, scale: 0.8 }}
+                  exit={{ opacity: 0, x: -20, scale: 0.8 }}
                   transition={{ delay: (MENU_ITEMS.length - i) * 0.06, type: 'spring', stiffness: 300, damping: 20 }}
                   whileHover={{
                     scale: 1.05,
                     borderColor: item.color,
                     boxShadow: `0 0 20px ${item.color}30`,
+                    transition: { duration: 0.2, type: 'tween' },
                   }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -89,26 +90,27 @@ export default function SoccerBallMenu() {
         )}
       </AnimatePresence>
 
-      {/* "Book Now" text on hover */}
+      {/* "Quick Book" label on hover */}
       <AnimatePresence>
         {isHovered && !isOpen && (
           <motion.div
-            className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-lg whitespace-nowrap"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
+            key="label"
+            className="absolute left-16 top-1/2 -translate-y-1/2 bg-green-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg whitespace-nowrap"
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
           >
-            Book Now
+            Quick Book
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Soccer ball button */}
+      {/* Main button — rectangle, left-center, writing icon */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="w-14 h-14 rounded-full flex items-center justify-center text-white cursor-pointer border-2"
+        className="w-12 h-16 rounded-r-xl flex items-center justify-center text-white cursor-pointer border-2 border-l-0"
         style={{
           background: isOpen
             ? 'linear-gradient(135deg, #dc2626, #b91c1c)'
@@ -120,9 +122,9 @@ export default function SoccerBallMenu() {
         }}
         animate={
           isOpen
-            ? { rotate: 90 }
+            ? { rotate: 0 }
             : {
-                y: [0, -6, 0],
+                x: [0, 4, 0],
                 boxShadow: [
                   '0 0 15px rgba(34,197,94,0.3)',
                   '0 0 25px rgba(34,197,94,0.6)',
@@ -132,14 +134,14 @@ export default function SoccerBallMenu() {
         }
         transition={
           isOpen
-            ? { duration: 0.3 }
-            : { y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }, boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }
+            ? { duration: 0.3, ease: 'easeOut' }
+            : { x: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }, boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }
         }
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.1, transition: { duration: 0.15, type: 'tween' } }}
         whileTap={{ scale: 0.9 }}
         aria-label={isOpen ? 'Close menu' : 'Quick booking'}
       >
-        {isOpen ? <FaTimes size={18} /> : <FaFutbol size={20} />}
+        {isOpen ? <FaTimes size={16} /> : <FaPen size={16} />}
       </motion.button>
     </div>
   );
