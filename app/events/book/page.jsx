@@ -90,7 +90,9 @@ function EventBookingContent() {
     name: '', email: '', phone: '',
     date: '', time: '10:00', guests: '',
     specialRequests: '',
+    termsAccepted: false,
   });
+  const [showTerms, setShowTerms] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -333,22 +335,32 @@ function EventBookingContent() {
                       placeholder="Any special requirements, dietary needs, etc." />
                   </div>
 
-                  {/* Info note */}
-                  <div className="flex items-start gap-2 text-[10px] text-gray-500 bg-gray-800/30 rounded-lg p-3 border border-gray-800/50">
-                    <FaInfoCircle className="mt-0.5 flex-shrink-0 text-gray-600" />
-                    <span>Contact us for pricing — packages are customised to your needs. A 50% deposit is required to secure your booking date. <strong>IMPORTANT: You must use "5's Arena World Cup" as the payment reference for all transactions.</strong> Our team will confirm within 24 hours.</span>
+                  {/* Terms & Conditions Checkbox */}
+                  <div className="flex items-start gap-3 p-3 bg-gray-800/30 rounded-xl border border-gray-800/50">
+                    <input 
+                      type="checkbox" 
+                      id="terms" 
+                      name="termsAccepted" 
+                      checked={form.termsAccepted} 
+                      onChange={(e) => setForm(prev => ({ ...prev, termsAccepted: e.target.checked }))}
+                      required
+                      className="mt-1 w-4 h-4 rounded border-gray-700 bg-gray-900 text-green-600 focus:ring-green-500 focus:ring-offset-gray-950 cursor-pointer" 
+                    />
+                    <label htmlFor="terms" className="text-[11px] text-gray-400 leading-tight cursor-pointer">
+                      I have read and agree to the <button type="button" onClick={() => setShowTerms(true)} className="text-green-500 hover:text-green-400 font-bold underline decoration-green-500/30">Terms & Conditions</button>, including the 50% non-refundable deposit policy and the mandatory <strong>"5's Arena World Cup"</strong> payment reference requirement.
+                    </label>
                   </div>
 
                   <motion.button
-                    type="submit" disabled={submitting}
-                    className="w-full py-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all disabled:opacity-50 cursor-pointer relative overflow-hidden"
-                    style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)', backgroundSize: '200% 200%' }}
-                    animate={{ backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'], boxShadow: ['0 0 20px rgba(16,185,129,0.3)', '0 0 35px rgba(16,185,129,0.5)', '0 0 20px rgba(16,185,129,0.3)'] }}
+                    type="submit" disabled={submitting || !form.termsAccepted}
+                    className="w-full py-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer relative overflow-hidden"
+                    style={{ background: form.termsAccepted ? 'linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)' : '#374151', backgroundSize: '200% 200%' }}
+                    animate={form.termsAccepted ? { backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'], boxShadow: ['0 0 20px rgba(16,185,129,0.3)', '0 0 35px rgba(16,185,129,0.5)', '0 0 20px rgba(16,185,129,0.3)'] } : {}}
                     transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
+                    whileHover={form.termsAccepted ? { scale: 1.02 } : {}}
+                    whileTap={form.termsAccepted ? { scale: 0.97 } : {}}
                   >
-                    <motion.div className="absolute inset-0" style={{ background: 'linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%)', backgroundSize: '200% 100%' }} animate={{ backgroundPosition: ['-100% 0', '200% 0'] }} transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1 }} />
+                    {form.termsAccepted && <motion.div className="absolute inset-0" style={{ background: 'linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%)', backgroundSize: '200% 100%' }} animate={{ backgroundPosition: ['-100% 0', '200% 0'] }} transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1 }} />}
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       <FaCalendarCheck /> {submitting ? 'Submitting...' : 'Submit Booking Request'}
                     </span>
@@ -358,6 +370,65 @@ function EventBookingContent() {
             </motion.div>
           </div>
         )}
+
+        {/* Terms Modal */}
+        <AnimatePresence>
+          {showTerms && (
+            <motion.div 
+              className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowTerms(false)} />
+              <motion.div 
+                className="relative bg-gray-950 border border-gray-800 rounded-3xl p-8 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl"
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+              >
+                <button onClick={() => setShowTerms(false)} className="absolute top-5 right-5 text-gray-500 hover:text-white transition-colors">
+                  <FaTimes size={18} />
+                </button>
+                <h3 className="text-2xl font-black text-white uppercase tracking-widest mb-6" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                  Terms & <span className="text-green-400">Conditions</span>
+                </h3>
+                <div className="prose prose-invert prose-sm max-w-none text-gray-400 space-y-4">
+                  <section>
+                    <h4 className="text-white font-bold uppercase tracking-wider text-xs flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> 1. Booking & Cancellation</h4>
+                    <p>All event bookings require a 50% non-refundable deposit to secure the date. Cancellations made within 7 days of the event will forfeit the entire deposit.</p>
+                  </section>
+                  <section>
+                    <h4 className="text-white font-bold uppercase tracking-wider text-xs flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> 2. Payment Reference</h4>
+                    <p className="bg-green-900/20 border border-green-800/50 p-3 rounded-xl text-green-400 font-bold">
+                      CRITICAL: All electronic transfers (EFT) must use the specific reference "5's Arena World Cup". Failure to use this reference may result in delays or loss of booking visibility in our accounting system.
+                    </p>
+                  </section>
+                  <section>
+                    <h4 className="text-white font-bold uppercase tracking-wider text-xs flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> 3. Pitch Rules</h4>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Correct footwear (astro turf trainers or smooth soles) only. No metal studs.</li>
+                      <li>Players must arrive 15 minutes before the scheduled time.</li>
+                      <li>Alcohol is only permitted in the designated bar/clubhouse area.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4 className="text-white font-bold uppercase tracking-wider text-xs flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> 4. Liability</h4>
+                    <p>5's Arena and its staff are not responsible for injuries or lost property. All players participate at their own risk.</p>
+                  </section>
+                </div>
+                <motion.button 
+                  onClick={() => { setForm(prev => ({ ...prev, termsAccepted: true })); setShowTerms(false); }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full mt-8 py-4 bg-green-600 hover:bg-green-500 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-lg"
+                >
+                  I Accept These Terms
+                </motion.button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
