@@ -62,10 +62,10 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
-    // 'user' = regular user, 'admin' = can add/edit/delete courts
+    // 'user' = regular user, 'manager' = manages squads/tournaments, 'admin' = can add/edit/delete courts & god-mode
     role: {
       type: String,
-      enum: ['user', 'admin'],
+      enum: ['user', 'manager', 'admin'],
       default: 'user',
     },
     // Referral system

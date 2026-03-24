@@ -8,6 +8,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import {
   FaSignInAlt, FaGoogle, FaUserSecret, FaEnvelope, FaLock,
   FaUserPlus, FaUser, FaShieldAlt, FaTrophy, FaStar, FaBolt,
+  FaGithub, FaApple, FaMicrosoft, FaGlobe, FaTicketAlt
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -150,11 +151,15 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [githubLoading, setGithubLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
+  const [microsoftLoading, setMicrosoftLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    if (!recaptchaToken) { setError('Please complete the security check.'); return; }
     setLoading(true);
     const result = await signIn('credentials', { email, password, redirect: false });
     setLoading(false);
@@ -189,9 +194,12 @@ export default function AuthPage() {
     else { router.push('/'); router.refresh(); }
   };
 
-  const handleGoogleSignIn = async () => {
-    setGoogleLoading(true);
-    await signIn('google', { callbackUrl: '/' });
+  const handleProviderSignIn = async (provider) => {
+    if (provider === 'google') setGoogleLoading(true);
+    if (provider === 'github') setGithubLoading(true);
+    if (provider === 'apple') setAppleLoading(true);
+    if (provider === 'azure-ad') setMicrosoftLoading(true);
+    await signIn(provider, { callbackUrl: '/' });
   };
 
   const inputClass = (field) =>
@@ -205,36 +213,44 @@ export default function AuthPage() {
 
       <div className="w-full max-w-5xl relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
-        {/* ── Left: Branding ── */}
+        {/* ── Left: FIFA WC Ad ── */}
         <motion.div
-          className="flex-1 text-center lg:text-left max-w-md"
+          className="flex-1 text-center lg:text-left max-w-md relative"
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
+          {/* Ad Badge */}
+          <motion.div 
+            className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full bg-gradient-to-r from-yellow-600/20 to-amber-900/30 border border-yellow-500/30 text-yellow-500 text-[10px] font-black tracking-widest uppercase shadow-[0_0_20px_rgba(234,179,8,0.2)]"
+            animate={{ boxShadow: ['0 0 10px rgba(234,179,8,0.2)', '0 0 25px rgba(234,179,8,0.5)', '0 0 10px rgba(234,179,8,0.2)'] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <FaTrophy size={11} /> Official Tournament
+          </motion.div>
+
           <motion.div
-            className="mb-6"
+            className="mb-8"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           >
             <h1
-              className="font-black uppercase"
+              className="font-black uppercase tracking-tight leading-none mb-2"
               style={{
-                fontSize: 'clamp(3rem, 8vw, 5rem)',
+                fontSize: 'clamp(3rem, 7vw, 4.5rem)',
                 fontFamily: 'Impact, Arial Black, sans-serif',
-                background: 'linear-gradient(135deg, #ffffff 0%, #4ade80 40%, #22c55e 70%, #16a34a 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                filter: 'drop-shadow(0 0 30px rgba(34,197,94,0.3))',
-                lineHeight: 1,
+                color: '#fff',
+                filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))',
               }}
             >
-              5S ARENA
+              WORLD CUP <span className="text-green-500">'26</span>
             </h1>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-300 uppercase tracking-widest flex items-center gap-3 justify-center lg:justify-start mt-4">
+              <FaGlobe className="text-blue-500" /> Global 5-a-side Clash
+            </h2>
             <motion.div
-              className="h-1 w-16 lg:w-24 bg-gradient-to-r from-green-500 to-emerald-400 rounded-full mt-3 mx-auto lg:mx-0"
+              className="h-1 w-24 bg-gradient-to-r from-yellow-500 to-amber-400 rounded-full mt-5 mx-auto lg:mx-0"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 0.5, duration: 0.6 }}
@@ -242,22 +258,38 @@ export default function AuthPage() {
             />
           </motion.div>
 
-          <motion.p
-            className="text-gray-400 text-lg leading-relaxed mb-8"
+          <motion.div
+            className="bg-gray-900/60 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 mb-8 text-left relative overflow-hidden group shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            {mode === 'login'
-              ? 'Welcome back to the pitch. Sign in to manage your bookings and unlock rewards.'
-              : 'Join the arena. Create your account and start booking courts today.'}
-          </motion.p>
-
-          <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-            <FeatureBadge icon={<FaTrophy size={11} />} text="Loyalty Rewards" delay={0.5} />
-            <FeatureBadge icon={<FaBolt size={11} />} text="Instant Booking" delay={0.6} />
-            <FeatureBadge icon={<FaStar size={11} />} text="Member Perks" delay={0.7} />
-          </div>
+            {/* Animated gleam */}
+            <motion.div 
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-[200%] -translate-x-full pointer-events-none"
+              animate={{ translateX: ['-100%', '200%'] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+            />
+            
+            <p className="text-gray-300 text-sm leading-relaxed font-medium relative z-10">
+              Registrations are now open for the ultimate <strong className="text-white text-base">48-team tournament</strong>. Represent your chosen nation, compete in the UEFA format group stages, and win massive cash prizes + social rewards!
+            </p>
+            
+            <div className="mt-5 flex flex-col gap-3 relative z-10">
+              <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">
+                <span>Start Date</span>
+                <span className="text-green-400 flex items-center gap-1.5"><FaCalendarAlt /> 29 May 2026</span>
+              </div>
+              <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">
+                <span>Reg. Fee</span>
+                <span className="text-yellow-400">ZAR 3,000</span>
+              </div>
+            </div>
+            
+            <Link href="/tournament" className="mt-6 w-full flex items-center justify-center gap-2 py-3.5 bg-green-600 hover:bg-green-500 text-white font-black uppercase tracking-widest text-sm rounded-xl transition-all shadow-[0_0_20px_rgba(22,163,74,0.4)] hover:shadow-[0_0_30px_rgba(34,197,94,0.6)] relative z-10 cursor-pointer">
+              <FaTicketAlt /> Secure Your Team Spot
+            </Link>
+          </motion.div>
         </motion.div>
 
         {/* ── Right: Auth card ── */}
@@ -310,17 +342,49 @@ export default function AuthPage() {
                 )}
               </AnimatePresence>
 
-              {/* Google */}
-              <motion.button
-                onClick={handleGoogleSignIn}
-                disabled={googleLoading}
-                className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-gray-800/50 border border-gray-700/40 rounded-xl text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 hover:text-white transition-all disabled:opacity-50 backdrop-blur-sm cursor-pointer mb-4"
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <FaGoogle className="text-red-400" />
-                {googleLoading ? 'Redirecting...' : 'Continue with Google'}
-              </motion.button>
+              {/* Social Login Providers */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <motion.button
+                  onClick={() => handleProviderSignIn('google')}
+                  disabled={googleLoading}
+                  className="flex items-center justify-center gap-2 py-3 px-2 bg-gray-800/50 border border-gray-700/40 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 transition-all disabled:opacity-50"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <FaGoogle className="text-red-400 flex-shrink-0" />
+                  <span className="truncate">Google</span>
+                </motion.button>
+                <motion.button
+                  onClick={() => handleProviderSignIn('apple')}
+                  disabled={appleLoading}
+                  className="flex items-center justify-center gap-2 py-3 px-2 bg-gray-800/50 border border-gray-700/40 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 transition-all disabled:opacity-50"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <FaApple className="text-white flex-shrink-0" />
+                  <span className="truncate">Apple</span>
+                </motion.button>
+                <motion.button
+                  onClick={() => handleProviderSignIn('azure-ad')}
+                  disabled={microsoftLoading}
+                  className="flex items-center justify-center gap-2 py-3 px-2 bg-gray-800/50 border border-gray-700/40 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 transition-all disabled:opacity-50"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <FaMicrosoft className="text-blue-400 flex-shrink-0" />
+                  <span className="truncate">Microsoft</span>
+                </motion.button>
+                <motion.button
+                  onClick={() => handleProviderSignIn('github')}
+                  disabled={githubLoading}
+                  className="flex items-center justify-center gap-2 py-3 px-2 bg-gray-800/50 border border-gray-700/40 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 transition-all disabled:opacity-50"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <FaGithub className="text-gray-400 flex-shrink-0" />
+                  <span className="truncate">GitHub</span>
+                </motion.button>
+              </div>
 
               {mode === 'login' && (
                 <Link href="/">
@@ -392,29 +456,30 @@ export default function AuthPage() {
                           onFocus={() => setFocusedField('confirm')} onBlur={() => setFocusedField(null)}
                           className={inputClass('confirm')} placeholder="Repeat password" />
                       </div>
-
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <FaShieldAlt className="text-green-500" size={12} />
-                          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Security Check</span>
-                        </div>
-                        <div className={`rounded-xl border p-3 transition-all flex justify-center backdrop-blur-sm ${recaptchaToken ? 'border-green-600/40 bg-green-900/10' : 'border-gray-700/40 bg-gray-800/20'}`}>
-                          {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== 'your_site_key_here' ? (
-                            <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} onChange={(token) => setRecaptchaToken(token || '')} onExpired={() => setRecaptchaToken('')} theme="dark" />
-                          ) : (
-                            <div className="text-center py-2">
-                              <p className="text-xs text-amber-500 font-semibold">reCAPTCHA not configured</p>
-                              <button type="button" onClick={() => setRecaptchaToken('dev-bypass')} className="mt-1.5 text-xs text-green-500 underline cursor-pointer">[Dev] Skip verification</button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
                     </>
                   )}
 
+                  {/* Global reCAPTCHA Security Check */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <FaShieldAlt className="text-green-500" size={12} />
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Security Check</span>
+                    </div>
+                    <div className={`rounded-xl border p-3 transition-all flex justify-center backdrop-blur-sm ${recaptchaToken ? 'border-green-600/40 bg-green-900/10' : 'border-gray-700/40 bg-gray-800/20'}`}>
+                      {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== 'your_site_key_here' ? (
+                        <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} onChange={(token) => setRecaptchaToken(token || '')} onExpired={() => setRecaptchaToken('')} theme="dark" />
+                      ) : (
+                        <div className="text-center py-2">
+                          <p className="text-xs text-amber-500 font-semibold">reCAPTCHA not configured</p>
+                          <button type="button" onClick={() => setRecaptchaToken('dev-bypass')} className="mt-1.5 text-xs text-green-500 underline cursor-pointer">[Dev] Skip verification</button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <motion.button
                     type="submit"
-                    disabled={loading || (mode === 'register' && !recaptchaToken)}
+                    disabled={loading || !recaptchaToken}
                     className="w-full py-4 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-2 relative overflow-hidden cursor-pointer"
                     style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)', backgroundSize: '200% 200%' }}
                     animate={{

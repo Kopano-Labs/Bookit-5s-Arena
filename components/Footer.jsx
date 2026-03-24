@@ -75,8 +75,12 @@ const Footer = () => {
   const { data: session, status } = useSession();
   const currentYear = new Date().getFullYear();
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
 
   useEffect(() => {
+    // Set shareUrl on mount (client-only) to avoid hydration mismatch
+    setShareUrl(window.location.href);
+
     const onScroll = () => setShowBackToTop(window.scrollY > 300);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -84,12 +88,12 @@ const Footer = () => {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
   const handleShare = () => {
+    const url = window.location.href;
     if (navigator.share) {
-      navigator.share({ title: '5s Arena', url: shareUrl });
+      navigator.share({ title: '5s Arena', url });
     } else {
-      navigator.clipboard?.writeText(shareUrl);
+      navigator.clipboard?.writeText(url);
     }
   };
 

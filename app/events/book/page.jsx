@@ -137,7 +137,8 @@ function EventBookingContent() {
             Your <span className="text-green-400 font-bold">{selectedPkg?.name}</span> event has been submitted.
           </p>
           <p className="text-gray-500 text-sm mb-6">
-            Our team will contact you within 24 hours to finalise details and payment.
+            Our team will contact you within 24 hours to finalise details. <br/>
+            <strong className="text-yellow-400 mt-2 block">IMPORTANT: Please use "5's Arena World Cup" as your payment reference for all deposits and EFTs.</strong>
           </p>
           <div className="flex gap-3">
             <Link href="/events" className="flex-1">
@@ -335,7 +336,7 @@ function EventBookingContent() {
                   {/* Info note */}
                   <div className="flex items-start gap-2 text-[10px] text-gray-500 bg-gray-800/30 rounded-lg p-3 border border-gray-800/50">
                     <FaInfoCircle className="mt-0.5 flex-shrink-0 text-gray-600" />
-                    <span>Contact us for pricing — packages are customised to your needs. A 50% deposit is required to secure your booking date. Our team will confirm within 24 hours.</span>
+                    <span>Contact us for pricing — packages are customised to your needs. A 50% deposit is required to secure your booking date. <strong>IMPORTANT: You must use "5's Arena World Cup" as the payment reference for all transactions.</strong> Our team will confirm within 24 hours.</span>
                   </div>
 
                   <motion.button

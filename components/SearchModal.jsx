@@ -3,31 +3,57 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { FaSearch, FaFutbol, FaTrophy, FaCalendarAlt, FaGavel, FaStar, FaUser, FaChartBar, FaTimes } from 'react-icons/fa';
+import { useSession } from 'next-auth/react';
+import { 
+  FaSearch, FaFutbol, FaTrophy, FaCalendarAlt, FaGavel, 
+  FaStar, FaUser, FaChartBar, FaTimes, FaNewspaper 
+} from 'react-icons/fa';
 
 const PAGES = [
-  { name: 'Book a Court', href: '/#courts', icon: FaFutbol, category: 'Booking' },
-  { name: 'Events & Services', href: '/events-and-services', icon: FaCalendarAlt, category: 'Booking' },
-  { name: 'Tournament', href: '/tournament', icon: FaTrophy, category: 'Competition' },
-  { name: 'Live Fixtures', href: '/fixtures', icon: FaChartBar, category: 'Competition' },
-  { name: 'Leagues', href: '/leagues', icon: FaTrophy, category: 'Competition' },
-  { name: 'Rules of the Game', href: '/rules-of-the-game', icon: FaGavel, category: 'Info' },
-  { name: 'Rewards', href: '/rewards', icon: FaStar, category: 'Account' },
-  { name: 'My Bookings', href: '/bookings', icon: FaCalendarAlt, category: 'Account' },
-  { name: 'Profile', href: '/profile', icon: FaUser, category: 'Account' },
-  { name: 'Creator', href: '/creator', icon: FaUser, category: 'Info' },
+  // Public (Guests & Everyone)
+  { name: 'Book a Court', href: '/#courts', icon: FaFutbol, category: 'Booking', auth: 'public' },
+  { name: 'Events & Services', href: '/events-and-services', icon: FaCalendarAlt, category: 'Booking', auth: 'public' },
+  { name: 'Tournament', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
+  { name: 'Leagues', href: '/leagues', icon: FaTrophy, category: 'Competition', auth: 'public' },
+  
+  // Authenticated Users (User, Manager, Admin)
+  { name: 'Live Fixtures', href: '/fixtures', icon: FaChartBar, category: 'Competition', auth: 'user' },
+  { name: 'Rules of the Game', href: '/rules-of-the-game', icon: FaGavel, category: 'Info', auth: 'user' },
+  { name: 'Rewards', href: '/rewards', icon: FaStar, category: 'Account', auth: 'user' },
+  { name: 'My Bookings', href: '/bookings', icon: FaCalendarAlt, category: 'Account', auth: 'user' },
+  { name: 'Profile', href: '/profile', icon: FaUser, category: 'Account', auth: 'user' },
+  { name: 'Creator', href: '/creator', icon: FaUser, category: 'Info', auth: 'user' },
+
+  // Admins Only
+  { name: 'Admin Dashboard', href: '/admin/dashboard', icon: FaChartBar, category: 'Admin', auth: 'admin' },
+  { name: 'User Management', href: '/admin/users', icon: FaUser, category: 'Admin', auth: 'admin' },
+  { name: 'Add Event', href: '/events/add', icon: FaCalendarAlt, category: 'Admin', auth: 'admin' },
+  { name: 'Add Newsletter', href: '/admin/newsletter', icon: FaNewspaper, category: 'Admin', auth: 'admin' },
 ];
 
 const SearchModal = () => {
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
   const router = useRouter();
 
-  const filtered = PAGES.filter((p) =>
-    p.name.toLowerCase().includes(query.toLowerCase()) ||
-    p.category.toLowerCase().includes(query.toLowerCase())
-  );
+  const userRole = session?.user?.role;
+  const isAuthenticated = !!session;
+  const isAdmin = userRole === 'admin';
+
+  // Filter based on authentication role and query
+  const filtered = PAGES.filter((p) => {
+    // 1. Enforce interface separation
+    if (p.auth === 'admin' && !isAdmin) return false;
+    if (p.auth === 'user' && !isAuthenticated) return false;
+
+    // 2. Enforce query search
+    return (
+      p.name.toLowerCase().includes(query.toLowerCase()) ||
+      p.category.toLowerCase().includes(query.toLowerCase())
+    );
+  });
 
   const handleKeyDown = useCallback((e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {

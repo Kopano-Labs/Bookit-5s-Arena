@@ -136,26 +136,9 @@ const Header = () => {
             </span>
           </Link>
 
-          {/* ── Search + Social Icons ── */}
+          {/* ── Search ── */}
           <div className="hidden md:flex items-center gap-2 mx-3">
             <SearchModal />
-            {[{ icon: FaTiktok, href: 'https://www.tiktok.com/@fivesarena', label: 'TikTok', color: '#ffffff' },
-              { icon: FaInstagram, href: 'https://www.instagram.com/fivesarena', label: 'Instagram', color: '#e1306c' },
-              { icon: FaFacebook, href: 'https://www.facebook.com/profile.php?id=61588019843126', label: 'Facebook', color: '#1877f2' },
-            ].map(({ icon: Icon, href, label, color }) => (
-              <motion.a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-white transition-all"
-                whileHover={{ scale: 1.2, color }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Icon size={14} />
-              </motion.a>
-            ))}
           </div>
 
           {/* ── Blog Promo Button ── */}

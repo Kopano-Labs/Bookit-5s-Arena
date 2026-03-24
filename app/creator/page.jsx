@@ -122,7 +122,7 @@ function WelcomeAnimation({ onComplete }) {
         <motion.div
           style={{ fontSize: "5rem", display: "block", marginBottom: "1.5rem" }}
           animate={{ rotate: [0, 360], scale: [0, 1.3, 1] }}
-          transition={{ duration: 1.5, type: "spring", stiffness: 100 }}
+          transition={{ duration: 1.5, ease: 'easeOut' }}
         >
           ⚽
         </motion.div>
