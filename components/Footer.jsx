@@ -20,8 +20,13 @@ const SOCIALS = [
   { icon: FaWhatsapp, href: 'https://wa.me/27637820245', label: 'WhatsApp', bg: '#25d366' },
 ];
 
-/* ─── Quick links ─────────────────────────────────────────── */
-const QUICK_LINKS = [
+/* ── Quick links — role-based ─────────────────────────────── */
+const GUEST_QUICK_LINKS = [
+  { label: 'Book a Court', href: '/#courts' },
+  { label: 'Book an Event', href: '/events-and-services' },
+  { label: 'Register for Competitions', href: '/leagues' },
+];
+const AUTH_QUICK_LINKS = [
   { label: 'Book a Court', href: '/#courts' },
   { label: 'Events & Services', href: '/events-and-services' },
   { label: 'Rules of the Game', href: '/rules-of-the-game' },
@@ -239,34 +244,32 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          {status === 'authenticated' && (
-            <div>
-              <motion.h4
-                className="text-green-400 font-bold text-xs uppercase tracking-[0.2em] mb-5"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-              >
-                Quick Links
-              </motion.h4>
-              <ul className="space-y-2">
-                {QUICK_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <motion.div whileHover={{ x: 3, scale: 1.02 }} transition={{ duration: 0.15 }}>
-                      <Link
-                        href={link.href}
-                        className="text-gray-400 hover:text-white text-sm transition-all flex items-center gap-2 bg-gray-800/40 hover:bg-green-600/20 px-3 py-2 rounded-lg border border-gray-800/60 hover:border-green-500/30"
-                      >
-                        <span className="text-green-500 text-xs">→</span>
-                        {link.label}
-                      </Link>
-                    </motion.div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {/* Quick Links — role-based */}
+          <div>
+            <motion.h4
+              className="text-green-400 font-bold text-xs uppercase tracking-[0.2em] mb-5"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              Quick Links
+            </motion.h4>
+            <ul className="space-y-2">
+              {(status === 'authenticated' ? AUTH_QUICK_LINKS : GUEST_QUICK_LINKS).map((link) => (
+                <li key={link.href}>
+                  <motion.div whileHover={{ x: 3, scale: 1.02 }} transition={{ duration: 0.15 }}>
+                    <Link
+                      href={link.href}
+                      className="text-gray-400 hover:text-white text-sm transition-all flex items-center gap-2 bg-gray-800/40 hover:bg-green-600/20 px-3 py-2 rounded-lg border border-gray-800/60 hover:border-green-500/30"
+                    >
+                      <span className="text-green-500 text-xs">→</span>
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Contact */}
           <div>
@@ -385,7 +388,7 @@ const Footer = () => {
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  Built with <FaHeart className="text-red-500" size={8} /> by Kholofelo Robyn Rababalela
+                  Built with ♡ by Kholofelo Robyn Rababalela
                 </motion.p>
               </Link>
             </div>
@@ -398,7 +401,7 @@ const Footer = () => {
         {showBackToTop && (
           <motion.button
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-green-600 border-2 border-green-400 flex items-center justify-center text-white shadow-lg cursor-pointer"
+            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-green-600 border-2 border-green-400 flex items-center justify-center text-white shadow-lg cursor-pointer"
             style={{ boxShadow: '0 0 20px rgba(34,197,94,0.5)' }}
             initial={{ opacity: 0, y: 20, scale: 0 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
