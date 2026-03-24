@@ -25,6 +25,26 @@ export default withAuth(
       return NextResponse.redirect(new URL('/manager', req.url));
     }
 
+    // 4. Guest Restricted Access
+    // The user requested: "Guest: ONLY Book Court, Events, Register for Competitions"
+    if (role === 'guest') {
+      const allowedPrefixes = [
+        '/events',
+        '/tournament',
+        '/competitions',
+        '/login',
+        '/register',
+        '/api',
+        '/_next'
+      ];
+      
+      const isAllowed = path === '/' || allowedPrefixes.some(p => path.startsWith(p));
+      
+      if (!isAllowed) {
+        return NextResponse.redirect(new URL('/login', req.url));
+      }
+    }
+
     return NextResponse.next();
   },
   {

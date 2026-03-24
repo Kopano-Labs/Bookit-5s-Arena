@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
   FaCalendarAlt, FaFutbol, FaMoneyBillWave, FaClock,
   FaFilter, FaTimes, FaUsers, FaCheckCircle, FaHourglassHalf,
-  FaBan, FaArrowUp, FaChartBar, FaStar,
+  FaBan, FaArrowUp, FaChartBar, FaStar, FaUserSecret, FaCogs, FaShieldAlt, FaBullhorn
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import InfoTooltip from '@/components/InfoTooltip';
@@ -195,6 +195,49 @@ const AdminDashboard = () => {
               {card.sub2 && <p className="text-xs text-green-500 font-semibold">{card.sub2}</p>}
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* ── GOD-MODE CONTROL CENTER ── */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: 0.2, duration: 0.5 } } }}
+          initial="hidden"
+          animate="visible"
+          className="bg-black/40 border border-red-900/30 rounded-2xl p-6 shadow-[0_0_30px_rgba(220,38,38,0.05)] relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+          
+          <div className="flex items-center gap-3 mb-6 relative z-10">
+            <div className="bg-red-900/40 p-2 rounded-lg border border-red-500/30">
+              <FaShieldAlt className="text-red-500 text-xl" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-widest leading-none">God-Mode Controls</h2>
+              <p className="text-xs text-red-400 font-bold uppercase tracking-wider mt-1">Super-Admin Privileges Only</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+            <button className="flex flex-col items-center justify-center p-4 bg-gray-900/80 border border-gray-700/50 hover:border-red-500/50 hover:bg-gray-800 rounded-xl transition-all group">
+              <FaUserSecret className="text-2xl text-purple-400 mb-3 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-bold text-white uppercase tracking-widest">Impersonate User</span>
+              <span className="text-[10px] text-gray-500 text-center mt-1">Ghost login to debug issues</span>
+            </button>
+            <button className="flex flex-col items-center justify-center p-4 bg-gray-900/80 border border-gray-700/50 hover:border-red-500/50 hover:bg-gray-800 rounded-xl transition-all group">
+              <FaCogs className="text-2xl text-blue-400 mb-3 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-bold text-white uppercase tracking-widest">Feature Flags</span>
+              <span className="text-[10px] text-gray-500 text-center mt-1">Toggle maintenance & systems</span>
+            </button>
+            <button className="flex flex-col items-center justify-center p-4 bg-gray-900/80 border border-gray-700/50 hover:border-red-500/50 hover:bg-gray-800 rounded-xl transition-all group">
+              <FaBullhorn className="text-2xl text-yellow-500 mb-3 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-bold text-white uppercase tracking-widest">Global Broadcast</span>
+              <span className="text-[10px] text-gray-500 text-center mt-1">Dispatch SMS/Newsletters</span>
+            </button>
+            <button className="flex flex-col items-center justify-center p-4 bg-gray-900/80 border border-gray-700/50 hover:border-red-500/50 hover:bg-gray-800 rounded-xl transition-all group">
+              <FaBan className="text-2xl text-red-500 mb-3 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-bold text-white uppercase tracking-widest">Access Control</span>
+              <span className="text-[10px] text-gray-500 text-center mt-1">Manage bans & permissions</span>
+            </button>
+          </div>
         </motion.div>
 
         {/* Revenue trend + Status breakdown row */}

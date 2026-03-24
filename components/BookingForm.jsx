@@ -123,13 +123,13 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
           </p>
         </div>
         <div className="bg-amber-900/20 border border-amber-700/40 rounded-xl p-4 mb-5 text-sm text-amber-300">
-          <p className="font-bold mb-1">Payment required on arrival — R{totalPrice}</p>
-          <p className="text-amber-400/80 text-xs">
-            Your slot is held. Please contact us to finalise your reservation.
+          <p className="font-bold mb-1">EFT Payment Required — R{totalPrice}</p>
+          <p className="text-amber-400/80 text-xs leading-relaxed">
+            Your slot is held. Please perform an EFT/Deposit to our Capitec Account using the reference <strong>"5's Arena World Cup"</strong> so our accountant can securely track your payment.
           </p>
         </div>
         <p className="text-gray-400 text-xs mb-4 text-center font-bold uppercase tracking-widest">
-          Contact us to confirm
+          Send Proof of Payment via WhatsApp
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <motion.a
@@ -201,7 +201,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                 onClick={() => setShowGuestForm((v) => !v)}
                 className="bg-gray-900 px-3 flex items-center gap-1 text-gray-500 hover:text-amber-400 text-xs uppercase tracking-widest transition-colors"
               >
-                or reserve as guest · pay at venue
+                or reserve as guest · EFT payment
                 <motion.span animate={{ rotate: showGuestForm ? 180 : 0 }} transition={{ duration: 0.2 }}>
                   <FaChevronDown size={9} />
                 </motion.span>
@@ -220,10 +220,10 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               >
                 <div className="bg-gray-800/60 border border-amber-700/40 rounded-xl p-4 space-y-3">
                   <p className="text-amber-300 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                    <FaMapMarkerAlt className="text-amber-400" /> Guest Reservation — Pay at Venue
-                    <InfoTooltip text="No account needed! We'll hold your court slot. Create a free account to earn loyalty points and manage bookings online." position="right" />
+                    <FaMapMarkerAlt className="text-amber-400" /> Guest Reservation — Manual EFT
+                    <InfoTooltip text="No account needed! We'll hold your court slot. Please send us your EFT proof of payment with reference '5's Arena World Cup' via WhatsApp." position="right" />
                   </p>
-                  <p className="text-gray-500 text-xs">Fill in your details to hold this slot. Bring R{totalPrice} on arrival.</p>
+                  <p className="text-gray-500 text-xs">Fill in your details to hold this slot. A manual EFT of R{totalPrice} is required to secure the booking.</p>
 
                   <div className="space-y-2.5">
                     <input
@@ -271,7 +271,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                     {guestReserveLoading ? (
                       <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Reserving...</>
                     ) : (
-                      <>Hold My Slot — Pay R{totalPrice} at Venue</>
+                      <>Hold My Slot — EFT R{totalPrice}</>
                     )}
                   </motion.button>
                 </div>
@@ -336,7 +336,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               <div className="relative flex justify-center">
                 <button type="button" onClick={() => setShowPayOptions((v) => !v)}
                   className="bg-gray-900 px-3 flex items-center gap-1 text-gray-500 hover:text-gray-300 text-xs uppercase tracking-widest transition-colors">
-                  or reserve and pay at venue
+                  or reserve and pay via manual EFT
                   <motion.span animate={{ rotate: showPayOptions ? 180 : 0 }} transition={{ duration: 0.2 }}>
                     <FaChevronDown size={9} />
                   </motion.span>
@@ -358,11 +358,10 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                       <FaMapMarkerAlt className="text-amber-400 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="text-white text-sm font-bold flex items-center gap-1.5">
-                          Reserve and Pay at Venue <InfoTooltip text="Your slot is held for you. Bring R{totalPrice} cash or card when you arrive. WhatsApp us to confirm — unclaimed slots may be released 30 min before start time." position="top" />
+                          Reserve & Pay via EFT <InfoTooltip text="Your slot is conditionally held. To confirm it, you must perform an EFT/Deposit of R{totalPrice} to Capitec with the reference '5's Arena World Cup' and send us POP via WhatsApp within 2 hours." position="top" />
                         </p>
-                        <p className="text-gray-400 text-xs mt-0.5">
-                          Hold your slot now — bring R{totalPrice} cash or card on arrival.
-                          WhatsApp or call us to lock in your time.
+                        <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">
+                          Hold your slot now. You are required to perform an EFT of R{totalPrice} using reference <strong>"5's Arena World Cup"</strong> so our accountant can securely track it. Please WhatsApp us the Proof of Payment to lock in your time.
                         </p>
                       </div>
                     </div>
@@ -387,7 +386,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                       {reserveLoading ? (
                         <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Reserving...</>
                       ) : (
-                        <>Reserve Slot — Pay R{totalPrice} at Venue</>
+                        <>Reserve Slot — EFT R{totalPrice}</>
                       )}
                     </motion.button>
                   </div>
