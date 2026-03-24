@@ -109,6 +109,7 @@ const TERMS = [
 export default function EventsPage() {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showTerms, setShowTerms] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [contactMethod, setContactMethod] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -123,6 +124,8 @@ export default function EventsPage() {
   const handleSelectPackage = (pkg) => {
     setSelectedPackage(pkg);
     setContactMethod(null);
+    setTermsAccepted(false);
+    setShowTerms(true);
     setTimeout(() => {
       document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
@@ -314,8 +317,48 @@ export default function EventsPage() {
                     Choose how you&apos;d like to get in touch. Our team will confirm availability and provide a custom quote for your event.
                   </p>
 
+                  {/* T&Cs Section */}
+                  {showTerms && !termsAccepted && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="mb-6 bg-gray-800/50 border border-gray-700 rounded-xl p-5"
+                    >
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-green-400 mb-3 flex items-center gap-2">
+                        <FaInfoCircle size={10} /> Terms & Conditions
+                      </h4>
+                      <ul className="space-y-2 text-xs text-gray-400 mb-4">
+                        {TERMS.map((term, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span> {term}
+                          </li>
+                        ))}
+                      </ul>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={termsAccepted}
+                          onChange={(e) => {
+                            setTermsAccepted(e.target.checked);
+                            if (e.target.checked) setShowTerms(false);
+                          }}
+                          className="w-5 h-5 rounded accent-green-500"
+                        />
+                        <span className="text-sm text-gray-300 font-bold">
+                          I agree to the Terms & Conditions
+                        </span>
+                      </label>
+                    </motion.div>
+                  )}
+
+                  {termsAccepted && (
+                    <div className="mb-4 flex items-center gap-2 text-green-400 text-xs font-bold uppercase tracking-widest">
+                      <FaCheck size={10} /> Terms accepted — choose your contact method
+                    </div>
+                  )}
+
                   {/* Contact Method Buttons */}
-                  <div className="space-y-4 mb-8">
+                  <div className={`space-y-4 mb-8 ${!termsAccepted ? 'opacity-40 pointer-events-none' : ''}`}>
                     {/* WhatsApp */}
                     <motion.a
                       href={`https://wa.me/${WHATSAPP_NUMBER}?text=${pkgMessage(selectedPackage)}`}

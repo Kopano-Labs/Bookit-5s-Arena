@@ -9,6 +9,7 @@ import {
   FaFutbol, FaUsers, FaWhatsapp, FaEnvelope,
   FaPhone, FaShieldAlt, FaChevronDown,
 } from 'react-icons/fa';
+import GiscusComments from '@/components/GiscusComments';
 
 /* ─── World Cup teams for selection ───────────────────────── */
 const WORLD_CUP_TEAMS = [
@@ -535,6 +536,11 @@ export default function TournamentPage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* ── Comments / Fan Zone ── */}
+        <div className="mt-20 relative z-20">
+          <GiscusComments />
+        </div>
       </div>
     </div>
   );

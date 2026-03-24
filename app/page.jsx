@@ -10,6 +10,7 @@ import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
 import TournamentSection from '@/components/home/TournamentSection';
 import ContactSection   from '@/components/home/ContactSection';
+import WelcomePopup     from '@/components/home/WelcomePopup';
 import connectDB        from '@/lib/mongodb';
 import Court            from '@/models/Court';
 
@@ -39,6 +40,7 @@ const HomePage = async () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <WelcomePopup />
 
       {/* ══ HERO — animated entrance + particle background ══════ */}
       <HeroSection />

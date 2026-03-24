@@ -45,6 +45,34 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      /* Edge caching: immutable static assets (JS/CSS bundles, images) */
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      /* Cache images served by Next.js image optimizer */
+      {
+        source: '/_next/image(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
+        ],
+      },
+      /* Cache public assets (logos, event images, tournament images) */
+      {
+        source: '/images/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
+        ],
+      },
+      /* Service worker + manifest — short cache */
+      {
+        source: '/(sw.js|manifest.json)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+        ],
+      },
     ];
   },
 };

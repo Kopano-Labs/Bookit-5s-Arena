@@ -400,18 +400,28 @@ const LeaguesPage = () => {
                 <p className="text-gray-400 text-xs mb-5 max-w-sm mx-auto">
                   Send us a WhatsApp with your team name, captain contact details, and preferred league.
                 </p>
-                <a
+                <motion.a
                   href="https://wa.me/27612345678?text=Hi%2C%20we%27d%20like%20to%20register%20our%20team%20for%20the%20league"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 py-3 px-7 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all hover:scale-105"
+                  className="inline-flex items-center justify-center mx-auto gap-2 py-4 px-8 rounded-xl text-sm font-black text-white uppercase tracking-widest cursor-pointer w-[90%] sm:w-auto"
                   style={{
-                    background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)',
-                    boxShadow: '0 0 24px rgba(34,197,94,0.35)',
+                    background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
                   }}
+                  animate={{
+                    scale: [1, 1.03, 1],
+                    boxShadow: [
+                      '0 0 15px rgba(34,197,94,0.3)',
+                      '0 0 35px rgba(34,197,94,0.7)',
+                      '0 0 15px rgba(34,197,94,0.3)'
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <FaWhatsapp size={16} /> Register via WhatsApp
-                </a>
+                  <FaWhatsapp size={20} /> <span className="mt-0.5">Register via WhatsApp</span>
+                </motion.a>
               </motion.div>
 
               {/* FAQ */}

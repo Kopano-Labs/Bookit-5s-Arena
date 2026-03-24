@@ -521,6 +521,56 @@ const ProfilePage = () => {
           </AccordionSection>
           </motion.div>
 
+          {/* 1c. Online Status Tracker */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+          >
+          <AccordionSection
+            id="status"
+            icon={FaUser}
+            iconColor="text-blue-400"
+            title="Online Status"
+            summary="Active / Away / Do Not Disturb"
+            isOpen={openSections.status}
+            onToggle={toggleSection}
+          >
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">
+                Set Your Status
+              </label>
+              <p className="text-gray-600 text-xs mb-3">Let your teammates know if you're available for a match.</p>
+              
+              <div className="space-y-2">
+                {[
+                  { id: 'online', label: 'Online & Ready', color: 'bg-green-500', border: 'border-green-500' },
+                  { id: 'away', label: 'Away / In a Match', color: 'bg-yellow-500', border: 'border-yellow-500' },
+                  { id: 'dnd', label: 'Do Not Disturb', color: 'bg-red-500', border: 'border-red-500' },
+                  { id: 'offline', label: 'Offline / Invisible', color: 'bg-gray-500', border: 'border-gray-500' },
+                ].map(stat => (
+                  <button
+                    key={stat.id}
+                    type="button"
+                    onClick={() => {
+                      localStorage.setItem('userStatus', stat.id);
+                      window.dispatchEvent(new Event('storage'));
+                      setSuccess(`Status updated to ${stat.label}`);
+                      setTimeout(() => setSuccess(''), 2000);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`w-3 h-3 rounded-full ${stat.color} shadow-[0_0_10px_${stat.color}]`} />
+                      <span className="text-sm text-gray-300 font-bold">{stat.label}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </AccordionSection>
+          </motion.div>
+
           {/* 2. Security */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}

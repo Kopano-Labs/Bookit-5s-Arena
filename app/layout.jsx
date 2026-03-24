@@ -48,6 +48,8 @@ const RootLayout = ({ children }) => {
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/images/logo.png" />
+        {/* Plausible Analytics — Lightweight & Privacy-focused */}
+        <script defer data-domain="5sarena.co.za" src="https://plausible.io/js/script.js"></script>
       </head>
       <body suppressHydrationWarning>
         <AuthProvider>
