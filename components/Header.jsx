@@ -75,7 +75,7 @@ const Header = () => {
 
   const publicTabs = [
     { href: '/fixtures', icon: <FaTv size={11} className="text-blue-400" />,         label: 'Fixtures' },
-    { href: '/leagues',  icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Leagues' },
+    { href: '/leagues',  icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Competitions' },
     { href: '/rules-of-the-game', icon: <FaBookOpen size={11} className="text-orange-400" />, label: 'Rules' },
     { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings' },
     { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards' },
@@ -100,6 +100,7 @@ const Header = () => {
     { href: '/events/add',        icon: <FaGlassCheers size={12} className="text-pink-400" />,   label: '+ Add Events' },
     { href: '/admin/newsletter',  icon: <FaNewspaper size={12} className="text-rose-400" />,     label: '+ Add Newsletter' },
     { href: '/leagues/add',       icon: <FaTrophy size={12} className="text-yellow-400" />,      label: '+ Add League' },
+    { href: '/tournament',         icon: <FaTrophy size={12} className="text-green-400" />,       label: '+ Add Tournament' },
   ];
 
   return (
@@ -158,29 +159,32 @@ const Header = () => {
           </div>
 
           {/* ── Blog Promo Button ── */}
-          <motion.a
-            href="https://5s-arena-blog.vercel.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-green-400 border border-green-500/50 mx-2"
-            animate={{
-              boxShadow: [
-                '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
-                '0 0 12px rgba(34,197,94,0.6), inset 0 0 8px rgba(34,197,94,0.2)',
-                '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
-              ],
-              borderColor: [
-                'rgba(34,197,94,0.5)',
-                'rgba(34,197,94,0.9)',
-                'rgba(34,197,94,0.5)',
-              ],
-            }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span>⚽</span> Visit our Blog!
-          </motion.a>
+          {/* ── Blog Promo Button (Guests) ── */}
+          {!session && (
+            <motion.a
+              href="https://5s-arena-blog.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-green-400 border border-green-500/50 mx-2"
+              animate={{
+                boxShadow: [
+                  '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
+                  '0 0 12px rgba(34,197,94,0.6), inset 0 0 8px rgba(34,197,94,0.2)',
+                  '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
+                ],
+                borderColor: [
+                  'rgba(34,197,94,0.5)',
+                  'rgba(34,197,94,0.9)',
+                  'rgba(34,197,94,0.5)',
+                ],
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span>⚽</span> Visit our Blog!
+            </motion.a>
+          )}
 
           {/* ── Desktop Nav ── */}
           <div className="hidden md:flex items-center gap-0.5">
@@ -310,6 +314,30 @@ const Header = () => {
                 >
                   <FaSignOutAlt size={12} /> Out
                 </motion.button>
+                {/* ── Blog Promo Button (Auth Users) ── */}
+                <motion.a
+                  href="https://5s-arena-blog.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-green-400 border border-green-500/50 ml-2"
+                  animate={{
+                    boxShadow: [
+                      '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
+                      '0 0 12px rgba(34,197,94,0.6), inset 0 0 8px rgba(34,197,94,0.2)',
+                      '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
+                    ],
+                    borderColor: [
+                      'rgba(34,197,94,0.5)',
+                      'rgba(34,197,94,0.9)',
+                      'rgba(34,197,94,0.5)',
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span>⚽</span> Visit our Blog!
+                </motion.a>
               </>
             ) : (
               <>

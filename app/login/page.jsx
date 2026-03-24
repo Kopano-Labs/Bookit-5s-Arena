@@ -421,7 +421,7 @@ export default function AuthPage() {
                       backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
                       boxShadow: ['0 0 20px rgba(16,185,129,0.3)', '0 0 40px rgba(16,185,129,0.5)', '0 0 20px rgba(16,185,129,0.3)'],
                     }}
-                    transition={{ duration: 4, repeat: Infinity }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                   >

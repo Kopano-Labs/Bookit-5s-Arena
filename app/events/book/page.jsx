@@ -343,7 +343,7 @@ function EventBookingContent() {
                     className="w-full py-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all disabled:opacity-50 cursor-pointer relative overflow-hidden"
                     style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)', backgroundSize: '200% 200%' }}
                     animate={{ backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'], boxShadow: ['0 0 20px rgba(16,185,129,0.3)', '0 0 35px rgba(16,185,129,0.5)', '0 0 20px rgba(16,185,129,0.3)'] }}
-                    transition={{ duration: 4, repeat: Infinity }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                   >

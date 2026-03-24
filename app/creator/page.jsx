@@ -7,11 +7,18 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
    5-SECOND WELCOME ANIMATION — plays before content reveals
    ════════════════════════════════════════════════════════════════ */
 
-/* Floating particle */
+/* Floating particle using deterministic values (based on delay instead of Math.random) to fix hydration */
 function Particle({ delay, color }) {
-  const x = (Math.random() - 0.5) * 800;
-  const y = (Math.random() - 0.5) * 600;
-  const size = Math.random() * 6 + 2;
+  // Use a deterministic seed to prevent hydration mismatch across server/client
+  const pseudoRandom = Math.sin(delay * 100) * 10000;
+  const random = pseudoRandom - Math.floor(pseudoRandom);
+  const pseudoRandom2 = Math.cos(delay * 100) * 10000;
+  const random2 = pseudoRandom2 - Math.floor(pseudoRandom2);
+
+  const x = (random - 0.5) * 800;
+  const y = (random2 - 0.5) * 600;
+  const size = random * 6 + 2;
+
   return (
     <motion.div
       className="absolute rounded-full pointer-events-none"

@@ -133,7 +133,7 @@ export default function SoccerBallMenu() {
         transition={
           isOpen
             ? { duration: 0.3 }
-            : { y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }, boxShadow: { duration: 2, repeat: Infinity } }
+            : { y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }, boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }
         }
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}

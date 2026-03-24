@@ -186,7 +186,16 @@ export default function TournamentPage() {
                 <FaFutbol size={16} /> Register Your Team <FaArrowRight size={12} />
               </motion.button>
 
-              <p className="text-gray-600 text-xs mt-6">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8 mb-4">
+                <Link href="/fixtures" className="text-xs text-green-400 border border-green-500/30 bg-green-900/20 rounded-xl px-6 py-3 font-bold uppercase tracking-widest hover:bg-green-900/40 hover:border-green-500/60 transition-all flex items-center gap-2">
+                  <FaCheck /> View Fixtures & Standings
+                </Link>
+                <Link href="/tournament/bracket" className="text-xs text-purple-400 border border-purple-500/30 bg-purple-900/20 rounded-xl px-6 py-3 font-bold uppercase tracking-widest hover:bg-purple-900/40 hover:border-purple-500/60 transition-all flex items-center gap-2">
+                  <FaTrophy /> View Knockout Bracket
+                </Link>
+              </div>
+
+              <p className="text-gray-600 text-[10px] mt-6">
                 By proceeding, you&apos;ll need to accept our Terms & Conditions and review the tournament rules.
               </p>
             </motion.div>

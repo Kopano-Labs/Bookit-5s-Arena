@@ -1,483 +1,356 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import {
-  FaTrophy,
-  FaCalendarAlt,
-  FaUsers,
-  FaListOl,
-  FaQuestionCircle,
-  FaWhatsapp,
-  FaChevronDown,
-  FaChevronUp,
-  FaMedal,
+  FaTrophy, FaFutbol, FaBolt, FaArrowRight,
+  FaWhatsapp, FaInstagram, FaTiktok,
 } from 'react-icons/fa';
 
-// ─── mock data ──────────────────────────────────────────────
-const leagues = [
-  {
-    id: 1,
-    name: 'Monday Night League',
-    day: 'Monday',
-    time: '7pm – 10pm',
-    level: 'Competitive',
-    price: 'R800',
-    teamsRegistered: 8,
-    totalSlots: 10,
-    startDate: '7 April 2026',
-    accent: 'green',
-  },
-  {
-    id: 2,
-    name: 'Wednesday Social League',
-    day: 'Wednesday',
-    time: '6pm – 9pm',
-    level: 'Social / Mixed',
-    price: 'R600',
-    teamsRegistered: 6,
-    totalSlots: 10,
-    startDate: '9 April 2026',
-    accent: 'cyan',
-  },
-  {
-    id: 3,
-    name: 'Saturday Morning League',
-    day: 'Saturday',
-    time: '9am – 12pm',
-    level: 'All Levels',
-    price: 'R700',
-    teamsRegistered: 10,
-    totalSlots: 10,
-    startDate: '12 April 2026',
-    accent: 'yellow',
-  },
-];
-
-const standings = [
-  { pos: 1, team: 'West Coast Warriors', p: 14, w: 11, d: 2, l: 1, gf: 42, ga: 14 },
-  { pos: 2, team: 'Parklands United',    p: 14, w: 10, d: 2, l: 2, gf: 38, ga: 18 },
-  { pos: 3, team: 'Table Bay FC',        p: 14, w: 9,  d: 3, l: 2, gf: 35, ga: 19 },
-  { pos: 4, team: 'Milnerton FC',        p: 14, w: 7,  d: 4, l: 3, gf: 29, ga: 22 },
-  { pos: 5, team: 'Blouberg Strikers',   p: 14, w: 6,  d: 3, l: 5, gf: 25, ga: 24 },
-  { pos: 6, team: 'Cape Crusaders',      p: 14, w: 4,  d: 3, l: 7, gf: 20, ga: 30 },
-  { pos: 7, team: 'Durbanville Dynamos', p: 14, w: 2,  d: 4, l: 8, gf: 16, ga: 33 },
-  { pos: 8, team: 'Bellville City',      p: 14, w: 1,  d: 1, l: 12, gf: 10, ga: 45 },
-];
-
-const faqItems = [
-  {
-    q: 'How long are matches?',
-    a: 'Each match consists of two 20-minute halves with a 5-minute half-time break.',
-  },
-  {
-    q: 'What if we can\'t make a week?',
-    a: 'Teams can request a reschedule up to 48 hours before the match. Otherwise the fixture will count as a forfeit (0-3 loss).',
-  },
-  {
-    q: 'Can individuals join without a team?',
-    a: 'Yes! Post an ad on our Find Players page and we\'ll help match you with a team looking for players.',
-  },
-  {
-    q: 'When is the registration deadline?',
-    a: 'Registration closes one week before each league\'s start date. Payment must be received in full before the first match.',
-  },
-];
-
-// ─── helpers ────────────────────────────────────────────────
-const accentMap = {
-  green:  { border: 'border-green-700',  bg: 'bg-green-900/20', text: 'text-green-400',  dot: 'bg-green-400' },
-  cyan:   { border: 'border-cyan-700',   bg: 'bg-cyan-900/20',  text: 'text-cyan-400',   dot: 'bg-cyan-400' },
-  yellow: { border: 'border-yellow-700', bg: 'bg-yellow-900/20', text: 'text-yellow-400', dot: 'bg-yellow-400' },
-};
-
-const posColour = (pos) => {
-  if (pos === 1) return 'text-yellow-400';
-  if (pos === 2) return 'text-gray-300';
-  if (pos === 3) return 'text-amber-600';
-  return 'text-gray-500';
-};
-
-const posIcon = (pos) => {
-  if (pos <= 3) return <FaMedal size={12} className={posColour(pos)} />;
-  return <span className="text-gray-600 text-xs font-bold">{pos}</span>;
-};
-
-const rowBg = (pos) => {
-  if (pos === 1) return 'bg-yellow-900/10 border-yellow-800/40';
-  if (pos === 2) return 'bg-gray-800/30 border-gray-700/40';
-  if (pos === 3) return 'bg-amber-900/10 border-amber-800/40';
-  return 'border-gray-800/40';
-};
-
-const cardVariants = {
-  hidden:  { opacity: 0, y: 24 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.4 },
-  }),
-};
-
-// ─── component ──────────────────────────────────────────────
-const LeaguesPage = () => {
-  const [tab, setTab] = useState('season');
-  const [openFaq, setOpenFaq] = useState(null);
-
-  const tabs = [
-    { key: 'season',   label: 'CURRENT SEASON', icon: <FaCalendarAlt size={12} /> },
-    { key: 'standings', label: 'STANDINGS',       icon: <FaListOl size={12} /> },
-    { key: 'join',     label: 'HOW TO JOIN',     icon: <FaQuestionCircle size={12} /> },
-  ];
+/* ── Floating particle with deterministic seed ── */
+function FloatingParticle({ index }) {
+  const seed1 = Math.sin(index * 127.1) * 43758.5453;
+  const seed2 = Math.cos(index * 311.7) * 43758.5453;
+  const x = (seed1 - Math.floor(seed1)) * 100;
+  const y = (seed2 - Math.floor(seed2)) * 100;
+  const size = 2 + (seed1 - Math.floor(seed1)) * 4;
+  const dur = 8 + (seed2 - Math.floor(seed2)) * 12;
 
   return (
-    <div className="min-h-screen bg-gray-950 py-10 px-4">
-      <div className="max-w-5xl mx-auto">
+    <motion.div
+      className="absolute rounded-full pointer-events-none"
+      style={{
+        width: size,
+        height: size,
+        left: `${x}%`,
+        top: `${y}%`,
+        background: index % 3 === 0 ? '#22c55e' : index % 3 === 1 ? '#06b6d4' : '#a855f7',
+      }}
+      animate={{
+        y: [0, -30, 0, 20, 0],
+        x: [0, 15, -10, 5, 0],
+        opacity: [0.2, 0.6, 0.3, 0.7, 0.2],
+        scale: [1, 1.5, 1, 1.3, 1],
+      }}
+      transition={{
+        duration: dur,
+        repeat: Infinity,
+        ease: 'easeInOut',
+        delay: index * 0.3,
+      }}
+    />
+  );
+}
 
-        {/* ── Hero ──────────────────────────────────────────── */}
-        <motion.div
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-900/30 border border-yellow-800/50 mb-5">
-            <FaTrophy className="text-2xl text-yellow-400" />
-          </div>
+/* ── Pulsing ring ── */
+function PulsingRing({ size, delay, color }) {
+  return (
+    <motion.div
+      className="absolute rounded-full border-2 pointer-events-none"
+      style={{
+        width: size,
+        height: size,
+        borderColor: color,
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+      }}
+      animate={{
+        scale: [0.8, 1.3, 0.8],
+        opacity: [0.05, 0.2, 0.05],
+      }}
+      transition={{
+        duration: 6,
+        repeat: Infinity,
+        delay,
+        ease: 'easeInOut',
+      }}
+    />
+  );
+}
 
-          {/* Coming Soon badge */}
+export default function LeaguesPage() {
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [choice, setChoice] = useState(null);
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white relative overflow-hidden">
+
+      {/* ── Background particles ── */}
+      {Array.from({ length: 30 }).map((_, i) => (
+        <FloatingParticle key={i} index={i} />
+      ))}
+
+      {/* ── Pulsing rings ── */}
+      <PulsingRing size={400} delay={0} color="rgba(34,197,94,0.15)" />
+      <PulsingRing size={600} delay={1} color="rgba(6,182,212,0.08)" />
+      <PulsingRing size={800} delay={2} color="rgba(168,85,247,0.06)" />
+
+      {/* Background gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-green-950/20 via-transparent to-gray-950 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,197,94,0.06)_0%,transparent_70%)] pointer-events-none" />
+
+      {/* ── Welcome Choice Popup ── */}
+      <AnimatePresence>
+        {showWelcome && (
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-900/30 border border-red-700/50 text-red-400 text-xs font-bold uppercase tracking-widest mb-4"
-            animate={{
-              opacity: [1, 0.5, 1],
-              boxShadow: ['0 0 0px rgba(239,68,68,0)', '0 0 15px rgba(239,68,68,0.4)', '0 0 0px rgba(239,68,68,0)'],
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            key="welcome-overlay"
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
           >
-            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-            Coming Soon — Season 1
-          </motion.div>
-
-          <h1
-            className="text-4xl md:text-5xl font-black uppercase tracking-widest text-white"
-            style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-          >
-            Leagues &amp; Tournaments
-          </h1>
-          <p className="text-gray-500 text-sm mt-2 max-w-md mx-auto">
-            Compete with the best in Cape Town. Weekly 5-a-side leagues for every skill level.
-          </p>
-        </motion.div>
-
-        {/* ── Tabs ──────────────────────────────────────────── */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {tabs.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${
-                tab === t.key
-                  ? 'bg-green-900/40 text-green-400 border border-green-700'
-                  : 'bg-gray-900 text-gray-400 border border-gray-800 hover:border-gray-700 hover:text-gray-300'
-              }`}
-            >
-              {t.icon} {t.label}
-            </button>
-          ))}
-        </div>
-
-        {/* ── Tab Content ───────────────────────────────────── */}
-        <AnimatePresence mode="wait">
-          {/* ─ CURRENT SEASON ─ */}
-          {tab === 'season' && (
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
             <motion.div
-              key="season"
-              className="grid gap-5 md:grid-cols-3"
-              initial="hidden"
-              animate="visible"
-              exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
+              className="relative z-10 max-w-lg w-full bg-gray-900 border border-gray-700 rounded-3xl p-8 text-center shadow-2xl"
+              initial={{ scale: 0.8, y: 40 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 40 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
-              {leagues.map((league, i) => {
-                const a = accentMap[league.accent];
-                const full = league.teamsRegistered >= league.totalSlots;
-                return (
-                  <motion.div
-                    key={league.id}
-                    custom={i}
-                    variants={cardVariants}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    className={`bg-gray-900 border ${a.border} rounded-2xl p-5 shadow-lg`}
+              <motion.div
+                className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-900/40 border-2 border-green-500/50 flex items-center justify-center"
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <FaTrophy className="text-green-400 text-3xl" />
+              </motion.div>
+
+              <h2
+                className="font-black uppercase tracking-widest text-2xl mb-2"
+                style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+              >
+                Welcome to <span className="text-green-400">Competitions</span>
+              </h2>
+              <p className="text-gray-400 text-sm mb-8">
+                Where would you like to go?
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Leagues (Coming Soon) */}
+                <motion.button
+                  onClick={() => { setChoice('leagues'); setShowWelcome(false); }}
+                  className="relative px-6 py-5 rounded-2xl border border-gray-700 bg-gray-800/60 text-left cursor-pointer overflow-hidden group"
+                  whileHover={{ borderColor: 'rgba(6,182,212,0.5)', scale: 1.02, transition: { duration: 0.2, type: 'tween' } }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <FaFutbol className="text-cyan-400" />
+                    <span className="font-black uppercase tracking-widest text-sm">Leagues</span>
+                  </div>
+                  <p className="text-gray-500 text-xs">Weekly 5-a-side leagues</p>
+                  <motion.span
+                    className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest bg-red-900/40 text-red-400 border border-red-700/40"
+                    animate={{ opacity: [1, 0.4, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                   >
-                    {/* dot + name */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`w-2.5 h-2.5 rounded-full ${a.dot}`} />
-                      <h3 className="text-white font-bold text-sm">{league.name}</h3>
-                    </div>
+                    🔴 Coming Soon
+                  </motion.span>
+                </motion.button>
 
-                    <div className="space-y-2 text-xs text-gray-400 mb-4">
-                      <p className="flex items-center gap-2">
-                        <FaCalendarAlt size={10} className={a.text} />
-                        {league.day} &middot; {league.time}
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <FaTrophy size={10} className={a.text} />
-                        {league.level}
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <FaUsers size={10} className={a.text} />
-                        {league.teamsRegistered}/{league.totalSlots} teams registered
-                      </p>
-                    </div>
-
-                    {/* price + start */}
-                    <div className="flex items-end justify-between">
-                      <div>
-                        <p className="text-lg font-black text-white">{league.price}</p>
-                        <p className="text-[10px] text-gray-600 uppercase tracking-wider">per team / season</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] text-gray-600 uppercase tracking-wider">Starts</p>
-                        <p className={`text-xs font-bold ${a.text}`}>{league.startDate}</p>
-                      </div>
-                    </div>
-
-                    {full && (
-                      <div className="mt-3 text-center py-1.5 rounded-lg bg-red-900/30 border border-red-800/50 text-red-400 text-[10px] font-bold uppercase tracking-wider">
-                        League Full
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          )}
-
-          {/* ─ STANDINGS ─ */}
-          {tab === 'standings' && (
-            <motion.div
-              key="standings"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
-              transition={{ duration: 0.45 }}
-            >
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl shadow-lg overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-800 flex items-center gap-2">
-                  <FaTrophy size={14} className="text-yellow-400" />
-                  <h2
-                    className="text-sm font-black uppercase tracking-widest text-white"
-                    style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                  >
-                    Monday Night League — Season 3
-                  </h2>
-                </div>
-
-                {/* desktop table */}
-                <div className="hidden sm:block overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="text-gray-500 uppercase tracking-wider border-b border-gray-800">
-                        <th className="px-4 py-3 text-left w-10">#</th>
-                        <th className="px-4 py-3 text-left">Team</th>
-                        <th className="px-3 py-3 text-center">P</th>
-                        <th className="px-3 py-3 text-center">W</th>
-                        <th className="px-3 py-3 text-center">D</th>
-                        <th className="px-3 py-3 text-center">L</th>
-                        <th className="px-3 py-3 text-center">GF</th>
-                        <th className="px-3 py-3 text-center">GA</th>
-                        <th className="px-3 py-3 text-center">GD</th>
-                        <th className="px-3 py-3 text-center font-black">Pts</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {standings.map((row) => (
-                        <motion.tr
-                          key={row.pos}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: row.pos * 0.05 }}
-                          className={`border-b ${rowBg(row.pos)} hover:bg-gray-800/40 transition-colors`}
-                        >
-                          <td className="px-4 py-3">{posIcon(row.pos)}</td>
-                          <td className={`px-4 py-3 font-bold ${row.pos <= 3 ? 'text-white' : 'text-gray-400'}`}>
-                            {row.team}
-                          </td>
-                          <td className="px-3 py-3 text-center text-gray-400">{row.p}</td>
-                          <td className="px-3 py-3 text-center text-gray-400">{row.w}</td>
-                          <td className="px-3 py-3 text-center text-gray-400">{row.d}</td>
-                          <td className="px-3 py-3 text-center text-gray-400">{row.l}</td>
-                          <td className="px-3 py-3 text-center text-gray-400">{row.gf}</td>
-                          <td className="px-3 py-3 text-center text-gray-400">{row.ga}</td>
-                          <td className="px-3 py-3 text-center text-gray-400">
-                            {row.gf - row.ga > 0 ? '+' : ''}{row.gf - row.ga}
-                          </td>
-                          <td className={`px-3 py-3 text-center font-black ${row.pos <= 3 ? 'text-green-400' : 'text-gray-300'}`}>
-                            {row.w * 3 + row.d}
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* mobile cards */}
-                <div className="sm:hidden divide-y divide-gray-800">
-                  {standings.map((row) => (
-                    <motion.div
-                      key={row.pos}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: row.pos * 0.05 }}
-                      className={`px-4 py-3 flex items-center gap-3 ${row.pos <= 3 ? 'bg-gray-800/20' : ''}`}
-                    >
-                      <div className="w-7 flex-shrink-0 text-center">{posIcon(row.pos)}</div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-xs font-bold truncate ${row.pos <= 3 ? 'text-white' : 'text-gray-400'}`}>
-                          {row.team}
-                        </p>
-                        <p className="text-[10px] text-gray-600">
-                          {row.p}P &middot; {row.w}W {row.d}D {row.l}L &middot; GD {row.gf - row.ga > 0 ? '+' : ''}{row.gf - row.ga}
-                        </p>
-                      </div>
-                      <div className={`text-sm font-black ${row.pos <= 3 ? 'text-green-400' : 'text-gray-300'}`}>
-                        {row.w * 3 + row.d}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                {/* Tournament */}
+                <motion.button
+                  onClick={() => { setChoice('tournament'); setShowWelcome(false); }}
+                  className="relative px-6 py-5 rounded-2xl border border-green-700/40 bg-green-900/20 text-left cursor-pointer overflow-hidden group"
+                  whileHover={{ borderColor: 'rgba(34,197,94,0.6)', scale: 1.02, transition: { duration: 0.2, type: 'tween' } }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <FaTrophy className="text-yellow-400" />
+                    <span className="font-black uppercase tracking-widest text-sm">Tournament</span>
+                  </div>
+                  <p className="text-gray-500 text-xs">5s Arena World Cup 2026</p>
+                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest bg-green-900/40 text-green-400 border border-green-700/40">
+                    🟢 Open
+                  </span>
+                </motion.button>
               </div>
             </motion.div>
-          )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-          {/* ─ HOW TO JOIN ─ */}
-          {tab === 'join' && (
+      {/* ── MAIN CONTENT ── */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20">
+
+        <AnimatePresence mode="wait">
+          {/* ── LEAGUES: COMING SOON ── */}
+          {(choice === 'leagues' || !choice) && !showWelcome && (
             <motion.div
-              key="join"
-              initial={{ opacity: 0, y: 20 }}
+              key="coming-soon"
+              className="text-center max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
-              transition={{ duration: 0.45 }}
-              className="space-y-8"
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
-              {/* Steps */}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Blinking red dot */}
+              <motion.div
+                className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-red-950/40 border border-red-700/40 mb-8"
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <motion.div
+                  className="w-3 h-3 rounded-full bg-red-500"
+                  animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <span className="text-red-400 text-xs font-bold uppercase tracking-widest">Season 1 · Coming Soon</span>
+              </motion.div>
+
+              {/* Main title */}
+              <motion.h1
+                className="font-black uppercase mb-6 leading-none"
+                style={{
+                  fontSize: 'clamp(3.5rem, 12vw, 8rem)',
+                  fontFamily: 'Impact, Arial Black, sans-serif',
+                  background: 'linear-gradient(135deg, #22c55e 0%, #06b6d4 50%, #a855f7 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+                animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                COMING
+                <br />
+                SOON
+              </motion.h1>
+
+              {/* Subtitle with animated bolt */}
+              <div className="flex items-center justify-center gap-3 mb-8">
+                <motion.div
+                  animate={{ rotate: [0, 20, -20, 0], scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <FaBolt className="text-yellow-400 text-2xl" />
+                </motion.div>
+                <p className="text-gray-300 text-lg font-semibold">
+                  5-a-side leagues are about to kick off
+                </p>
+                <motion.div
+                  animate={{ rotate: [0, -20, 20, 0], scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                >
+                  <FaBolt className="text-yellow-400 text-2xl" />
+                </motion.div>
+              </div>
+
+              <p className="text-gray-500 text-sm max-w-md mx-auto mb-10 leading-relaxed">
+                Compete with the best in Cape Town. Weekly 5-a-side leagues for every skill level.
+                Monday nights, Wednesday socials, Saturday mornings — your pitch, your team, your glory.
+              </p>
+
+              {/* Feature preview cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 {[
-                  { step: 1, title: 'Register Your Team', desc: 'Gather a squad of at least 7 players and pick a team name.' },
-                  { step: 2, title: 'Choose Your League', desc: 'Pick the day and level that suits your team best.' },
-                  { step: 3, title: 'Pay League Fee', desc: 'Secure your spot with a once-off season fee per team.' },
-                  { step: 4, title: 'Show Up & Play', desc: 'Turn up on match day and compete for the title!' },
-                ].map((s, i) => (
+                  { icon: '🏆', title: 'Competitive Play', desc: 'Weekly matches & standings' },
+                  { icon: '📊', title: 'Live Standings', desc: 'Real-time league tables' },
+                  { icon: '⚡', title: 'All Levels', desc: 'Social to competitive' },
+                ].map((item, i) => (
                   <motion.div
-                    key={s.step}
-                    custom={i}
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center"
+                    key={item.title}
+                    className="px-5 py-6 rounded-2xl bg-gray-900/60 border border-gray-800 backdrop-blur-sm"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.15, duration: 0.5, ease: 'easeOut' }}
+                    whileHover={{ borderColor: 'rgba(34,197,94,0.4)', y: -4, transition: { duration: 0.2, type: 'tween' } }}
                   >
-                    <div className="w-10 h-10 mx-auto rounded-full bg-green-900/30 border border-green-800/50 flex items-center justify-center text-green-400 font-black text-sm mb-3">
-                      {s.step}
-                    </div>
-                    <h3 className="text-white font-bold text-sm mb-1">{s.title}</h3>
-                    <p className="text-gray-500 text-xs leading-relaxed">{s.desc}</p>
+                    <div className="text-4xl mb-3">{item.icon}</div>
+                    <p className="text-white font-bold text-sm mb-1">{item.title}</p>
+                    <p className="text-gray-500 text-xs">{item.desc}</p>
                   </motion.div>
                 ))}
               </div>
 
-              {/* WhatsApp CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-                className="bg-gray-900 border border-green-800/50 rounded-2xl p-6 text-center"
-              >
-                <h3
-                  className="text-lg font-black uppercase tracking-widest text-white mb-2"
-                  style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                >
-                  Ready to Register?
-                </h3>
-                <p className="text-gray-400 text-xs mb-5 max-w-sm mx-auto">
-                  Send us a WhatsApp with your team name, captain contact details, and preferred league.
-                </p>
+              {/* CTA buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link href="/tournament">
+                  <motion.div
+                    className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-green-600 text-white font-black uppercase tracking-widest text-sm cursor-pointer"
+                    style={{ boxShadow: '0 0 30px rgba(34,197,94,0.4)' }}
+                    whileHover={{ scale: 1.05, boxShadow: '0 0 50px rgba(34,197,94,0.6)', transition: { duration: 0.2, type: 'tween' } }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FaTrophy size={16} /> Join the Tournament Instead <FaArrowRight size={12} />
+                  </motion.div>
+                </Link>
                 <motion.a
-                  href="https://wa.me/27612345678?text=Hi%2C%20we%27d%20like%20to%20register%20our%20team%20for%20the%20league"
+                  href="https://wa.me/27637820245?text=Hi%2C%20I%27m%20interested%20in%20joining%20a%20league%20at%205s%20Arena!"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center mx-auto gap-2 py-4 px-8 rounded-xl text-sm font-black text-white uppercase tracking-widest cursor-pointer w-[90%] sm:w-auto"
-                  style={{
-                    background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
-                  }}
-                  animate={{
-                    scale: [1, 1.03, 1],
-                    boxShadow: [
-                      '0 0 15px rgba(34,197,94,0.3)',
-                      '0 0 35px rgba(34,197,94,0.7)',
-                      '0 0 15px rgba(34,197,94,0.3)'
-                    ],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-700 text-gray-300 text-xs font-bold uppercase tracking-widest hover:border-green-700 hover:text-white transition-all"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  <FaWhatsapp size={20} /> <span className="mt-0.5">Register via WhatsApp</span>
+                  <FaWhatsapp className="text-green-400" /> Get Notified When We Launch
                 </motion.a>
-              </motion.div>
-
-              {/* FAQ */}
-              <div>
-                <h3
-                  className="text-sm font-black uppercase tracking-widest text-white mb-4"
-                  style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                >
-                  Frequently Asked Questions
-                </h3>
-
-                <div className="space-y-2">
-                  {faqItems.map((item, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 + idx * 0.07 }}
-                      className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden"
-                    >
-                      <button
-                        onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                        className="w-full flex items-center justify-between px-5 py-3.5 text-left cursor-pointer"
-                      >
-                        <span className="text-sm font-bold text-gray-300">{item.q}</span>
-                        {openFaq === idx ? (
-                          <FaChevronUp size={12} className="text-green-400 flex-shrink-0" />
-                        ) : (
-                          <FaChevronDown size={12} className="text-gray-600 flex-shrink-0" />
-                        )}
-                      </button>
-                      <AnimatePresence>
-                        {openFaq === idx && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="overflow-hidden"
-                          >
-                            <p className="px-5 pb-4 text-xs text-gray-400 leading-relaxed">
-                              {item.a}
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  ))}
-                </div>
               </div>
+
+              {/* Social follow */}
+              <div className="mt-12 flex items-center justify-center gap-4">
+                <span className="text-gray-600 text-xs uppercase tracking-widest">Follow us</span>
+                {[
+                  { icon: FaInstagram, href: 'https://instagram.com/fivesarena', color: '#e1306c' },
+                  { icon: FaTiktok, href: 'https://tiktok.com/@fivesarena', color: '#fff' },
+                  { icon: FaWhatsapp, href: 'https://wa.me/27637820245', color: '#25d366' },
+                ].map((s) => (
+                  <motion.a
+                    key={s.href}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center transition-colors hover:border-gray-600"
+                    whileHover={{ scale: 1.15, y: -2, transition: { duration: 0.15, type: 'tween' } }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <s.icon style={{ color: s.color }} size={14} />
+                  </motion.a>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── TOURNAMENT: Redirect ── */}
+          {choice === 'tournament' && !showWelcome && (
+            <motion.div
+              key="tournament-redirect"
+              className="text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <Redirecting />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     </div>
   );
-};
+}
 
-export default LeaguesPage;
+/* ── Auto-redirect to tournament page ── */
+function Redirecting() {
+  const router = typeof window !== 'undefined' ? require('next/navigation').useRouter() : null;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.location.href = '/tournament';
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <motion.div
+        className="w-16 h-16 rounded-full border-4 border-green-500 border-t-transparent"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+      />
+      <p className="text-green-400 font-bold uppercase tracking-widest text-sm animate-pulse">
+        Heading to the Tournament...
+      </p>
+    </div>
+  );
+}

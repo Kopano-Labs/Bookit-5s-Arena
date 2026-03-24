@@ -1,7 +1,22 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FaMapMarkerAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaClock, FaParking, FaMusic, FaUtensils, FaBolt, FaDirections } from 'react-icons/fa';
+
+/* ── Venue amenity items ── */
+const AMENITIES = [
+  { icon: FaBolt, label: 'Floodlit Pitches', color: '#facc15' },
+  { icon: FaUtensils, label: 'Bar & Restaurant', color: '#f97316' },
+  { icon: FaMusic, label: 'Sound System', color: '#a855f7' },
+  { icon: FaParking, label: 'Secure Parking', color: '#3b82f6' },
+];
+
+/* ── Opening hours ── */
+const HOURS = [
+  { day: 'Mon – Fri', time: '10:00 – 22:00' },
+  { day: 'Saturday', time: '10:00 – 22:00' },
+  { day: 'Sunday', time: '10:00 – 22:00' },
+];
 
 export default function AboutSection({ courtsCount = 4 }) {
   const stats = [
@@ -11,7 +26,7 @@ export default function AboutSection({ courtsCount = 4 }) {
   ];
 
   return (
-    <section className="py-20 bg-gray-950 text-white overflow-hidden">
+    <section id="about" className="py-20 bg-gray-950 text-white overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-center">
 
@@ -52,7 +67,7 @@ export default function AboutSection({ courtsCount = 4 }) {
             <div className="flex gap-10">
               {stats.map((s, i) => (
                 <motion.div
-                  key={i}
+                  key={s.label}
                   className="text-center"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -73,49 +88,104 @@ export default function AboutSection({ courtsCount = 4 }) {
             </div>
           </motion.div>
 
-          {/* Right — map card */}
+          {/* Right — Animated Venue Showcase Card (replaces Google Maps) */}
           <motion.div
-            className="border border-green-900 overflow-hidden flex flex-col"
+            className="rounded-2xl border border-green-900/60 overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-green-950/40 relative"
             initial={{ opacity: 0, x: 60 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ borderColor: 'rgba(74,222,128,0.5)', transition: { duration: 0.3 } }}
+            whileHover={{ borderColor: 'rgba(74,222,128,0.5)', transition: { duration: 0.3, type: 'tween' } }}
           >
-            <div className="relative h-72">
-              <iframe
-                title="Hellenic Football Club Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3310.5!2d18.5128!3d-33.8714!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1dcc5e0351267c4d%3A0x2e0e5f984a51ef0a!2sHellenic%20Football%20Club!5e0!3m2!1sen!2sza!4v1711234567890"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-              <a
-                href="https://maps.google.com/?q=Hellenic+Football+Club,+Pringle+Rd,+Milnerton,+Cape+Town"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute inset-0 z-10"
-                aria-label="Open in Google Maps"
-              />
-            </div>
-            <div className="bg-green-950/40 border-t border-green-900 px-6 py-5 flex items-center justify-between">
-              <div>
-                <p className="text-green-400 font-bold text-sm uppercase tracking-widest mb-0.5">
-                  Hellenic Football Club
-                </p>
-                <p className="text-gray-400 text-sm">Pringle Rd, Milnerton · Cape Town 7441</p>
+            {/* Decorative background glow */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-green-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-600/5 rounded-full blur-2xl pointer-events-none" />
+
+            {/* Header with animated pin */}
+            <div className="relative px-6 pt-6 pb-4 border-b border-green-900/40">
+              <div className="flex items-start gap-4">
+                <motion.div
+                  className="w-12 h-12 rounded-xl bg-green-600/20 border border-green-700/40 flex items-center justify-center flex-shrink-0"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <FaMapMarkerAlt className="text-green-400 text-xl" />
+                </motion.div>
+                <div>
+                  <h3 className="text-white font-black text-lg uppercase tracking-widest" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                    Hellenic Football Club
+                  </h3>
+                  <p className="text-gray-400 text-sm mt-0.5">Pringle Rd, Milnerton · Cape Town 7441</p>
+                  <p className="text-gray-500 text-xs mt-1">Western Cape, South Africa 🇿🇦</p>
+                </div>
               </div>
-              <a
+            </div>
+
+            {/* Amenities Grid */}
+            <div className="px-6 py-5 border-b border-green-900/30">
+              <p className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-3">Amenities</p>
+              <div className="grid grid-cols-2 gap-3">
+                {AMENITIES.map((a, i) => (
+                  <motion.div
+                    key={a.label}
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-800/60 border border-gray-700/40"
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.4 + i * 0.08, ease: 'easeOut' }}
+                    whileHover={{ borderColor: `${a.color}50`, backgroundColor: `${a.color}08`, x: 4, transition: { duration: 0.2, type: 'tween' } }}
+                  >
+                    <a.icon style={{ color: a.color }} size={14} />
+                    <span className="text-gray-300 text-xs font-semibold">{a.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Opening Hours */}
+            <div className="px-6 py-5 border-b border-green-900/30">
+              <div className="flex items-center gap-2 mb-3">
+                <motion.div
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <FaClock className="text-emerald-400" size={12} />
+                </motion.div>
+                <p className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Opening Hours</p>
+                <motion.span
+                  className="ml-auto px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-green-900/40 text-green-400 border border-green-700/40"
+                  animate={{ opacity: [1, 0.6, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  Open Now
+                </motion.span>
+              </div>
+              <div className="space-y-2">
+                {HOURS.map((h) => (
+                  <div key={h.day} className="flex items-center justify-between">
+                    <span className="text-gray-400 text-xs font-medium">{h.day}</span>
+                    <span className="text-white text-xs font-bold tabular-nums">{h.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer CTA */}
+            <div className="px-6 py-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-green-400 text-xs font-bold uppercase tracking-widest">All-Weather · Synthetic Turf</span>
+              </div>
+              <motion.a
                 href="https://maps.google.com/?q=Hellenic+Football+Club,+Pringle+Rd,+Milnerton,+Cape+Town"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 font-bold uppercase text-xs tracking-wide transition-colors flex-shrink-0 ml-4"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-600/20 border border-green-700/50 text-green-400 text-xs font-bold uppercase tracking-widest hover:bg-green-600/30 transition-colors flex-shrink-0"
+                whileHover={{ scale: 1.05, transition: { duration: 0.15, type: 'tween' } }}
+                whileTap={{ scale: 0.95 }}
               >
-                <FaMapMarkerAlt /> Directions
-              </a>
+                <FaDirections size={12} /> Directions
+              </motion.a>
             </div>
           </motion.div>
 
