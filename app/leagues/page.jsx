@@ -228,7 +228,7 @@ export default function LeaguesPage() {
                   <FaBolt className="text-yellow-400 text-2xl" />
                 </motion.div>
                 <p className="text-gray-300 text-lg font-semibold">
-                  5-a-side leagues are about to kick off
+                  5-a-side competitions are about to kick off
                 </p>
                 <motion.div
                   animate={{ rotate: [0, -20, 20, 0], scale: [1, 1.2, 1] }}
@@ -239,7 +239,7 @@ export default function LeaguesPage() {
               </div>
 
               <p className="text-gray-500 text-sm max-w-md mx-auto mb-10 leading-relaxed">
-                Compete with the best in Cape Town. Weekly 5-a-side leagues for every skill level.
+                Compete with the best in Cape Town. Weekly 5-a-side competitions for every skill level.
                 Monday nights, Wednesday socials, Saturday mornings — your pitch, your team, your glory.
               </p>
 
@@ -247,7 +247,7 @@ export default function LeaguesPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 {[
                   { icon: '🏆', title: 'Competitive Play', desc: 'Weekly matches & standings' },
-                  { icon: '📊', title: 'Live Standings', desc: 'Real-time league tables' },
+                  { icon: '📊', title: 'Live Standings', desc: 'Real-time standings tables' },
                   { icon: '⚡', title: 'All Levels', desc: 'Social to competitive' },
                 ].map((item, i) => (
                   <motion.div
@@ -278,7 +278,7 @@ export default function LeaguesPage() {
                   </motion.div>
                 </Link>
                 <motion.a
-                  href="https://wa.me/27637820245?text=Hi%2C%20I%27m%20interested%20in%20joining%20a%20league%20at%205s%20Arena!"
+                  href="https://wa.me/27637820245?text=Hi%2C%20I%27m%20interested%20in%20joining%20a%20competition%20at%205s%20Arena!"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-700 text-gray-300 text-xs font-bold uppercase tracking-widest hover:border-green-700 hover:text-white transition-all"

@@ -134,7 +134,7 @@ export default function FixturesPromo() {
             transition={{ duration: 0.6, delay: 0.35 }}
           >
             Live scores, breaking news, video highlights & match analysis —
-            all your leagues, all in one place.
+            all your competitions, all in one place.
           </motion.p>
 
           {/* CTA Buttons */}

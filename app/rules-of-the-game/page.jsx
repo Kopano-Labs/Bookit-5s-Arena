@@ -87,21 +87,21 @@ const CHAPTERS = [
     ],
   },
   {
-    id: 'league',
-    title: 'League Rules',
+    id: 'competition',
+    title: 'Competition Rules',
     icon: FaTrophy,
     color: '#a855f7',
     desc: 'Structure, points, and standings — how our league system works.',
     content: [
-      '📊 League standings are calculated using the standard points system:',
+      '📊 Competition standings are calculated using the standard points system:',
       'Win = 3 points | Draw = 1 point | Loss = 0 points.',
       'Goal difference is used as the first tiebreaker.',
       'Head-to-head record is used as the second tiebreaker.',
       'Goals scored is the third tiebreaker.',
       'If still tied, a playoff match will be held.',
-      'All league fixtures are generated randomly and announced via your preferred channel.',
+      'All competition fixtures are generated randomly and announced via your preferred channel.',
       'Forfeited matches result in a 3-0 loss for the forfeiting team.',
-      'Two forfeits = automatic disqualification from the league.',
+      'Two forfeits = automatic disqualification from the competition.',
     ],
   },
   {
@@ -345,6 +345,7 @@ export default function RulesOfTheGamePage() {
             { title: 'Ready to Play?', desc: 'Now that you know the rules, grab your squad and book a court.', href: '/#courts', color: '#22c55e', icon: FaFutbol },
             { title: 'Book an Event', desc: 'Birthdays, corporate days, and more — book your next big event.', href: '/events-and-services', color: '#3b82f6', icon: FaShieldAlt },
             { title: 'Register for Tournament', desc: 'Join the World Cup-style tournament. Sign up your team now!', href: '/tournament', color: '#eab308', icon: FaTrophy },
+            { title: 'Competition Rules', desc: 'Understand the rules for all 5s Arena competitions.', href: '/competition-rules', color: '#ef4444', icon: FaClipboardList },
           ].map((cta, i) => {
             const Icon = cta.icon;
             return (

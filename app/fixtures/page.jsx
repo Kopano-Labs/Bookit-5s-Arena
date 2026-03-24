@@ -22,6 +22,7 @@ const LEAGUE_META = {
   BL:  { name: 'Bundesliga',               color: 'border-red-500',    bg: 'bg-red-600',     accent: 'red',    textColor: 'text-red-400' },
   PSL: { name: 'Premier Soccer League',    color: 'border-yellow-500', bg: 'bg-yellow-600',  accent: 'yellow', textColor: 'text-yellow-400' },
   UCL: { name: 'Champions League',         color: 'border-blue-900',   bg: 'bg-blue-900',    accent: 'navy',   textColor: 'text-blue-300' },
+  WC:  { name: 'World Cup 5s Arena',       color: 'border-green-500',  bg: 'bg-green-600',   accent: 'green',  textColor: 'text-green-400' },
 };
 
 const TEAM_COLORS = {
@@ -82,6 +83,9 @@ const mockMatches = [
   { id: 25, league: 'UCL', home: 'Barcelona',        away: 'Bayern Munich',    homeScore: 3, awayScore: 3, status: 'FINISHED', date: '14 Mar 2026' },
   { id: 26, league: 'UCL', home: 'Arsenal',          away: 'Inter Milan',      homeScore: null, awayScore: null, status: 'TIMED', kickoff: '21:00', date: '16 Mar 2026' },
   { id: 27, league: 'UCL', home: 'Liverpool',        away: 'Juventus',         homeScore: null, awayScore: null, status: 'TIMED', kickoff: '21:00', date: '16 Mar 2026' },
+  // Local 5s Arena World Cup (Mock Data)
+  { id: 101, league: 'WC', home: 'Algeria',          away: 'Belgium',          homeScore: 3, awayScore: 2, status: 'FINISHED', date: '15 Mar 2026', featured: true },
+  { id: 102, league: 'WC', home: 'Cameroon',         away: 'Colombia',         homeScore: 1, awayScore: 1, status: 'IN_PLAY', minute: 15, date: '15 Mar 2026', featured: true },
 ];
 
 const mockNews = [
@@ -256,13 +260,15 @@ const TEAM_LOGOS = {
 };
 
 const TeamBadge = ({ team, size = 'md', liveLogoUrl = null }) => {
+  const [imgError, setImgError] = useState(false);
   const color = getTeamColor(team);
+  const initials = getTeamInitials(team);
   // Prefer: live logo from TheSportsDB → our static logo map → colour initial
   const logo = liveLogoUrl || TEAM_LOGOS[team];
   const dims = size === 'lg' ? 'w-14 h-14' : size === 'sm' ? 'w-9 h-9' : 'w-12 h-12';
   const textSize = size === 'lg' ? 'text-sm' : size === 'sm' ? 'text-[9px]' : 'text-xs';
 
-  if (logo) {
+  if (logo && !imgError) {
     return (
       <div className={`${dims} rounded-full flex items-center justify-center flex-shrink-0 bg-white/10 border border-white/20 shadow-md overflow-hidden p-1`}>
         <img
@@ -270,7 +276,7 @@ const TeamBadge = ({ team, size = 'md', liveLogoUrl = null }) => {
           alt={team}
           className="w-full h-full object-contain"
           loading="lazy"
-          onError={(e) => { e.target.style.display = 'none'; }}
+          onError={() => setImgError(true)}
         />
       </div>
     );
@@ -278,10 +284,11 @@ const TeamBadge = ({ team, size = 'md', liveLogoUrl = null }) => {
 
   return (
     <div
-      className={`${dims} ${textSize} rounded-full flex items-center justify-center font-black text-white flex-shrink-0 border border-white/20 shadow-md`}
+      className={`${dims} ${textSize} rounded-full flex items-center justify-center font-black text-white flex-shrink-0 border border-white/20 shadow-lg relative overflow-hidden`}
       style={{ backgroundColor: color }}
     >
-      {team.charAt(0)}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
+      <span className="relative z-10 drop-shadow-md">{initials}</span>
     </div>
   );
 };
@@ -692,24 +699,41 @@ const FixturesPage = () => {
   const [liveLoading, setLiveLoading] = useState(false);
   const [useLiveData, setUseLiveData] = useState(false);
 
-  const fetchLiveData = useCallback(async () => {
-    if (liveData) return; // Already fetched
-    setLiveLoading(true);
+  const fetchLiveData = useCallback(async (force = false) => {
+    if (liveData && !force) return; // Prevent unnecessary fetches if data exists and not forced
+    
+    // Only show loading spinner on initial fetch or manual refresh
+    if (!liveData) setLiveLoading(true);
+    
     try {
       const res = await fetch('/api/fixtures');
       if (res.ok) {
         const json = await res.json();
         setLiveData(json.leagues || null);
+        setLastUpdated(new Date());
       }
-    } catch {}
+    } catch (err) {
+      console.error('Failed to fetch live fixtures:', err);
+    }
     setLiveLoading(false);
   }, [liveData]);
+
+  // Silent background refresh every 15 seconds
+  useEffect(() => {
+    if (!useLiveData) return;
+    
+    const interval = setInterval(() => {
+      fetchLiveData(true); // Forced background fetch
+    }, 15000); // 15 seconds as requested
+    
+    return () => clearInterval(interval);
+  }, [useLiveData, fetchLiveData]);
 
   // Merge real upcoming matches into mock data when live toggle is on
   const buildLiveMatches = useCallback(() => {
     if (!liveData) return {};
     const merged = {};
-    const baseLeagueCodes = ['PL', 'LL', 'SA', 'BL', 'PSL', 'UCL'];
+    const baseLeagueCodes = ['PL', 'LL', 'SA', 'BL', 'PSL', 'UCL', 'WC'];
     baseLeagueCodes.forEach(code => {
       const upcoming = (liveData[code] || []).map((e, idx) => ({
         id:        `live_${code}_${idx}`,
@@ -757,8 +781,8 @@ const FixturesPage = () => {
     setExpandedLeagues(prev => ({ ...prev, [code]: !prev[code] }));
   };
 
-  // Group matches by league — respect selected & priority
-  const baseLeagueOrder = ['PL', 'LL', 'SA', 'BL', 'PSL', 'UCL'];
+  // Group matches by competition — respect selected & priority
+  const baseLeagueOrder = ['WC', 'PL', 'LL', 'SA', 'BL', 'PSL', 'UCL'];
   const leagueOrder = [
     ...baseLeagueOrder.filter(c => priorityLeagues.has(c) && selectedLeagues.has(c)),
     ...baseLeagueOrder.filter(c => !priorityLeagues.has(c) && selectedLeagues.has(c)),
@@ -766,8 +790,8 @@ const FixturesPage = () => {
 
   const liveMatchesByLeague = useLiveData ? buildLiveMatches() : null;
   const matchesByLeague = baseLeagueOrder.reduce((acc, code) => {
-    acc[code] = liveMatchesByLeague
-      ? (liveMatchesByLeague[code] || mockMatches.filter(m => m.league === code))
+    acc[code] = (liveMatchesByLeague && liveMatchesByLeague[code])
+      ? liveMatchesByLeague[code]
       : mockMatches.filter(m => m.league === code);
     return acc;
   }, {});
@@ -1062,7 +1086,7 @@ const FixturesPage = () => {
                   className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest bg-gray-900 border border-gray-800 hover:border-green-800 text-gray-400 hover:text-green-400 transition-colors cursor-pointer"
                 >
                   <FaHeart size={10} className="text-green-500" />
-                  My Leagues
+                  My Competitions
                   {priorityLeagues.size > 0 && (
                     <span className="bg-green-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">{priorityLeagues.size}</span>
                   )}
@@ -1176,6 +1200,7 @@ const FixturesPage = () => {
                       >
                         {meta.name}
                       </h3>
+                      {code === 'WC' && <span className="text-[9px] bg-green-600 text-white px-2 py-0.5 rounded-full font-black animate-pulse">LIVE FROM ARENA</span>}
                       <span className="text-[10px] text-gray-500 font-bold mr-2">
                         {matches.length} {matches.length === 1 ? 'match' : 'matches'}
                       </span>
@@ -1232,7 +1257,7 @@ const FixturesPage = () => {
               exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
               transition={{ duration: 0.4 }}
             >
-              {/* League selector */}
+              {/* Competition selector */}
               <div className="flex flex-wrap justify-center gap-2 mb-6">
                 {STANDINGS_LEAGUES.map(lg => (
                   <motion.button
@@ -1318,11 +1343,7 @@ const FixturesPage = () => {
 
                             {/* Team */}
                             <div className="flex items-center gap-2 min-w-0">
-                              {row.logo ? (
-                                <img src={row.logo} alt={row.team} className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
-                              ) : (
-                                <div className="w-5 h-5 rounded-full bg-gray-700 flex-shrink-0" />
-                              )}
+                              <TeamBadge team={row.team} liveLogoUrl={row.logo} size="sm" />
                               <span className="text-xs text-white font-semibold truncate">{row.team}</span>
                             </div>
 
@@ -1450,9 +1471,9 @@ const FixturesPage = () => {
                 </AnimatePresence>
               </div>
 
-              {/* League filter chips */}
+              {/* Competition filter chips */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="text-[9px] text-gray-600 uppercase tracking-widest font-bold">By League:</span>
+                <span className="text-[9px] text-gray-600 uppercase tracking-widest font-bold">By Competition:</span>
                 {[{ code: 'ALL', name: 'All Leagues' }, ...Object.entries(LEAGUE_META).map(([code, meta]) => ({ code, name: meta.name }))].map(({ code, name }) => (
                   <motion.button
                     key={code}
@@ -1465,17 +1486,58 @@ const FixturesPage = () => {
                         : 'bg-gray-900 text-gray-500 border border-gray-800 hover:border-gray-700'
                     }`}
                   >
-                    {name}
+                    {name === 'All Leagues' ? 'All Competitions' : name}
                   </motion.button>
                 ))}
+              </div>
+
+              {/* Breaking Ticker */}
+              <div className="mb-6 bg-gray-900 border-y border-gray-800 py-2 overflow-hidden relative group">
+                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-900 to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-900 to-transparent z-10 pointer-events-none" />
+                <motion.div
+                  className="whitespace-nowrap flex items-center gap-12"
+                  animate={{ x: [0, -1000] }}
+                  transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+                >
+                  {mockNews.slice(0, 5).map(n => (
+                    <div key={`ticker-${n.id}`} className="flex items-center gap-3">
+                      <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">BREAKING:</span>
+                      <span className="text-[11px] text-white font-bold">{n.title}</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-700" />
+                    </div>
+                  ))}
+                </motion.div>
               </div>
 
               <motion.div
                 variants={staggerContainer}
                 initial="hidden"
                 animate="visible"
-                className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
               >
+                {/* 5s Arena Featured News Item */}
+                <motion.div
+                   variants={staggerItem}
+                   className="relative col-span-full bg-gradient-to-r from-green-900/40 via-gray-900 to-green-900/40 border border-green-500/30 rounded-3xl p-6 overflow-hidden group mb-4"
+                >
+                   <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                      <div className="w-20 h-20 rounded-2xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(34,197,94,0.3)]">🏆</div>
+                      <div className="flex-1 text-center md:text-left">
+                        <span className="inline-block px-3 py-1 rounded-full bg-green-600 text-white text-[10px] font-black uppercase tracking-tighter mb-2">Platform Exclusive</span>
+                        <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight mb-2">World Cup 5s Arena: Tournament Registration is Open!</h2>
+                        <p className="text-gray-400 text-xs leading-relaxed max-w-xl">Grab your squad and register for the ultimate 5-a-side challenge. Live fixtures, player stats, and massive prizes await the champions.</p>
+                      </div>
+                      <Link href="/tournament" className="px-8 py-3 rounded-full bg-green-600 hover:bg-green-500 text-white font-black text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:scale-105 active:scale-95 whitespace-nowrap">Register Now</Link>
+                   </div>
+                   {/* Background Shimmer */}
+                   <motion.div 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%]"
+                    animate={{ translateX: ['-100%', '200%'] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                   />
+                </motion.div>
+
                 {filteredNews.map((article, i) => (
                   <motion.a
                     key={article.id}
@@ -1483,67 +1545,60 @@ const FixturesPage = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     variants={staggerItem}
-                    whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
-                    className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-lg group cursor-pointer hover:border-green-700/50 transition-all block"
+                    whileHover={{ y: -8, transition: { duration: 0.2 } }}
+                    className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl overflow-hidden shadow-2xl group cursor-pointer hover:border-green-500/50 transition-all block relative"
                   >
-                    {/* Designed card header — gradient + category visual (no broken external images) */}
-                    <div className="h-44 relative overflow-hidden">
-                      {/* Base gradient */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${article.gradient}`} />
-                      {/* Radial colour accent layer */}
-                      <div
-                        className="absolute inset-0"
-                        style={{ background: CATEGORY_VISUAL[article.category]?.pattern || 'none' }}
-                      />
-                      {/* Dot grid texture */}
-                      <div
-                        className="absolute inset-0 opacity-[0.07]"
-                        style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '18px 18px' }}
-                      />
-                      {/* Giant decorative emoji — scales on hover */}
-                      <div className="absolute -right-3 -bottom-4 text-[80px] leading-none opacity-20 group-hover:opacity-30 group-hover:scale-110 transition-all duration-700 select-none pointer-events-none">
-                        {CATEGORY_VISUAL[article.category]?.emoji || '📰'}
+                    {/* Scanner Effect */}
+                    <motion.div
+                      className="absolute top-0 left-0 right-0 h-[2px] bg-green-500/50 z-20 pointer-events-none opacity-0 group-hover:opacity-100"
+                      initial={{ top: '0%' }}
+                      whileHover={{ top: '100%' }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                    />
+
+                    {/* News Image/Gradient Area */}
+                    <div className="h-48 relative overflow-hidden">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${article.gradient} opacity-80`} />
+                      <div className="absolute inset-0 backdrop-blur-[2px]" style={{ background: CATEGORY_VISUAL[article.category]?.pattern || 'none' }} />
+                      
+                      {/* Decorative elements */}
+                      <div className="absolute -right-6 -bottom-6 text-9xl text-white/5 group-hover:text-white/10 transition-colors duration-500 select-none pointer-events-none rotate-12">
+                        {CATEGORY_VISUAL[article.category]?.emoji}
                       </div>
-                      {/* Source initial + name centred */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                        <div className="w-12 h-12 rounded-full bg-white/10 border border-white/25 flex items-center justify-center text-white font-black text-lg backdrop-blur-sm shadow-lg">
+
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                        <motion.div 
+                          className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl mb-2 backdrop-blur-md shadow-2xl"
+                          whileHover={{ rotate: 10, scale: 1.1 }}
+                        >
                           {article.source.charAt(0)}
-                        </div>
-                        <span className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em]">
-                          {article.source}
-                        </span>
+                        </motion.div>
+                        <span className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{article.source}</span>
                       </div>
-                      {/* Bottom scrim for badge legibility */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                      {/* Category + league badges */}
-                      <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
-                        <span className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border backdrop-blur-sm ${CATEGORY_COLORS[article.category] || 'bg-gray-700 text-gray-300'}`}>
-                          {article.category}
-                        </span>
-                        {article.leagues?.map((lc) => (
-                          <span key={lc} className={`text-[8px] font-bold px-2 py-0.5 rounded-full bg-black/40 backdrop-blur border border-white/10 ${LEAGUE_META[lc]?.textColor || 'text-gray-400'}`}>
-                            {LEAGUE_META[lc]?.name || lc}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-white/90 bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-lg">
-                          {article.source}
-                        </span>
-                        <span className="text-[9px] text-white/70 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded">
-                          {article.timeAgo}
-                        </span>
+
+                      {/* Badges */}
+                      <div className="absolute top-4 left-4 flex gap-2">
+                         <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${CATEGORY_COLORS[article.category]}`}>
+                           {article.category}
+                         </span>
                       </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="p-4">
-                      <h3 className="text-sm font-bold text-white mb-2 leading-snug line-clamp-2 group-hover:text-green-400 transition-colors">
+                    <div className="p-5 border-t border-gray-800/50">
+                      <div className="flex items-center gap-2 mb-3">
+                        {article.leagues?.map(l => (
+                          <span key={l} className="text-[8px] font-bold text-gray-500 uppercase tracking-widest border border-gray-800 px-1.5 py-0.5 rounded">{LEAGUE_META[l]?.name || l}</span>
+                        ))}
+                        <span className="text-[8px] text-gray-600 ml-auto font-bold uppercase tracking-widest">{article.timeAgo}</span>
+                      </div>
+                      <h3 className="text-sm font-bold text-white mb-4 leading-relaxed line-clamp-2 group-hover:text-green-400 transition-colors">
                         {article.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-green-500 group-hover:text-green-400 transition-colors">
-                        <FaExternalLinkAlt size={9} />
-                        Read Full Article
+                      <div className="flex items-center justify-between">
+                         <div className="flex items-center gap-1.5 text-[10px] font-black text-green-500 group-hover:underline">
+                            VIEW ARTICLE <FaExternalLinkAlt size={8} />
+                         </div>
+                         <div className="w-1 h-1 rounded-full bg-gray-800" />
                       </div>
                     </div>
                   </motion.a>
@@ -1656,7 +1711,8 @@ const FixturesPage = () => {
                     className="text-sm font-black text-white uppercase tracking-widest"
                     style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
                   >
-                    Football Highlights Channels
+                   Live scores, breaking news, video highlights & match analysis —
+            all your competitions, all in one place.
                   </h2>
                   <p className="text-[10px] text-gray-600 mt-1 uppercase tracking-wider">
                     {filteredChannels.length} channels &mdash; ranked by global team relevance

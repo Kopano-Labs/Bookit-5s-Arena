@@ -41,6 +41,16 @@ const TournamentTeamSchema = new mongoose.Schema(
     groupNumber: { type: Number, min: 1, max: 8 },
     groupLetter: { type: String, enum: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] },
 
+    /* REAL-TIME STANDINGS (Editable by Admin) */
+    mp: { type: Number, default: 0 }, // Matches Played
+    w:  { type: Number, default: 0 }, // Wins
+    d:  { type: Number, default: 0 }, // Draws
+    l:  { type: Number, default: 0 }, // Losses
+    gf: { type: Number, default: 0 }, // Goals For
+    ga: { type: Number, default: 0 }, // Goals Against
+    gd: { type: Number, default: 0 }, // Goal Difference
+    pts: { type: Number, default: 0 }, // Total Points
+
     /* Status */
     status: {
       type: String,

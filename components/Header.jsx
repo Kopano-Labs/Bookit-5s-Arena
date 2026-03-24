@@ -69,11 +69,13 @@ const Header = () => {
   const publicTabs = [
     { href: '/#courts',  icon: <FaFutbol size={11} className="text-green-400" />,     label: 'Book Court' },
     { href: '/events-and-services', icon: <FaBolt size={11} className="text-cyan-400" />, label: 'Events' },
+    { href: '/leagues', icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Competitions' },
     { href: '/tournament', icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Tournament' },
   ];
 
   const userTabs = [
     { href: '/fixtures', icon: <FaTv size={11} className="text-blue-400" />,         label: 'Fixtures' },
+    { href: '/leagues', icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Competitions' },
     { href: '/rules-of-the-game', icon: <FaBookOpen size={11} className="text-orange-400" />, label: 'Rules' },
     { href: '/bookings', icon: <FaBolt size={11} className="text-cyan-400" />, label: 'My Bookings' },
     { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards' },
@@ -87,6 +89,7 @@ const Header = () => {
   ];
 
   const adminTabs = [
+    { href: '/admin/competitions', icon: <FaTrophy size={11} className="text-yellow-400" />,        label: 'Competition Hub' },
     { href: '/admin/dashboard',  icon: <FaTachometerAlt size={11} className="text-purple-400" />, label: 'Dashboard' },
     { href: '/admin/bookings',   icon: <FaListAlt size={11} className="text-teal-400" />,         label: 'Manage' },
     { href: '/admin/newsletter', icon: <FaEnvelope size={11} className="text-rose-400" />,         label: 'Newsletter' },
@@ -236,8 +239,8 @@ const Header = () => {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/login" className="px-4 py-2 text-[10px] font-bold text-gray-400 hover:text-white uppercase tracking-widest">In</Link>
-                <Link href="/register" className="px-5 py-2 text-[10px] font-black text-white bg-green-600 rounded-lg shadow-[0_0_12px_rgba(34,197,94,0.4)] uppercase tracking-widest">Join</Link>
+                <Link href="/login" className="px-4 py-2 text-[10px] font-bold text-gray-400 hover:text-white uppercase tracking-widest">LOGIN</Link>
+                <Link href="/register" className="px-5 py-2 text-[10px] font-black text-white bg-green-600 rounded-lg shadow-[0_0_12px_rgba(34,197,94,0.4)] uppercase tracking-widest">REGISTER</Link>
               </div>
             )}
 

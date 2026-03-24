@@ -65,9 +65,12 @@ const TEAM_CARDS = [
 
 /* ─── Bottom bar tabs ─────────────────────────────────────── */
 const BOTTOM_TABS = [
-  { label: 'Terms', href: '/rules-of-the-game' },
-  { label: 'Contact', href: '/#contact' },
-  { label: 'RSS', href: '/api/rss' },
+  { label: 'Roadmap',  href: '/roadmap' },
+  { label: 'Security', href: '/security' },
+  { label: 'Terms',    href: '/rules-of-the-game' },
+  { label: 'Analytics', href: '/admin/dashboard' }, // Restricted to Admin by middleware
+  { label: 'Contact',  href: '/#contact' },
+  { label: 'RSS Feed', href: '/api/rss' },
 ];
 
 /* ═══════════════════════════════════════════════════════════ */
@@ -190,8 +193,8 @@ const Footer = () => {
               <motion.img
                 src="/images/logo.png"
                 alt="5s Arena"
-                className="w-12 h-12 rounded-full object-cover"
-                whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(74,222,128,0.5)' }}
+                className="w-12 h-12 rounded-full object-cover border-2 border-green-500 shadow-lg"
+                whileHover={{ scale: 1.15, rotate: 5, boxShadow: '0 0 24px rgba(34,197,94,0.6)' }}
               />
               <div>
                 <p className="font-black uppercase text-white text-lg tracking-wider" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>

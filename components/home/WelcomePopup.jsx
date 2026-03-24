@@ -54,7 +54,7 @@ export default function WelcomePopup() {
                 WELCOME TO <span className="text-green-400">5S ARENA</span>
               </h2>
               <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto">
-                Are you here for our regular social leagues or the ultimate 5s Arena World Cup 2026?
+                Are you here for our regular social competitions or the ultimate 5s Arena World Cup 2026?
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

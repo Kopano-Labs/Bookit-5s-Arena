@@ -361,125 +361,37 @@ export default function AuthPage() {
                 </Link>
               )}
 
-              <div className="relative mb-5">
+              <div className="relative mb-8">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-800/40" /></div>
                 <div className="relative flex justify-center">
-                  <span className="bg-gray-900/70 px-3 text-gray-600 text-[10px] uppercase tracking-widest">
-                    or {mode === 'login' ? 'sign in' : 'register'} with email
+                  <span className="bg-gray-900/70 px-3 text-gray-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                    Enterprise Security Gate
                   </span>
                 </div>
               </div>
 
-              {/* Form */}
-              <AnimatePresence mode="wait">
-                <motion.form
-                  key={mode}
-                  onSubmit={mode === 'login' ? handleLogin : handleRegister}
-                  className="space-y-4"
-                  initial={{ opacity: 0, x: mode === 'login' ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: mode === 'login' ? 20 : -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {mode === 'register' && (
-                    <div>
-                      <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                        <FaUser size={10} className="text-green-500" /> Full Name
-                      </label>
-                      <input type="text" value={name} onChange={(e) => setName(e.target.value)} required
-                        onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)}
-                        className={inputClass('name')} placeholder="John Doe" />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                      <FaEnvelope size={10} className="text-green-500" /> Email
-                    </label>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                      onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
-                      className={inputClass('email')} placeholder="you@example.com" />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                      <FaLock size={10} className="text-green-500" /> Password
-                    </label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                      onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)}
-                      className={inputClass('password')} placeholder={mode === 'register' ? 'Min. 6 characters' : '••••••••'} />
-                  </div>
-
-                  {mode === 'register' && (
-                    <>
-                      <div>
-                        <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                          <FaLock size={10} className="text-green-500" /> Confirm Password
-                        </label>
-                        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required
-                          onFocus={() => setFocusedField('confirm')} onBlur={() => setFocusedField(null)}
-                          className={inputClass('confirm')} placeholder="Repeat password" />
-                      </div>
-                    </>
-                  )}
-
-                  {/* Global reCAPTCHA Security Check */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <FaShieldAlt className="text-green-500" size={12} />
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Security Check</span>
-                    </div>
-                    <div className={`rounded-xl border p-3 transition-all flex justify-center backdrop-blur-sm ${recaptchaToken ? 'border-green-600/40 bg-green-900/10' : 'border-gray-700/40 bg-gray-800/20'}`}>
-                      {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== 'your_site_key_here' ? (
-                        <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} onChange={(token) => setRecaptchaToken(token || '')} onExpired={() => setRecaptchaToken('')} theme="dark" />
-                      ) : (
-                        <div className="text-center py-2">
-                          <p className="text-xs text-amber-500 font-semibold">reCAPTCHA not configured</p>
-                          <button type="button" onClick={() => setRecaptchaToken('dev-bypass')} className="mt-1.5 text-xs text-green-500 underline cursor-pointer">[Dev] Skip verification</button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <motion.button
-                    type="submit"
-                    disabled={loading || !recaptchaToken}
-                    className="w-full py-4 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-2 relative overflow-hidden cursor-pointer"
-                    style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)', backgroundSize: '200% 200%' }}
-                    animate={{
-                      backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
-                      boxShadow: ['0 0 20px rgba(16,185,129,0.3)', '0 0 40px rgba(16,185,129,0.5)', '0 0 20px rgba(16,185,129,0.3)'],
-                    }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
+              <div className="space-y-4">
+                <div className="p-6 rounded-2xl bg-gray-800/20 border border-gray-700/40 backdrop-blur-xl relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <FaShieldAlt className="text-green-500 mx-auto mb-4 text-3xl" />
+                  <h3 className="text-white text-sm font-black uppercase tracking-widest mb-2 text-center">Verified Identities Only</h3>
+                  <p className="text-gray-500 text-[11px] leading-relaxed text-center font-medium">
+                    To ensure the integrity of Squad Management and Tournament registration, all accounts must be linked to a verified Google presence.
+                  </p>
+                </div>
+                
+                <div className="p-4 flex items-center gap-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1] }} 
+                    transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <motion.div
-                      className="absolute inset-0"
-                      style={{ background: 'linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%)', backgroundSize: '200% 100%' }}
-                      animate={{ backgroundPosition: ['-100% 0', '200% 0'] }}
-                      transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1 }}
-                    />
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {mode === 'login' ? <FaSignInAlt /> : <FaUserPlus />}
-                      {loading
-                        ? (mode === 'login' ? 'Signing in...' : 'Creating account...')
-                        : (mode === 'login' ? 'Sign In' : 'Create Account')
-                      }
-                    </span>
-                  </motion.button>
-                </motion.form>
-              </AnimatePresence>
-
-              <p className="mt-6 text-center text-sm text-gray-500">
-                {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-                <button
-                  onClick={() => { setMode(m => m === 'login' ? 'register' : 'login'); setError(''); }}
-                  className="font-bold text-green-400 hover:text-green-300 transition-colors cursor-pointer"
-                >
-                  {mode === 'login' ? 'Register here' : 'Sign in here'}
-                </button>
-              </p>
+                    <FaBolt className="text-amber-500" size={16} />
+                  </motion.div>
+                  <p className="text-amber-200/70 text-[10px] uppercase font-bold tracking-wider">
+                    Guest browsing is available via the link above.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
