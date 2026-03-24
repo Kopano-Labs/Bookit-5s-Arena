@@ -113,13 +113,16 @@ const Header = () => {
               className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)]"
               whileHover={{ scale: 1.12, boxShadow: '0 0 22px rgba(34,197,94,0.75)', rotate: 5 }}
               whileTap={{ scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 300 }}
               animate={{
                 boxShadow: [
                   '0 0 14px rgba(34,197,94,0.45)',
                   '0 0 20px rgba(34,197,94,0.65)',
                   '0 0 14px rgba(34,197,94,0.45)',
                 ],
+              }}
+              transition={{
+                boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+                scale: { type: 'spring', stiffness: 300 },
               }}
             >
               <Image src="/images/logo.png" alt="5s Arena" fill sizes="44px" className="object-cover" priority />

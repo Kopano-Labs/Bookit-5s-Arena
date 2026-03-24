@@ -44,12 +44,12 @@ export const viewport = {
 
 const RootLayout = ({ children }) => {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/images/logo.png" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider>
             <AnalyticsTracker />
