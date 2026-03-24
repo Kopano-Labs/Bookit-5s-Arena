@@ -10,6 +10,7 @@ import {
   FaFutbol, FaLinkedinIn, FaShareAlt, FaRss,
   FaCoffee, FaHeart, FaExternalLinkAlt
 } from 'react-icons/fa';
+import { useSession } from 'next-auth/react';
 
 /* ─── Social links ────────────────────────────────────────── */
 const SOCIALS = [
@@ -33,7 +34,7 @@ const QUICK_LINKS = [
 const TEAM_CARDS = [
   {
     name: 'Kholofelo Robyn Rababalela',
-    role: 'Founder & Lead Developer',
+    role: 'Lead Developer and Web-developer',
     image: '/images/admin-photos/kholofelo-robyn-rababalela-footer-picture.png',
     linkedin: 'https://www.linkedin.com/in/kholofelo-robyn-rababalela-7a26273b6/',
     gradient: 'from-green-600/20 to-emerald-900/30',
@@ -41,7 +42,7 @@ const TEAM_CARDS = [
   },
   {
     name: 'Mashoto Bayne Rababalela',
-    role: 'Co-Founder & Business Lead',
+    role: 'Founder, Business Lead & Organizer',
     image: '/images/admin-photos/mashoto-rababalela-footer-picture.png',
     linkedin: 'https://www.linkedin.com/in/mashoto-bayne-rababalela-836a47139/',
     gradient: 'from-blue-600/20 to-indigo-900/30',
@@ -66,6 +67,7 @@ const BOTTOM_TABS = [
 
 /* ═══════════════════════════════════════════════════════════ */
 const Footer = () => {
+  const { data: session, status } = useSession();
   const currentYear = new Date().getFullYear();
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -238,31 +240,33 @@ const Footer = () => {
           </div>
 
           {/* Quick Links */}
-          <div>
-            <motion.h4
-              className="text-green-400 font-bold text-xs uppercase tracking-[0.2em] mb-5"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-            >
-              Quick Links
-            </motion.h4>
-            <ul className="space-y-2">
-              {QUICK_LINKS.map((link) => (
-                <li key={link.href}>
-                  <motion.div whileHover={{ x: 3, scale: 1.02 }} transition={{ duration: 0.15 }}>
-                    <Link
-                      href={link.href}
-                      className="text-gray-400 hover:text-white text-sm transition-all flex items-center gap-2 bg-gray-800/40 hover:bg-green-600/20 px-3 py-2 rounded-lg border border-gray-800/60 hover:border-green-500/30"
-                    >
-                      <span className="text-green-500 text-xs">→</span>
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {status === 'authenticated' && (
+            <div>
+              <motion.h4
+                className="text-green-400 font-bold text-xs uppercase tracking-[0.2em] mb-5"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                Quick Links
+              </motion.h4>
+              <ul className="space-y-2">
+                {QUICK_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <motion.div whileHover={{ x: 3, scale: 1.02 }} transition={{ duration: 0.15 }}>
+                      <Link
+                        href={link.href}
+                        className="text-gray-400 hover:text-white text-sm transition-all flex items-center gap-2 bg-gray-800/40 hover:bg-green-600/20 px-3 py-2 rounded-lg border border-gray-800/60 hover:border-green-500/30"
+                      >
+                        <span className="text-green-500 text-xs">→</span>
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Contact */}
           <div>

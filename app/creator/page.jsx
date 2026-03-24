@@ -57,7 +57,7 @@ function LightBeam({ angle, color, delay }) {
 
 const WELCOME_COLORS = ["#22c55e", "#06b6d4", "#f59e0b", "#a855f7", "#ef4444"];
 const NAME_LETTERS = "KHOLOFELO".split("");
-const TAGLINE = "Web Designer · Football Fan · Digital Architect";
+const TAGLINE = "Lead Developer and Web-developer";
 
 function WelcomeAnimation({ onComplete }) {
   const [phase, setPhase] = useState(0);
@@ -288,13 +288,14 @@ export default function CreatorPage() {
     <>
       <AnimatePresence>
         {!welcomeDone && (
-          <WelcomeAnimation onComplete={() => setWelcomeDone(true)} />
+          <WelcomeAnimation key="welcome" onComplete={() => setWelcomeDone(true)} />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {welcomeDone && (
           <motion.div
+            key="creator-content"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
