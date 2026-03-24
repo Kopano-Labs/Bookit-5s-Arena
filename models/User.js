@@ -90,6 +90,13 @@ const UserSchema = new mongoose.Schema(
         pointsEarned: { type: Number, default: 0 },
       },
     ],
+    // Player status (e.g. "Ready for Match", "Looking for Team", "Injured")
+    status: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Status must be at most 100 characters'],
+      default: 'Ready for 5s Arena',
+    },
   },
   { timestamps: true }
 );

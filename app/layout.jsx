@@ -1,8 +1,6 @@
 import AuthProvider from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import SupportChatbot from '@/components/SupportChatbot';
-import BottomNavBar from '@/components/BottomNavBar';
 import SoccerBallMenu from '@/components/SoccerBallMenu';
 import NewsletterPopup from '@/components/NewsletterPopup';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
@@ -51,7 +49,7 @@ const RootLayout = ({ children }) => {
         {/* Plausible Analytics — Lightweight & Privacy-focused */}
         <script defer data-domain="5sarena.co.za" src="https://plausible.io/js/script.js"></script>
       </head>
-      <body suppressHydrationWarning>
+      <body className="bg-gray-950 text-white antialiased selection:bg-green-500/30" suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider>
             <AnalyticsTracker />
@@ -64,10 +62,8 @@ const RootLayout = ({ children }) => {
             </main>
             <Footer />
             {/* Fixed floating elements */}
-            <BottomNavBar />
             <SoccerBallMenu />
             <NewsletterPopup />
-            <SupportChatbot />
             <CookieBanner />
           </ThemeProvider>
         </AuthProvider>

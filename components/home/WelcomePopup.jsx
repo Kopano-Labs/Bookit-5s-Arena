@@ -58,7 +58,7 @@ export default function WelcomePopup() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Regular Leagues Option */}
+                {/* Social Competitions Option */}
                 <Link href="/leagues" onClick={handleClose}>
                   <motion.div
                     className="h-full flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-2xl cursor-pointer group hover:bg-gray-800 hover:border-gray-500 transition-all"
@@ -68,10 +68,10 @@ export default function WelcomePopup() {
                     <div className="w-16 h-16 rounded-full bg-blue-900/30 text-blue-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <FaFutbol size={28} />
                     </div>
-                    <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-2">Social Leagues</h3>
-                    <p className="text-xs text-gray-400 mb-4">Join our weekly social divisions. (Coming soon)</p>
+                    <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-2">Social Competitions</h3>
+                    <p className="text-xs text-gray-400 mb-4">Join our weekly social divisions and build your squad rankings.</p>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      View Leagues <FaArrowRight />
+                      Explore Competitions <FaArrowRight />
                     </span>
                   </motion.div>
                 </Link>
@@ -87,7 +87,7 @@ export default function WelcomePopup() {
                       <FaTrophy size={28} />
                     </div>
                     <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-2">World Cup &apos;26</h3>
-                    <p className="text-xs text-gray-400 mb-4">The ultimate 48-team tournament event.</p>
+                    <p className="text-xs text-gray-400 mb-4">The ultimate 48-team tournament. Global glory awaits.</p>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                       Register Team <FaArrowRight />
                     </span>

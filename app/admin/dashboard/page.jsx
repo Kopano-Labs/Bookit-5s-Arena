@@ -7,9 +7,9 @@ import Link from 'next/link';
 import {
   FaCalendarAlt, FaFutbol, FaMoneyBillWave, FaClock,
   FaFilter, FaTimes, FaUsers, FaCheckCircle, FaHourglassHalf,
-  FaBan, FaArrowUp, FaChartBar, FaStar, FaUserSecret, FaCogs, FaShieldAlt, FaBullhorn
+  FaBan, FaArrowUp, FaChartBar, FaStar, FaUserSecret, FaCogs, FaShieldAlt, FaBullhorn, FaTrophy, FaUpload
 } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import InfoTooltip from '@/components/InfoTooltip';
 
 const statusBadge = (status) => {
@@ -30,6 +30,9 @@ const AdminDashboard = () => {
   const [toDate, setToDate] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedCourt, setSelectedCourt] = useState(null);
+  
+  const [teams, setTeams] = useState([]);
+  const [verifying, setVerifying] = useState(null);
 
   const fetchStats = useCallback((params) => {
     const p = params || new URLSearchParams();
@@ -44,11 +47,37 @@ const AdminDashboard = () => {
       .then((data) => { setStats(data); setLoading(false); });
   }, [fromDate, toDate, statusFilter]);
 
+  const fetchTeams = useCallback(() => {
+    fetch('/api/tournament')
+      .then(r => r.json())
+      .then(data => setTeams(data.teams || []))
+      .catch(console.error);
+  }, []);
+
   useEffect(() => {
     if (status === 'unauthenticated') { router.push('/login'); return; }
     if (status === 'authenticated' && session.user.role !== 'admin') { router.push('/'); return; }
-    if (status === 'authenticated') fetchStats(new URLSearchParams());
-  }, [status, session, router]);
+    if (status === 'authenticated') {
+      fetchStats(new URLSearchParams());
+      fetchTeams();
+    }
+  }, [status, session, router, fetchStats, fetchTeams]);
+
+  const handleVerify = async (teamId, action) => {
+    setVerifying(teamId);
+    try {
+      const res = await fetch('/api/admin/tournament/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teamId, action }),
+      });
+      if (res.ok) fetchTeams();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setVerifying(null);
+    }
+  };
 
   if (loading || !stats) {
     return (
@@ -59,8 +88,6 @@ const AdminDashboard = () => {
   }
 
   const inputClass = 'bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all';
-
-  // Revenue trend bar chart
   const maxRevenue = Math.max(...(stats.revenueTrend?.map((d) => d.revenue) ?? [1]), 1);
 
   const topCards = [
@@ -133,337 +160,200 @@ const AdminDashboard = () => {
         {/* Filters */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-wrap gap-4 items-end shadow-lg">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
-              From{' '}
-              <InfoTooltip text="Start date for the dashboard data range. All stats, charts, and tables will reflect bookings from this date." size={12} />
-            </label>
+            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">From</label>
             <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className={inputClass} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
-              To{' '}
-              <InfoTooltip text="End date for the dashboard data range. Leave blank to include all bookings up to today." size={12} />
-            </label>
+            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">To</label>
             <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className={inputClass} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
-              Period{' '}
-              <InfoTooltip text="Quick filter: 'Upcoming' shows only future bookings, 'Past' shows completed bookings. 'All' shows everything." size={12} />
-            </label>
+            <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">Period</label>
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={inputClass}>
               <option value="">All Bookings</option>
               <option value="upcoming">Upcoming</option>
               <option value="past">Past</option>
             </select>
           </div>
-          <button
-            onClick={() => fetchStats()}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-all hover:scale-105"
-            style={{ background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)', boxShadow: '0 0 15px rgba(34,197,94,0.3)' }}
-          >
+          <button onClick={() => fetchStats()} className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-all hover:scale-105 bg-green-600 shadow-lg shadow-green-900/30">
             <FaFilter size={11} /> Apply
           </button>
-          <button
-            onClick={() => { setFromDate(''); setToDate(''); setStatusFilter(''); fetchStats(new URLSearchParams()); }}
-            className="flex items-center gap-2 px-5 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-white hover:border-gray-600 transition-all"
-          >
+          <button onClick={() => { setFromDate(''); setToDate(''); setStatusFilter(''); fetchStats(new URLSearchParams()); }} className="flex items-center gap-2 px-5 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-white transition-all">
             <FaTimes size={11} /> Clear
           </button>
         </div>
 
-        {/* Top stat cards */}
-        <motion.div
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
-          initial="hidden"
-          animate="visible"
-        >
+        {/* Top cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {topCards.map((card) => (
-            <motion.div
-              key={card.label}
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } } }}
-              whileHover={{ y: -4, scale: 1.01, transition: { duration: 0.2 } }}
-              className={`border rounded-2xl p-5 flex flex-col items-center text-center gap-2 shadow-lg ${card.bg}`}
-            >
+            <div key={card.label} className={`border rounded-2xl p-5 flex flex-col items-center text-center gap-2 shadow-lg ${card.bg}`}>
               <div className="p-3 rounded-xl bg-gray-900/60">{card.icon}</div>
               <p className="text-2xl font-black text-white">{card.value}</p>
-              <p className="text-xs text-gray-500 uppercase tracking-wide leading-tight flex items-center gap-1">
-                {card.label} <InfoTooltip text={card.tip} position="bottom" size={12} />
-              </p>
+              <p className="text-xs text-gray-500 uppercase tracking-wide leading-tight">{card.label}</p>
               <p className="text-xs text-gray-600">{card.sub}</p>
-              {card.sub2 && <p className="text-xs text-green-500 font-semibold">{card.sub2}</p>}
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* ── GOD-MODE CONTROL CENTER ── */}
-        <motion.div
-          variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: 0.2, duration: 0.5 } } }}
-          initial="hidden"
-          animate="visible"
-          className="bg-black/40 border border-red-900/30 rounded-2xl p-6 shadow-[0_0_30px_rgba(220,38,38,0.05)] relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
-          
-          <div className="flex items-center gap-3 mb-6 relative z-10">
-            <div className="bg-red-900/40 p-2 rounded-lg border border-red-500/30">
-              <FaShieldAlt className="text-red-500 text-xl" />
-            </div>
+        {/* God-Mode Control Center */}
+        <div className="bg-black/60 border-2 border-red-600/30 rounded-3xl p-8 shadow-[0_0_50px_rgba(220,38,38,0.15)] relative overflow-hidden group">
+          <div className="flex items-center gap-4 mb-8 relative z-10">
+            <div className="bg-red-600 p-3 rounded-2xl shadow-[0_0_20px_rgba(220,38,38,0.5)]"><FaShieldAlt className="text-white text-2xl" /></div>
             <div>
-              <h2 className="text-lg font-black text-white uppercase tracking-widest leading-none">God-Mode Controls</h2>
-              <p className="text-xs text-red-400 font-bold uppercase tracking-wider mt-1">Super-Admin Privileges Only</p>
+              <h2 className="text-2xl font-black text-white uppercase tracking-widest leading-none" style={{ fontFamily: 'Impact, sans-serif' }}>God-Mode <span className="text-red-600">Command</span></h2>
+              <p className="text-[10px] text-red-500 font-black uppercase tracking-[0.2em] mt-2">System Status: Critical Priority</p>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
-            <button className="flex flex-col items-center justify-center p-4 bg-gray-900/80 border border-gray-700/50 hover:border-red-500/50 hover:bg-gray-800 rounded-xl transition-all group">
-              <FaUserSecret className="text-2xl text-purple-400 mb-3 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-bold text-white uppercase tracking-widest">Impersonate User</span>
-              <span className="text-[10px] text-gray-500 text-center mt-1">Ghost login to debug issues</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-gray-900/80 border border-gray-700/50 hover:border-red-500/50 hover:bg-gray-800 rounded-xl transition-all group">
-              <FaCogs className="text-2xl text-blue-400 mb-3 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-bold text-white uppercase tracking-widest">Feature Flags</span>
-              <span className="text-[10px] text-gray-500 text-center mt-1">Toggle maintenance & systems</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-gray-900/80 border border-gray-700/50 hover:border-red-500/50 hover:bg-gray-800 rounded-xl transition-all group">
-              <FaBullhorn className="text-2xl text-yellow-500 mb-3 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-bold text-white uppercase tracking-widest">Global Broadcast</span>
-              <span className="text-[10px] text-gray-500 text-center mt-1">Dispatch SMS/Newsletters</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-gray-900/80 border border-gray-700/50 hover:border-red-500/50 hover:bg-gray-800 rounded-xl transition-all group">
-              <FaBan className="text-2xl text-red-500 mb-3 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-bold text-white uppercase tracking-widest">Access Control</span>
-              <span className="text-[10px] text-gray-500 text-center mt-1">Manage bans & permissions</span>
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Revenue trend + Status breakdown row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-          {/* Revenue trend (last 7 days) */}
-          <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-                <FaArrowUp className="text-green-400" /> Revenue — Last 7 Days
-                <InfoTooltip text="Daily revenue breakdown for the past week. Hover over each bar to see booking count and revenue. Taller bars = higher revenue days — use this to spot trends." size={12} />
-              </h3>
-              <span className="text-xs text-gray-600">
-                R{(stats.revenueTrend?.reduce((a, d) => a + d.revenue, 0) || 0).toLocaleString()} total
-              </span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+            <div className="grid grid-cols-2 gap-3">
+              <button className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-red-500 rounded-2xl transition-all group">
+                <FaUserSecret className="text-2xl text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">Ghost Log</span>
+              </button>
+              <button className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-blue-500 rounded-2xl transition-all group">
+                <FaCogs className="text-2xl text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">Flags</span>
+              </button>
+              <button className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-yellow-500 rounded-2xl transition-all group">
+                <FaBullhorn className="text-2xl text-yellow-500 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">Broadcast</span>
+              </button>
+              <button className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-red-600 rounded-2xl transition-all group">
+                <FaBan className="text-2xl text-red-600 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">Banhammer</span>
+              </button>
             </div>
-            <div className="flex items-end gap-2 h-32">
-              {stats.revenueTrend?.map((day) => {
-                const heightPct = maxRevenue > 0 ? (day.revenue / maxRevenue) * 100 : 0;
-                const label = new Date(day.date + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short' });
-                return (
-                  <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-[10px] text-gray-600">{day.revenue > 0 ? `R${day.revenue}` : ''}</span>
-                    <motion.div
-                      className="w-full rounded-t-lg transition-all duration-500 relative group"
-                      initial={{ scaleY: 0 }}
-                      animate={{ scaleY: 1 }}
-                      style={{
-                        height: `${Math.max(heightPct, day.revenue > 0 ? 8 : 2)}%`,
-                        background: day.revenue > 0
-                          ? 'linear-gradient(to top, #15803d, #22c55e)'
-                          : 'rgba(55,65,81,0.5)',
-                        minHeight: '4px',
-                        transformOrigin: 'bottom',
-                      }}
-                    >
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-gray-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                        {day.bookings} booking{day.bookings !== 1 ? 's' : ''} · R{day.revenue}
-                      </div>
-                    </motion.div>
-                    <span className="text-[10px] text-gray-500">{label}</span>
-                  </div>
-                );
-              })}
+            <div className="lg:col-span-2 bg-gray-950 border border-gray-800 rounded-2xl p-4 flex flex-col gap-3">
+              <textarea placeholder="Global notify..." className="flex-1 bg-transparent text-gray-300 text-xs font-mono outline-none resize-none placeholder:text-gray-700" />
+              <button className="px-6 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500 transition-all">Execute Dispatch</button>
             </div>
-          </div>
-
-          {/* Booking status breakdown */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
-            <h3 className="text-sm font-black uppercase tracking-widest text-white mb-5 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-              <FaChartBar className="text-blue-400" /> Booking Status
-              <InfoTooltip text="Breakdown of all bookings by status. A high 'Pending' rate may mean bookings need attention. A 'Cancelled' rate above 20% could indicate pricing or availability issues." size={12} />
-            </h3>
-            <div className="space-y-4">
-              {[
-                { label: 'Confirmed', count: stats.statusCounts?.confirmed ?? 0, icon: <FaCheckCircle className="text-green-400" />, color: '#22c55e' },
-                { label: 'Pending', count: stats.statusCounts?.pending ?? 0, icon: <FaHourglassHalf className="text-yellow-400" />, color: '#eab308' },
-                { label: 'Cancelled', count: stats.statusCounts?.cancelled ?? 0, icon: <FaBan className="text-red-400" />, color: '#ef4444' },
-              ].map((s) => {
-                const total = (stats.statusCounts?.confirmed ?? 0) + (stats.statusCounts?.pending ?? 0) + (stats.statusCounts?.cancelled ?? 0);
-                const pct = total > 0 ? Math.round((s.count / total) * 100) : 0;
-                return (
-                  <div key={s.label}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div className="flex items-center gap-2 text-xs text-gray-400">{s.icon} {s.label}</div>
-                      <span className="text-xs font-bold text-white">{s.count} <span className="text-gray-600">({pct}%)</span></span>
-                    </div>
-                    <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: s.color }} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Peak hours */}
-            {stats.peakHours?.length > 0 && (
-              <div className="mt-6 pt-5 border-t border-gray-800">
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                  <FaClock size={10} /> Peak Booking Hours
-                  <InfoTooltip text="The most popular start times based on confirmed bookings. Use this to plan staffing and promotions during quieter periods." position="left" size={12} />
-                </p>
-                {stats.peakHours.slice(0, 3).map((h, i) => (
-                  <div key={h.hour} className="flex items-center justify-between py-1.5">
-                    <span className="text-xs text-gray-400">{i + 1}. {h.hour}</span>
-                    <span className="text-xs font-bold text-green-400">{h.count} bookings</span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Payment Status panel */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
-          <h3 className="text-sm font-black uppercase tracking-widest text-white mb-5 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-            <FaMoneyBillWave className="text-green-400" /> Payment Status
-            <InfoTooltip text="Paid = Stripe payment verified or manually marked paid. Confirmed Unpaid = booking is confirmed but payment not yet received — action may be needed. Refunded = Stripe refund processed." position="right" />
-          </h3>
-          <div className="space-y-4">
-            {[
-              { label: 'Paid', count: stats.paidCount ?? 0, color: '#22c55e', textColor: 'text-green-400', icon: '✅' },
-              { label: 'Confirmed Unpaid', count: stats.unpaidConfirmed ?? 0, color: '#f59e0b', textColor: 'text-amber-400', icon: '⚠️' },
-              { label: 'Refunded', count: stats.refundedCount ?? 0, color: '#60a5fa', textColor: 'text-blue-400', icon: '🔄' },
-            ].map((s) => {
-              const total = (stats.paidCount ?? 0) + (stats.unpaidConfirmed ?? 0) + (stats.refundedCount ?? 0);
-              const pct = total > 0 ? Math.round((s.count / total) * 100) : 0;
-              return (
-                <div key={s.label}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className={`flex items-center gap-2 text-xs ${s.textColor}`}>
-                      <span>{s.icon}</span> {s.label}
+        {/* ── TOURNAMENT REGISTRATIONS (POP AUDIT) ── */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+          <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+            <h3 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+              <FaTrophy className="text-yellow-500" /> Tournament POP Audit
+              <InfoTooltip text="Manage tournament entries. 'Pending' teams have uploaded POP but need verification." size={12} />
+            </h3>
+            <span className="text-[10px] text-gray-500 font-bold">{teams.length} total entries</span>
+          </div>
+          {!teams.length ? (
+            <p className="p-10 text-center text-gray-600 text-sm italic">No registrations found.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse font-sans">
+                <thead>
+                  <tr className="bg-gray-800/50 text-gray-400 uppercase tracking-widest border-b border-gray-800 font-bold">
+                    <th className="px-6 py-4">Team</th>
+                    <th className="px-6 py-4">Nation</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4">Audit</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800">
+                  {teams.map((team) => (
+                    <tr key={team._id} className="hover:bg-gray-800/30 transition-colors">
+                      <td className="px-6 py-4">
+                        <p className="font-bold text-white">{team.teamName}</p>
+                        <p className="text-[10px] text-gray-500">{team.managerName}</p>
+                      </td>
+                      <td className="px-6 py-4 text-gray-300">{team.worldCupTeam}</td>
+                      <td className="px-6 py-4">
+                         <span className={`px-2 py-0.5 rounded-full font-black uppercase text-[8px] border ${
+                          team.paymentStatus === 'confirmed' ? 'bg-green-900/40 text-green-400 border-green-700/50' :
+                          team.paymentStatus === 'pending' ? 'bg-yellow-900/40 text-yellow-400 border-yellow-700/50' :
+                          team.paymentStatus === 'rejected' ? 'bg-red-900/40 text-red-400 border-red-700/50' :
+                          'bg-gray-800 text-gray-500 border-gray-700'
+                        }`}>{team.paymentStatus || 'unpaid'}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {team.paymentScreenshot ? (
+                          <Link href={`/uploads/payments/${team.paymentScreenshot}`} target="_blank" className="text-blue-400 hover:text-blue-200 flex items-center gap-1"><FaUpload size={10} /> Slip</Link>
+                        ) : <span className="text-gray-700">None</span>}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                           {team.paymentStatus !== 'confirmed' && <button onClick={() => handleVerify(team._id, 'confirm')} disabled={verifying === team._id} className="w-7 h-7 rounded-lg bg-green-900/30 text-green-500 border border-green-700/50 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all"><FaCheckCircle size={12} /></button>}
+                           {team.paymentStatus !== 'rejected' && <button onClick={() => handleVerify(team._id, 'reject')} disabled={verifying === team._id} className="w-7 h-7 rounded-lg bg-red-900/30 text-red-500 border border-red-700/50 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all"><FaBan size={12} /></button>}
+                           <button onClick={() => handleVerify(team._id, 'reset')} disabled={verifying === team._id} className="w-7 h-7 rounded-lg bg-gray-800 text-gray-400 flex items-center justify-center border border-gray-700 hover:bg-gray-700 transition-all"><FaClock size={12} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Revenue trend + Status breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
+            <h3 className="text-sm font-black uppercase tracking-widest text-white mb-5 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+              <FaArrowUp className="text-green-400" /> Revenue — Last 7 Days
+            </h3>
+            <div className="flex items-end gap-2 h-32">
+              {stats.revenueTrend?.map((day) => {
+                const heightPct = (day.revenue / maxRevenue) * 100;
+                return (
+                  <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="w-full rounded-t-lg bg-green-600 transition-all duration-500" style={{ height: `${Math.max(heightPct, 4)}%` }} />
+                    <span className="text-[10px] text-gray-500">{new Date(day.date + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short' })}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl">
+             <h3 className="text-sm font-black uppercase tracking-widest text-white mb-5 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}><FaChartBar className="text-blue-400" /> Status</h3>
+             <div className="space-y-4">
+                {['confirmed', 'pending', 'cancelled'].map(s => (
+                  <div key={s}>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="capitalize">{s}</span>
+                      <span className="font-bold">{stats.statusCounts?.[s] || 0}</span>
                     </div>
-                    <span className="text-xs font-bold text-white">{s.count} <span className="text-gray-600">({pct}%)</span></span>
+                    <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500" style={{ width: `${(stats.statusCounts?.[s] / stats.totalBookings) * 100 || 0}%` }} />
+                    </div>
                   </div>
-                  <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: s.color }} />
-                  </div>
-                </div>
-              );
-            })}
+                ))}
+             </div>
           </div>
         </div>
 
         {/* Court Breakdown + Recent Bookings */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-          {/* Court Breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
-            <div
-              className={`px-6 py-4 border-b border-gray-800 flex items-center gap-2 ${selectedCourt ? 'cursor-pointer hover:bg-gray-800/40 transition-colors' : ''}`}
-              onClick={() => selectedCourt && setSelectedCourt(null)}
-              title={selectedCourt ? 'Click to view all courts' : ''}
-            >
-              <FaStar className={`${selectedCourt ? 'text-green-400' : 'text-yellow-400'} transition-colors`} />
-              <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${selectedCourt ? 'text-green-400' : 'text-white'}`} style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-                Court Performance
-                <InfoTooltip text="Click a court to filter recent bookings for that court only. Revenue and booking count shown per court — use this to identify your top performers and underperformers." size={12} />
-                {selectedCourt && <span className="text-[10px] text-green-500 font-normal normal-case tracking-normal">(click to reset view)</span>}
-              </h3>
+            <div className="px-6 py-4 border-b border-gray-800"><h3 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>Court Performance</h3></div>
+            <div className="divide-y divide-gray-800">
+               {stats.courtBreakdown?.map(c => (
+                 <div key={c._id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-800/40 transition-colors">
+                   <span className="font-semibold text-sm">{c.name}</span>
+                   <span className="font-bold text-green-400">R{c.revenue.toLocaleString()}</span>
+                 </div>
+               ))}
             </div>
-            {stats.courtBreakdown.length === 0 ? (
-              <p className="text-center py-10 text-gray-600 text-sm">No bookings in this period.</p>
-            ) : (
-              <div className="divide-y divide-gray-800">
-                {stats.courtBreakdown.map((c, i) => {
-                  const pct = stats.totalBookings > 0 ? Math.round((c.bookings / stats.totalBookings) * 100) : 0;
-                  const isSelected = selectedCourt === c.name;
-                  return (
-                    <motion.div
-                      key={c._id}
-                      onClick={() => setSelectedCourt(isSelected ? null : c.name)}
-                      className={`px-6 py-4 cursor-pointer transition-colors ${isSelected ? 'bg-green-900/20 border-l-2 border-green-500' : 'hover:bg-gray-800/40'}`}
-                      whileHover={{ backgroundColor: 'rgba(31,41,55,0.6)', x: 2, transition: { duration: 0.15 } }}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center text-[10px] font-black text-gray-400">{i + 1}</span>
-                          <span className={`font-semibold text-sm ${isSelected ? 'text-green-400' : 'text-white'}`}>{c.name}</span>
-                        </div>
-                        <div className="text-right">
-                          <span className="font-bold text-green-400 text-sm">R{c.revenue.toLocaleString()}</span>
-                          <span className="text-gray-600 text-xs ml-2">· {c.bookings} bookings · {pct}%</span>
-                        </div>
-                      </div>
-                      <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #15803d, #22c55e)' }} />
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
           </div>
-
-          {/* Recent Bookings */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
-            <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
-              <h3 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-                <FaCalendarAlt className="text-blue-400" /> Recent Bookings
-                <InfoTooltip text="The latest bookings across all courts. Click a court in 'Court Performance' to filter this list. Click 'View All' to go to the full Manage Bookings page." size={12} />
-              </h3>
-              <Link href="/admin/bookings" className="text-xs text-green-400 hover:text-green-300 transition-colors uppercase tracking-wide">
-                View All →
-              </Link>
+            <div className="px-6 py-4 border-b border-gray-800"><h3 className="text-sm font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>Recent Bookings</h3></div>
+            <div className="divide-y divide-gray-800">
+               {stats.recentBookings?.slice(0, 5).map(b => (
+                 <div key={b._id} className="px-6 py-3.5 hover:bg-gray-800/40 transition-colors flex justify-between">
+                   <div>
+                     <p className="text-white text-sm font-semibold">{b.courtName}</p>
+                     <p className="text-gray-500 text-xs">{b.userName} · {b.date}</p>
+                   </div>
+                   <div className="text-right">
+                     <p className="font-bold text-green-400 text-sm">R{b.total_price}</p>
+                     <span className={`text-[10px] font-bold border px-2 py-0.5 rounded-full ${statusBadge(b.status)}`}>{b.status}</span>
+                   </div>
+                 </div>
+               ))}
             </div>
-            {selectedCourt && (
-              <div className="px-6 py-2.5 bg-green-900/20 border-b border-green-800/40 flex items-center justify-between">
-                <span className="text-xs text-green-400 font-semibold">Viewing: {selectedCourt}</span>
-                <button
-                  onClick={() => setSelectedCourt(null)}
-                  className="text-xs text-gray-500 hover:text-white transition-colors flex items-center gap-1"
-                >
-                  <FaTimes size={10} /> Clear
-                </button>
-              </div>
-            )}
-            {(() => {
-              const filtered = selectedCourt
-                ? (stats.recentBookings ?? []).filter((b) => b.courtName === selectedCourt)
-                : (stats.recentBookings ?? []);
-              return !filtered.length ? (
-                <p className="text-center py-10 text-gray-600 text-sm">
-                  {selectedCourt ? `No recent bookings for ${selectedCourt}.` : 'No bookings yet.'}
-                </p>
-              ) : (
-                <div className="divide-y divide-gray-800">
-                  {filtered.map((b) => (
-                    <div key={b._id} className="px-6 py-3.5 hover:bg-gray-800/40 transition-colors">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-white text-sm font-semibold truncate">{b.courtName}</p>
-                          <p className="text-gray-500 text-xs truncate">{b.userName} · {b.date} {b.start_time}</p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                          <span className="font-bold text-green-400 text-sm">R{b.total_price}</span>
-                          <span className={`text-[10px] font-bold border px-2 py-0.5 rounded-full uppercase tracking-wide ${statusBadge(b.status)}`}>
-                            {b.status}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
           </div>
         </div>
 

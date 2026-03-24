@@ -151,9 +151,6 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [githubLoading, setGithubLoading] = useState(false);
-  const [appleLoading, setAppleLoading] = useState(false);
-  const [microsoftLoading, setMicrosoftLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
   const handleLogin = async (e) => {
@@ -196,9 +193,6 @@ export default function AuthPage() {
 
   const handleProviderSignIn = async (provider) => {
     if (provider === 'google') setGoogleLoading(true);
-    if (provider === 'github') setGithubLoading(true);
-    if (provider === 'apple') setAppleLoading(true);
-    if (provider === 'azure-ad') setMicrosoftLoading(true);
     await signIn(provider, { callbackUrl: '/' });
   };
 
@@ -278,7 +272,7 @@ export default function AuthPage() {
             <div className="mt-5 flex flex-col gap-3 relative z-10">
               <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">
                 <span>Start Date</span>
-                <span className="text-green-400 flex items-center gap-1.5"><FaCalendarAlt /> 29 May 2026</span>
+                <span className="text-green-400 flex items-center gap-1.5"><FaBolt /> 29 May 2026</span>
               </div>
               <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">
                 <span>Reg. Fee</span>
@@ -343,46 +337,16 @@ export default function AuthPage() {
               </AnimatePresence>
 
               {/* Social Login Providers */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="mb-4">
                 <motion.button
                   onClick={() => handleProviderSignIn('google')}
                   disabled={googleLoading}
-                  className="flex items-center justify-center gap-2 py-3 px-2 bg-gray-800/50 border border-gray-700/40 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 transition-all disabled:opacity-50"
-                  whileHover={{ scale: 1.02 }}
+                  className="w-full flex items-center justify-center gap-3 py-4 bg-white text-gray-900 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-gray-100 transition-all shadow-xl shadow-green-950/20 disabled:opacity-50 text-center"
+                  whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <FaGoogle className="text-red-400 flex-shrink-0" />
-                  <span className="truncate">Google</span>
-                </motion.button>
-                <motion.button
-                  onClick={() => handleProviderSignIn('apple')}
-                  disabled={appleLoading}
-                  className="flex items-center justify-center gap-2 py-3 px-2 bg-gray-800/50 border border-gray-700/40 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 transition-all disabled:opacity-50"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <FaApple className="text-white flex-shrink-0" />
-                  <span className="truncate">Apple</span>
-                </motion.button>
-                <motion.button
-                  onClick={() => handleProviderSignIn('azure-ad')}
-                  disabled={microsoftLoading}
-                  className="flex items-center justify-center gap-2 py-3 px-2 bg-gray-800/50 border border-gray-700/40 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 transition-all disabled:opacity-50"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <FaMicrosoft className="text-blue-400 flex-shrink-0" />
-                  <span className="truncate">Microsoft</span>
-                </motion.button>
-                <motion.button
-                  onClick={() => handleProviderSignIn('github')}
-                  disabled={githubLoading}
-                  className="flex items-center justify-center gap-2 py-3 px-2 bg-gray-800/50 border border-gray-700/40 rounded-xl text-xs sm:text-sm font-semibold text-gray-200 hover:border-green-600/40 hover:bg-gray-800/80 transition-all disabled:opacity-50"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <FaGithub className="text-gray-400 flex-shrink-0" />
-                  <span className="truncate">GitHub</span>
+                  <FaGoogle className="text-red-500 text-xl" />
+                  Continue with Google
                 </motion.button>
               </div>
 

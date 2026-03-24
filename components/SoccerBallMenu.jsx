@@ -44,15 +44,15 @@ export default function SoccerBallMenu() {
   };
 
   return (
-    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40">
+    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-[100]">
       {/* Expanded menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute left-16 top-1/2 -translate-y-1/2 flex flex-col gap-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="absolute left-14 top-1/2 -translate-y-1/2 flex flex-col gap-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
           >
             {MENU_ITEMS.map((item, i) => {
               const Icon = item.icon;
@@ -60,28 +60,27 @@ export default function SoccerBallMenu() {
                 <motion.button
                   key={item.href}
                   onClick={() => navigate(item.href)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700 shadow-lg cursor-pointer whitespace-nowrap"
+                  className="flex items-center gap-4 px-5 py-4 rounded-xl bg-gray-950/90 backdrop-blur-2xl border border-gray-800 shadow-[0_10px_40px_rgba(0,0,0,0.8)] cursor-pointer whitespace-nowrap"
                   initial={{ opacity: 0, x: -20, scale: 0.8 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: -20, scale: 0.8 }}
-                  transition={{ delay: (MENU_ITEMS.length - i) * 0.06, type: 'spring', stiffness: 300, damping: 20 }}
+                  transition={{ delay: i * 0.05, type: 'spring', stiffness: 300, damping: 20 }}
                   whileHover={{
                     scale: 1.05,
                     borderColor: item.color,
-                    boxShadow: `0 0 20px ${item.color}30`,
-                    transition: { duration: 0.2, type: 'tween' },
+                    boxShadow: `0 0 30px ${item.color}40`,
                   }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{ background: `${item.color}20` }}
                   >
-                    <Icon size={14} style={{ color: item.color }} />
+                    <Icon size={18} style={{ color: item.color }} />
                   </div>
                   <div className="text-left">
-                    <p className="text-white text-xs font-bold">{item.label}</p>
-                    <p className="text-gray-500 text-[10px]">{item.desc}</p>
+                    <p className="text-white text-sm font-black uppercase tracking-widest">{item.label}</p>
+                    <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider">{item.desc}</p>
                   </div>
                 </motion.button>
               );
@@ -90,58 +89,46 @@ export default function SoccerBallMenu() {
         )}
       </AnimatePresence>
 
-      {/* "Quick Book" label on hover */}
-      <AnimatePresence>
-        {isHovered && !isOpen && (
-          <motion.div
-            key="label"
-            className="absolute left-16 top-1/2 -translate-y-1/2 bg-green-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg whitespace-nowrap"
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -8 }}
-          >
-            Quick Book
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Main button — rectangle, left-center, writing icon */}
+      {/* Main trigger button — FIXED RECTANGLE ON LEFT EDGE */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="w-12 h-16 rounded-r-xl flex items-center justify-center text-white cursor-pointer border-2 border-l-0"
+        className="w-14 h-20 rounded-r-2xl flex items-center justify-center text-white cursor-pointer border-2 border-l-0"
         style={{
           background: isOpen
-            ? 'linear-gradient(135deg, #dc2626, #b91c1c)'
-            : 'linear-gradient(135deg, #15803d, #22c55e)',
-          borderColor: isOpen ? '#f87171' : '#4ade80',
+            ? 'linear-gradient(135deg, #ef4444, #b91c1c)'
+            : 'linear-gradient(135deg, #22c55e, #15803d)',
+          borderColor: isOpen ? '#fca5a5' : '#4ade80',
           boxShadow: isOpen
-            ? '0 0 20px rgba(239,68,68,0.4)'
-            : '0 0 20px rgba(34,197,94,0.4)',
+            ? '0 0 30px rgba(239,68,68,0.5)'
+            : '0 0 30px rgba(34,197,94,0.5)',
         }}
         animate={
           isOpen
-            ? { rotate: 0 }
+            ? { x: 0 }
             : {
-                x: [0, 4, 0],
+                x: [0, 8, 0],
                 boxShadow: [
                   '0 0 15px rgba(34,197,94,0.3)',
-                  '0 0 25px rgba(34,197,94,0.6)',
+                  '0 0 30px rgba(34,197,94,0.6)',
                   '0 0 15px rgba(34,197,94,0.3)',
                 ],
               }
         }
         transition={
           isOpen
-            ? { duration: 0.3, ease: 'easeOut' }
-            : { x: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }, boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }
+            ? { duration: 0.3 }
+            : { x: { duration: 3, repeat: Infinity, ease: 'easeInOut' }, boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }
         }
-        whileHover={{ scale: 1.1, transition: { duration: 0.15, type: 'tween' } }}
+        whileHover={{ scale: 1.05, x: 5 }}
         whileTap={{ scale: 0.9 }}
         aria-label={isOpen ? 'Close menu' : 'Quick booking'}
       >
-        {isOpen ? <FaTimes size={16} /> : <FaPen size={16} />}
+        <div className="flex flex-col items-center gap-1">
+          {isOpen ? <FaTimes size={20} /> : <FaPen size={20} />}
+          {!isOpen && <span className="text-[8px] font-black uppercase tracking-tighter">BOOK</span>}
+        </div>
       </motion.button>
     </div>
   );

@@ -89,6 +89,7 @@ const ProfilePage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
+  const [statusText, setStatusText] = useState('');
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const [phone, setPhone] = useState('');
   const [communicationPreference, setCommunicationPreference] = useState('email');
@@ -126,6 +127,7 @@ const ProfilePage = () => {
         setEmail(data.email || '');
         setUsername(data.username || '');
         setPhone(data.phone || '');
+        setStatusText(data.status || 'Ready for 5s Arena');
         setCommunicationPreference(data.communicationPreference || 'email');
         setNewsletterOptIn(data.newsletterOptIn || false);
         setBirthDate(data.birthDate ? new Date(data.birthDate).toISOString().split('T')[0] : '');
@@ -195,6 +197,7 @@ const ProfilePage = () => {
         body: JSON.stringify({
           name,
           username: username.trim(),
+          status: statusText.trim(),
           phone: phone.trim() || null,
           communicationPreference,
           newsletterOptIn,
@@ -531,41 +534,51 @@ const ProfilePage = () => {
             id="status"
             icon={FaUser}
             iconColor="text-blue-400"
-            title="Online Status"
-            summary="Active / Away / Do Not Disturb"
+            title="Player Status"
+            summary={statusText || 'Set your availability'}
             isOpen={openSections.status}
             onToggle={toggleSection}
           >
             <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">
-                Set Your Status
-              </label>
-              <p className="text-gray-600 text-xs mb-3">Let your teammates know if you're available for a match.</p>
+              <Field 
+                label="Current Status" 
+                hint="Max 100 characters. Visible to teammates."
+              >
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={statusText}
+                    onChange={(e) => setStatusText(e.target.value)}
+                    className={inputCls}
+                    placeholder="e.g. Ready for the World Cup!"
+                    maxLength={100}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-600 font-mono">
+                    {statusText.length}/100
+                  </div>
+                </div>
+              </Field>
               
-              <div className="space-y-2">
-                {[
-                  { id: 'online', label: 'Online & Ready', color: 'bg-green-500', border: 'border-green-500' },
-                  { id: 'away', label: 'Away / In a Match', color: 'bg-yellow-500', border: 'border-yellow-500' },
-                  { id: 'dnd', label: 'Do Not Disturb', color: 'bg-red-500', border: 'border-red-500' },
-                  { id: 'offline', label: 'Offline / Invisible', color: 'bg-gray-500', border: 'border-gray-500' },
-                ].map(stat => (
-                  <button
-                    key={stat.id}
-                    type="button"
-                    onClick={() => {
-                      localStorage.setItem('userStatus', stat.id);
-                      window.dispatchEvent(new Event('storage'));
-                      setSuccess(`Status updated to ${stat.label}`);
-                      setTimeout(() => setSuccess(''), 2000);
-                    }}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className={`w-3 h-3 rounded-full ${stat.color} shadow-[0_0_10px_${stat.color}]`} />
-                      <span className="text-sm text-gray-300 font-bold">{stat.label}</span>
-                    </div>
-                  </button>
-                ))}
+              <div className="mt-4">
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Quick Presets</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    'Ready for Match ⚽',
+                    'Looking for Team 👥',
+                    'Injured 🤕',
+                    'On Fire! 🔥',
+                    'Training 🏃‍♂️',
+                  ].map(preset => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setStatusText(preset)}
+                      className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-xs text-gray-300 transition-all"
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </AccordionSection>

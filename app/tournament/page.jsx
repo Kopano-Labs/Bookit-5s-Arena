@@ -9,7 +9,7 @@ import {
   FaFutbol, FaUsers, FaWhatsapp, FaEnvelope,
   FaPhone, FaShieldAlt, FaChevronDown, FaUpload,
   FaMoneyBillWave, FaFileUpload, FaExclamationTriangle,
-  FaChevronLeft, FaChevronRight,
+  FaChevronLeft, FaChevronRight, FaTimes,
 } from 'react-icons/fa';
 
 /* ─── All 48 World Cup teams ───────────────────────────────── */
@@ -141,8 +141,8 @@ function PlayerCarousel() {
 
 /* ═══════════════════════════════════════════════════════════ */
 export default function TournamentPage() {
-  // Steps: 0=gate, 1=rules, 2=terms, 3=form, 4=payment, 5=congrats
   const [step, setStep] = useState(0);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [rulesRead, setRulesRead] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -204,7 +204,7 @@ export default function TournamentPage() {
       const res = await fetch('/api/tournament', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, agreedToTerms: true, agreedToRules: rulesRead }),
+        body: JSON.stringify({ ...form, agreedToTerms: true, agreedToRules: true }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -239,7 +239,6 @@ export default function TournamentPage() {
     }
   };
 
-  /* ─── Step renderer ─────────────────────────────────────── */
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Background */}
@@ -257,34 +256,30 @@ export default function TournamentPage() {
         {/* Progress indicator */}
         {step > 0 && step < 5 && (
           <div className="flex items-center justify-center gap-1.5 mb-10 flex-wrap">
-            {['Rules', 'Terms', 'Register', 'Payment'].map((label, i) => (
+            {['Rules & T&Cs', 'Register', 'Payment'].map((label, i) => (
               <div key={label} className="flex items-center gap-1.5">
                 <motion.div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border-2 ${
-                    step > i + 1
+                    step > i + 2
                       ? 'bg-green-600 border-green-500 text-white'
-                      : step === i + 1
-                      ? 'border-green-500 text-green-400'
-                      : 'border-gray-700 text-gray-600'
+                      : step === i + 3 ? 'border-green-500 text-green-400' : 'border-gray-700 text-gray-600'
                   }`}
-                  animate={step === i + 1 ? { scale: [1, 1.1, 1] } : {}}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  {step > i + 1 ? <FaCheck size={8} /> : i + 1}
+                  {step > i + 3 ? <FaCheck size={8} /> : i + 1}
                 </motion.div>
                 <span className={`text-[9px] uppercase tracking-widest font-bold ${
-                  step >= i + 1 ? 'text-green-400' : 'text-gray-600'
+                  step >= i + 3 ? 'text-green-400' : 'text-gray-600'
                 }`}>
                   {label}
                 </span>
-                {i < 3 && <div className={`w-6 h-px ${step > i + 1 ? 'bg-green-500' : 'bg-gray-700'}`} />}
+                {i < 2 && <div className={`w-6 h-px ${step > i + 3 ? 'bg-green-500' : 'bg-gray-700'}`} />}
               </div>
             ))}
           </div>
         )}
 
         <AnimatePresence mode="wait">
-          {/* ── Step 0: Gate / Welcome ── */}
+          {/* Step 0: Gate */}
           {step === 0 && (
             <motion.div
               key="gate"
@@ -300,613 +295,162 @@ export default function TournamentPage() {
               >
                 <FaTrophy className="text-green-400" size={40} />
               </motion.div>
-              <h1
-                className="font-black uppercase mb-4"
-                style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontFamily: 'Impact, Arial Black, sans-serif' }}
-              >
+              <h1 className="font-black uppercase mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 5s ARENA <span className="text-green-400">WORLD CUP</span>
               </h1>
               <p className="text-gray-400 text-lg mb-2">May 29 – 31, 2026 · Hellenic Football Club</p>
-              <p className="text-gray-500 text-sm mb-2">
-                {tournamentInfo
-                  ? `${tournamentInfo.registeredCount}/${tournamentInfo.totalSlots} teams registered`
-                  : 'Loading...'}
+              <p className="text-gray-500 text-sm mb-8">
+                {tournamentInfo ? `${tournamentInfo.registeredCount}/${tournamentInfo.totalSlots} teams registered` : 'Loading...'}
               </p>
 
-              {/* Tournament format info */}
-              <div className="flex items-center justify-center gap-3 mb-8 flex-wrap">
-                {[
-                  { icon: '🏟️', label: '8 Groups' },
-                  { icon: '⚽', label: '6 Teams / Group' },
-                  { icon: '🏆', label: 'Top 4 Advance' },
-                  { icon: '🎯', label: 'Round of 32 → Finals' },
-                ].map((item) => (
-                  <span key={item.label} className="px-3 py-1.5 rounded-full bg-gray-800/60 border border-gray-700 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                    {item.icon} {item.label}
-                  </span>
-                ))}
-              </div>
-
-              {/* Registration fee banner */}
-              <motion.div
-                className="bg-yellow-900/20 border border-yellow-600/30 rounded-2xl p-4 mb-8 max-w-md mx-auto"
-                animate={{ borderColor: ['rgba(202,138,4,0.3)', 'rgba(202,138,4,0.6)', 'rgba(202,138,4,0.3)'] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <FaMoneyBillWave className="text-yellow-400 text-xl mx-auto mb-2" />
-                <p className="text-yellow-400 text-sm font-black uppercase tracking-widest">Registration Fee</p>
-                <p className="text-white text-2xl font-black mt-1" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>ZAR 3,000.00</p>
-                <p className="text-yellow-600 text-[10px] mt-1 uppercase tracking-wider">Non-negotiable · One-time · Bank deposit only</p>
-              </motion.div>
-
               <motion.button
-                onClick={() => setStep(1)}
+                onClick={() => setShowTermsModal(true)}
                 className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-green-600 text-white font-black uppercase tracking-widest text-sm cursor-pointer"
                 style={{ boxShadow: '0 0 30px rgba(34,197,94,0.4)' }}
-                whileHover={{ scale: 1.05, boxShadow: '0 0 50px rgba(34,197,94,0.6)', transition: { duration: 0.2, type: 'tween' } }}
+                whileHover={{ scale: 1.05, boxShadow: '0 0 50px rgba(34,197,94,0.6)' }}
                 whileTap={{ scale: 0.95 }}
               >
                 <FaFutbol size={16} /> Register Your Team <FaArrowRight size={12} />
               </motion.button>
-
-              <p className="text-gray-600 text-[10px] mt-6">
-                By proceeding, you&apos;ll need to read the tournament rules, accept our Terms &amp; Conditions, and upload proof of payment.
-              </p>
-
-              {/* Player Carousel */}
+              
               <PlayerCarousel />
             </motion.div>
           )}
 
-          {/* ── Step 1: Rules (FIRST) ── */}
-          {step === 1 && (
-            <motion.div
-              key="rules"
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-            >
-              <h2 className="text-2xl font-black uppercase tracking-widest mb-6" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-                📖 Tournament Rules
-              </h2>
-              <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 mb-6 max-h-96 overflow-y-auto space-y-4 text-sm text-gray-300">
-                <h3 className="text-green-400 font-bold uppercase tracking-widest text-xs">Format — UEFA Champions League Style</h3>
-                <p>The 5s Arena World Cup follows the UEFA Champions League format:</p>
-                <ul className="list-disc list-inside space-y-1 text-gray-400">
-                  <li><strong className="text-white">8 Groups</strong> with <strong className="text-white">6 teams</strong> each (48 teams total)</li>
-                  <li>Each team plays <strong className="text-white">one match</strong> against every other team in their group</li>
-                  <li><strong className="text-green-400">Top 4 teams</strong> from each group advance to the <strong className="text-white">Round of 32</strong></li>
-                  <li>From R32 onwards: single-elimination knockout (R32 → R16 → QF → SF → Final)</li>
-                  <li>All knockout matches are <strong className="text-white">single game</strong> — win or go home</li>
-                </ul>
-
-                <h3 className="text-green-400 font-bold uppercase tracking-widest text-xs mt-6">Registration Fee</h3>
-                <div className="bg-red-900/20 border border-red-700/40 rounded-xl p-4">
-                  <p className="text-red-400 font-bold">⚠️ IMPORTANT INFORMATION</p>
-                  <p className="mt-2">The registration fee is <strong className="text-white text-lg">ZAR 3,000.00</strong> per team.</p>
-                  <p className="text-gray-400 mt-1">This is <strong className="text-red-400">non-negotiable</strong> with <strong className="text-red-400">no installment options</strong>. One-time payment only.</p>
-                  <p className="text-gray-400 mt-2">We <strong className="text-red-400">adamantly only accept bank deposits</strong> for the tournament. No other payment methods.</p>
-                </div>
-
-                <h3 className="text-green-400 font-bold uppercase tracking-widest text-xs mt-6">Banking Details</h3>
-                <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-4 space-y-1">
-                  <p><strong className="text-gray-300">Bank:</strong> <span className="text-white">Capitec</span></p>
-                  <p><strong className="text-gray-300">Account Name:</strong> <span className="text-white">Hellenic Courts</span></p>
-                  <p><strong className="text-gray-300">Account Number:</strong> <span className="text-white font-mono">2503477980</span></p>
-                  <p><strong className="text-gray-300">SWIFT/BIC:</strong> <span className="text-white font-mono">CABLZAJJ</span></p>
-                </div>
-
-                <h3 className="text-green-400 font-bold uppercase tracking-widest text-xs mt-6">Payment Approval Process</h3>
-                <ul className="list-disc list-inside space-y-1 text-gray-400">
-                  <li>Upload your proof of payment during registration</li>
-                  <li>A staff member will confirm your payment within <strong className="text-white">24 hours</strong> (latest 2 working days)</li>
-                  <li><strong className="text-yellow-400">Weekends not included</strong> — only special occasions (contact via WhatsApp)</li>
-                  <li>Team management features unlock <strong className="text-white">only after payment approval</strong></li>
-                </ul>
-
-                <h3 className="text-green-400 font-bold uppercase tracking-widest text-xs mt-6">General Rules</h3>
-                <ul className="list-disc list-inside space-y-1 text-gray-400">
-                  <li>All players must be 16+. Under-16s require parental consent.</li>
-                  <li>Sign-ups close <strong className="text-red-400">1 week before the tournament</strong>. Late sign-ups will NOT be accepted.</li>
-                  <li>Teams that fail to comply with the deadline will be removed entirely.</li>
-                  <li>The manager is fully accountable for their team&apos;s conduct and compliance.</li>
-                  <li>Any intentional damage to equipment — you pay for it.</li>
-                  <li>Refunds available up to 48 hours before the event. No refunds after.</li>
-                </ul>
-
-                <h3 className="text-green-400 font-bold uppercase tracking-widest text-xs mt-6">🏅 Rewards Program</h3>
-                <p>Teams earn points through social media engagement:</p>
-                <ul className="list-disc list-inside space-y-1 text-gray-400">
-                  <li>Take pictures/videos and <strong className="text-white">tag @fivesarena</strong> on social media</li>
-                  <li>Paste the link in your Manager Dashboard to submit for points</li>
-                  <li>More posts = more points. Points scale with engagement (likes, shares, reach)</li>
-                  <li>Admin verifies each submission before awarding points</li>
-                  <li><strong className="text-yellow-400">Special prizes at the Awards Ceremony</strong> for teams with the highest reward points</li>
-                  <li>Awards ceremony prizes announced <strong className="text-white">1 week before tournament starts</strong></li>
-                </ul>
-              </div>
-
-              <label className="flex items-center gap-3 mb-6 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rulesRead}
-                  onChange={(e) => setRulesRead(e.target.checked)}
-                  className="w-5 h-5 rounded accent-green-500"
-                />
-                <span className="text-sm text-gray-300">
-                  I have read and understand the tournament rules
-                </span>
-              </label>
-
-              <div className="flex justify-between">
-                <motion.button
-                  onClick={() => setStep(0)}
-                  className="px-4 py-2 rounded-lg border border-gray-700 text-gray-400 text-sm font-bold cursor-pointer"
-                  whileHover={{ scale: 1.03 }}
-                >
-                  <FaArrowLeft size={10} className="inline mr-2" /> Back
-                </motion.button>
-                <motion.button
-                  onClick={() => rulesRead && setStep(2)}
-                  disabled={!rulesRead}
-                  className={`px-6 py-2 rounded-lg text-sm font-bold cursor-pointer ${
-                    rulesRead
-                      ? 'bg-green-600 text-white hover:bg-green-500'
-                      : 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                  }`}
-                  whileHover={rulesRead ? { scale: 1.03 } : {}}
-                >
-                  Continue <FaArrowRight size={10} className="inline ml-2" />
-                </motion.button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ── Step 2: Terms & Conditions ── */}
-          {step === 2 && (
-            <motion.div
-              key="terms"
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-            >
-              <h2 className="text-2xl font-black uppercase tracking-widest mb-6" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-                <FaShieldAlt className="inline text-green-400 mr-2" size={20} />
-                Terms &amp; Conditions
-              </h2>
-              <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 mb-6 max-h-80 overflow-y-auto space-y-3 text-sm text-gray-300">
-                <p>1. By registering, you agree to all rules outlined on our Rules of the Game page.</p>
-                <p>2. Participants play at their own risk. 5s Arena is not liable for injuries during play.</p>
-                <p>3. All players must be 16+. Under-16s need parental consent.</p>
-                <p>4. Personal belongings are your responsibility.</p>
-                <p>5. 5s Arena reserves the right to refuse entry or remove anyone without refund.</p>
-                <p>6. Sign-ups close 1 week before the tournament. <strong className="text-red-400">Late sign-ups will NOT be accepted.</strong></p>
-                <p>7. Teams that fail to comply with the deadline will be removed from the system entirely.</p>
-                <p>8. Refunds available up to 48 hours before the event. No refunds after.</p>
-                <p>9. Any intentional damage to equipment — you pay for it.</p>
-                <p>10. The manager is fully accountable for their team&apos;s conduct and compliance.</p>
-                <p>11. The registration fee of <strong className="text-white">ZAR 3,000.00</strong> is non-refundable after the 48-hour window.</p>
-                <p>12. Team features (edit squad, manage lineup) are only available after proof of payment is verified.</p>
-              </div>
-
-              <label className="flex items-center gap-3 mb-6 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="w-5 h-5 rounded accent-green-500"
-                />
-                <span className="text-sm text-gray-300">
-                  I have read and agree to the Terms &amp; Conditions
-                </span>
-              </label>
-
-              <div className="flex justify-between">
-                <motion.button
-                  onClick={() => setStep(1)}
-                  className="px-4 py-2 rounded-lg border border-gray-700 text-gray-400 text-sm font-bold cursor-pointer"
-                  whileHover={{ scale: 1.03 }}
-                >
-                  <FaArrowLeft size={10} className="inline mr-2" /> Back
-                </motion.button>
-                <motion.button
-                  onClick={() => termsAccepted && setStep(3)}
-                  disabled={!termsAccepted}
-                  className={`px-6 py-2 rounded-lg text-sm font-bold cursor-pointer ${
-                    termsAccepted
-                      ? 'bg-green-600 text-white hover:bg-green-500'
-                      : 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                  }`}
-                  whileHover={termsAccepted ? { scale: 1.03 } : {}}
-                >
-                  Continue <FaArrowRight size={10} className="inline ml-2" />
-                </motion.button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ── Step 3: Registration Form ── */}
+          {/* Registration Form (Step 3) */}
           {step === 3 && (
-            <motion.div
-              key="form"
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-            >
-              {/* Congrats header */}
-              <motion.div
-                className="text-center mb-8"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <h2
-                  className="text-2xl font-black uppercase tracking-widest mb-2"
-                  style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-                >
-                  🎉 <span className="text-green-400">WELCOME</span> TO THE WORLD CUP!
-                </h2>
-                <p className="text-gray-400 text-sm">You&apos;re signing up for the 5s Arena World Cup 2026. Let&apos;s get your team registered!</p>
-              </motion.div>
-
-              {error && (
-                <div className="bg-red-900/30 border border-red-800 rounded-xl p-3 mb-4 text-red-400 text-sm">
-                  {error}
-                </div>
-              )}
-
+            <motion.div key="form" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}>
+               <h2 className="text-2xl font-black uppercase tracking-widest mb-6 text-center" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                🎉 <span className="text-green-400">WELCOME</span> TO THE WORLD CUP!
+              </h2>
+              {error && <div className="bg-red-900/30 border border-red-800 rounded-xl p-3 mb-4 text-red-400 text-sm">{error}</div>}
+              
               <div className="space-y-6">
-                {/* Manager Details */}
-                <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-5">
+                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
                   <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">Manager / Captain</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input
-                      value={form.managerName}
-                      onChange={(e) => setForm({ ...form, managerName: e.target.value })}
-                      placeholder="Full Name *"
-                      className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500"
-                    />
-                    <input
-                      value={form.managerEmail}
-                      onChange={(e) => setForm({ ...form, managerEmail: e.target.value })}
-                      placeholder="Email *"
-                      type="email"
-                      className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500"
-                    />
-                    <input
-                      value={form.managerPhone}
-                      onChange={(e) => setForm({ ...form, managerPhone: e.target.value })}
-                      placeholder="Phone Number *"
-                      type="tel"
-                      className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500"
-                    />
-                    <input
-                      value={form.teamName}
-                      onChange={(e) => setForm({ ...form, teamName: e.target.value })}
-                      placeholder="Team Name *"
-                      className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500"
-                    />
+                    <input value={form.managerName} onChange={(e) => setForm({...form, managerName: e.target.value})} placeholder="Full Name *" className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500" />
+                    <input value={form.managerEmail} onChange={(e) => setForm({...form, managerEmail: e.target.value})} placeholder="Email *" className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500" />
+                    <input value={form.managerPhone} onChange={(e) => setForm({...form, managerPhone: e.target.value})} placeholder="Phone *" className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500" />
+                    <input value={form.teamName} onChange={(e) => setForm({...form, teamName: e.target.value})} placeholder="Team Name *" className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500" />
                   </div>
                 </div>
 
-                {/* World Cup Team Selection */}
-                <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-5">
-                  <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">Choose Your Country</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-72 overflow-y-auto pr-2">
-                    {WORLD_CUP_TEAMS.map((wc) => {
-                      const val = `${wc.name} (${wc.player})`;
-                      const selected = form.worldCupTeam === val;
-                      return (
-                        <motion.button
-                          key={wc.name}
-                          onClick={() => setForm({ ...form, worldCupTeam: val })}
-                          className={`relative p-3 rounded-xl border text-center cursor-pointer overflow-hidden ${
-                            selected
-                              ? 'border-green-500 bg-green-900/30'
-                              : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
-                          }`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <div className="w-12 h-12 mx-auto mb-2 rounded-lg overflow-hidden relative">
-                            <Image src={wc.logo} alt={wc.name} fill className="object-cover" sizes="48px" />
-                          </div>
-                          <p className="text-white text-xs font-bold">{wc.name}</p>
-                          <p className="text-gray-500 text-[10px]">{wc.player}</p>
-                          {selected && (
-                            <motion.div
-                              className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                            >
-                              <FaCheck size={8} className="text-white" />
-                            </motion.div>
-                          )}
-                        </motion.button>
-                      );
-                    })}
-                  </div>
+                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                   <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">Choose Your Country</h3>
+                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-60 overflow-y-auto pr-2">
+                     {WORLD_CUP_TEAMS.map((wc) => (
+                       <button key={wc.name} onClick={() => setForm({...form, worldCupTeam: `${wc.name} (${wc.player})`})} className={`p-3 rounded-xl border text-center transition-all ${form.worldCupTeam.includes(wc.name) ? 'border-green-500 bg-green-900/20' : 'border-gray-700 bg-gray-800/50'}`}>
+                         <div className="w-10 h-10 mx-auto mb-1 relative"><Image src={wc.logo} alt={wc.name} fill className="object-cover rounded" /></div>
+                         <p className="text-[10px] font-bold text-white">{wc.name}</p>
+                       </button>
+                     ))}
+                   </div>
                 </div>
 
-                {/* Players */}
-                <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-5">
-                  <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">
-                    Players ({form.players.filter((p) => !p.isReserve).length} starters, {form.players.filter((p) => p.isReserve).length} reserves)
-                  </h3>
+                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                  <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">Starting Players (5)</h3>
                   <div className="space-y-2">
-                    {form.players.map((player, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <span className={`text-xs font-bold w-6 text-center ${player.isReserve ? 'text-gray-600' : 'text-green-400'}`}>
-                          {player.isReserve ? 'R' : i + 1}
-                        </span>
-                        <input
-                          value={player.name}
-                          onChange={(e) => updatePlayer(i, 'name', e.target.value)}
-                          placeholder={player.isReserve ? 'Reserve name' : `Player ${i + 1} name *`}
-                          className="flex-1 px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500"
-                        />
-                        <select
-                          value={player.position}
-                          onChange={(e) => updatePlayer(i, 'position', e.target.value)}
-                          className="px-2 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-400 text-xs outline-none cursor-pointer"
-                        >
-                          {POSITIONS.map((pos) => (
-                            <option key={pos} value={pos}>{pos}</option>
-                          ))}
+                    {form.players.map((p, i) => (
+                      <div key={i} className="flex gap-2">
+                        <input value={p.name} onChange={(e) => updatePlayer(i, 'name', e.target.value)} placeholder={`Player ${i+1} Name`} className="flex-1 px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500" />
+                        <select value={p.position} onChange={(e) => updatePlayer(i, 'position', e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-2 text-xs text-gray-400">
+                          {POSITIONS.map(pos => <option key={pos} value={pos}>{pos}</option>)}
                         </select>
                       </div>
                     ))}
                   </div>
-                  {form.players.length < 8 && (
-                    <motion.button
-                      onClick={() => addPlayer(true)}
-                      className="mt-3 text-green-400 text-xs font-bold uppercase tracking-wider cursor-pointer"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      + Add Reserve Player
-                    </motion.button>
-                  )}
                 </div>
 
-                {/* Support Guests */}
-                <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-5">
-                  <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">Support Guests (Optional, max 3)</h3>
-                  {form.supportGuests.map((guest, i) => (
-                    <div key={i} className="flex gap-2 mb-2">
-                      <input
-                        value={guest.name}
-                        onChange={(e) => {
-                          const g = [...form.supportGuests];
-                          g[i] = { ...g[i], name: e.target.value };
-                          setForm({ ...form, supportGuests: g });
-                        }}
-                        placeholder="Guest name"
-                        className="flex-1 px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500"
-                      />
-                      <input
-                        value={guest.role}
-                        onChange={(e) => {
-                          const g = [...form.supportGuests];
-                          g[i] = { ...g[i], role: e.target.value };
-                          setForm({ ...form, supportGuests: g });
-                        }}
-                        placeholder="Role (e.g. Water carrier)"
-                        className="flex-1 px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500"
-                      />
-                    </div>
-                  ))}
-                  {form.supportGuests.length < 3 && (
-                    <motion.button
-                      onClick={addSupportGuest}
-                      className="text-green-400 text-xs font-bold uppercase tracking-wider cursor-pointer"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      + Add Support Guest
-                    </motion.button>
-                  )}
-                </div>
-
-                {/* Communication Preference */}
-                <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-5">
-                  <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">Communication Preference</h3>
-                  <div className="flex gap-3">
-                    {[
-                      { value: 'whatsapp', icon: FaWhatsapp, label: 'WhatsApp', c: '#22c55e' },
-                      { value: 'email', icon: FaEnvelope, label: 'Email', c: '#3b82f6' },
-                      { value: 'sms', icon: FaPhone, label: 'SMS', c: '#a855f7' },
-                    ].map(({ value, icon: Icon, label, c }) => (
-                      <motion.button
-                        key={value}
-                        onClick={() => setForm({ ...form, communicationPref: value })}
-                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-bold cursor-pointer ${
-                          form.communicationPref === value
-                            ? 'border-green-500 bg-green-900/30 text-green-400'
-                            : 'border-gray-700 text-gray-500'
-                        }`}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                      >
-                        <Icon size={14} style={{ color: form.communicationPref === value ? c : undefined }} /> {label}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Submit */}
-                <div className="flex justify-between pt-4">
-                  <motion.button
-                    onClick={() => setStep(2)}
-                    className="px-4 py-2 rounded-lg border border-gray-700 text-gray-400 text-sm font-bold cursor-pointer"
-                    whileHover={{ scale: 1.03 }}
-                  >
-                    <FaArrowLeft size={10} className="inline mr-2" /> Back
-                  </motion.button>
-                  <motion.button
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    className="px-8 py-3 rounded-xl bg-green-600 text-white font-black uppercase tracking-widest text-sm cursor-pointer disabled:opacity-50"
-                    style={{ boxShadow: '0 0 25px rgba(34,197,94,0.4)' }}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    {loading ? 'Registering...' : 'Register & Continue to Payment'} <FaArrowRight size={10} className="inline ml-2" />
-                  </motion.button>
+                <div className="flex justify-between">
+                   <button onClick={() => setStep(0)} className="text-gray-500 text-sm font-bold uppercase tracking-widest hover:text-white transition-colors">Cancel</button>
+                   <button onClick={handleSubmit} disabled={loading} className="px-8 py-3 rounded-xl bg-green-600 text-white font-black uppercase tracking-widest text-sm shadow-lg shadow-green-900/20 hover:scale-105 transition-all">
+                     {loading ? 'Processing...' : 'Proceed to Payment'}
+                   </button>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ── Step 4: Payment Upload ── */}
+          {/* Step 4: Payment */}
           {step === 4 && (
-            <motion.div
-              key="payment"
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              className="text-center"
-            >
-              <motion.div
-                className="w-20 h-20 mx-auto mb-6 rounded-full bg-yellow-900/30 border-2 border-yellow-500/50 flex items-center justify-center"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <FaFileUpload className="text-yellow-400" size={30} />
-              </motion.div>
-
-              <h2
-                className="text-2xl font-black uppercase tracking-widest mb-4"
-                style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-              >
-                Upload <span className="text-yellow-400">Proof of Payment</span>
-              </h2>
-
-              <p className="text-gray-400 text-sm mb-6">
-                Team registration saved! Now upload your deposit slip to complete the process.
-              </p>
-
-              {/* Banking details reminder */}
-              <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-5 mb-6 text-left max-w-md mx-auto">
-                <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-3">Banking Details</h3>
-                <div className="space-y-1 text-sm">
-                  <p className="text-gray-400">Bank: <span className="text-white">Capitec</span></p>
-                  <p className="text-gray-400">Account: <span className="text-white">Hellenic Courts</span></p>
-                  <p className="text-gray-400">Number: <span className="text-white font-mono">2503477980</span></p>
-                  <p className="text-gray-400">SWIFT: <span className="text-white font-mono">CABLZAJJ</span></p>
-                  <p className="text-gray-400 mt-2">Amount: <span className="text-yellow-400 font-bold">ZAR 3,000.00</span></p>
-                </div>
+            <motion.div key="payment" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+              <FaFileUpload className="text-yellow-400 text-4xl mx-auto mb-4" />
+              <h2 className="text-2xl font-black uppercase tracking-widest mb-4">Upload <span className="text-yellow-400">Proof of Payment</span></h2>
+              <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto">Team saved! Please upload your deposit slip. Use <strong className="text-white">"{form.teamName} WC26"</strong> as reference.</p>
+              
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8 max-w-sm mx-auto text-left">
+                <p className="text-xs text-gray-500 mb-2 uppercase tracking-widest font-bold">Banking Details</p>
+                <p className="text-sm font-bold">Capitec Bank</p>
+                <p className="text-sm">Account: Hellenic Courts</p>
+                <p className="text-sm">Number: 2503477980</p>
               </div>
 
-              {/* Upload area */}
-              <div className="max-w-md mx-auto mb-6">
-                <label
-                  className={`flex flex-col items-center justify-center w-full h-40 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${
-                    paymentFile
-                      ? 'border-green-500 bg-green-900/10'
-                      : 'border-gray-700 bg-gray-900/40 hover:border-gray-600'
-                  }`}
-                >
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    className="hidden"
-                    onChange={(e) => setPaymentFile(e.target.files?.[0] || null)}
-                  />
-                  {paymentFile ? (
-                    <div className="text-center">
-                      <FaCheck className="text-green-400 text-2xl mx-auto mb-2" />
-                      <p className="text-green-400 text-sm font-bold">{paymentFile.name}</p>
-                      <p className="text-gray-500 text-xs mt-1">Click to change file</p>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <FaUpload className="text-gray-600 text-2xl mx-auto mb-2" />
-                      <p className="text-gray-400 text-sm">Click to upload deposit slip</p>
-                      <p className="text-gray-600 text-xs mt-1">PNG, JPG, or PDF</p>
-                    </div>
-                  )}
-                </label>
-              </div>
-
-              {error && (
-                <div className="bg-red-900/30 border border-red-800 rounded-xl p-3 mb-4 text-red-400 text-sm max-w-md mx-auto">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex justify-center gap-4">
-                <motion.button
-                  onClick={handlePaymentUpload}
-                  disabled={!paymentFile || paymentUploading}
-                  className={`px-8 py-3 rounded-xl font-black uppercase tracking-widest text-sm cursor-pointer ${
-                    paymentFile
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                  }`}
-                  style={paymentFile ? { boxShadow: '0 0 25px rgba(34,197,94,0.4)' } : {}}
-                  whileHover={paymentFile ? { scale: 1.03 } : {}}
-                  whileTap={paymentFile ? { scale: 0.97 } : {}}
-                >
-                  {paymentUploading ? 'Uploading...' : 'Submit Proof of Payment'}
-                </motion.button>
-              </div>
-
-              <p className="text-gray-600 text-[10px] mt-4">
-                Your payment will be verified within 24 hours (max 2 working days). Team features unlock after approval.
-              </p>
+              <input type="file" onChange={(e) => setPaymentFile(e.target.files?.[0])} className="mb-6 block mx-auto text-xs text-gray-500" />
+              
+              <button onClick={handlePaymentUpload} disabled={!paymentFile || paymentUploading} className="px-8 py-3 rounded-xl bg-green-600 text-white font-black uppercase tracking-widest text-sm w-full max-w-xs">
+                {paymentUploading ? 'Uploading...' : 'Submit POP'}
+              </button>
             </motion.div>
           )}
 
-          {/* ── Step 5: Congratulations ── */}
+          {/* Step 5: Success */}
           {step === 5 && (
-            <motion.div
-              key="congrats"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center"
-            >
-              <motion.div
-                className="w-24 h-24 mx-auto mb-8 rounded-full bg-green-600/20 border-2 border-green-500 flex items-center justify-center"
-                animate={{ scale: [1, 1.1, 1], boxShadow: ['0 0 0 rgba(34,197,94,0)', '0 0 40px rgba(34,197,94,0.5)', '0 0 0 rgba(34,197,94,0)'] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <FaCheck className="text-green-400" size={36} />
-              </motion.div>
-              <h2
-                className="text-3xl font-black uppercase tracking-widest mb-4"
-                style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-              >
-                🎉 <span className="text-green-400">CONGRATULATIONS!</span>
-              </h2>
-              <p className="text-gray-300 text-lg mb-2">Your team has been registered for the 5s Arena World Cup 2026!</p>
-              <p className="text-gray-500 text-sm mb-4">
-                Your proof of payment has been submitted and will be reviewed by our staff within 24 hours.
-              </p>
-              <p className="text-gray-500 text-sm mb-8">
-                A copy of the tournament rules and sign-up details will be sent to your preferred communication channel.
-                Once payment is confirmed, you&apos;ll unlock the Manager Dashboard to edit your team.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/">
-                  <motion.button
-                    className="px-6 py-3 rounded-xl bg-gray-800 text-white font-bold uppercase tracking-widest text-sm cursor-pointer"
-                    whileHover={{ scale: 1.03 }}
-                  >
-                    Back to Home
-                  </motion.button>
-                </Link>
-                <Link href="/rules-of-the-game">
-                  <motion.button
-                    className="px-6 py-3 rounded-xl border border-green-600 text-green-400 font-bold uppercase tracking-widest text-sm cursor-pointer"
-                    whileHover={{ scale: 1.03 }}
-                  >
-                    Read the Rules
-                  </motion.button>
-                </Link>
+            <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-10">
+              <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-green-900/40">
+                <FaCheck className="text-white text-3xl" />
               </div>
+              <h2 className="text-3xl font-black uppercase tracking-widest mb-4">Nation <span className="text-green-400">Secured!</span></h2>
+              <p className="text-gray-400 mb-8">Your registration is pending payment verification. You'll receive a notification within 24 hours.</p>
+              <Link href="/profile" className="inline-block px-10 py-4 rounded-xl bg-gray-800 text-white font-black uppercase tracking-widest text-sm border border-gray-700 hover:bg-gray-700 transition-all">Go to Dashboard</Link>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* T&C Modal */}
+      <AnimatePresence>
+        {showTermsModal && (
+          <motion.div className="fixed inset-0 z-[100] flex items-center justify-center px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowTermsModal(false)} />
+            <motion.div className="relative z-10 w-full max-w-2xl bg-gray-900 border border-gray-700 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" initial={{ scale: 0.9, y: 20 }}>
+              <button 
+                onClick={() => setShowTermsModal(false)}
+                className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors z-20"
+              >
+                <FaTimes size={18} />
+              </button>
+              <div className="p-6 bg-gray-800 border-b border-gray-700">
+                <h2 className="text-xl font-black uppercase tracking-widest text-white">World Cup Rules & T&Cs</h2>
+              </div>
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 text-sm text-gray-300">
+                <div>
+                   <h3 className="text-green-400 font-bold uppercase mb-2">1. Payment & Reference</h3>
+                   <p>ZAR 3,000.00 non-negotiable. Use team name + WC26 as reference. Bank deposit only.</p>
+                </div>
+                <div>
+                   <h3 className="text-green-400 font-bold uppercase mb-2">2. Conduct</h3>
+                   <p>Managers are responsible for player conduct. No refunds after 48h before event.</p>
+                </div>
+                <div>
+                   <h3 className="text-green-400 font-bold uppercase mb-2">3. Media</h3>
+                   <p>Participants consent to photography and videography for promotional use.</p>
+                </div>
+              </div>
+              <div className="p-6 bg-gray-800/50 border-t border-gray-700 space-y-4">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="w-5 h-5 accent-green-600" />
+                  <span className="text-xs text-gray-400 group-hover:text-white transition-colors">I irrevocably agree to the tournament regulations.</span>
+                </label>
+                <div className="flex gap-3">
+                  <button onClick={() => setShowTermsModal(false)} className="flex-1 py-3 rounded-xl bg-gray-800 text-gray-400 font-bold uppercase text-xs">Cancel</button>
+                  <button onClick={() => { setShowTermsModal(false); setStep(3); }} disabled={!termsAccepted} className={`flex-1 py-3 rounded-xl font-black uppercase text-xs transition-all ${termsAccepted ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`}>Accept & Register</button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

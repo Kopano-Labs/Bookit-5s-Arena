@@ -39,7 +39,7 @@ const AUTH_QUICK_LINKS = [
 const TEAM_CARDS = [
   {
     name: 'Kholofelo Robyn Rababalela',
-    role: 'Lead Developer and Web-developer',
+    role: 'Lead Developer',
     image: '/images/admin-photos/kholofelo-robyn-rababalela-footer-picture.png',
     linkedin: 'https://www.linkedin.com/in/kholofelo-robyn-rababalela-7a26273b6/',
     gradient: 'from-green-600/20 to-emerald-900/30',
@@ -47,7 +47,7 @@ const TEAM_CARDS = [
   },
   {
     name: 'Mashoto Bayne Rababalela',
-    role: 'Founder, Business Lead & Organizer',
+    role: 'Founder',
     image: '/images/admin-photos/mashoto-rababalela-footer-picture.png',
     linkedin: 'https://www.linkedin.com/in/mashoto-bayne-rababalela-836a47139/',
     gradient: 'from-blue-600/20 to-indigo-900/30',
@@ -190,7 +190,7 @@ const Footer = () => {
               <motion.img
                 src="/images/logo.png"
                 alt="5s Arena"
-                className="w-12 h-12 rounded-full object-cover border-2 border-green-500"
+                className="w-12 h-12 rounded-full object-cover"
                 whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(74,222,128,0.5)' }}
               />
               <div>
@@ -259,7 +259,7 @@ const Footer = () => {
               Quick Links
             </motion.h4>
             <ul className="space-y-2">
-              {(status === 'authenticated' ? AUTH_QUICK_LINKS : GUEST_QUICK_LINKS).map((link) => (
+              {(!session ? GUEST_QUICK_LINKS : AUTH_QUICK_LINKS).map((link) => (
                 <li key={link.href}>
                   <motion.div whileHover={{ x: 3, scale: 1.02 }} transition={{ duration: 0.15 }}>
                     <Link

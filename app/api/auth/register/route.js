@@ -11,7 +11,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
     }
 
-    const { name, email, password, recaptchaToken } = await request.json();
+    const { name, email, password, recaptchaToken, role: requestedRole } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -19,6 +19,9 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+
+    // Role whitelisting — SAFETY: Never allow 'admin' registration
+    const role = ['user', 'manager'].includes(requestedRole) ? requestedRole : 'user';
 
     // Validate types to prevent NoSQL injection
     if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
@@ -82,9 +85,14 @@ export async function POST(request) {
       );
     }
 
-    // Only pass whitelisted fields — prevent mass-assignment (e.g. injecting role: 'admin')
-    // Auto-subscribe to newsletter for all new users
-    const user = await User.create({ name: name.trim(), email: email.trim().toLowerCase(), password, newsletterOptIn: true });
+    // Whitelisted fields — prevent mass-assignment
+    const user = await User.create({ 
+      name: name.trim(), 
+      email: email.trim().toLowerCase(), 
+      password, 
+      role, // Using whitelisted role
+      newsletterOptIn: true 
+    });
 
     return NextResponse.json(
       { message: 'Account created successfully', userId: user._id },

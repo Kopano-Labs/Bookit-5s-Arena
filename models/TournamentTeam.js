@@ -48,6 +48,14 @@ const TournamentTeamSchema = new mongoose.Schema(
       default: 'pending',
     },
 
+    /* Payment tracking */
+    paymentScreenshot: { type: String }, // Filename of the POP upload
+    paymentStatus: {
+      type: String,
+      enum: ['unpaid', 'pending', 'confirmed', 'rejected'],
+      default: 'unpaid',
+    },
+
     agreedToTerms: { type: Boolean, required: true, default: false },
     agreedToRules: { type: Boolean, default: false },
   },

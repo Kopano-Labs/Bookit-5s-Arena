@@ -129,18 +129,18 @@ export default function LeaguesPage() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Leagues (Coming Soon) */}
+                {/* Competitions (Coming Soon) */}
                 <motion.button
-                  onClick={() => { setChoice('leagues'); setShowWelcome(false); }}
+                  onClick={() => { setChoice('competitions'); setShowWelcome(false); }}
                   className="relative px-6 py-5 rounded-2xl border border-gray-700 bg-gray-800/60 text-left cursor-pointer overflow-hidden group"
                   whileHover={{ borderColor: 'rgba(6,182,212,0.5)', scale: 1.02, transition: { duration: 0.2, type: 'tween' } }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <FaFutbol className="text-cyan-400" />
-                    <span className="font-black uppercase tracking-widest text-sm">Leagues</span>
+                    <span className="font-black uppercase tracking-widest text-sm">Competitions</span>
                   </div>
-                  <p className="text-gray-500 text-xs">Weekly 5-a-side leagues</p>
+                  <p className="text-gray-500 text-xs">Weekly 5-a-side competitions</p>
                   <motion.span
                     className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest bg-red-900/40 text-red-400 border border-red-700/40"
                     animate={{ opacity: [1, 0.4, 1] }}
@@ -176,8 +176,8 @@ export default function LeaguesPage() {
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20">
 
         <AnimatePresence mode="wait">
-          {/* ── LEAGUES: COMING SOON ── */}
-          {(choice === 'leagues' || !choice) && !showWelcome && (
+          {/* ── COMPETITIONS: COMING SOON ── */}
+          {(choice === 'competitions' || !choice) && !showWelcome && (
             <motion.div
               key="coming-soon"
               className="text-center max-w-3xl mx-auto"

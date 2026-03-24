@@ -10,7 +10,7 @@ import {
   FaFutbol, FaTachometerAlt, FaListAlt, FaBookOpen,
   FaGlassCheers, FaTrophy, FaStar, FaTv,
   FaPlus, FaChevronDown, FaNewspaper,
-  FaTiktok, FaInstagram, FaFacebook, FaPaintBrush,
+  FaPaintBrush, FaBolt,
 } from 'react-icons/fa';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
@@ -35,6 +35,7 @@ const Header = () => {
   const dropdownRef = useRef(null);
 
   const isAdmin = session?.user?.role === 'admin';
+  const isManager = session?.user?.role === 'manager';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -48,7 +49,7 @@ const Header = () => {
   }, []);
 
   const navClass = (href) => {
-    const base = 'flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest';
+    const base = 'flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest whitespace-nowrap';
     const active = pathname === href || (href !== '/' && href !== '/#courts' && pathname?.startsWith(href))
       ? 'text-white bg-gray-800 border-b-2 border-green-500 shadow-[0_2px_8px_rgba(34,197,94,0.25)]'
       : 'text-gray-400 hover:text-white hover:bg-gray-800';
@@ -64,29 +65,27 @@ const Header = () => {
     }`;
   };
 
-  /* ── Public tabs — shown to regular users only ── */
-  /* ── Online status ── */
-  const [userStatus, setUserStatus] = useState('online');
-  useEffect(() => {
-    const saved = localStorage.getItem('5s_user_status');
-    if (saved) setUserStatus(saved);
-  }, []);
-  const statusColors = { online: '#22c55e', busy: '#eab308', offline: '#ef4444' };
-
+  /* ── Interface Tabs Definitions ── */
   const publicTabs = [
+    { href: '/#courts',  icon: <FaFutbol size={11} className="text-green-400" />,     label: 'Book Court' },
+    { href: '/events-and-services', icon: <FaBolt size={11} className="text-cyan-400" />, label: 'Events' },
+    { href: '/tournament', icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Tournament' },
+  ];
+
+  const userTabs = [
     { href: '/fixtures', icon: <FaTv size={11} className="text-blue-400" />,         label: 'Fixtures' },
-    { href: '/leagues',  icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Competitions' },
     { href: '/rules-of-the-game', icon: <FaBookOpen size={11} className="text-orange-400" />, label: 'Rules' },
-    { href: '/bookings', icon: <FaCalendarAlt size={11} className="text-cyan-400" />, label: 'Bookings' },
+    { href: '/bookings', icon: <FaBolt size={11} className="text-cyan-400" />, label: 'My Bookings' },
     { href: '/rewards',  icon: <FaStar size={11} className="text-yellow-400" />,      label: 'Rewards' },
     { href: '/creator',  icon: <FaPaintBrush size={11} className="text-pink-400" />, label: 'Creator' },
   ];
 
-  /* ── Auth tabs (user-only) ── */
-  const userTabs = [
+  const managerTabs = [
+    { href: '/leagues', icon: <FaTrophy size={11} className="text-yellow-400" />,   label: 'Competitions' },
+    { href: '/rewards', icon: <FaStar size={11} className="text-blue-400" />,         label: 'Rewards' },
+    { href: '/manager/squad', icon: <FaUser size={11} className="text-green-400" />,  label: 'Squad' },
   ];
 
-  /* ── Admin tabs ── */
   const adminTabs = [
     { href: '/admin/dashboard',  icon: <FaTachometerAlt size={11} className="text-purple-400" />, label: 'Dashboard' },
     { href: '/admin/bookings',   icon: <FaListAlt size={11} className="text-teal-400" />,         label: 'Manage' },
@@ -94,7 +93,6 @@ const Header = () => {
     { href: '/admin/analytics',  icon: <FaChartBar size={11} className="text-amber-400" />,        label: 'Analytics' },
   ];
 
-  /* ── Admin Dashboard Dropdown Items ── */
   const dashboardDropdownItems = [
     { href: '/courts/add',        icon: <FaFutbol size={12} className="text-green-400" />,       label: '+ Add Court' },
     { href: '/events/add',        icon: <FaGlassCheers size={12} className="text-pink-400" />,   label: '+ Add Events' },
@@ -104,27 +102,20 @@ const Header = () => {
   ];
 
   return (
-    <header className="bg-gray-950 border-b border-gray-800 sticky top-0 z-50 shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
+    <header className="bg-gray-950/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
 
-          {/* ── Logo ── */}
+          {/* ── Logo Container (Centered Content) ── */}
           <Link href="/#about" className="flex items-center gap-3 group flex-shrink-0">
             <motion.div
-              className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)]"
+              className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)] flex items-center justify-center"
               whileHover={{ scale: 1.12, boxShadow: '0 0 22px rgba(34,197,94,0.75)', rotate: 5 }}
               whileTap={{ scale: 0.95 }}
               animate={{
-                boxShadow: [
-                  '0 0 14px rgba(34,197,94,0.45)',
-                  '0 0 20px rgba(34,197,94,0.65)',
-                  '0 0 14px rgba(34,197,94,0.45)',
-                ],
+                boxShadow: ['0 0 14px rgba(34,197,94,0.45)', '0 0 20px rgba(34,197,94,0.65)', '0 0 14px rgba(34,197,94,0.45)'],
               }}
-              transition={{
-                boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-                scale: { type: 'spring', stiffness: 300 },
-              }}
+              transition={{ boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }}
             >
               <Image src="/images/logo.png" alt="5s Arena" fill sizes="44px" className="object-cover" priority />
             </motion.div>
@@ -136,325 +127,164 @@ const Header = () => {
             </span>
           </Link>
 
-          {/* ── Search ── */}
-          <div className="hidden md:flex items-center gap-2 mx-3">
-            <SearchModal />
-          </div>
+          {/* ── Desktop Nav (Role-Based Separation) ── */}
+          <div className="hidden md:flex items-center gap-0.5 justify-center flex-1 mx-4">
+             {/* Search Hub */}
+             <SearchModal />
 
-          {/* ── Blog Promo Button ── */}
-          {/* ── Blog Promo Button (Guests) ── */}
-          {!session && (
-            <motion.a
-              href="https://5s-arena-blog.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-green-400 border border-green-500/50 mx-2"
-              animate={{
-                boxShadow: [
-                  '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
-                  '0 0 12px rgba(34,197,94,0.6), inset 0 0 8px rgba(34,197,94,0.2)',
-                  '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
-                ],
-                borderColor: [
-                  'rgba(34,197,94,0.5)',
-                  'rgba(34,197,94,0.9)',
-                  'rgba(34,197,94,0.5)',
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span>⚽</span> Visit our Blog!
-            </motion.a>
-          )}
+             {/* GUEST: Public Tabs ONLY */}
+             {!session && publicTabs.map((tab) => (
+                <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                  <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                </Link>
+              ))}
 
-          {/* ── Desktop Nav ── */}
-          <div className="hidden md:flex items-center gap-0.5">
-            {/* Public tabs — HIDDEN for admin, shown for regular users, hidden for guests */}
-            {session && !isAdmin && publicTabs.map((tab) => (
-              <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
-                <NavIcon>{tab.icon}</NavIcon> {tab.label}
-              </Link>
-            ))}
-
-            {/* Auth tabs */}
-            {session && (
-              <>
-                {userTabs
-                  .filter((t) => !(t.hideAdmin && isAdmin))
-                  .map((tab) => (
+             {/* USER: Public + User Tabs */}
+             {session && !isAdmin && !isManager && (
+               <>
+                 {publicTabs.map((tab) => (
                     <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
                       <NavIcon>{tab.icon}</NavIcon> {tab.label}
                     </Link>
                   ))}
+                  {userTabs.map((tab) => (
+                    <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                      <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                    </Link>
+                  ))}
+               </>
+             )}
 
-                {/* Admin tabs + Dashboard Dropdown */}
-                {isAdmin && (
-                  <>
-                    {adminTabs.map((tab) => (
-                      <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
-                        <NavIcon>{tab.icon}</NavIcon> {tab.label}
-                      </Link>
-                    ))}
+             {/* MANAGER: Manager Tabs ONLY */}
+             {session && isManager && managerTabs.map((tab) => (
+                <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                  <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                </Link>
+              ))}
 
-                    {/* Dashboard Dropdown replacing +Add Court */}
-                    <div className="relative" ref={dropdownRef}>
-                      <motion.button
-                        onClick={() => setDashboardOpen(!dashboardOpen)}
-                        className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold text-green-400 hover:text-white hover:bg-green-700 rounded-lg transition-all uppercase tracking-widest"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <FaPlus size={10} /> Dashboard
-                        <motion.span
-                          animate={{ rotate: dashboardOpen ? 180 : 0 }}
-                          transition={{ duration: 0.2 }}
+             {/* ADMIN: Admin Tabs ONLY + God-Mode Dropdown */}
+             {session && isAdmin && (
+               <>
+                 {adminTabs.map((tab) => (
+                    <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                      <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                    </Link>
+                  ))}
+                  
+                  {/* God-Mode Quick Actions */}
+                  <div className="relative" ref={dropdownRef}>
+                    <motion.button
+                      onClick={() => setDashboardOpen(!dashboardOpen)}
+                      className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold text-green-400 hover:text-white hover:bg-green-700/20 rounded-lg transition-all uppercase tracking-widest border border-green-500/20 ml-2"
+                      whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <FaPlus size={10} /> God-Mode
+                    </motion.button>
+                    <AnimatePresence>
+                      {dashboardOpen && (
+                        <motion.div
+                          className="absolute right-0 top-full mt-2 w-60 bg-gray-950 border border-green-500/30 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-[60] backdrop-blur-xl"
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         >
-                          <FaChevronDown size={8} />
-                        </motion.span>
-                      </motion.button>
-
-                      <AnimatePresence>
-                        {dashboardOpen && (
-                          <motion.div
-                            className="absolute right-0 top-full mt-2 w-56 bg-gray-900 border border-gray-700 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden z-50"
-                            initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                          >
-                            <div className="px-4 py-2.5 border-b border-gray-800">
-                              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Quick Actions</p>
-                            </div>
-                            {dashboardDropdownItems.map((item, i) => (
-                              <motion.div
-                                key={item.href}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.05 }}
-                              >
-                                <Link
-                                  href={item.href}
-                                  onClick={() => setDashboardOpen(false)}
-                                  className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-all"
-                                >
-                                  {item.icon}
-                                  <span className="font-semibold text-xs uppercase tracking-widest">{item.label}</span>
-                                </Link>
-                              </motion.div>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </>
-                )}
-              </>
-            )}
+                           <div className="px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                             <p className="text-[10px] text-green-400 uppercase tracking-widest font-black">⚡ Dispatch Center</p>
+                           </div>
+                           <div className="p-2 grid grid-cols-1 gap-1">
+                             {dashboardDropdownItems.map((item) => (
+                               <Link key={item.href} href={item.href} onClick={() => setDashboardOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-xs text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all group">
+                                 <span className="group-hover:scale-125 transition-transform">{item.icon}</span>
+                                 <span className="font-bold uppercase tracking-widest">{item.label}</span>
+                               </Link>
+                             ))}
+                           </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+               </>
+             )}
           </div>
 
-          {/* ── Auth Controls ── */}
-          <div className="flex items-center gap-2">
+          {/* ── Actions (Profile, Logout, Mobile Toggle) ── */}
+          <div className="flex items-center gap-3">
             {session ? (
-              <>
-                <Link
-                  href="/profile"
-                  className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-gray-800 transition-all group border border-transparent hover:border-gray-700"
-                >
-                  <div className="relative flex-shrink-0">
-                    {session.user.image ? (
-                      <motion.div
-                        className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        <Image src={session.user.image} alt={session.user.name || 'Profile'} width={32} height={32} className="w-full h-full object-cover" />
-                      </motion.div>
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-black shadow-inner border border-green-500">
-                        {session.user.name?.[0]?.toUpperCase() || 'U'}
-                      </div>
-                    )}
-                    {/* Online status dot */}
-                    <span
-                      className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-gray-950"
-                      style={{ backgroundColor: statusColors[userStatus] || '#22c55e' }}
-                      title={userStatus}
-                    />
-                  </div>
-                  <div className="hidden lg:block text-left leading-tight">
-                    <p className="text-white text-xs font-bold">{session.user.name?.split(' ')[0]}</p>
-                    <p className="text-green-400 text-[10px] uppercase tracking-widest">
-                      {session.user.username ? `@${session.user.username}` : 'Profile'}
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <Link href="/profile" className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-gray-800 transition-all border border-transparent hover:border-gray-800">
+                   <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-green-500">
+                     {session.user.image ? (
+                        <Image src={session.user.image} alt="Profile" fill className="object-cover" />
+                     ) : (
+                        <div className="w-full h-full bg-green-600 flex items-center justify-center text-white text-[10px] font-black">{session.user.name?.[0] || 'U'}</div>
+                     )}
+                   </div>
+                   <div className="hidden lg:block text-left leading-none">
+                     <p className="text-white text-[10px] font-black uppercase tracking-widest">{session.user.name?.split(' ')[0]}</p>
+                     <p className="text-green-500 text-[9px] font-bold uppercase">{session.user.role || 'Player'}</p>
+                   </div>
                 </Link>
                 <motion.button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="hidden md:flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-green-700 rounded-lg transition-all uppercase tracking-widest"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
-                  <FaSignOutAlt size={12} /> Out
+                  <FaSignOutAlt size={14} />
                 </motion.button>
-                {/* ── Blog Promo Button (Auth Users) ── */}
-                <motion.a
-                  href="https://5s-arena-blog.vercel.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-green-400 border border-green-500/50 ml-2"
-                  animate={{
-                    boxShadow: [
-                      '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
-                      '0 0 12px rgba(34,197,94,0.6), inset 0 0 8px rgba(34,197,94,0.2)',
-                      '0 0 4px rgba(34,197,94,0.3), inset 0 0 4px rgba(34,197,94,0.1)',
-                    ],
-                    borderColor: [
-                      'rgba(34,197,94,0.5)',
-                      'rgba(34,197,94,0.9)',
-                      'rgba(34,197,94,0.5)',
-                    ],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                  whileHover={{ scale: 1.05, backgroundColor: 'rgba(34,197,94,0.1)' }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span>⚽</span> Visit our Blog!
-                </motion.a>
-              </>
+              </div>
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="hidden md:flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all uppercase tracking-widest"
-                >
-                  <FaSignInAlt size={12} /> Login
-                </Link>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    href="/register"
-                    className="hidden md:flex items-center gap-1.5 px-5 py-2 text-xs font-black text-white bg-green-600 hover:bg-green-500 rounded-lg transition-all uppercase tracking-widest shadow-[0_0_12px_rgba(34,197,94,0.4)] hover:shadow-[0_0_20px_rgba(34,197,94,0.7)]"
-                  >
-                    <FaUser size={11} /> Register
-                  </Link>
-                </motion.div>
-              </>
+              <div className="flex items-center gap-2">
+                <Link href="/login" className="px-4 py-2 text-[10px] font-bold text-gray-400 hover:text-white uppercase tracking-widest">In</Link>
+                <Link href="/register" className="px-5 py-2 text-[10px] font-black text-white bg-green-600 rounded-lg shadow-[0_0_12px_rgba(34,197,94,0.4)] uppercase tracking-widest">Join</Link>
+              </div>
             )}
 
-            {/* Mobile toggle */}
-            <motion.button
-              className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Menu"
-              whileTap={{ scale: 0.85, rotate: 90 }}
-            >
+            {/* Mobile Toggle */}
+            <motion.button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg" whileTap={{ scale: 0.85 }}>
               {mobileOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
             </motion.button>
           </div>
         </div>
       </nav>
 
-      {/* ── Mobile Drawer ── */}
+      {/* ── Mobile Sidebar (Strict Role-Based) ── */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            className="md:hidden bg-gray-900 border-t border-gray-800 px-4 pb-5 pt-3 space-y-1 overflow-hidden"
+            className="md:hidden bg-gray-950 border-t border-gray-800 px-4 py-6 space-y-2 overflow-y-auto max-h-[calc(100vh-64px)] shadow-2xl"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
           >
-            {/* Mobile user identity strip */}
-            {session && (
-              <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-gray-800">
-                {session.user.image ? (
-                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-500 flex-shrink-0">
-                    <Image src={session.user.image} alt={session.user.name || 'Profile'} width={40} height={40} className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-black border border-green-500 flex-shrink-0">
-                    {session.user.name?.[0]?.toUpperCase() || 'U'}
-                  </div>
-                )}
-                <div>
-                  <p className="text-white text-sm font-bold">{session.user.name}</p>
-                  {session.user.username && (
-                    <p className="text-green-400 text-xs font-mono">@{session.user.username}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Public tabs — HIDDEN for admin on mobile too, hidden for guests */}
-            {session && !isAdmin && publicTabs.map((tab, i) => (
-              <motion.div
-                key={tab.href}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.04 }}
-              >
-                <Link href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
-                  {tab.icon} {tab.label}
-                </Link>
-              </motion.div>
-            ))}
-
-            {session ? (
-              <>
-                {userTabs
-                  .filter((t) => !(t.hideAdmin && isAdmin))
-                  .map((tab, i) => (
-                    <motion.div
-                      key={tab.href}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: (isAdmin ? 0 : publicTabs.length + i) * 0.04 }}
-                    >
-                      <Link href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
-                        {tab.icon} {tab.label}
-                      </Link>
-                    </motion.div>
-                  ))}
-                <Link href="/profile" onClick={() => setMobileOpen(false)} className={mobileClass('/profile')}>
-                  <FaUserEdit className="text-emerald-400" size={13} /> Edit Profile
-                </Link>
-                {isAdmin && (
-                  <>
-                    {adminTabs.map((tab) => (
-                      <Link key={tab.href} href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
-                        {tab.icon} {tab.label}
-                      </Link>
-                    ))}
-                    {/* Mobile Dashboard dropdown items */}
-                    <div className="mt-2 pt-2 border-t border-gray-800">
-                      <p className="px-3 py-1.5 text-[10px] text-gray-500 uppercase tracking-widest font-bold">Quick Actions</p>
-                      {dashboardDropdownItems.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setMobileOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-3 text-sm font-bold text-green-400 hover:text-white hover:bg-green-700 rounded-xl transition-all"
-                        >
-                          {item.icon} {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                )}
-                <button onClick={() => signOut({ callbackUrl: '/' })} className="w-full text-left px-3 py-3 text-sm font-bold text-red-400 hover:bg-gray-800 rounded-xl uppercase tracking-widest">
-                  <FaSignOutAlt className="inline mr-2" size={13} />Sign Out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setMobileOpen(false)} className="block px-3 py-3 text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl uppercase tracking-widest">
-                  <FaSignInAlt className="inline mr-2" size={13} />Login
-                </Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-sm font-black text-white bg-green-600 hover:bg-green-500 rounded-xl text-center uppercase tracking-widest">
-                  Register
-                </Link>
-              </>
-            )}
+             {!session && publicTabs.map(tab => (
+               <Link key={tab.href} href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                 {tab.icon} {tab.label}
+               </Link>
+             ))}
+             {session && !isAdmin && !isManager && [...publicTabs, ...userTabs].map(tab => (
+               <Link key={tab.href} href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                 {tab.icon} {tab.label}
+               </Link>
+             ))}
+             {session && isManager && managerTabs.map(tab => (
+               <Link key={tab.href} href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                 {tab.icon} {tab.label}
+               </Link>
+             ))}
+             {session && isAdmin && adminTabs.map(tab => (
+               <Link key={tab.href} href={tab.href} onClick={() => setMobileOpen(false)} className={mobileClass(tab.href)}>
+                 {tab.icon} {tab.label}
+               </Link>
+             ))}
+             {session && (
+               <div className="pt-4 border-t border-gray-800 mt-4">
+                 <button onClick={() => signOut({ callbackUrl: '/' })} className="w-full text-left px-3 py-3 text-sm font-black text-red-500 uppercase tracking-widest flex items-center gap-2">
+                   <FaSignOutAlt size={14} /> Log Out
+                 </button>
+               </div>
+             )}
           </motion.div>
         )}
       </AnimatePresence>

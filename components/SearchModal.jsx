@@ -6,28 +6,33 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { 
   FaSearch, FaFutbol, FaTrophy, FaCalendarAlt, FaGavel, 
-  FaStar, FaUser, FaChartBar, FaTimes, FaNewspaper 
+  FaStar, FaUser, FaChartBar, FaTimes, FaNewspaper,
+  FaBolt, FaPaintBrush, FaPlus, FaUsers
 } from 'react-icons/fa';
 
 const PAGES = [
   // Public (Guests & Everyone)
   { name: 'Book a Court', href: '/#courts', icon: FaFutbol, category: 'Booking', auth: 'public' },
-  { name: 'Events & Services', href: '/events-and-services', icon: FaCalendarAlt, category: 'Booking', auth: 'public' },
-  { name: 'Tournament', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
-  { name: 'Leagues', href: '/leagues', icon: FaTrophy, category: 'Competition', auth: 'public' },
+  { name: 'Events & Services', href: '/events-and-services', icon: FaBolt, category: 'Booking', auth: 'public' },
+  { name: 'Register for Tournament', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
   
-  // Authenticated Users (User, Manager, Admin)
+  // Authenticated Users (User)
+  { name: 'Competitions', href: '/leagues', icon: FaTrophy, category: 'Competition', auth: 'user' },
   { name: 'Live Fixtures', href: '/fixtures', icon: FaChartBar, category: 'Competition', auth: 'user' },
   { name: 'Rules of the Game', href: '/rules-of-the-game', icon: FaGavel, category: 'Info', auth: 'user' },
   { name: 'Rewards', href: '/rewards', icon: FaStar, category: 'Account', auth: 'user' },
-  { name: 'My Bookings', href: '/bookings', icon: FaCalendarAlt, category: 'Account', auth: 'user' },
-  { name: 'Profile', href: '/profile', icon: FaUser, category: 'Account', auth: 'user' },
-  { name: 'Creator', href: '/creator', icon: FaUser, category: 'Info', auth: 'user' },
+  { name: 'My Bookings', href: '/bookings', icon: FaBolt, category: 'Account', auth: 'user' },
+  { name: 'Profile Settings', href: '/profile', icon: FaUser, category: 'Account', auth: 'user' },
+  { name: 'Arena Creator', href: '/creator', icon: FaPaintBrush, category: 'Info', auth: 'user' },
+
+  // Managers
+  { name: 'Squad Management', href: '/manager/squad', icon: FaUsers, category: 'Staff', auth: 'manager' },
+  { name: 'Manager Rewards', href: '/rewards', icon: FaStar, category: 'Staff', auth: 'manager' },
 
   // Admins Only
   { name: 'Admin Dashboard', href: '/admin/dashboard', icon: FaChartBar, category: 'Admin', auth: 'admin' },
   { name: 'User Management', href: '/admin/users', icon: FaUser, category: 'Admin', auth: 'admin' },
-  { name: 'Add Event', href: '/events/add', icon: FaCalendarAlt, category: 'Admin', auth: 'admin' },
+  { name: 'Add Event', href: '/events/add', icon: FaPlus, category: 'Admin', auth: 'admin' },
   { name: 'Add Newsletter', href: '/admin/newsletter', icon: FaNewspaper, category: 'Admin', auth: 'admin' },
 ];
 
@@ -41,14 +46,19 @@ const SearchModal = () => {
   const userRole = session?.user?.role;
   const isAuthenticated = !!session;
   const isAdmin = userRole === 'admin';
+  const isManager = userRole === 'manager';
 
   // Filter based on authentication role and query
   const filtered = PAGES.filter((p) => {
-    // 1. Enforce interface separation
+    // 1. Strict Role-Based Filtering
     if (p.auth === 'admin' && !isAdmin) return false;
-    if (p.auth === 'user' && !isAuthenticated) return false;
+    if (p.auth === 'manager' && !isManager && !isAdmin) return false;
+    
+    // Explicit Guest Safety: If guest, ONLY show public items.
+    // If not public and not authenticated, hide it.
+    if (!isAuthenticated && p.auth !== 'public') return false;
 
-    // 2. Enforce query search
+    // 2. Query matching
     return (
       p.name.toLowerCase().includes(query.toLowerCase()) ||
       p.category.toLowerCase().includes(query.toLowerCase())

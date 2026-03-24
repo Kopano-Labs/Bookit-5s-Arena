@@ -20,6 +20,7 @@ export async function GET(request) {
     role: user.role,
     username: user.username || '',
     phone: user.phone || '',
+    status: user.status || 'Ready for 5s Arena',
     communicationPreference: user.communicationPreference || 'email',
     newsletterOptIn: user.newsletterOptIn || false,
     birthDate: user.birthDate || null,
@@ -27,13 +28,13 @@ export async function GET(request) {
   });
 }
 
-// PUT — update name, username, newsletter opt-in and/or password
+// PUT — update name, username, status, newsletter opt-in and/or password
 export async function PUT(request) {
   const session = await getServerSession(authOptions);
   if (!session) return Response.json({ error: 'Unauthorised' }, { status: 401 });
 
   const body = await request.json();
-  const { name, username, phone, communicationPreference, newsletterOptIn, birthDate, currentPassword, newPassword } = body;
+  const { name, username, status, phone, communicationPreference, newsletterOptIn, birthDate, currentPassword, newPassword } = body;
 
   // Validate types to prevent NoSQL injection
   if (typeof name !== 'string') {
@@ -42,6 +43,11 @@ export async function PUT(request) {
 
   if (!name || name.trim().length < 2 || name.trim().length > 100) {
     return Response.json({ error: 'Name must be between 2 and 100 characters.' }, { status: 400 });
+  }
+
+  // Validate status length
+  if (status && status.length > 100) {
+    return Response.json({ error: 'Status must be at most 100 characters.' }, { status: 400 });
   }
 
   // Validate username if provided
@@ -55,6 +61,7 @@ export async function PUT(request) {
 
   // Update fields
   user.name = name.trim();
+  if (status !== undefined) user.status = status.trim() || 'Ready for 5s Arena';
   if (username !== undefined) user.username = username.trim() || null;
   if (typeof newsletterOptIn === 'boolean') user.newsletterOptIn = newsletterOptIn;
 
