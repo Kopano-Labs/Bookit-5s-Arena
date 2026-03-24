@@ -24,9 +24,9 @@ const LEAGUES = {
   UCL: { id: '4480', name: 'Champions League' }, // Note: UCL has its own ID
 };
 
-// Simple in-memory cache — TTL 10 minutes
+// Simple in-memory cache — TTL 60 seconds (optimized for 15s high-frequency polling)
 const cache = new Map();
-const CACHE_TTL = 10 * 60 * 1000;
+const CACHE_TTL = 60 * 1000;
 
 async function fetchLeagueEvents(leagueId) {
   const cacheKey = `next_${leagueId}`;
@@ -38,7 +38,7 @@ async function fetchLeagueEvents(leagueId) {
   try {
     const res = await fetch(
       `${BASE}/eventsnextleague.php?id=${leagueId}`,
-      { next: { revalidate: 600 } }
+      { next: { revalidate: 60 } }
     );
     if (!res.ok) return [];
     const json = await res.json();
@@ -64,11 +64,44 @@ async function fetchLeagueEvents(leagueId) {
   }
 }
 
-// GET /api/fixtures?leagues=PL,PSL  (defaults to all leagues if omitted)
+// GET /api/fixtures?leagues=PL,PSL,WC  (defaults to all leagues if omitted)
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const leagueParam = searchParams.get('leagues');
+    
+    // ── Local Tournament Logic ─────────────────────────────────
+    // We always include local WC data if requested or if no leagues specified
+    let localWC = null;
+    if (!leagueParam || leagueParam.split(',').includes('WC')) {
+       try {
+         const { default: connectDB } = await import('@/lib/mongodb');
+         const { default: TournamentTeam } = await import('@/models/TournamentTeam');
+         await connectDB();
+         const teams = await TournamentTeam.find({ status: 'confirmed' })
+           .sort({ pts: -1, gd: -1, gf: -1 })
+           .lean();
+         
+         localWC = teams.map(t => ({
+           id: t._id.toString(),
+           name: t.teamName,
+           logo: t.worldCupTeamLogo,
+           stats: {
+             mp: t.mp || 0,
+             w: t.w || 0,
+             d: t.d || 0,
+             l: t.l || 0,
+             gf: t.gf || 0,
+             ga: t.ga || 0,
+             gd: t.gd || 0,
+             pts: t.pts || 0
+           }
+         }));
+       } catch (err) {
+         console.error('Local WC fetch failed:', err);
+       }
+    }
+
     const codes = leagueParam
       ? leagueParam.split(',').filter(c => LEAGUES[c])
       : Object.keys(LEAGUES);
@@ -86,14 +119,17 @@ export async function GET(request) {
       data[code] = events;
     });
 
-    const res = Response.json({
-      source: 'thesportsdb',
+    const body = {
+      source: 'hybrid',
       fetchedAt: new Date().toISOString(),
       leagues: data,
-    });
+    };
+    if (localWC) body.wc_standings = localWC;
 
-    // Cache at the HTTP edge layer too
-    res.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+    const res = Response.json(body);
+
+    // Cache at the HTTP edge layer too — lower revalidate for live feel
+    res.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
     return res;
   } catch (err) {
     console.error('Fixtures API error:', err);

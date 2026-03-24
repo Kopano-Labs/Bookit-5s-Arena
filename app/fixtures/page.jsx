@@ -710,6 +710,25 @@ const FixturesPage = () => {
       if (res.ok) {
         const json = await res.json();
         setLiveData(json.leagues || null);
+        
+        // Map WC standings if they exist in the hybrid feed
+        if (json.wc_standings) {
+           const wcTable = json.wc_standings.map((t, i) => ({
+             rank: i + 1,
+             team: t.name,
+             logo: t.logo,
+             played: t.stats.mp,
+             won: t.stats.w,
+             drawn: t.stats.d,
+             lost: t.stats.l,
+             gf: t.stats.gf,
+             ga: t.stats.ga,
+             gd: t.stats.gd,
+             points: t.stats.pts,
+           }));
+           setStandingsData(prev => ({ ...prev, WC: wcTable }));
+        }
+
         setLastUpdated(new Date());
       }
     } catch (err) {
@@ -800,11 +819,12 @@ const FixturesPage = () => {
   const featuredMatches = mockMatches.filter(m => m.featured).slice(0, 5);
 
   // ── Standings state ─────────────────────────────────────────
-  const [standingsLeague, setStandingsLeague] = useState('PSL');
+  const [standingsLeague, setStandingsLeague] = useState('WC');
   const [standingsData, setStandingsData] = useState({});
   const [standingsLoading, setStandingsLoading] = useState(false);
 
   const STANDINGS_LEAGUES = [
+    { code: 'WC',  name: 'World Cup 5s',         id: 'local', color: 'text-green-400',  border: 'border-green-600/50',  bg: 'bg-green-900/20' },
     { code: 'PSL', name: 'Premier Soccer League', id: '4806', color: 'text-yellow-400', border: 'border-yellow-600/50', bg: 'bg-yellow-900/20' },
     { code: 'PL',  name: 'Premier League',         id: '4406', color: 'text-purple-400', border: 'border-purple-600/50', bg: 'bg-purple-900/20' },
     { code: 'LL',  name: 'La Liga',                id: '4480', color: 'text-orange-400', border: 'border-orange-600/50', bg: 'bg-orange-900/20' },
@@ -813,7 +833,14 @@ const FixturesPage = () => {
   ];
 
   const fetchStandings = useCallback(async (code) => {
-    if (standingsData[code]) return; // Already cached
+    if (standingsData[code] && code !== 'WC') return; // Already cached for international
+    
+    // Handle Local World Cup standings fetching
+    if (code === 'WC') {
+      if (!liveData) await fetchLiveData();
+      return; // Handled by fetchLiveData callback setting standingsData['WC']
+    }
+
     const league = STANDINGS_LEAGUES.find(l => l.code === code);
     if (!league) return;
     setStandingsLoading(true);

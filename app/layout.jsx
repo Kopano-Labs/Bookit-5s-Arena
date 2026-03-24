@@ -17,20 +17,20 @@ const SITE_URL =
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: '5s Arena | 5-a-Side Football Cape Town', template: '%s | 5s Arena' },
-  description: "Cape Town's premier 5-a-side football venue. Book floodlit courts at Hellenic Football Club, Milnerton. From R400/hour. Bar, restaurant & secure parking on site.",
-  keywords: ['5-a-side football', 'Cape Town', 'Milnerton', 'court booking', 'football venue', 'Hellenic Football Club', '5s Arena'],
-  authors: [{ name: '5s Arena' }],
+  title: { default: 'Bookit 5s Arena | Elite 5-a-Side Football Cape Town', template: '%s | Bookit 5s Arena' },
+  description: "Cape Town's most advanced 5-a-side football venue. Experience the World Cup 5s, real-time competition standings, and pro-tier floodlit courts at Milnerton. Book online from R400/hour.",
+  keywords: ['World Cup 5s', '5-a-side football', 'Cape Town', 'Milnerton', 'court booking', 'football tournament', 'Hellenic Football Club', 'Bookit 5s Arena', 'Competition Hub'],
+  authors: [{ name: 'Bookit 5s Arena Engineering' }],
   openGraph: {
     type: 'website',
     locale: 'en_ZA',
     url: process.env.NEXTAUTH_URL || 'https://5sarena.co.za',
-    siteName: '5s Arena',
-    title: '5s Arena | 5-a-Side Football Cape Town',
-    description: "Cape Town's premier 5-a-side football venue in Milnerton. Floodlit courts, bar & restaurant. Book online from R400/hour.",
-    images: [{ url: '/images/logo.png', width: 512, height: 512, alt: '5s Arena Logo' }],
+    siteName: 'Bookit 5s Arena',
+    title: 'Bookit 5s Arena | The Future of 5-a-Side Football',
+    description: "Elite 5-a-side football in Milnerton, Cape Town. Live competition standings, floodlit courts, and integrated fan experiences. Join the World Cup 5s today.",
+    images: [{ url: '/images/logo.png', width: 512, height: 512, alt: 'Bookit 5s Arena Elite Football' }],
   },
-  twitter: { card: 'summary', title: '5s Arena | Cape Town Football', description: 'Book 5-a-side courts in Milnerton, Cape Town. From R400/hour.' },
+  twitter: { card: 'summary_large_image', title: 'Bookit 5s Arena | Elite Cape Town Football', description: 'Experience the World Cup 5s and real-time competition stats in Milnerton, Cape Town.' },
   robots: { index: true, follow: true },
 };
 
