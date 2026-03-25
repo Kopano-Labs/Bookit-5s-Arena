@@ -106,7 +106,8 @@ const Header = () => {
   ];
 
   const adminTabs = [
-    { href: '/admin/competitions', icon: <FaTrophy size={11} className="text-yellow-400" />,        label: 'Competition Hub' },
+    { href: '/fixtures',         icon: <FaTv size={11} className="text-blue-400" />,           label: 'Fixtures' },
+    { href: '/admin/competitions', icon: <FaTrophy size={11} className="text-yellow-400" />,        label: 'Competitions' },
     { href: '/admin/dashboard',  icon: <FaTachometerAlt size={11} className="text-purple-400" />, label: 'Dashboard' },
     { href: '/admin/bookings',   icon: <FaListAlt size={11} className="text-teal-400" />,         label: 'Manage' },
     { href: '/admin/newsletter', icon: <FaEnvelope size={11} className="text-rose-400" />,         label: 'Newsletter' },
@@ -130,7 +131,7 @@ const Header = () => {
           {/* ── Logo Container (Centered Content) ── */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
             <motion.div
-              className="relative relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)] flex items-center justify-center"
+              className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-green-500 shadow-[0_0_14px_rgba(34,197,94,0.45)] flex items-center justify-center"
               whileHover={{ scale: 1.12, boxShadow: '0 0 22px rgba(34,197,94,0.75)', rotate: 5 }}
               whileTap={{ scale: 0.95 }}
               animate={{
@@ -163,8 +164,8 @@ const Header = () => {
              {/* USER/ADMIN/MANAGER: Shared Base + Role Specific */}
              {session && (
                <>
-                 {/* Shared for all logged in */}
-                 {userTabs.slice(0, 3).map((tab) => (
+                 {/* Shared for all logged in (EXCEPT ADMINS - they get admin-specific versions) */}
+                 {!isAdmin && userTabs.slice(0, 3).map((tab) => (
                     <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
                       <NavIcon>{tab.icon}</NavIcon> {tab.label}
                     </Link>
@@ -178,18 +179,22 @@ const Header = () => {
                   ))}
 
                  {/* ADMIN SPECIFIC */}
-                 {isAdmin && adminTabs.slice(0, 3).map((tab) => (
+                 {isAdmin && adminTabs.slice(0, 6).map((tab) => (
                     <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
                       <NavIcon>{tab.icon}</NavIcon> {tab.label}
                     </Link>
                   ))}
 
-                 {/* Shared functional tabs */}
-                 {userTabs.slice(3).map((tab) => (
-                    <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
-                      <NavIcon>{tab.icon}</NavIcon> {tab.label}
-                    </Link>
-                  ))}
+                 {/* Shared functional tabs (Rewards, Creator etc) - Excluding those already in Admin set if admin */}
+                 {userTabs.slice(3).map((tab) => {
+                    // If admin is already seeing these via adminTabs or special set, we skip duplicates here if needed
+                    // For now, these are rewards/creator which aren't in adminTabs
+                    return (
+                      <Link key={tab.href} href={tab.href} className={navClass(tab.href)}>
+                        <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                      </Link>
+                    );
+                  })}
 
                   {/* God-Mode Quick Actions (Admin Only) */}
                   {isAdmin && (

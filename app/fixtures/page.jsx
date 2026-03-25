@@ -28,7 +28,7 @@ const LEAGUE_META = {
   '2':   { name: 'Champions League',         color: 'border-blue-900',   bg: 'bg-blue-900',    accent: 'navy',   textColor: 'text-blue-300', type: 'global' },
   '1':   { name: 'World Cup',               color: 'border-green-500',  bg: 'bg-green-600',   accent: 'green',  textColor: 'text-green-400', type: 'global' },
   // Local League (MongoDB)
-  'local-5s': { name: '5s Arena Masters',   color: 'border-emerald-500', bg: 'bg-emerald-600', accent: 'emerald', textColor: 'text-emerald-400', type: 'local' },
+  'local-5s': { name: '5s Arena World Cup',   color: 'border-emerald-500', bg: 'bg-emerald-600', accent: 'emerald', textColor: 'text-emerald-400', type: 'local' },
 };
 
 const TEAM_COLORS = {
@@ -307,8 +307,21 @@ const LeagueBadge = ({ code }) => {
     </div>
   );
 };
-
 const StatusBadge = ({ match }) => {
+  if (match.status === 'LIVE') {
+    return (
+      <motion.div
+        className="flex items-center gap-1.5"
+        animate={{ opacity: [1, 0.5, 1] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      >
+        <span className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.8)]" />
+        <span className="text-[10px] font-black text-green-400 uppercase tracking-widest">
+          IN PROGRESS
+        </span>
+      </motion.div>
+    );
+  }
   if (match.status === 'IN_PLAY') {
     return (
       <motion.div
@@ -323,9 +336,9 @@ const StatusBadge = ({ match }) => {
       </motion.div>
     );
   }
-  if (match.status === 'FINISHED') {
+  if (match.status === 'FINISHED' || match.status === 'FT') {
     return (
-      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider bg-gray-800 px-2.5 py-0.5 rounded">
+      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider bg-gray-800 px-2.5 py-0.5 rounded shadow-sm border border-gray-700">
         FT
       </span>
     );
@@ -333,7 +346,9 @@ const StatusBadge = ({ match }) => {
   return (
     <div className="flex items-center gap-1">
       <FaClock size={9} className="text-gray-500" />
-      <span className="text-[10px] font-bold text-gray-400 tracking-wider">{match.kickoff}</span>
+      <span className="text-[10px] font-bold text-gray-400 tracking-wider">
+        {match.kickoff === 'TBD' ? 'TIME TBD' : match.kickoff}
+      </span>
     </div>
   );
 };
@@ -755,26 +770,27 @@ const FixturesPage = () => {
   const fetchLocalFixtures = useCallback(async () => {
     setFixturesLoading(true);
     try {
-      const res = await fetch('/api/tournament'); // Live MongoDB Tournament API
+      const res = await fetch('/api/tournament'); 
       if (res.ok) {
         const data = await res.json();
         const teams = data.teams || [];
         
-        // Map TournamentTeam documents to match cards
+        // Use real tournament team data
         const localFixtures = teams.map((team, idx) => ({
           id: `local_${team._id || idx}`,
           league: 'local-5s',
           home: team.teamName,
-          away: 'QUEUED', // Team status usually 'confirmed' or 'pending'
+          away: team.worldCupTeam.split(' (')[0], // The selected nation
           homeScore: team.pts || 0,
-          awayScore: 0,
+          awayScore: team.w + team.d + team.l, // Mocking some relative data if scores aren't present
           status: team.status === 'confirmed' ? 'LIVE' : 'TIMED',
-          kickoff: 'TBD',
-          date: 'Tournament Match',
+          kickoff: team.groupLetter ? `GROUP ${team.groupLetter}` : 'TBD',
+          date: '5s Arena World Cup',
           homeLogo: team.worldCupTeamLogo || '/images/logo.png',
-          awayLogo: '/images/logo.png',
+          awayLogo: '/images/tournment/worldcup-logos/world-cup-badge.jpg',
         }));
         setFixturesData(prev => ({ ...prev, local: { 'local-5s': localFixtures } }));
+        setLastUpdated(new Date());
       }
     } catch (err) {
       console.error('Local Sync Failed:', err);

@@ -38,33 +38,57 @@ const SOCIALS = [
   },
 ];
 
+import LatestNews from '@/components/home/LatestNews';
+
 export default function SocialSection() {
   return (
-    <section className="py-20 bg-gray-900">
-      <div className="max-w-6xl mx-auto px-6">
+    <section className="py-24 bg-[#020617] relative overflow-hidden">
+      {/* Decorative background effects */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        
+        {/* News Feed - The "Latest Intelligence" */}
+        <motion.div
+          className="mb-20"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <div className="flex items-center gap-4 mb-8">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-800 to-gray-800" />
+            <h2 className="text-[10px] font-black text-green-500 uppercase tracking-[0.4em] whitespace-nowrap">
+              Latest Intelligence
+            </h2>
+            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-gray-800 to-gray-800" />
+          </div>
+          <LatestNews />
+        </motion.div>
 
         {/* Header */}
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-green-400 font-bold tracking-widest uppercase text-sm mb-2">
-            Stay connected
+          <p className="text-green-400 font-bold tracking-[0.3em] uppercase text-[10px] mb-3">
+            Digital Perimeter
           </p>
           <h2
-            className="events-title font-black uppercase text-white"
+            className="font-black uppercase text-white leading-none"
             style={{
-              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-              fontFamily: "'Rubik Dirt', Impact, Arial Black, sans-serif",
+              fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+              fontFamily: "Impact, Arial Black, sans-serif",
             }}
           >
-            FOLLOW OUR JOURNEY
+            STAY <span className="text-green-500">CONNECTED</span>
           </h2>
-          <p className="text-gray-400 mt-3 text-sm">
-            See what&apos;s happening at 5s Arena — follow us for latest updates, goals &amp; events
+          <p className="text-gray-500 mt-4 text-xs font-medium uppercase tracking-widest max-w-lg mx-auto leading-relaxed">
+            Satellite uplink active — monitor our feeds for highlights, 
+            booking windows and tactical updates.
           </p>
         </motion.div>
 

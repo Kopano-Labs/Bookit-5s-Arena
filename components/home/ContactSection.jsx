@@ -1,42 +1,40 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { FaPhone, FaEnvelope, FaWhatsapp } from 'react-icons/fa';
+import { motion } from "framer-motion";
+import { FaPhone, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 
 const CONTACT_CARDS = [
   {
     icon: <FaPhone className="text-green-400 text-3xl" />,
-    label: 'Phone',
-    main: '063 782 0245',
-    sub: 'Mashoto',
-    href: 'tel:+27637820245',
-    hoverBorder: '#4ade80',
+    label: "Phone",
+    main: "063 782 0245",
+    sub: "Mashoto",
+    href: "tel:+27637820245",
+    hoverBorder: "#4ade80",
   },
   {
     icon: <FaEnvelope className="text-green-400 text-3xl" />,
-    label: 'Email',
-    main: 'fivearena@gmail.com',
-    sub: 'We reply within 24hrs',
-    href: 'mailto:fivearena@gmail.com',
-    hoverBorder: '#4ade80',
+    label: "Email",
+    main: "fivearena@gmail.com",
+    sub: "We reply within 24hrs",
+    href: "mailto:fivearena@gmail.com",
+    hoverBorder: "#4ade80",
   },
   {
     icon: <FaWhatsapp className="text-green-400 text-3xl" />,
-    label: 'WhatsApp',
-    main: '063 782 0245',
-    sub: 'Instant response',
-    href: 'https://wa.me/27637820245',
-    hoverBorder: '#25D366',
+    label: "WhatsApp",
+    main: "063 782 0245",
+    sub: "Instant response",
+    href: "https://wa.me/27637820245",
+    hoverBorder: "#25D366",
     highlight: true,
   },
 ];
 
-
 export default function ContactSection() {
   return (
-    <section className="py-20 bg-black text-white overflow-hidden">
+    <section id="contact" className="py-20 bg-black text-white overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
-
         {/* Header */}
         <motion.div
           className="text-center mb-14"
@@ -51,8 +49,8 @@ export default function ContactSection() {
           <h2
             className="font-black uppercase"
             style={{
-              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-              fontFamily: 'Impact, Arial Black, sans-serif',
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
+              fontFamily: "Impact, Arial Black, sans-serif",
             }}
           >
             GET IN TOUCH
@@ -65,10 +63,14 @@ export default function ContactSection() {
             <motion.a
               key={i}
               href={c.href}
-              target={c.href.startsWith('http') ? '_blank' : undefined}
-              rel={c.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+              target={c.href.startsWith("http") ? "_blank" : undefined}
+              rel={
+                c.href.startsWith("http") ? "noopener noreferrer" : undefined
+              }
               className={`flex flex-col items-center gap-3 p-8 border transition-all ${
-                c.highlight ? 'border-green-900 bg-green-950/20' : 'border-gray-800'
+                c.highlight
+                  ? "border-green-900 bg-green-950/20"
+                  : "border-gray-800"
               }`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -82,11 +84,13 @@ export default function ContactSection() {
             >
               <motion.div
                 whileHover={{ scale: 1.2, rotate: 10 }}
-                transition={{ type: 'spring', stiffness: 300 }}
+                transition={{ type: "spring", stiffness: 300 }}
               >
                 {c.icon}
               </motion.div>
-              <span className="text-gray-400 text-xs uppercase tracking-widest">{c.label}</span>
+              <span className="text-gray-400 text-xs uppercase tracking-widest">
+                {c.label}
+              </span>
               <span className="font-black text-lg">{c.main}</span>
               <span className="text-gray-500 text-sm">{c.sub}</span>
             </motion.a>

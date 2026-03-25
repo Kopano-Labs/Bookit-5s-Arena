@@ -345,7 +345,7 @@ export default function RulesOfTheGamePage() {
             { title: 'Ready to Play?', desc: 'Now that you know the rules, grab your squad and book a court.', href: '/#courts', color: '#22c55e', icon: FaFutbol },
             { title: 'Book an Event', desc: 'Birthdays, corporate days, and more — book your next big event.', href: '/events-and-services', color: '#3b82f6', icon: FaShieldAlt },
             { title: 'Register for Tournament', desc: 'Join the World Cup-style tournament. Sign up your team now!', href: '/tournament', color: '#eab308', icon: FaTrophy },
-            { title: 'Competition Rules', desc: 'Understand the rules for all 5s Arena competitions.', href: '/competition-rules', color: '#ef4444', icon: FaClipboardList },
+            { title: 'Competition Rules', desc: 'Understand the rules for all 5s Arena competitions.', href: '/rules', color: '#ef4444', icon: FaClipboardList },
           ].map((cta, i) => {
             const Icon = cta.icon;
             return (

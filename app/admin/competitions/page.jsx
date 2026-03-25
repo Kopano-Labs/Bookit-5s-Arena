@@ -39,6 +39,25 @@ export default function AdminCompetitionsPage() {
     if (status === 'authenticated' && session.user.role !== 'admin') { router.push('/'); return; }
   }, [status, session, router]);
 
+  // Persistent Tab & Selection Tracking
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    const team = params.get('teamId');
+    if (tab) setActiveTab(tab);
+    if (team) {
+       fetch('/api/tournament')
+         .then(r => r.json())
+         .then(data => {
+            const found = data.teams?.find(t => t._id === team);
+            if (found) {
+               setSelectedTeam(found);
+               setEditForm({ ...found });
+            }
+         });
+    }
+  }, []);
+
   const fetchTeams = useCallback(async () => {
     try {
       setLoading(true);
@@ -46,23 +65,39 @@ export default function AdminCompetitionsPage() {
       if (res.ok) {
         const data = await res.json();
         setTeams(data.teams || []);
+        // Refresh selected team if it exists to maintain sync
+        if (selectedTeam) {
+           const refreshed = data.teams.find(t => t._id === selectedTeam._id);
+           if (refreshed) {
+              setSelectedTeam(refreshed);
+              setEditForm({ ...refreshed });
+           }
+        }
       }
     } catch (err) {
       console.error('Fetch failed:', err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedTeam]);
 
   useEffect(() => {
     if (activeTab === 'tournament') fetchTeams();
-  }, [activeTab, fetchTeams]);
+    // Update URL for persistence
+    const url = new URL(window.location);
+    url.searchParams.set('tab', activeTab);
+    if (!selectedTeam) url.searchParams.delete('teamId');
+    window.history.replaceState({}, '', url);
+  }, [activeTab, fetchTeams, selectedTeam]);
 
   const handleSelectTeam = (team) => {
     setSelectedTeam(team);
     setEditForm({ ...team });
     setTournamentTab('profile'); 
     setEditingPlayerIndex(null);
+    const url = new URL(window.location);
+    url.searchParams.set('teamId', team._id);
+    window.history.replaceState({}, '', url);
   };
 
   const handleSaveTeam = async () => {

@@ -21,7 +21,7 @@ export default function TournamentSection() {
   return (
     <section className="relative overflow-hidden">
       {/* Background Banner */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 relative">
         <Image
           src="/images/tournment/backgrounds/homepage-background-banner.jpg"
           alt="Tournament Background"
