@@ -108,6 +108,11 @@ export default function BottomNavbar() {
           ? USER_ITEMS
           : GUEST_ITEMS;
 
+  const hideNavbar =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/role-select";
+
   // Badge colour, icon, and label per role
   const roleBadge =
     role === "admin"
@@ -151,6 +156,13 @@ export default function BottomNavbar() {
     if (href.startsWith("/#")) return pathname === "/";
     return pathname?.startsWith(href);
   };
+
+  useEffect(() => {
+    setIsOpen(false);
+    setHoveredIndex(null);
+  }, [pathname]);
+
+  if (hideNavbar) return null;
 
   return (
     /* Hidden on mobile (sm:flex). Positioned at bottom center */

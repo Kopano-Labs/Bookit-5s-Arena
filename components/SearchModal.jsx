@@ -31,7 +31,6 @@ const PAGES = [
 
   // Admins Only
   { name: 'Admin Dashboard', href: '/admin/dashboard', icon: FaChartBar, category: 'Admin', auth: 'admin' },
-  { name: 'User Management', href: '/admin/users', icon: FaUser, category: 'Admin', auth: 'admin' },
   { name: 'Add Event', href: '/events/add', icon: FaPlus, category: 'Admin', auth: 'admin' },
   { name: 'Add Newsletter', href: '/admin/newsletter', icon: FaNewspaper, category: 'Admin', auth: 'admin' },
   { name: 'Rights Management', href: '/admin/rights', icon: FaUser, category: 'Admin', auth: 'admin' },

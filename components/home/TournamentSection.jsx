@@ -1,21 +1,39 @@
 "use client";
 
-import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { FaTrophy, FaArrowRight, FaFutbol, FaMapMarkerAlt, FaCalendarAlt, FaUsers } from "react-icons/fa";
 
 /* World Cup team logos */
 const TEAMS = [
-  { name: "Lionel Messi",     logo: "/images/tournament/worldcup-logos/lionel-messi-team.jpg" },
-  { name: "Cristiano Ronaldo",logo: "/images/tournament/worldcup-logos/cristiano-ronaldo-team.jpg" },
-  { name: "Kylian Mbappé",    logo: "/images/tournament/worldcup-logos/kylian-mbappe-team.jpg" },
-  { name: "Vinícius Jr",      logo: "/images/tournament/worldcup-logos/vinícius-jr-team.jpg" },
-  { name: "Lamine Yamal",     logo: "/images/tournament/worldcup-logos/lamine-yamal-team.jpg" },
-  { name: "Harry Kane",       logo: "/images/tournament/worldcup-logos/harry-kane-team.jpg" },
-  { name: "Florian Wirtz",    logo: "/images/tournament/worldcup-logos/florian-wirtz-team.jpg" },
-  { name: "Son Heung-Min",    logo: "/images/tournament/worldcup-logos/son-heung-min-team.jpg" },
+  { name: "Lionel Messi", logo: "/images/tournament/worldcup-logos/lionel-messi-team.jpg" },
+  { name: "Cristiano Ronaldo", logo: "/images/tournament/worldcup-logos/cristiano-ronaldo-team.jpg" },
+  { name: "Kylian Mbappé", logo: "/images/tournament/worldcup-logos/kylian-mbappe-team.jpg" },
+  { name: "Vinicius Jr", logo: "/images/tournament/worldcup-logos/vinícius-jr-team.jpg" },
+  { name: "Lamine Yamal", logo: "/images/tournament/worldcup-logos/lamine-yamal-team.jpg" },
+  { name: "Harry Kane", logo: "/images/tournament/worldcup-logos/harry-kane-team.jpg" },
+  { name: "Florian Wirtz", logo: "/images/tournament/worldcup-logos/florian-wirtz-team.jpg" },
+  { name: "Son Heung-Min", logo: "/images/tournament/worldcup-logos/son-heung-min-team.jpg" },
+  { name: "Mohamed Salah", logo: "/images/tournament/worldcup-logos/mohamed-salah-team.png" },
+  { name: "Kevin De Bruyne", logo: "/images/tournament/worldcup-logos/kevin-de-bruyne-team.jpg" },
+  { name: "Gianluigi Donnarumma", logo: "/images/tournament/worldcup-logos/gianluigi-donnarumma-team.jpg" },
+  { name: "Robert Lewandowski", logo: "/images/tournament/worldcup-logos/robert-lewandowski-team.jpg" },
+  { name: "Luka Modric", logo: "/images/tournament/worldcup-logos/luka-modric-team.png" },
+  { name: "Achraf Hakimi", logo: "/images/tournament/worldcup-logos/achraf-hakimi-team.jpg" },
+  { name: "Takefusa Kubo", logo: "/images/tournament/worldcup-logos/takefusa-kubo-team.jpg" },
+  { name: "Riyad Mahrez", logo: "/images/tournament/worldcup-logos/riyad-mahrez-team.jpg" },
+  { name: "Victor Osimhen", logo: "/images/tournament/worldcup-logos/victor-osimhen-team.png" },
+  { name: "Percy Tau", logo: "/images/tournament/worldcup-logos/percy-tau-team.png" },
+  { name: "Oswin Appollis", logo: "/images/tournament/worldcup-logos/oswin-appollis-team.jpg" },
+  { name: "Peter Shalulile", logo: "/images/tournament/worldcup-logos/peter-shalulile-team.png" },
+  { name: "Thomas Partey", logo: "/images/tournament/worldcup-logos/thomas-partey-team.png" },
+  { name: "Yves Bissouma", logo: "/images/tournament/worldcup-logos/yves-bissouma-team.png" },
+  { name: "Christian Pulisic", logo: "/images/tournament/worldcup-logos/christian-pulisic-team.png" },
+  { name: "Jordan Pefok", logo: "/images/tournament/worldcup-logos/jordan-pefok-team.jpg" },
 ];
+
+const MARQUEE_TEAMS = [...TEAMS, ...TEAMS];
 
 /* Floating football decorations */
 const BALLS = [0, 1, 2, 3, 4];
@@ -187,42 +205,46 @@ export default function TournamentSection() {
           </motion.div>
         </motion.div>
 
-        {/* Team Logos Grid */}
+        {/* Team Logos Marquee */}
         <motion.div
-          className="grid grid-cols-4 md:grid-cols-8 gap-3 mb-14 max-w-3xl mx-auto"
+          className="relative mb-14"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.6 }}
         >
-          {TEAMS.map((team, i) => (
+          <div className="absolute inset-y-0 left-0 z-10 w-16 md:w-24 bg-linear-to-r from-gray-950 via-gray-950/70 to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 z-10 w-16 md:w-24 bg-linear-to-l from-gray-950 via-gray-950/70 to-transparent pointer-events-none" />
+
+          <div className="overflow-hidden rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-sm px-3 py-4 md:px-4">
             <motion.div
-              key={team.name}
-              className="relative aspect-square rounded-xl overflow-hidden border-2 border-white/10"
-              initial={{ opacity: 0, scale: 0.4, rotate: -10 }}
-              whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 + i * 0.06, type: "spring", stiffness: 220, damping: 14 }}
-              whileHover={{
-                scale: 1.22,
-                zIndex: 10,
-                rotate: 3,
-                borderColor: "rgba(74,222,128,0.8)",
-                boxShadow: "0 0 35px rgba(34,197,94,0.5), 0 8px 30px rgba(0,0,0,0.4)",
-              }}
+              className="flex w-max gap-3 md:gap-4"
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
             >
-              <Image src={team.logo} alt={team.name} fill className="object-cover" sizes="100px" />
-              <motion.div
-                className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent flex items-end justify-center p-1"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-              >
-                <span className="text-white text-[8px] font-bold uppercase tracking-wider text-center leading-tight">
-                  {team.name}
-                </span>
-              </motion.div>
+              {MARQUEE_TEAMS.map((team, i) => (
+                <motion.div
+                  key={`${team.name}-${i}`}
+                  className="group relative h-24 w-24 md:h-28 md:w-28 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
+                  whileHover={{
+                    y: -6,
+                    scale: 1.08,
+                    borderColor: "rgba(74,222,128,0.8)",
+                    boxShadow: "0 0 30px rgba(34,197,94,0.35), 0 14px 34px rgba(0,0,0,0.35)",
+                  }}
+                  transition={{ type: "spring", stiffness: 280, damping: 18 }}
+                >
+                  <Image src={team.logo} alt={team.name} fill className="object-cover" sizes="112px" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-x-0 bottom-0 p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <span className="block text-center text-[9px] font-bold uppercase tracking-[0.15em] text-white leading-tight">
+                      {team.name}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
             </motion.div>
-          ))}
+          </div>
         </motion.div>
 
         {/* ── R50,000 Prize Banner — trophy LEFT, prize RIGHT ── */}

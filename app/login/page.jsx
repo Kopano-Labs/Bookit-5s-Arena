@@ -279,6 +279,14 @@ export default function AuthPage() {
   const [rememberMe, setRememberMe] = useState(true);
 
   useEffect(() => {
+    const requestedMode = new URLSearchParams(window.location.search).get("mode");
+    if (requestedMode === "register" || requestedMode === "login") {
+      setMode(requestedMode);
+      setError("");
+    }
+  }, []);
+
+  useEffect(() => {
     // Detect if ReCAPTCHA script can load (ad-blockers block google.com/recaptcha)
     const timeout = setTimeout(() => {
       if (!window.grecaptcha) {

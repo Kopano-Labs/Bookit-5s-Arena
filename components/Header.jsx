@@ -81,6 +81,7 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const activeRole = session?.user?.activeRole || session?.user?.role;
+  const hideDesktopSearch = pathname === "/login" || pathname === "/register" || pathname === "/role-select";
 
   const navLinks =
     activeRole === "admin"   ? ADMIN_NAV :
@@ -100,6 +101,10 @@ const Header = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setImgError(false);
   }, [session?.user?.image]);
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   return (
     <header className="bg-gray-950/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
@@ -135,7 +140,7 @@ const Header = () => {
           {/* ── Desktop Nav (Minimal Pattern) ── */}
           <div className="hidden md:flex items-center gap-1.5 justify-center flex-1 mx-4">
             {/* Search Hub */}
-            <SearchModal />
+            {!hideDesktopSearch && <SearchModal />}
             {navLinks.map((tab) => (
               <Link
                 key={tab.href}

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { FaCalendarCheck, FaFutbol, FaCalendarAlt, FaTrophy } from 'react-icons/fa';
 
 const MENU_ITEMS = [
@@ -33,8 +34,18 @@ export default function SoccerBallMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const router = useRouter();
+  const pathname = usePathname();
+  const { data: session } = useSession();
   const closeTimer = useRef(null);
   const menuRef = useRef(null);
+  const role = session?.user?.activeRole || session?.user?.role;
+
+  const hideMenu =
+    pathname === '/login' ||
+    pathname === '/register' ||
+    pathname === '/role-select' ||
+    role === 'manager' ||
+    role === 'admin';
 
   // Auto-close after 4 seconds of no interaction
   useEffect(() => {
@@ -55,6 +66,11 @@ export default function SoccerBallMenu() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  useEffect(() => {
+    setIsOpen(false);
+    setHoveredIndex(null);
+  }, [pathname]);
+
   const navigate = (href) => {
     setIsOpen(false);
     if (href.startsWith('/#')) {
@@ -73,6 +89,8 @@ export default function SoccerBallMenu() {
     if (dist === 1) return 1.2;
     return 1;
   };
+
+  if (hideMenu) return null;
 
   return (
     <div ref={menuRef} className="fixed left-0 top-[60%] sm:top-1/2 -translate-y-1/2 z-[100] hidden sm:block">
