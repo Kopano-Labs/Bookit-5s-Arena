@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { 
   FaSearch, FaFutbol, FaTrophy, FaGavel,
@@ -16,10 +16,10 @@ const PAGES = [
   { name: 'Events & Services', href: '/events-and-services', icon: FaBolt, category: 'Booking', auth: 'public' },
   { name: 'Register for Tournament', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
   { name: 'Fixtures & Live Scores', href: '/fixtures', icon: FaFutbol, category: 'Competition', auth: 'public' },
+  { name: 'Competitions', href: '/leagues', icon: FaTrophy, category: 'Competition', auth: 'public' },
+  { name: 'Rules of the Game', href: '/rules-of-the-game', icon: FaGavel, category: 'Info', auth: 'public' },
 
   // Authenticated Users (User)
-  { name: 'Competitions', href: '/leagues', icon: FaTrophy, category: 'Competition', auth: 'user' },
-  { name: 'Rules of the Game', href: '/rules-of-the-game', icon: FaGavel, category: 'Info', auth: 'user' },
   { name: 'Rewards', href: '/rewards', icon: FaStar, category: 'Account', auth: 'user' },
   { name: 'My Bookings', href: '/bookings', icon: FaBolt, category: 'Account', auth: 'user' },
   { name: 'Profile Settings', href: '/profile', icon: FaUser, category: 'Account', auth: 'user' },
@@ -40,10 +40,12 @@ const SearchModal = () => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
   const inputRef = useRef(null);
   const router = useRouter();
+  const pathname = usePathname();
 
-  const userRole = session?.user?.role;
+  const userRole = session?.user?.activeRole || session?.user?.role;
   const isAuthenticated = !!session;
   const isAdmin = userRole === 'admin';
   const isManager = userRole === 'manager';
@@ -65,13 +67,38 @@ const SearchModal = () => {
     );
   });
 
+  const flatResults = filtered;
+
   const handleKeyDown = useCallback((e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
       setIsOpen((prev) => !prev);
+      return;
     }
-    if (e.key === 'Escape') setIsOpen(false);
-  }, []);
+    if (!isOpen) {
+      if (e.key === 'Escape') setIsOpen(false);
+      return;
+    }
+    if (e.key === 'Escape') {
+      setIsOpen(false);
+      return;
+    }
+    if (!flatResults.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev + 1) % flatResults.length);
+      return;
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev - 1 + flatResults.length) % flatResults.length);
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      navigate(flatResults[highlightedIndex].href);
+    }
+  }, [flatResults, highlightedIndex, isOpen]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -82,8 +109,17 @@ const SearchModal = () => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
       setQuery('');
+      setHighlightedIndex(0);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [query]);
 
   const navigate = (href) => {
     setIsOpen(false);
@@ -157,11 +193,18 @@ const SearchModal = () => {
                       <p className="text-green-500 text-[10px] uppercase tracking-widest font-bold px-3 py-1">{cat}</p>
                       {filtered.filter((p) => p.category === cat).map((page) => {
                         const Icon = page.icon;
+                        const pageIndex = flatResults.findIndex((item) => item.href === page.href);
+                        const isHighlighted = pageIndex === highlightedIndex;
                         return (
                           <motion.button
                             key={page.href}
                             onClick={() => navigate(page.href)}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-gray-300 hover:bg-green-600/10 hover:text-white transition-all cursor-pointer"
+                            onMouseEnter={() => setHighlightedIndex(pageIndex)}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all cursor-pointer ${
+                              isHighlighted
+                                ? 'bg-green-600/10 text-white'
+                                : 'text-gray-300 hover:bg-green-600/10 hover:text-white'
+                            }`}
                             whileHover={{ x: 3 }}
                           >
                             <Icon size={14} className="text-green-400 flex-shrink-0" />
