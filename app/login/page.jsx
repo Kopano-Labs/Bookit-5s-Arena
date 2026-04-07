@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { signIn } from "next-auth/react";
+import { getProviders, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -276,6 +276,7 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleEnabled, setGoogleEnabled] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
   const [showSecurityNotice, setShowSecurityNotice] = useState(false);
   const [pendingAction, setPendingAction] = useState(null); // stores fn to run after security ack
@@ -290,6 +291,39 @@ export default function AuthPage() {
       setMode(requestedMode);
       setError("");
     }
+  }, []);
+
+  useEffect(() => {
+    const authError = new URLSearchParams(window.location.search).get("error");
+    if (authError === "google") {
+      setError(
+        "Google sign-in is unavailable right now. Use your email and password instead.",
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProviders() {
+      try {
+        const providers = await getProviders();
+        if (!cancelled) {
+          setGoogleEnabled(Boolean(providers?.google));
+        }
+      } catch (providerError) {
+        console.warn("[5s Arena] Failed to load auth providers:", providerError);
+        if (!cancelled) {
+          setGoogleEnabled(false);
+        }
+      }
+    }
+
+    loadProviders();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -650,28 +684,32 @@ export default function AuthPage() {
               </AnimatePresence>
 
               {/* Google */}
-              <motion.button
-                onClick={() => handleProviderSignIn("google")}
-                disabled={googleLoading}
-                className="w-full flex items-center justify-center gap-3 py-3.5 bg-white text-gray-900 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-gray-100 transition-all shadow-lg disabled:opacity-50 mb-4"
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <FaGoogle className="text-red-500 text-lg" />
-                Continue with Google
-              </motion.button>
+              {googleEnabled && (
+                <>
+                  <motion.button
+                    onClick={() => handleProviderSignIn("google")}
+                    disabled={googleLoading}
+                    className="w-full flex items-center justify-center gap-3 py-3.5 bg-white text-gray-900 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-gray-100 transition-all shadow-lg disabled:opacity-50 mb-4"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <FaGoogle className="text-red-500 text-lg" />
+                    Continue with Google
+                  </motion.button>
 
-              {/* OR divider */}
-              <div className="relative mb-5">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-800" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-gray-900/70 px-3 text-gray-600 text-[10px] font-bold uppercase tracking-widest">
-                    or
-                  </span>
-                </div>
-              </div>
+                  {/* OR divider */}
+                  <div className="relative mb-5">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-800" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-gray-900/70 px-3 text-gray-600 text-[10px] font-bold uppercase tracking-widest">
+                        or
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* Email/Password form */}
               <AnimatePresence mode="wait">
