@@ -79,9 +79,13 @@ const Header = () => {
   const { theme, themes, cycleTheme } = useTheme();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [authMode, setAuthMode] = useState(() =>
+    pathname === "/register" ? "register" : "login",
+  );
 
   const activeRole = session?.user?.activeRole || session?.user?.role;
   const hideDesktopSearch = pathname === "/login" || pathname === "/register" || pathname === "/role-select";
+  const onAuthScreen = pathname === "/login" || pathname === "/register";
 
   const navLinks =
     activeRole === "admin"   ? ADMIN_NAV :
@@ -104,6 +108,25 @@ const Header = () => {
 
   useEffect(() => {
     setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (pathname === "/register") {
+      setAuthMode("register");
+      return;
+    }
+
+    if (pathname !== "/login") {
+      setAuthMode("login");
+      return;
+    }
+
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const requestedMode = new URLSearchParams(window.location.search).get("mode");
+    setAuthMode(requestedMode === "register" ? "register" : "login");
   }, [pathname]);
 
   return (
@@ -224,18 +247,22 @@ const Header = () => {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className="px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] text-center font-bold text-gray-400 hover:text-white uppercase tracking-widest"
-                >
-                  LOGIN
-                </Link>
-                <Link
-                  href="/register"
-                  className="px-3 sm:px-5 py-2 text-[9px] sm:text-[10px] text-center font-black text-white bg-green-600 rounded-lg shadow-[0_0_12px_rgba(34,197,94,0.4)] uppercase tracking-widest"
-                >
-                  REGISTER
-                </Link>
+                {(!onAuthScreen || authMode !== "login") && (
+                  <Link
+                    href="/login"
+                    className="px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] text-center font-bold text-gray-400 hover:text-white uppercase tracking-widest"
+                  >
+                    LOGIN
+                  </Link>
+                )}
+                {(!onAuthScreen || authMode !== "register") && (
+                  <Link
+                    href="/register"
+                    className="px-3 sm:px-5 py-2 text-[9px] sm:text-[10px] text-center font-black text-white bg-green-600 rounded-lg shadow-[0_0_12px_rgba(34,197,94,0.4)] uppercase tracking-widest"
+                  >
+                    REGISTER
+                  </Link>
+                )}
               </div>
             )}
 
