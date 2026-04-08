@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { getPremierLeagueMatches } from "@/lib/sports/premierLeague";
 import { getFootballNewsFeed } from "@/lib/media/news";
+import { normalizePremierLeagueSeason } from "@/lib/sports/premierLeagueConfig";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const season = searchParams.get("season");
-    const matches = await getPremierLeagueMatches(season);
+    const { seasonYear } = normalizePremierLeagueSeason(searchParams.get("season"));
+    const matches = await getPremierLeagueMatches(seasonYear);
     const newsFeed = await getFootballNewsFeed({
       seasonLabel: matches.season.label,
     });

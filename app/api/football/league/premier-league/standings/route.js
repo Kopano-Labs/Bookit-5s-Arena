@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
 import { getPremierLeagueStandings } from "@/lib/sports/premierLeagueStandings";
+import {
+  normalizePremierLeagueSeason,
+  normalizePremierLeagueStandingsView,
+} from "@/lib/sports/premierLeagueConfig";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const season = searchParams.get("season");
-    const view = searchParams.get("view") || "overall";
-    const payload = await getPremierLeagueStandings(season, view);
+    const { seasonYear } = normalizePremierLeagueSeason(searchParams.get("season"));
+    const view = normalizePremierLeagueStandingsView(searchParams.get("view"));
+    const payload = await getPremierLeagueStandings(seasonYear, view);
 
     return NextResponse.json(payload);
   } catch (error) {

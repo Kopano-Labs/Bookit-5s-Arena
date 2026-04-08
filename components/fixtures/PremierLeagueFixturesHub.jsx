@@ -12,6 +12,7 @@ import {
   FaClock,
   FaExternalLinkAlt,
   FaNewspaper,
+  FaInfoCircle,
   FaTable,
   FaTimes,
   FaTrophy,
@@ -132,6 +133,44 @@ function EmptyTabState({ icon, title, description }) {
         </h3>
         <p className="text-sm leading-6 text-zinc-500">{description}</p>
       </div>
+    </div>
+  );
+}
+
+function ProviderBadge({ provider, fallbackLabel = "Source pending" }) {
+  const label = provider?.name || fallbackLabel;
+  const status = provider?.status || "unconfigured";
+  const styles = {
+    ok: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    fallback: "bg-violet-100 text-violet-700 border-violet-200",
+    degraded: "bg-amber-100 text-amber-700 border-amber-200",
+    "coming-soon": "bg-sky-100 text-sky-700 border-sky-200",
+    unconfigured: "bg-zinc-100 text-zinc-600 border-zinc-200",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${styles[status] || styles.unconfigured}`}
+    >
+      <FaBroadcastTower size={9} />
+      {label}
+    </span>
+  );
+}
+
+function InlineNotice({ tone = "info", children }) {
+  const styles = {
+    info: "border-sky-200 bg-sky-50 text-sky-700",
+    warning: "border-amber-200 bg-amber-50 text-amber-800",
+    error: "border-rose-200 bg-rose-50 text-rose-700",
+  };
+
+  return (
+    <div
+      className={`flex items-start gap-2 rounded-[20px] border px-4 py-3 text-sm ${styles[tone] || styles.info}`}
+    >
+      <FaInfoCircle className="mt-0.5 shrink-0" size={14} />
+      <div>{children}</div>
     </div>
   );
 }
@@ -509,6 +548,10 @@ export default function PremierLeagueFixturesHub() {
   const [teamAnalysis, setTeamAnalysis] = useState(null);
   const [teamLoadingId, setTeamLoadingId] = useState("");
   const [error, setError] = useState("");
+  const [newsError, setNewsError] = useState("");
+  const [standingsError, setStandingsError] = useState("");
+  const [statsError, setStatsError] = useState("");
+  const [teamError, setTeamError] = useState("");
 
   const formatRelativeTime = (value) => {
     if (!value) {
@@ -598,6 +641,9 @@ export default function PremierLeagueFixturesHub() {
 
     let cancelled = false;
     setLoading(true);
+    setError("");
+    setTeamAnalysis(null);
+    setTeamError("");
 
     async function loadMatches() {
       try {
@@ -620,7 +666,7 @@ export default function PremierLeagueFixturesHub() {
         }
       } catch (matchesError) {
         if (!cancelled) {
-          setError(matchesError.message);
+          setError(matchesError.message || "Failed to load matches.");
           setLoading(false);
         }
       }
@@ -640,6 +686,7 @@ export default function PremierLeagueFixturesHub() {
 
     let cancelled = false;
     setNewsLoading(true);
+    setNewsError("");
 
     async function loadNews() {
       try {
@@ -657,19 +704,27 @@ export default function PremierLeagueFixturesHub() {
 
         if (!cancelled) {
           setNewsPayload(payload);
+          setNewsError("");
           setNewsLoading(false);
         }
-      } catch {
+      } catch (loadError) {
         if (!cancelled) {
-          setNewsPayload({
-            season: matchesPayload?.season,
-            provider: {
-              articles: "rss-og-enrichment",
-              videos: "youtube-unavailable",
-            },
-            articles: [],
-            videos: [],
-          });
+          setNewsPayload((current) =>
+            current?.season?.year === Number(season)
+              ? current
+              : {
+                  season: matchesPayload?.season,
+                  provider: {
+                    articles: "rss-og-enrichment",
+                    videos: "youtube-unavailable",
+                    status: "degraded",
+                    name: "Feed fallback",
+                  },
+                  articles: [],
+                  videos: [],
+                },
+          );
+          setNewsError(loadError.message || "News feed is temporarily unavailable.");
           setNewsLoading(false);
         }
       }
@@ -689,6 +744,7 @@ export default function PremierLeagueFixturesHub() {
 
     let cancelled = false;
     setStandingsLoading(true);
+    setStandingsError("");
 
     async function loadStandings() {
       try {
@@ -706,17 +762,24 @@ export default function PremierLeagueFixturesHub() {
 
         if (!cancelled) {
           setStandingsPayload(payload);
+          setStandingsError("");
           setStandingsLoading(false);
         }
-      } catch {
+      } catch (loadError) {
         if (!cancelled) {
-          setStandingsPayload({
-            season: matchesPayload?.season,
-            view: activeStandingsView,
-            rows: [],
-            provider: { name: "standings-unavailable", status: "degraded" },
-            emptyState: "Standings are temporarily unavailable.",
-          });
+          setStandingsPayload((current) =>
+            current?.season?.year === Number(season) &&
+            current?.view === activeStandingsView
+              ? current
+              : {
+                  season: matchesPayload?.season,
+                  view: activeStandingsView,
+                  rows: [],
+                  provider: { name: "standings-unavailable", status: "degraded" },
+                  emptyState: "Standings are temporarily unavailable.",
+                },
+          );
+          setStandingsError(loadError.message || "Standings are temporarily unavailable.");
           setStandingsLoading(false);
         }
       }
@@ -752,6 +815,7 @@ export default function PremierLeagueFixturesHub() {
 
     let cancelled = false;
     setStatsLoading(true);
+    setStatsError("");
 
     async function loadStats() {
       try {
@@ -769,17 +833,24 @@ export default function PremierLeagueFixturesHub() {
 
         if (!cancelled) {
           setStatsPayload(payload);
+          setStatsError("");
           setStatsLoading(false);
         }
-      } catch {
+      } catch (loadError) {
         if (!cancelled) {
-          setStatsPayload({
-            season: matchesPayload?.season,
-            category: activeStatsCategory,
-            leaders: [],
-            provider: { name: "stats-unavailable", status: "degraded" },
-            emptyState: "Stats are temporarily unavailable.",
-          });
+          setStatsPayload((current) =>
+            current?.season?.year === Number(season) &&
+            current?.category === activeStatsCategory
+              ? current
+              : {
+                  season: matchesPayload?.season,
+                  category: activeStatsCategory,
+                  leaders: [],
+                  provider: { name: "stats-unavailable", status: "degraded" },
+                  emptyState: "Stats are temporarily unavailable.",
+                },
+          );
+          setStatsError(loadError.message || "Stats are temporarily unavailable.");
           setStatsLoading(false);
         }
       }
@@ -794,6 +865,7 @@ export default function PremierLeagueFixturesHub() {
 
   async function handleSelectTeam(teamId) {
     setTeamLoadingId(teamId);
+    setTeamError("");
 
     try {
       const response = await fetch(
@@ -809,8 +881,9 @@ export default function PremierLeagueFixturesHub() {
       }
 
       setTeamAnalysis(payload);
-    } catch {
+    } catch (loadError) {
       setTeamAnalysis(null);
+      setTeamError(loadError.message || "Team analysis is temporarily unavailable.");
     } finally {
       setTeamLoadingId("");
     }
@@ -843,10 +916,10 @@ export default function PremierLeagueFixturesHub() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-full bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-white/85">
-                  {meta?.provider?.name || "Provider pending"}
-                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="rounded-full bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-white/85">
+                    {meta?.provider?.name || "Provider pending"}
+                  </div>
                 <Link
                   href={meta?.arenaLink?.href || "/fixtures/arena"}
                   className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-violet-900 transition hover:bg-violet-50"
@@ -925,6 +998,7 @@ export default function PremierLeagueFixturesHub() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
                     <FaClock size={12} />
+                    <ProviderBadge provider={matchesPayload?.provider} fallbackLabel="Match data" />
                     <span>
                       {matchesPayload?.provider?.name === "iSports"
                         ? "Live data from iSports"
@@ -943,7 +1017,9 @@ export default function PremierLeagueFixturesHub() {
                     ))}
                   </div>
                 ) : error ? (
-                  <div className="px-6 py-10 text-center text-sm text-rose-600">{error}</div>
+                  <div className="px-6 py-8">
+                    <InlineNotice tone="error">{error}</InlineNotice>
+                  </div>
                 ) : matchesPayload?.groups?.length ? (
                   <div className="space-y-6 px-4 py-6 sm:px-8">
                     {matchesPayload.groups.map((group) => (
@@ -984,7 +1060,16 @@ export default function PremierLeagueFixturesHub() {
                       <h2 className="mt-2 text-2xl font-black text-zinc-950">
                         Live Premier League headlines
                       </h2>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <ProviderBadge provider={newsPayload?.provider} fallbackLabel="Editorial feed" />
+                      </div>
                     </div>
+
+                    {newsError && (
+                      <div className="px-6 pt-6">
+                        <InlineNotice tone="warning">{newsError}</InlineNotice>
+                      </div>
+                    )}
 
                     {newsLoading ? (
                       <div className="space-y-4 px-6 py-6">
@@ -1119,6 +1204,9 @@ export default function PremierLeagueFixturesHub() {
                           Drag the inner pills to reorder them, then click any team for analysis.
                         </p>
                       </div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <ProviderBadge provider={standingsPayload?.provider} fallbackLabel="League table" />
+                      </div>
                     </div>
 
                     <div className="border-b border-zinc-200 px-4 py-4 sm:px-6">
@@ -1144,6 +1232,12 @@ export default function PremierLeagueFixturesHub() {
                         ))}
                       </Reorder.Group>
                     </div>
+
+                    {standingsError && (
+                      <div className="px-6 pt-6">
+                        <InlineNotice tone="warning">{standingsError}</InlineNotice>
+                      </div>
+                    )}
 
                     {standingsLoading ? (
                       <div className="space-y-3 px-6 py-6">
@@ -1189,6 +1283,9 @@ export default function PremierLeagueFixturesHub() {
                           Swipe across categories on mobile to move between the live leaderboards.
                         </p>
                       </div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <ProviderBadge provider={statsPayload?.provider} fallbackLabel="Player leaders" />
+                      </div>
                     </div>
 
                     <div className="border-b border-zinc-200 px-4 py-4 sm:px-6">
@@ -1208,6 +1305,12 @@ export default function PremierLeagueFixturesHub() {
                         ))}
                       </div>
                     </div>
+
+                    {statsError && (
+                      <div className="px-6 pt-6">
+                        <InlineNotice tone="warning">{statsError}</InlineNotice>
+                      </div>
+                    )}
 
                     {statsLoading ? (
                       <div className="space-y-4 px-6 py-6">
@@ -1287,6 +1390,13 @@ export default function PremierLeagueFixturesHub() {
           </div>
         </section>
       </div>
+      {teamError && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
+          <div className="pointer-events-auto w-full max-w-xl">
+            <InlineNotice tone="error">{teamError}</InlineNotice>
+          </div>
+        </div>
+      )}
       <TeamAnalysisDrawer analysis={teamAnalysis} onClose={() => setTeamAnalysis(null)} />
     </div>
   );
