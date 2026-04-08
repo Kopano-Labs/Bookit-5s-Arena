@@ -4,6 +4,7 @@ import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Court from '@/models/Court';
 import { rateLimit } from '@/lib/rateLimit';
+import { verifyBotRequest } from '@/lib/security/botid';
 
 const toMinutes = (t) => {
   const [h, m] = t.split(':').map(Number);
@@ -13,6 +14,11 @@ const toMinutes = (t) => {
 // POST /api/bookings/guest — reserve without login (pay at venue)
 export async function POST(request) {
   try {
+    const botVerification = await verifyBotRequest();
+    if (botVerification.isBot) {
+      return NextResponse.json({ error: 'Automated guest reservations are blocked.' }, { status: 403 });
+    }
+
     const ip = request.headers.get('x-forwarded-for') || 'unknown';
     if (rateLimit(ip, 5, 60000)) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
@@ -115,7 +121,6 @@ export async function POST(request) {
 
     // Provide a cleaner user-facing message
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((e) => e.message);
       return NextResponse.json(
         { error: `Reservation could not be processed. Please try again or contact us via WhatsApp.` },
         { status: 400 }

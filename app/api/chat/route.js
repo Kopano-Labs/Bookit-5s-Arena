@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 //   3. Rule-based local engine (lib/supportAI.js — always works, no key needed)
 
 import { answerSupportQuestion } from '@/lib/supportAI';
+import { verifyBotRequest } from '@/lib/security/botid';
 
 const SYSTEM_PROMPT = `You are the friendly AI assistant for 5s Arena, a 5-a-side football venue in Cape Town, South Africa.
 
@@ -111,6 +112,11 @@ import { rateLimit } from '@/lib/rateLimit';
 
 // ── Route handler ─────────────────────────────────────────────────────────
 export async function POST(request) {
+  const botVerification = await verifyBotRequest();
+  if (botVerification.isBot) {
+    return Response.json({ error: 'Automated chat abuse is blocked.' }, { status: 403 });
+  }
+
   const ip =
     request.headers
       .get('x-forwarded-for')

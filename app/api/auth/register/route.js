@@ -4,10 +4,16 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { rateLimit } from '@/lib/rateLimit';
 import { getRecaptchaEnv } from '@/lib/config/env';
+import { verifyBotRequest } from '@/lib/security/botid';
 
 // POST /api/auth/register
 export async function POST(request) {
   try {
+    const botVerification = await verifyBotRequest();
+    if (botVerification.isBot) {
+      return NextResponse.json({ error: 'Automated registration attempts are blocked.' }, { status: 403 });
+    }
+
     const { secretKey: recaptchaSecretKey } = getRecaptchaEnv();
     const ip = request.headers.get('x-forwarded-for') || 'unknown';
     if (rateLimit(ip, 5, 60000)) {
