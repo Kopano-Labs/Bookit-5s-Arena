@@ -5,6 +5,41 @@ import { getAuthSession } from '@/lib/getSession';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 
+function detectImageExtension(buffer) {
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return 'jpg';
+  }
+
+  if (
+    buffer.length >= 8 &&
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47
+  ) {
+    return 'png';
+  }
+
+  if (
+    buffer.length >= 6 &&
+    buffer[0] === 0x47 &&
+    buffer[1] === 0x49 &&
+    buffer[2] === 0x46
+  ) {
+    return 'gif';
+  }
+
+  if (
+    buffer.length >= 12 &&
+    buffer.subarray(0, 4).toString('ascii') === 'RIFF' &&
+    buffer.subarray(8, 12).toString('ascii') === 'WEBP'
+  ) {
+    return 'webp';
+  }
+
+  return null;
+}
+
 export async function POST(request) {
   const session = await getAuthSession();
   if (!session) return Response.json({ error: 'Unauthorised' }, { status: 401 });
@@ -30,14 +65,18 @@ export async function POST(request) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const detectedExt = detectImageExtension(buffer);
+
+    if (!detectedExt) {
+      return Response.json({ error: 'The uploaded file is not a valid supported image.' }, { status: 400 });
+    }
 
     // Ensure upload directory exists
     const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'avatars');
     await mkdir(uploadDir, { recursive: true });
 
     // Use user ID as filename (one file per user, replaces previous)
-    const ext = file.type.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
-    const filename = `${session.user.id}.${ext}`;
+    const filename = `${session.user.id}.${detectedExt}`;
     await writeFile(path.join(uploadDir, filename), buffer);
 
     const imageUrl = `/uploads/avatars/${filename}`;

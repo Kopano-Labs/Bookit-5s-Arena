@@ -111,7 +111,11 @@ import { rateLimit } from '@/lib/rateLimit';
 
 // ── Route handler ─────────────────────────────────────────────────────────
 export async function POST(request) {
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
+  const ip =
+    request.headers
+      .get('x-forwarded-for')
+      ?.split(',')[0]
+      ?.trim() || 'unknown';
   if (rateLimit(ip, 10, 60000)) {
     return Response.json({ error: 'Too many requests. Please slow down.' }, { status: 429 });
   }
