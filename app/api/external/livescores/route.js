@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { fetchISportsLiveScores } from '@/lib/sports/isports';
 
 const API_FOOTBALL_BASE = 'https://v3.football.api-sports.io';
 const SPORTSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/3';
@@ -131,23 +132,30 @@ export async function GET(request) {
 
     let result;
 
-    // Try API-Football first if key is configured (real live data)
-    if (process.env.FOOTBALL_API_KEY) {
-      try {
-        const params = new URLSearchParams();
-        if (date) {
-          params.set('date', date);
-        } else {
-          params.set('live', 'all');
+    try {
+      const matches = await fetchISportsLiveScores({ date });
+      result = { matches, available: true, source: 'isports' };
+    } catch (iSportsError) {
+      console.warn('iSports failed, falling back to legacy providers:', iSportsError.message);
+
+      // Try API-Football first if key is configured (legacy compatibility)
+      if (process.env.FOOTBALL_API_KEY) {
+        try {
+          const params = new URLSearchParams();
+          if (date) {
+            params.set('date', date);
+          } else {
+            params.set('live', 'all');
+          }
+          result = await fetchFromApiFootball(params);
+        } catch (err) {
+          console.warn('API-Football failed, falling back to TheSportsDB:', err.message);
+          result = await fetchFromSportsDB(date);
         }
-        result = await fetchFromApiFootball(params);
-      } catch (err) {
-        console.warn('API-Football failed, falling back to TheSportsDB:', err.message);
+      } else {
+        // Free fallback — TheSportsDB (today's/date's matches, no key needed)
         result = await fetchFromSportsDB(date);
       }
-    } else {
-      // Free fallback — TheSportsDB (today's/date's matches, no key needed)
-      result = await fetchFromSportsDB(date);
     }
 
     // Cache the result

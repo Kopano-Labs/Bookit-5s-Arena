@@ -3,10 +3,12 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { rateLimit } from '@/lib/rateLimit';
+import { getRecaptchaEnv } from '@/lib/config/env';
 
 // POST /api/auth/register
 export async function POST(request) {
   try {
+    const { secretKey: recaptchaSecretKey } = getRecaptchaEnv();
     const ip = request.headers.get('x-forwarded-for') || 'unknown';
     if (rateLimit(ip, 5, 60000)) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
@@ -53,10 +55,10 @@ export async function POST(request) {
     // ── Verify Google reCAPTCHA token (server-side) ──────────────
     // Optional: if token provided, verify it. If not (ad-blocker), allow registration
     // since we have rate-limiting + security notice as fallback protection.
-    if (recaptchaToken) {
+    if (recaptchaToken && recaptchaSecretKey) {
       try {
         const recaptchaRes = await fetch(
-          `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+          `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${recaptchaToken}`,
           { method: 'POST' }
         );
         const recaptchaData = await recaptchaRes.json();

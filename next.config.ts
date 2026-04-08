@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Skip type-checking & linting during CI build for speed (run these locally)
   typescript: { ignoreBuildErrors: true },
+  env: {
+    NEXT_PUBLIC_RECAPTCHA_SITE_KEY:
+      process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
+      process.env.RECAPTCHA_SITE_KEY ||
+      "",
+  },
   // Prevent webpack from bundling native/binary packages
   serverExternalPackages: ["bcryptjs", "mongoose", "mongodb"],
 

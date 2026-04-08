@@ -153,24 +153,6 @@ function ParticleField() {
   );
 }
 
-// ─── Feature badge ───────────────────────────────────────────────────────────
-
-function FeatureBadge({ icon, text, delay }) {
-  return (
-    <motion.div
-      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-800/40 border border-gray-700/30 backdrop-blur-sm"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.5 }}
-    >
-      <span className="text-green-400">{icon}</span>
-      <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
-        {text}
-      </span>
-    </motion.div>
-  );
-}
-
 // ─── Security Notice Modal ────────────────────────────────────────────────────
 
 function SecurityNotice({ onAccept }) {
@@ -287,19 +269,31 @@ export default function AuthPage() {
 
   useEffect(() => {
     const requestedMode = new URLSearchParams(window.location.search).get("mode");
-    if (requestedMode === "register" || requestedMode === "login") {
+    if (requestedMode !== "register" && requestedMode !== "login") {
+      return undefined;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
       setMode(requestedMode);
       setError("");
-    }
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   useEffect(() => {
     const authError = new URLSearchParams(window.location.search).get("error");
-    if (authError === "google") {
+    if (authError !== "google") {
+      return undefined;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
       setError(
         "Google sign-in is unavailable right now. Use your email and password instead.",
       );
-    }
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   useEffect(() => {
@@ -328,7 +322,6 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (!recaptchaSiteKey) {
-      setRecaptchaAvailable(false);
       return;
     }
     // Detect if ReCAPTCHA script can load (ad-blockers block google.com/recaptcha)
