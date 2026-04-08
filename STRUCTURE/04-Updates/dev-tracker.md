@@ -2,13 +2,14 @@
 
 ## Recent Commits
 
+- `3bdc468` `homepage-csp-hero-polish`
+- `1fdba7a` `followup-external-access-blockers`
+- `7781658` `followup-newsletter-mongo-resilience`
+- `2b0eb74` `phase-14-obsidian-structure-and-ui-audit`
 - `245907a` `phase-13-whatsapp-osint-admin-review`
 - `a50416d` `phase-12-env-integrations-weather-search`
 - `8ef6b3d` `phase-11-botid-anti-bot-hardening`
 - `d13807e` `phase-10-security-hardening`
-- `72c0bb8` `phase-9-regenerate-court-images`
-- `22659bb` `phase-8-expanded-fixtures-home-polish`
-- `85ad333` `phase-7-responsive-popup-repairs`
 
 ## Verification Pattern Used
 
@@ -21,4 +22,6 @@
 
 - port `3002` is the normal dev port
 - `.next` should be cleared if Next dev starts surfacing manifest or stale build artifacts
-- `.next-dev-phase*.log` files document prior debugging runs
+- `.next-dev-phase*.log` files were only temporary local debugging artifacts and should not remain in the repo root once the debugging pass is complete
+- local Mongo auth is no longer blocked by SRV resolution, but it is still blocked if Atlas has not allowlisted the current machine IP
+- Google Search74 and WhatsApp OSINT provider wiring is in place, but live verification currently fails with `403` until the RapidAPI account has access to those APIs
