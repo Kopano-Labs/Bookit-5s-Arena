@@ -205,6 +205,22 @@ const AdminDashboard = () => {
                 <FaChartBar size={11} /> Analytics
               </Link>
             </motion.div>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                href="/admin/integrations"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-gray-400 bg-gray-800 border border-gray-700 rounded-xl hover:text-white hover:border-gray-600 transition-all uppercase tracking-widest"
+              >
+                <FaCogs size={11} /> Integrations
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                href="/admin/sandbox"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-cyan-300 bg-cyan-500/10 border border-cyan-500/20 rounded-xl hover:text-white hover:border-cyan-400 transition-all uppercase tracking-widest"
+              >
+                <FaShieldAlt size={11} /> Sandbox
+              </Link>
+            </motion.div>
           </div>
         </div>
 
