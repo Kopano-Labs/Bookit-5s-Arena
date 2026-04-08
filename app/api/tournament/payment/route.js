@@ -107,7 +107,7 @@ export async function POST(request) {
     await writeFile(filepath, buffer);
 
     // Update team record (already verified and connected above)
-    const team = await TournamentTeam.findOneAndUpdate(
+    await TournamentTeam.findOneAndUpdate(
       { teamName, managerEmail: managerEmail.toLowerCase() },
       {
         paymentScreenshot: filename,
@@ -167,7 +167,7 @@ export async function GET(request) {
       status: team.paymentStatus || "unpaid",
       message: messages[team.paymentStatus || "unpaid"],
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch status" },
       { status: 500 },

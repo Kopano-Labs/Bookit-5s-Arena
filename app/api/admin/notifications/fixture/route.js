@@ -2,8 +2,6 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Fixture from '@/models/Fixture';
-import TournamentTeam from '@/models/TournamentTeam';
-import LeagueTeam from '@/models/LeagueTeam';
 import League from '@/models/League';
 import { getAuthSession } from '@/lib/getSession';
 import { requireRole } from '@/lib/roles';
@@ -40,8 +38,6 @@ export async function POST(request) {
     if (groupLetter) fixtureFilter.groupLetter = groupLetter;
     if (type === 'schedule') fixtureFilter.status = 'scheduled';
     if (type === 'result') fixtureFilter.status = 'completed';
-
-    const TeamModel = competitionType === 'league' ? LeagueTeam : TournamentTeam;
 
     // Get competition name
     let competitionName = '5s Arena World Cup';
