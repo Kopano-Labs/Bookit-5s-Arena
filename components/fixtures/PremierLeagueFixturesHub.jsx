@@ -3,15 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Reorder } from "framer-motion";
 import {
   FaArrowRight,
   FaBroadcastTower,
+  FaChartBar,
   FaChevronRight,
   FaClock,
   FaExternalLinkAlt,
   FaNewspaper,
   FaTable,
+  FaTimes,
   FaTrophy,
 } from "react-icons/fa";
 
@@ -134,14 +136,284 @@ function EmptyTabState({ icon, title, description }) {
   );
 }
 
+const STANDINGS_VIEW_LABELS = {
+  overall: "Overall",
+  form: "Form",
+  home: "Home",
+  away: "Away",
+  goals: "Goals",
+};
+
+function FormDot({ result }) {
+  const styles = {
+    W: "bg-emerald-600 text-white",
+    D: "bg-zinc-400 text-white",
+    L: "bg-rose-600 text-white",
+  };
+
+  return (
+    <span
+      className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-black ${styles[result] || "bg-zinc-300 text-zinc-900"}`}
+    >
+      {result}
+    </span>
+  );
+}
+
+function StandingsTable({ rows, onSelectTeam, loadingTeamId }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full border-collapse">
+        <thead>
+          <tr className="border-b border-zinc-200 bg-zinc-50 text-left text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500">
+            <th className="px-4 py-4 sm:px-6">Team</th>
+            <th className="px-3 py-4 text-right">Pts</th>
+            <th className="px-3 py-4 text-right">MP</th>
+            <th className="px-3 py-4 text-right">W</th>
+            <th className="px-3 py-4 text-right">L</th>
+            <th className="px-3 py-4 text-right">D</th>
+            <th className="px-3 py-4 text-right">GF</th>
+            <th className="px-3 py-4 text-right">GA</th>
+            <th className="px-3 py-4 text-right">GD</th>
+            <th className="px-4 py-4 sm:px-6">Last 5</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr
+              key={row.teamId}
+              className="border-b border-zinc-200 transition hover:bg-violet-50/60"
+            >
+              <td className="px-4 py-4 sm:px-6">
+                <button
+                  onClick={() => onSelectTeam(row.teamId)}
+                  className="flex w-full items-center gap-3 text-left"
+                >
+                  <span className="w-7 text-sm font-black text-zinc-500">{row.rank}</span>
+                  <div className="relative h-9 w-9 shrink-0 rounded-full bg-white">
+                    <Image
+                      src={row.team.logo}
+                      alt={row.team.name}
+                      fill
+                      unoptimized
+                      className="object-contain p-1"
+                    />
+                  </div>
+                  <span className="truncate text-sm font-semibold text-zinc-950">
+                    {row.team.name}
+                  </span>
+                  {loadingTeamId === row.teamId && (
+                    <span className="text-xs font-bold uppercase tracking-[0.14em] text-violet-700">
+                      Loading
+                    </span>
+                  )}
+                </button>
+              </td>
+              <td className="px-3 py-4 text-right font-black text-zinc-950">{row.points}</td>
+              <td className="px-3 py-4 text-right text-sm text-zinc-700">{row.played}</td>
+              <td className="px-3 py-4 text-right text-sm text-zinc-700">{row.won}</td>
+              <td className="px-3 py-4 text-right text-sm text-zinc-700">{row.lost}</td>
+              <td className="px-3 py-4 text-right text-sm text-zinc-700">{row.draw}</td>
+              <td className="px-3 py-4 text-right text-sm text-zinc-700">{row.goalsFor}</td>
+              <td className="px-3 py-4 text-right text-sm text-zinc-700">{row.goalsAgainst}</td>
+              <td className="px-3 py-4 text-right text-sm text-zinc-700">{row.goalDifference}</td>
+              <td className="px-4 py-4 sm:px-6">
+                <div className="flex gap-1">
+                  {row.lastFive.map((item) => (
+                    <FormDot key={`${row.teamId}-${item.fixtureId}`} result={item.result} />
+                  ))}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function TeamAnalysisDrawer({ analysis, onClose }) {
+  if (!analysis) {
+    return null;
+  }
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-zinc-950/45 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.aside
+          initial={{ x: 420 }}
+          animate={{ x: 0 }}
+          exit={{ x: 420 }}
+          transition={{ type: "spring", stiffness: 260, damping: 28 }}
+          className="absolute right-0 top-0 h-full w-full max-w-xl overflow-y-auto bg-white shadow-2xl"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="flex items-start justify-between gap-4 border-b border-zinc-200 px-6 py-5">
+            <div className="flex items-center gap-4">
+              <div className="relative h-14 w-14 rounded-full bg-zinc-50">
+                <Image
+                  src={analysis.team.logo}
+                  alt={analysis.team.name}
+                  fill
+                  unoptimized
+                  className="object-contain p-2"
+                />
+              </div>
+              <div>
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">
+                  Team analysis
+                </div>
+                <h3 className="text-2xl font-black text-zinc-950">{analysis.team.name}</h3>
+                <p className="text-sm text-zinc-500">
+                  Rank {analysis.summary.rank} · {analysis.summary.points} points
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="rounded-full bg-zinc-100 p-2 text-zinc-600 transition hover:bg-zinc-200"
+            >
+              <FaTimes />
+            </button>
+          </div>
+
+          <div className="space-y-6 px-6 py-6">
+            <section className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-[22px] border border-zinc-200 bg-zinc-50 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Streak</div>
+                <div className="mt-2 text-sm font-semibold text-zinc-950">{analysis.summary.streak}</div>
+              </div>
+              <div className="rounded-[22px] border border-zinc-200 bg-zinc-50 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Goals</div>
+                <div className="mt-2 text-sm font-semibold text-zinc-950">
+                  {analysis.summary.goalsFor} scored · {analysis.summary.goalsAgainst} conceded
+                </div>
+              </div>
+              <div className="rounded-[22px] border border-zinc-200 bg-zinc-50 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Last 5</div>
+                <div className="mt-2 flex gap-1">
+                  {analysis.lastFive.map((item) => (
+                    <FormDot key={`${analysis.team.id}-${item.fixtureId}`} result={item.result} />
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[24px] border border-zinc-200 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Home split</div>
+                <div className="mt-3 space-y-2 text-sm text-zinc-700">
+                  <div>{analysis.home.points} pts from {analysis.home.played} matches</div>
+                  <div>{analysis.home.won}W · {analysis.home.draw}D · {analysis.home.lost}L</div>
+                  <div>{analysis.home.goalsFor}-{analysis.home.goalsAgainst} goals</div>
+                </div>
+              </div>
+              <div className="rounded-[24px] border border-zinc-200 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Away split</div>
+                <div className="mt-3 space-y-2 text-sm text-zinc-700">
+                  <div>{analysis.away.points} pts from {analysis.away.played} matches</div>
+                  <div>{analysis.away.won}W · {analysis.away.draw}D · {analysis.away.lost}L</div>
+                  <div>{analysis.away.goalsFor}-{analysis.away.goalsAgainst} goals</div>
+                </div>
+              </div>
+            </section>
+
+            <section className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[24px] border border-zinc-200 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Next fixtures</div>
+                <div className="mt-3 space-y-3">
+                  {analysis.nextFixtures.length ? analysis.nextFixtures.map((fixture) => (
+                    <div key={fixture.fixtureId} className="rounded-2xl bg-zinc-50 px-3 py-3 text-sm text-zinc-700">
+                      <div className="font-semibold text-zinc-950">
+                        {fixture.isHome ? "vs" : "at"} {fixture.opponent.name}
+                      </div>
+                      <div className="text-xs text-zinc-500">{fixture.dateLabel}</div>
+                    </div>
+                  )) : <div className="text-sm text-zinc-500">No upcoming fixtures in the current window.</div>}
+                </div>
+              </div>
+              <div className="rounded-[24px] border border-zinc-200 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Recent results</div>
+                <div className="mt-3 space-y-3">
+                  {analysis.recentResults.map((fixture) => (
+                    <div key={fixture.fixtureId} className="rounded-2xl bg-zinc-50 px-3 py-3 text-sm text-zinc-700">
+                      <div className="font-semibold text-zinc-950">
+                        {fixture.isHome ? "vs" : "at"} {fixture.opponent.name}
+                      </div>
+                      <div className="text-xs text-zinc-500">{fixture.dateLabel}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[24px] border border-zinc-200 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Related articles</div>
+                <div className="mt-3 space-y-3">
+                  {analysis.relatedArticles.length ? analysis.relatedArticles.map((article) => (
+                    <a
+                      key={article.url}
+                      href={article.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-2xl bg-zinc-50 px-3 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-violet-50"
+                    >
+                      {article.title}
+                    </a>
+                  )) : <div className="text-sm text-zinc-500">No team-specific articles were found in the current article window.</div>}
+                </div>
+              </div>
+              <div className="rounded-[24px] border border-zinc-200 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Related videos</div>
+                <div className="mt-3 space-y-3">
+                  {analysis.relatedVideos.length ? analysis.relatedVideos.map((video) => (
+                    <a
+                      key={video.id}
+                      href={video.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-2xl bg-zinc-50 px-3 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-violet-50"
+                    >
+                      {video.reactor?.name || video.channelName}: {video.title}
+                    </a>
+                  )) : <div className="text-sm text-zinc-500">YouTube enrichment is not available right now for this team.</div>}
+                </div>
+              </div>
+            </section>
+          </div>
+        </motion.aside>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 export default function PremierLeagueFixturesHub() {
   const [meta, setMeta] = useState(null);
   const [matchesPayload, setMatchesPayload] = useState(null);
   const [newsPayload, setNewsPayload] = useState(null);
+  const [standingsPayload, setStandingsPayload] = useState(null);
   const [activeTab, setActiveTab] = useState("matches");
   const [season, setSeason] = useState("");
   const [loading, setLoading] = useState(true);
   const [newsLoading, setNewsLoading] = useState(false);
+  const [standingsLoading, setStandingsLoading] = useState(false);
+  const [standingsViewOrder, setStandingsViewOrder] = useState([
+    "overall",
+    "form",
+    "home",
+    "away",
+    "goals",
+  ]);
+  const [activeStandingsView, setActiveStandingsView] = useState("overall");
+  const [teamAnalysis, setTeamAnalysis] = useState(null);
+  const [teamLoadingId, setTeamLoadingId] = useState("");
   const [error, setError] = useState("");
 
   const formatRelativeTime = (value) => {
@@ -197,6 +469,32 @@ export default function PremierLeagueFixturesHub() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const savedOrder = window.localStorage.getItem("pl-standings-view-order");
+    if (!savedOrder) {
+      return undefined;
+    }
+
+    try {
+      const parsed = JSON.parse(savedOrder);
+      if (!Array.isArray(parsed) || parsed.length !== 5) {
+        return undefined;
+      }
+
+      const frameId = window.requestAnimationFrame(() => {
+        setStandingsViewOrder(parsed);
+      });
+
+      return () => window.cancelAnimationFrame(frameId);
+    } catch {
+      return undefined;
+    }
   }, []);
 
   useEffect(() => {
@@ -289,6 +587,88 @@ export default function PremierLeagueFixturesHub() {
       cancelled = true;
     };
   }, [activeTab, season, newsPayload?.season?.year, matchesPayload?.season]);
+
+  useEffect(() => {
+    if (!season || activeTab !== "standings") {
+      return;
+    }
+
+    let cancelled = false;
+    setStandingsLoading(true);
+
+    async function loadStandings() {
+      try {
+        const response = await fetch(
+          `/api/football/league/premier-league/standings?season=${season}&view=${activeStandingsView}`,
+          {
+            cache: "no-store",
+          },
+        );
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || "Failed to load standings");
+        }
+
+        if (!cancelled) {
+          setStandingsPayload(payload);
+          setStandingsLoading(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setStandingsPayload({
+            season: matchesPayload?.season,
+            view: activeStandingsView,
+            rows: [],
+            provider: { name: "standings-unavailable", status: "degraded" },
+            emptyState: "Standings are temporarily unavailable.",
+          });
+          setStandingsLoading(false);
+        }
+      }
+    }
+
+    loadStandings();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, season, activeStandingsView, matchesPayload?.season]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(
+      "pl-standings-view-order",
+      JSON.stringify(standingsViewOrder),
+    );
+  }, [standingsViewOrder]);
+
+  async function handleSelectTeam(teamId) {
+    setTeamLoadingId(teamId);
+
+    try {
+      const response = await fetch(
+        `/api/football/league/premier-league/team/${teamId}?season=${season}`,
+        {
+          cache: "no-store",
+        },
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error || "Failed to load team analysis");
+      }
+
+      setTeamAnalysis(payload);
+    } catch {
+      setTeamAnalysis(null);
+    } finally {
+      setTeamLoadingId("");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#f6f3ff_0%,#f8f5ef_42%,#f5f5f5_100%)] px-4 py-8 sm:px-6 lg:px-8">
@@ -579,16 +959,78 @@ export default function PremierLeagueFixturesHub() {
               </motion.div>
             ) : activeTab === "standings" ? (
               <motion.div key="standings" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <EmptyTabState
-                  icon={<FaTable size={20} />}
-                  title="Standings tab queued for phase 3"
-                  description="This phase will add the interactive standings table, draggable view pills, and the team analysis drawer."
-                />
+                <div className="grid gap-6 bg-[#faf7f2] px-4 py-6 sm:px-8">
+                  <section className="overflow-hidden rounded-[28px] border border-zinc-200 bg-white">
+                    <div className="border-b border-zinc-200 px-6 py-5">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">
+                        Standings views
+                      </p>
+                      <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <h2 className="text-2xl font-black text-zinc-950">
+                          Rearrangeable league table
+                        </h2>
+                        <p className="text-sm text-zinc-500">
+                          Drag the inner pills to reorder them, then click any team for analysis.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="border-b border-zinc-200 px-4 py-4 sm:px-6">
+                      <Reorder.Group
+                        axis="x"
+                        values={standingsViewOrder}
+                        onReorder={setStandingsViewOrder}
+                        className="flex flex-wrap gap-3"
+                      >
+                        {standingsViewOrder.map((viewKey) => (
+                          <Reorder.Item
+                            key={viewKey}
+                            value={viewKey}
+                            className={`list-none rounded-full border px-4 py-2 text-sm font-bold cursor-grab ${
+                              activeStandingsView === viewKey
+                                ? "border-violet-900 bg-violet-900 text-white"
+                                : "border-zinc-200 bg-zinc-50 text-zinc-600"
+                            }`}
+                            onClick={() => setActiveStandingsView(viewKey)}
+                          >
+                            {STANDINGS_VIEW_LABELS[viewKey]}
+                          </Reorder.Item>
+                        ))}
+                      </Reorder.Group>
+                    </div>
+
+                    {standingsLoading ? (
+                      <div className="space-y-3 px-6 py-6">
+                        {Array.from({ length: 8 }).map((_, index) => (
+                          <div
+                            key={index}
+                            className="h-14 animate-pulse rounded-[20px] bg-zinc-100"
+                          />
+                        ))}
+                      </div>
+                    ) : standingsPayload?.rows?.length ? (
+                      <StandingsTable
+                        rows={standingsPayload.rows}
+                        onSelectTeam={handleSelectTeam}
+                        loadingTeamId={teamLoadingId}
+                      />
+                    ) : (
+                      <EmptyTabState
+                        icon={<FaTable size={20} />}
+                        title="Standings unavailable"
+                        description={
+                          standingsPayload?.emptyState ||
+                          "The standings engine is not returning data for this season selection yet."
+                        }
+                      />
+                    )}
+                  </section>
+                </div>
               </motion.div>
             ) : (
               <motion.div key="stats" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <EmptyTabState
-                  icon={<FaBroadcastTower size={20} />}
+                  icon={<FaChartBar size={20} />}
                   title="Stats tab queued for phase 4"
                   description="This phase will add the leaderboard categories for goals, assists, yellow cards, and red cards."
                 />
@@ -638,6 +1080,7 @@ export default function PremierLeagueFixturesHub() {
           </div>
         </section>
       </div>
+      <TeamAnalysisDrawer analysis={teamAnalysis} onClose={() => setTeamAnalysis(null)} />
     </div>
   );
 }
