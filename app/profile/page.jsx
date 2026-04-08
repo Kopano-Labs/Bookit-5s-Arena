@@ -112,6 +112,16 @@ const ProfilePage = () => {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const fileInputRef = useRef(null);
+  const oneDriveClientId =
+    typeof process.env.NEXT_PUBLIC_ONEDRIVE_CLIENT_ID === "string"
+      ? process.env.NEXT_PUBLIC_ONEDRIVE_CLIENT_ID.trim()
+      : "";
+  const googleDriveClientId =
+    typeof process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID === "string"
+      ? process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID.trim()
+      : "";
+  const oneDriveUploadAvailable = Boolean(oneDriveClientId);
+  const googleDriveUploadAvailable = Boolean(googleDriveClientId);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -244,14 +254,17 @@ const ProfilePage = () => {
 
   // OAuth popup helpers for OneDrive/Google Drive
   const handleOneDriveUpload = async () => {
+    if (!oneDriveUploadAvailable) {
+      setError("OneDrive upload is not configured for this environment yet.");
+      return;
+    }
+
     setUploadLoading(true);
     setError("");
     try {
-      // Construct OneDrive OAuth URL (placeholder client_id and redirect_uri)
-      const clientId = "YOUR_ONEDRIVE_CLIENT_ID";
       const redirectUri = encodeURIComponent(window.location.origin + "/api/profile/onedrive-callback");
       const scope = encodeURIComponent("files.readwrite offline_access");
-      const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}`;
+      const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${oneDriveClientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}`;
       window.open(authUrl, "onedrive-oauth", "width=500,height=700");
       setSuccess("OneDrive OAuth popup opened. Complete authentication to continue.");
     } catch {
@@ -262,14 +275,17 @@ const ProfilePage = () => {
   };
 
   const handleGoogleDriveUpload = async () => {
+    if (!googleDriveUploadAvailable) {
+      setError("Google Drive upload is not configured for this environment yet.");
+      return;
+    }
+
     setUploadLoading(true);
     setError("");
     try {
-      // Construct Google Drive OAuth URL (placeholder client_id and redirect_uri)
-      const clientId = "YOUR_GOOGLE_CLIENT_ID";
       const redirectUri = encodeURIComponent(window.location.origin + "/api/profile/googledrive-callback");
       const scope = encodeURIComponent("https://www.googleapis.com/auth/drive.file");
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&access_type=offline&prompt=consent`;
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleDriveClientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&access_type=offline&prompt=consent`;
       window.open(authUrl, "googledrive-oauth", "width=500,height=700");
       setSuccess("Google Drive OAuth popup opened. Complete authentication to continue.");
     } catch {
@@ -458,7 +474,12 @@ const ProfilePage = () => {
                       </button>
                       <button
                         type="button"
-                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all"
+                        disabled={!oneDriveUploadAvailable}
+                        className={`w-full flex items-center gap-2 px-4 py-3 text-sm transition-all ${
+                          oneDriveUploadAvailable
+                            ? "text-white hover:bg-gray-800"
+                            : "cursor-not-allowed text-gray-600"
+                        }`}
                         onClick={async () => {
                           setShowAvatarMenu(false);
                           await handleOneDriveUpload();
@@ -468,7 +489,12 @@ const ProfilePage = () => {
                       </button>
                       <button
                         type="button"
-                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all rounded-b-xl"
+                        disabled={!googleDriveUploadAvailable}
+                        className={`w-full flex items-center gap-2 px-4 py-3 text-sm transition-all rounded-b-xl ${
+                          googleDriveUploadAvailable
+                            ? "text-white hover:bg-gray-800"
+                            : "cursor-not-allowed text-gray-600"
+                        }`}
                         onClick={async () => {
                           setShowAvatarMenu(false);
                           await handleGoogleDriveUpload();
