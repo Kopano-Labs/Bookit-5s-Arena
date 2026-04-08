@@ -2,7 +2,7 @@
 
 ## Overall
 
-Status: `handoff-ready with known follow-up items`
+Status: `handoff-ready with active post-phase follow-ups recorded`
 
 The product is materially ahead of the starting point:
 
@@ -10,7 +10,8 @@ The product is materially ahead of the starting point:
 - local fixtures were upgraded
 - integrations are visible and operable from admin
 - security posture is stronger
-- the final repository handoff structure now exists
+- the repository handoff structure now exists
+- post-handoff resilience and homepage polish work has also been integrated
 
 ## What Is Stable
 
@@ -20,12 +21,15 @@ The product is materially ahead of the starting point:
 - admin sandbox exists
 - provider health aggregation exists
 - BotID is active on abuse-prone endpoints
+- newsletter popup subscribe path now has a local fallback when Mongo is unavailable
+- homepage and `/api/courts` stay usable with seeded fallback court data during local Mongo outages
+- homepage hero/header/CSP and local Leaflet asset loading were cleaned up after the first handoff pass
 
 ## What Still Needs Follow-up
 
 - intermittent `/` local dev manifest glitch
-- home page court fetch still depends on external Mongo connectivity
+- authenticated local manager/admin QA still depends on Atlas allowing this machine IP
 - guest `/bookings/success` redirect behavior needs product review
-- newsletter popup subscription route needs a dedicated QA pass
-- WhatsApp OSINT needs its own key before it becomes active
-- Google Search74 needs a dedicated key in active envs to become effective beyond code wiring
+- WhatsApp OSINT now resolves env aliases correctly, but current RapidAPI access still returns `403`
+- Google Search74 now resolves env aliases correctly, but current RapidAPI access still returns `403`
+- root-level local debug log files should be deleted after investigation runs so the workspace stays clean

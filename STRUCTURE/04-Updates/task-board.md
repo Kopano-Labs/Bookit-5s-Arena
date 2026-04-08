@@ -18,8 +18,17 @@
 
 ## Follow-up Queue
 
-- [ ] add a dedicated RapidAPI key for `WHATSAPP_OSINT_API_KEY`
-- [ ] add a dedicated RapidAPI key for `GOOGLE_SEARCH74_API_KEY`
-- [ ] verify newsletter popup subscription write flow
-- [ ] run an authenticated manager/admin mutation QA pass with seeded data
+- [x] verify newsletter popup subscription write flow
+- [x] harden newsletter subscriptions for local Mongo outages
+- [x] harden MongoDB connection fallback from SRV to direct Atlas path
+- [x] clean homepage hero/header/theme/CSP production polish issues
+- [ ] add Atlas allowlist access for the current dev machine so authenticated local QA can run
+- [ ] run a full authenticated manager/admin mutation QA pass with seeded data
+- [ ] activate RapidAPI access/subscription for `whatsapp-osint`
+- [ ] activate RapidAPI access/subscription for `google-search74`
 - [ ] resolve the intermittent home-page dev manifest error on first compile
+
+## Repository Hygiene
+
+- [x] `.next-dev*.log` files are ignored by git
+- [ ] keep repo root free of leftover local debug logs after each debugging session

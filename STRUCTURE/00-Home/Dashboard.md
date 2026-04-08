@@ -12,11 +12,11 @@ This `STRUCTURE/` folder is the project handoff vault for Bookit 5s Arena. It mi
 
 ## Current Rollout State
 
-- Core rollout phases `0` through `13` are complete.
+- Core rollout phases `0` through `14` are complete.
 - The public Premier League hub is live in the codebase under `/fixtures`.
 - Admin-only sandbox and integrations surfaces are implemented.
 - Security hardening and BotID protections are in place.
-- The final remaining deliverable is this audit and handoff structure itself.
+- The handoff vault exists, but follow-up commits after the initial audit have materially changed the live state and must be read before any new work starts.
 
 ## Start Here
 
@@ -42,9 +42,18 @@ This `STRUCTURE/` folder is the project handoff vault for Bookit 5s Arena. It mi
 - `8ef6b3d` `phase-11-botid-anti-bot-hardening`
 - `a50416d` `phase-12-env-integrations-weather-search`
 - `245907a` `phase-13-whatsapp-osint-admin-review`
+- `2b0eb74` `phase-14-obsidian-structure-and-ui-audit`
+
+## Post-Phase Follow-up Commits
+
+- `7781658` `followup-newsletter-mongo-resilience`
+- `1fdba7a` `followup-external-access-blockers`
+- `3bdc468` `homepage-csp-hero-polish`
 
 ## High-Signal Current Notes
 
-- Local dev on `/` can intermittently hit a Next dev client-manifest bundler bug on first compile, then recover on refresh.
-- The home page court query still depends on MongoDB availability; when Atlas DNS or network access fails, the server logs the error and court data falls back to empty.
-- `api/newsletter` still needs a follow-up audit because the popup subscription flow and admin newsletter flows were not the focus of the final phases.
+- `STRUCTURE/` is the right place for the next engineer to start, but older notes that stopped at Phase 14 have now been refreshed to include the follow-up work.
+- Homepage hero, header theme control, Leaflet asset loading, and CSP were all revised after the initial handoff audit.
+- Newsletter subscriptions now degrade to a local fallback store when MongoDB is unavailable locally.
+- MongoDB connection logic now auto-derives a direct Atlas connection path when SRV resolution fails, but authenticated local QA is still blocked if Atlas rejects the current machine IP.
+- Google Search74 and WhatsApp OSINT are wired in code, but current RapidAPI access still returns `403` until the account has the correct API subscriptions/access.
