@@ -45,5 +45,6 @@ MONGODB_URI passkey.txt
 stripe.exe
 
 *.txt
+.next-dev*.log
 
 .env*.local
