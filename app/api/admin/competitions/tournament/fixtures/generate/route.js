@@ -13,7 +13,7 @@ import sseEmitter from '@/lib/sseEmitter';
  * Assigns teams to groups and creates all group-stage fixtures
  * WARNING: This will overwrite existing group assignments and fixtures
  */
-export async function POST(request) {
+export async function POST() {
   try {
     const session = await getAuthSession();
     if (!requireRole(session, 'admin')) {

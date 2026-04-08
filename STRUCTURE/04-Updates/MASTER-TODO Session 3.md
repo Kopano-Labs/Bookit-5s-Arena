@@ -27,6 +27,7 @@
 - [x] fix court detail fallback so seeded courts still open when Mongo is unavailable
 - [x] fix `GiscusComments` env-readiness bug that was breaking linted builds
 - [x] reduce a safe subset of warning backlog outside the overlapping Codex App lane
+- [x] complete a second safe warning-reduction batch across untouched API/form utility files
 - [ ] keep ownership lanes current while parallel work is active
 - [ ] update this board after each safe session checkpoint
 
@@ -104,6 +105,7 @@ Next:
 - [x] confirm the booking/court change set passes targeted eslint with no warnings
 - [x] confirm court detail routes can fall back to seeded local court data during Mongo outages
 - [x] confirm the latest safe-lane warning-reduction files pass targeted eslint cleanly
+- [x] confirm the second safe-lane warning batch reduced the combined lint report to `56` warnings
 - [ ] reduce existing lint warning backlog now that `next build` is linting again
 - [ ] full authenticated manager mutation sweep
 - [ ] full authenticated admin mutation sweep
@@ -132,6 +134,7 @@ Next:
 - [x] court media refresh and hourly booking pass implemented
 - [x] fallback court detail route support added for local/offline data mode
 - [x] safe-lane warning cleanup checkpoint added
+- [x] second safe-lane warning cleanup checkpoint added
 - [ ] ownership board reconciled with Codex App output
 - [ ] reward lane resumed safely
 - [ ] merge/review checkpoint logged
