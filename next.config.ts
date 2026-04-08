@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "media-2.api-sports.io" },
       { protocol: "https", hostname: "media-3.api-sports.io" },
       { protocol: "https", hostname: "media-4.api-sports.io" },
+      { protocol: "https", hostname: "resources.premierleague.com" },
     ],
   },
 
