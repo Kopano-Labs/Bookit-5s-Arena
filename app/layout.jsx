@@ -9,6 +9,7 @@ import ClientOnly from "@/components/ClientOnly";
 import PageTransition from "@/components/PageTransition";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { FeatureAccessProvider } from "@/hooks/useFeatureAccess";
+import { Analytics } from "@vercel/analytics/react";
 import "../assets/styles/globals.css";
 
 const SITE_URL =
@@ -76,14 +77,40 @@ const RootLayout = ({ children }) => {
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/icons/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="512x512"
+          href="/icons/icon-512x512.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="192x192"
+          href="/icons/icon-192x192.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/icons/favicon-32x32.png"
+        />
         <link rel="shortcut icon" href="/icons/favicon-32x32.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap" rel="stylesheet" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap"
+          rel="stylesheet"
+        />
         {/* Plausible Analytics — Lightweight & Privacy-focused */}
         <script
           defer
@@ -92,28 +119,29 @@ const RootLayout = ({ children }) => {
         ></script>
       </head>
       <body
-        className="bg-gray-950 text-white antialiased selection:bg-green-500/30 overflow-x-hidden"
+        className="overflow-x-hidden bg-gray-950 text-white antialiased selection:bg-green-500/30"
         suppressHydrationWarning
       >
         <AuthProvider>
           <FeatureAccessProvider>
-          <ThemeProvider>
-            <AnalyticsTracker />
-            <ClientOnly />
-            <Header />
-            <main>
-              <PageTransition>{children}</PageTransition>
-            </main>
-            <Footer />
-            {/* Fixed floating elements */}
-            <ScrollToTop />
-            <SoccerBallMenu />
-            <BottomNavbar />
-            <NewsletterPopup />
-            <CookieBanner />
-          </ThemeProvider>
+            <ThemeProvider>
+              <AnalyticsTracker />
+              <ClientOnly />
+              <Header />
+              <main>
+                <PageTransition>{children}</PageTransition>
+              </main>
+              <Footer />
+              {/* Fixed floating elements */}
+              <ScrollToTop />
+              <SoccerBallMenu />
+              <BottomNavbar />
+              <NewsletterPopup />
+              <CookieBanner />
+            </ThemeProvider>
           </FeatureAccessProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
