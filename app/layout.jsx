@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import AuthProvider from "@/components/AuthProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -114,6 +115,7 @@ const RootLayout = ({ children }) => {
           </ThemeProvider>
           </FeatureAccessProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
