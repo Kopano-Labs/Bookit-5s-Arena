@@ -4,6 +4,7 @@ import { getAuthSession } from '@/lib/getSession';
 import { requireRole } from '@/lib/roles';
 import connectDB from '@/lib/mongodb';
 import EventBooking from '@/models/EventBooking';
+import { verifyBotRequest } from '@/lib/security/botid';
 
 // GET /api/events — list all event bookings (admin only)
 export async function GET() {
@@ -33,6 +34,11 @@ export async function GET() {
 // POST /api/events — create an event booking request (auth optional)
 export async function POST(request) {
   try {
+    const botVerification = await verifyBotRequest();
+    if (botVerification.isBot) {
+      return NextResponse.json({ error: 'Automated event booking requests are blocked.' }, { status: 403 });
+    }
+
     const body = await request.json();
     const { type, packageName, contactName, contactEmail, contactPhone, preferredDate, preferredTime, guestCount, message } = body;
 

@@ -6,6 +6,7 @@ import Booking from '@/models/Booking';
 import Court from '@/models/Court';
 import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
 import { rateLimit } from '@/lib/rateLimit';
+import { verifyBotRequest } from '@/lib/security/botid';
 
 // GET /api/bookings — get all bookings for the logged-in user
 export async function GET() {
@@ -34,6 +35,11 @@ export async function GET() {
 // POST /api/bookings — create a new booking
 export async function POST(request) {
   try {
+    const botVerification = await verifyBotRequest();
+    if (botVerification.isBot) {
+      return NextResponse.json({ error: 'Automated booking attempts are blocked.' }, { status: 403 });
+    }
+
     // Rate limit: max 10 booking attempts per minute per IP
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     if (rateLimit(ip, 10, 60000)) {

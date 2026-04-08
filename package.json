@@ -14,6 +14,7 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/sandbox": "^1.9.3",
     "bcryptjs": "^3.0.3",
+    "botid": "^1.5.11",
     "dotenv": "^17.3.1",
     "eslint-plugin-react": "^7.37.5",
     "framer-motion": "^12.38.0",
