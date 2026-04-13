@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { withBotId } from "botid/next/config";
 
 const nextConfig: NextConfig = {
+  compress: true,
   // Skip type-checking & linting during CI build for speed (run these locally)
   typescript: { ignoreBuildErrors: true },
   env: {
