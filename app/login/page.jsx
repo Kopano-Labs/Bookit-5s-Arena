@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { getProviders, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { getProviders, signIn, useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
 import {
@@ -21,6 +21,7 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { defaultActiveRole } from "@/lib/roles";
 
 // ─── Animated background (no footballs — geometric particles + scanning lines) ─
 
@@ -242,7 +243,9 @@ function SecurityNotice({ onAccept }) {
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function AuthPage() {
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const recaptchaRef = useRef(null);
   const recaptchaSiteKey =
     typeof process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY === "string"
@@ -266,6 +269,27 @@ export default function AuthPage() {
     Boolean(recaptchaSiteKey),
   );
   const [rememberMe, setRememberMe] = useState(true);
+
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.user) {
+      return;
+    }
+
+    const callbackUrl = searchParams.get("callbackUrl");
+    const activeRole = defaultActiveRole(
+      session.user.email,
+      session.user.roles || [session.user.activeRole || session.user.role || "user"],
+    );
+    const fallbackPath =
+      callbackUrl ||
+      (activeRole === "admin"
+        ? "/admin/dashboard"
+        : activeRole === "manager"
+          ? "/manager/dashboard"
+          : "/");
+
+    router.replace(fallbackPath);
+  }, [router, searchParams, session, status]);
 
   useEffect(() => {
     const requestedMode = new URLSearchParams(window.location.search).get("mode");
@@ -446,6 +470,14 @@ export default function AuthPage() {
         ? "border-green-600/50 bg-gray-800/60"
         : "border-gray-700/40"
     }`;
+
+  if (status === "authenticated") {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden bg-gray-950">

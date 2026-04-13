@@ -24,7 +24,7 @@ import {
   FaTrophy,
   FaUpload,
 } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useFeatureAccess } from "@/hooks/useFeatureAccess";
 
@@ -51,6 +51,60 @@ const AdminDashboard = () => {
   const [verifying, setVerifying] = useState(null);
   const [pdfModal, setPdfModal] = useState(null); // { url, teamName }
   const canGodMode = useFeatureAccess('admin.dashboard.godmode');
+
+  // God-mode panel/modal states
+  const [showGhostLog, setShowGhostLog] = useState(false);
+  const [showFlags, setShowFlags] = useState(false);
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [showBanhammer, setShowBanhammer] = useState(false);
+  const [broadcastMsg, setBroadcastMsg] = useState("");
+  const [banEmail, setBanEmail] = useState("");
+  const [banStatus, setBanStatus] = useState(null); // null | "banned" | "active"
+
+  // Mock data for Ghost Log
+  // TODO: Replace with fetch from /api/admin/audit-log
+  const mockAuditLog = [
+    { action: "Role changed", user: "test@email.com", by: "admin", timestamp: "2026-04-12 10:30" },
+    { action: "User banned", user: "spammer@fake.com", by: "admin", timestamp: "2026-04-12 09:15" },
+    { action: "Feature flag toggled", user: "maintenance_mode", by: "admin", timestamp: "2026-04-11 22:00" },
+    { action: "Broadcast sent", user: "all_users", by: "admin", timestamp: "2026-04-11 18:45" },
+    { action: "Booking cancelled", user: "player@mail.com", by: "admin", timestamp: "2026-04-11 14:20" },
+  ];
+
+  // Mock feature flags
+  // TODO: Replace with fetch/PUT to /api/admin/feature-flags
+  const [featureFlags, setFeatureFlags] = useState([
+    { key: "maintenance_mode", label: "Maintenance Mode", enabled: false },
+    { key: "tournament_registration", label: "Tournament Registration", enabled: true },
+    { key: "stripe_payments", label: "Stripe Payments", enabled: true },
+    { key: "guest_booking", label: "Guest Booking", enabled: true },
+    { key: "rewards_system", label: "Rewards System", enabled: false },
+  ]);
+
+  const toggleFlag = (key) => {
+    // TODO: POST to /api/admin/feature-flags with { key, enabled }
+    setFeatureFlags((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, enabled: !f.enabled } : f))
+    );
+  };
+
+  const handleBroadcast = () => {
+    // TODO: POST to /api/admin/broadcast with { message: broadcastMsg }
+    alert(`Broadcast sent: "${broadcastMsg}"`);
+    setBroadcastMsg("");
+    setShowBroadcast(false);
+  };
+
+  const handleBanSearch = () => {
+    // TODO: GET /api/admin/users/ban?email=banEmail to check status
+    // Mock: toggle between states
+    setBanStatus(banStatus === "banned" ? "active" : "banned");
+  };
+
+  const handleBanToggle = () => {
+    // TODO: POST to /api/admin/users/ban with { email: banEmail, action: banStatus === "banned" ? "unban" : "ban" }
+    setBanStatus(banStatus === "banned" ? "active" : "banned");
+  };
 
   const fetchStats = useCallback(
     (params) => {
@@ -319,25 +373,25 @@ const AdminDashboard = () => {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
             <div className="grid grid-cols-2 gap-3">
-              <button className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-red-500 rounded-2xl transition-all group">
+              <button onClick={() => setShowGhostLog(true)} className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-purple-500 rounded-2xl transition-all group">
                 <FaUserSecret className="text-2xl text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-black text-white uppercase tracking-widest">
                   Ghost Log
                 </span>
               </button>
-              <button className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-blue-500 rounded-2xl transition-all group">
+              <button onClick={() => setShowFlags(!showFlags)} className="relative flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-blue-500 rounded-2xl transition-all group">
                 <FaCogs className="text-2xl text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-black text-white uppercase tracking-widest">
                   Flags
                 </span>
               </button>
-              <button className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-yellow-500 rounded-2xl transition-all group">
+              <button onClick={() => setShowBroadcast(true)} className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-yellow-500 rounded-2xl transition-all group">
                 <FaBullhorn className="text-2xl text-yellow-500 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-black text-white uppercase tracking-widest">
                   Broadcast
                 </span>
               </button>
-              <button className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-red-600 rounded-2xl transition-all group">
+              <button onClick={() => setShowBanhammer(true)} className="flex flex-col items-center justify-center p-5 bg-gray-900/80 border border-gray-800 hover:border-red-600 rounded-2xl transition-all group">
                 <FaBan className="text-2xl text-red-600 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-black text-white uppercase tracking-widest">
                   Banhammer
@@ -345,15 +399,194 @@ const AdminDashboard = () => {
               </button>
             </div>
             <div className="lg:col-span-2 bg-gray-950 border border-gray-800 rounded-2xl p-4 flex flex-col gap-3">
-              <textarea
-                placeholder="Global notify..."
-                className="flex-1 bg-transparent text-gray-300 text-xs font-mono outline-none resize-none placeholder:text-gray-700"
-              />
-              <button className="px-6 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500 transition-all">
-                Execute Dispatch
-              </button>
+              {/* Flags dropdown panel */}
+              <AnimatePresence>
+                {showFlags && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Feature Flags</span>
+                      <button onClick={() => setShowFlags(false)} className="text-gray-500 hover:text-white"><FaTimes size={12} /></button>
+                    </div>
+                    {featureFlags.map((flag) => (
+                      <div key={flag.key} className="flex items-center justify-between bg-gray-900/60 border border-gray-800 rounded-xl px-4 py-2.5">
+                        <span className="text-xs text-gray-300 font-semibold">{flag.label}</span>
+                        <button
+                          onClick={() => toggleFlag(flag.key)}
+                          className={`w-10 h-5 rounded-full relative transition-colors ${flag.enabled ? "bg-green-600" : "bg-gray-700"}`}
+                        >
+                          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${flag.enabled ? "left-5" : "left-0.5"}`} />
+                        </button>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {!showFlags && (
+                <div className="flex-1 flex flex-col justify-center items-center gap-3 py-4">
+                  <p className="text-gray-600 text-xs font-mono">System ready. Select a command or dispatch.</p>
+                  <button
+                    onClick={() => router.push("/admin/sandbox")}
+                    className="px-6 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500 transition-all"
+                  >
+                    Execute Dispatch
+                  </button>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* ── GOD-MODE MODALS ── */}
+
+          {/* Ghost Log — slide-out panel */}
+          <AnimatePresence>
+            {showGhostLog && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/60 z-40"
+                  onClick={() => setShowGhostLog(false)}
+                />
+                <motion.div
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 250 }}
+                  className="fixed right-0 top-0 h-full w-full max-w-md bg-gray-950 border-l border-gray-800 z-50 p-6 overflow-y-auto"
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-sm font-black text-purple-400 uppercase tracking-widest">Ghost Log</h3>
+                    <button onClick={() => setShowGhostLog(false)} className="text-gray-500 hover:text-white"><FaTimes size={16} /></button>
+                  </div>
+                  {/* TODO: Fetch from /api/admin/audit-log */}
+                  <div className="space-y-3">
+                    {mockAuditLog.map((entry, i) => (
+                      <div key={i} className="bg-gray-900/80 border border-gray-800 rounded-2xl p-4">
+                        <p className="text-xs font-bold text-white">{entry.action}</p>
+                        <p className="text-[10px] text-gray-500 mt-1">User: {entry.user}</p>
+                        <p className="text-[10px] text-gray-600">By: {entry.by} &middot; {entry.timestamp}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* Broadcast modal */}
+          <AnimatePresence>
+            {showBroadcast && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/60 z-40"
+                  onClick={() => setShowBroadcast(false)}
+                />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                >
+                  <div className="bg-gray-950 border border-gray-800 rounded-2xl p-6 w-full max-w-lg shadow-2xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest">Broadcast</h3>
+                      <button onClick={() => setShowBroadcast(false)} className="text-gray-500 hover:text-white"><FaTimes size={16} /></button>
+                    </div>
+                    <textarea
+                      value={broadcastMsg}
+                      onChange={(e) => setBroadcastMsg(e.target.value)}
+                      placeholder="Type your announcement..."
+                      rows={4}
+                      className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none placeholder:text-gray-700 font-mono"
+                    />
+                    {/* TODO: POST to /api/admin/broadcast */}
+                    <button
+                      onClick={handleBroadcast}
+                      disabled={!broadcastMsg.trim()}
+                      className="mt-4 w-full px-6 py-2.5 bg-yellow-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-yellow-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Send to All
+                    </button>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* Banhammer modal */}
+          <AnimatePresence>
+            {showBanhammer && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/60 z-40"
+                  onClick={() => setShowBanhammer(false)}
+                />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                >
+                  <div className="bg-gray-950 border border-gray-800 rounded-2xl p-6 w-full max-w-lg shadow-2xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-black text-red-500 uppercase tracking-widest">Banhammer</h3>
+                      <button onClick={() => { setShowBanhammer(false); setBanEmail(""); setBanStatus(null); }} className="text-gray-500 hover:text-white"><FaTimes size={16} /></button>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        value={banEmail}
+                        onChange={(e) => { setBanEmail(e.target.value); setBanStatus(null); }}
+                        placeholder="user@email.com"
+                        className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent placeholder:text-gray-700"
+                      />
+                      {/* TODO: GET /api/admin/users/ban?email=... */}
+                      <button
+                        onClick={handleBanSearch}
+                        disabled={!banEmail.trim()}
+                        className="px-4 py-2.5 bg-gray-800 border border-gray-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:border-gray-600 transition-all disabled:opacity-40"
+                      >
+                        Search
+                      </button>
+                    </div>
+                    {banStatus && (
+                      <div className="mt-4 bg-gray-900/80 border border-gray-800 rounded-xl p-4 flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-bold text-white">{banEmail}</p>
+                          <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${banStatus === "banned" ? "text-red-400" : "text-green-400"}`}>
+                            Status: {banStatus}
+                          </p>
+                        </div>
+                        {/* TODO: POST to /api/admin/users/ban */}
+                        <button
+                          onClick={handleBanToggle}
+                          className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+                            banStatus === "banned"
+                              ? "bg-green-600 text-white hover:bg-green-500"
+                              : "bg-red-600 text-white hover:bg-red-500"
+                          }`}
+                        >
+                          {banStatus === "banned" ? "Unban" : "Ban"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
         )}
 

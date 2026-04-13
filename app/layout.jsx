@@ -1,16 +1,19 @@
+import dynamic from "next/dynamic";
 import AuthProvider from "@/components/AuthProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import SoccerBallMenu from "@/components/SoccerBallMenu";
-import NewsletterPopup from "@/components/NewsletterPopup";
-import AnalyticsTracker from "@/components/AnalyticsTracker";
-import CookieBanner from "@/components/CookieBanner";
 import ClientOnly from "@/components/ClientOnly";
-import PageTransition from "@/components/PageTransition";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { FeatureAccessProvider } from "@/hooks/useFeatureAccess";
-import { Analytics } from "@vercel/analytics/react";
 import "../assets/styles/globals.css";
+
+// Lazy-load non-critical client components to reduce initial bundle
+const SoccerBallMenu = dynamic(() => import("@/components/SoccerBallMenu"));
+const NewsletterPopup = dynamic(() => import("@/components/NewsletterPopup"));
+const AnalyticsTracker = dynamic(() => import("@/components/AnalyticsTracker"));
+const CookieBanner = dynamic(() => import("@/components/CookieBanner"));
+const PageTransition = dynamic(() => import("@/components/PageTransition"));
+const Analytics = dynamic(() => import("@vercel/analytics/react").then(m => m.Analytics));
 
 const SITE_URL =
   process.env.NODE_ENV === "production"
@@ -20,11 +23,11 @@ const SITE_URL =
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Bookit 5's Arena",
+    default: "Bookit 5's Arena | 5-a-Side Football Cape Town",
     template: "%s | Bookit 5's Arena",
   },
   description:
-    "Cape Town's most advanced 5-a-side football venue. Experience the World Cup 5s, real-time competition standings, and pro-tier floodlit courts at Milnerton. Book online from R400/hour.",
+    "Book 5-a-side football at Cape Town's premier arena. Floodlit courts at Hellenic FC, Milnerton. Online booking from R400/hr.",
   keywords: [
     "World Cup 5s",
     "5-a-side football",
@@ -69,8 +72,8 @@ export const viewport = {
   themeColor: "#15803d",
 };
 
-import ScrollToTop from "@/components/ScrollToTop";
-import BottomNavbar from "@/components/BottomNavbar";
+const ScrollToTop = dynamic(() => import("@/components/ScrollToTop"));
+const BottomNavbar = dynamic(() => import("@/components/BottomNavbar"));
 
 const RootLayout = ({ children }) => {
   return (
@@ -107,6 +110,8 @@ const RootLayout = ({ children }) => {
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+        <link rel="dns-prefetch" href="https://plausible.io" />
+        <link rel="dns-prefetch" href="https://media.api-sports.io" />
         <link
           href="https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap"
           rel="stylesheet"

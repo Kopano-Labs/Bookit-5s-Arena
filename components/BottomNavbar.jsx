@@ -20,6 +20,7 @@ import {
   FaUserShield,
   FaBookOpen,
   FaKey,
+  FaCog,
 } from "react-icons/fa";
 
 /* ─── Nav items per role (4-tier) ───────────────────── */
@@ -67,27 +68,11 @@ const MANAGER_ITEMS = [
 
 const ADMIN_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
-  {
-    href: "/admin/dashboard",
-    icon: FaUserShield,
-    label: "Dashboard",
-    color: "#22c55e",
-  },
-  {
-    href: "/admin/bookings",
-    icon: FaCalendarAlt,
-    label: "Bookings",
-    color: "#a855f7",
-  },
-  {
-    href: "/admin/competitions",
-    icon: FaTrophy,
-    label: "Comps",
-    color: "#f97316",
-  },
+  { href: "/admin/dashboard", icon: FaUserShield, label: "Dashboard", color: "#22c55e" },
+  { href: "/admin/bookings", icon: FaCalendarAlt, label: "Bookings", color: "#a855f7" },
+  { href: "/admin/competitions", icon: FaTrophy, label: "Comps", color: "#f97316" },
   { href: "/admin/rights", icon: FaKey, label: "Rights", color: "#eab308" },
-  { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
-  // Analytics tab removed
+  { href: "/admin/dashboard#tools", icon: FaCog, label: "More", color: "#9ca3af" },
 ];
 
 export default function BottomNavbar() {

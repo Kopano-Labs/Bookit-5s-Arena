@@ -1,31 +1,20 @@
 # Collaboration Split - Session 3
 
-> [!warning]
-> Two active coding surfaces exist right now. This note defines the safe split so work does not collide.
+> [!important]
+> Historical Session 3 lane split.
+> Use [Now](../00-Home/Now.md), [task-board](task-board.md), and current git status for live coordination. This overlap list is preserved as a session artifact, not as the current active control note.
 
-## Agent Labels
+## Historical Safe Split
 
-- `Codex Terminal` = this terminal-driven agent session
-- `Codex App` = the other Codex/editor session mentioned by the user
+- `Codex Terminal`: documentation, handoff, audits, safe non-overlapping work
+- `Codex App`: active product/config/runtime file edits already present in repo status
 
-## Codex Terminal Lane
+## Rule
 
-Safe write scope for this session:
-- new coordination notes
-- vault handoff improvements
-- external `Schematics` sync
-- audits, inventories, checklists, and non-overlapping docs
+Do not overwrite active parallel edits until ownership is reconciled.
 
-Do not touch without reconciliation:
-- reward/referral runtime code
-- env/runtime config files already modified in the parallel lane
-- shared status files currently showing live edits
+## Historical Parallel File Set
 
-## Codex App Lane
-
-Files currently showing live edits and therefore treated as owned by the parallel lane until reconciled:
-- `STRUCTURE/04-Updates/Project Status.md`
-- `STRUCTURE/06-Reference/Open Issues.md`
 - `app/api/referral/route.js`
 - `app/api/rss/route.js`
 - `app/layout.jsx`
@@ -40,35 +29,26 @@ Files currently showing live edits and therefore treated as owned by the paralle
 - `lib/sendBookingConfirmation.js`
 - `package.json`
 
-Observed functional scope from current diff:
-- centralizing `SITE_URL` and env-driven canonical origin handling
-- routing metadata hardening for `layout`, `robots`, `sitemap`, `rss`, and referral links
-- checkout/email/notification links moving to shared site constants
-- `SearchModal` and `BottomNavbar` state handling being refactored around route changes and interaction resets
-- `package.json` build script switching back to linted builds
+Plus two live documentation files:
 
-## Merge Protocol
+- `Schematics/04-Updates/Project Status.md`
+- `Schematics/06-Reference/Open Issues.md`
 
-1. Finish work inside the owned lane only.
-2. Record intent and next action in the master board.
-3. Reconcile overlapping files only after the active lane pauses.
-4. Do not revert or overwrite unreviewed parallel edits.
+## Current Repo Reality Check Against The Historical Snapshot
 
-## Session 3 Difference Summary
+- `2026-04-08` verification against the current `KasiLink` repo could not reproduce this file set.
+- The current app tree is TypeScript-first and uses paths such as `app/layout.tsx`, `app/api/gigs/route.ts`, `components/Navbar.tsx`, and `lib/db.ts`.
+- The listed overlap paths appear to belong to a different or older app snapshot than the repo currently available in `Introduction to MCP/KasiLink`.
+- Until the source repo for the older file list is identified, treat the above overlap set as a stale handoff artifact rather than a live collision in the current repo.
 
-### Codex Terminal
+## Safe Boundary After Reconciliation
 
-- focused on structure, handoff, reward audit, ownership map, and next-engineer clarity
-- avoids collision with live feature/config work
+- `Codex Terminal`: Schematics, audit notes, countdown planning, blocker documentation, rehearsal evidence, and verification against the current `KasiLink` repo
+- Current `KasiLink` code edits should stay limited to changes that are directly supported by the present tree and verified against local repo status
 
-### Codex App
+## Observed Functional Scope
 
-- appears to be inside active product/config/runtime changes
-- current lane is primarily origin/env normalization plus search/nav interaction cleanup
-- reward work is only adjacent in this lane through referral share URL normalization, not a full reward-system rewrite
-- still needs to publish final intent before reward/referral code can be safely continued
-
-## Immediate Next Move
-
-- `Codex Terminal`: maintain docs lane and prepare reward-system continuation plan.
-- `Codex App`: complete or pause the overlapping file set, then hand off.
+- centralizing `SITE_URL` and canonical origin handling
+- normalizing metadata, RSS, robots, sitemap, Stripe, email, and referral links
+- refactoring search modal and bottom navbar route-reset behavior
+- restoring linted build behavior in `package.json`

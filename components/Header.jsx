@@ -20,9 +20,16 @@ import {
   FaUserShield,
   FaUsers,
   FaKey,
+  FaCog,
+  FaNewspaper,
+  FaPlug,
+  FaFlask,
+  FaShieldAlt,
+  FaHistory,
+  FaGoogle,
 } from "react-icons/fa";
 import { useSession, signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import SearchModal from "@/components/SearchModal";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import OnlineStatus from "@/components/OnlineStatus";
@@ -91,7 +98,25 @@ const MANAGER_NAV = [
   { href: "/about",             icon: <FaBookOpen size={11} className="text-green-400" />,      label: "About" },
 ];
 
-const ADMIN_NAV = [
+const ADMIN_NAV_PRIMARY = [
+  { href: "/admin/dashboard",    icon: <FaUserShield size={11} className="text-green-400" />,   label: "Dashboard" },
+  { href: "/admin/bookings",     icon: <FaCalendarAlt size={11} className="text-purple-400" />, label: "Bookings" },
+  { href: "/admin/competitions", icon: <FaTrophy size={11} className="text-orange-400" />,      label: "Comps" },
+];
+
+const ADMIN_NAV_MORE = [
+  { href: "/admin/analytics",    icon: <FaChartBar size={11} className="text-cyan-400" />,      label: "Analytics" },
+  { href: "/admin/rights",       icon: <FaKey size={11} className="text-yellow-400" />,         label: "Rights" },
+  { href: "/admin/integrations", icon: <FaPlug size={11} className="text-emerald-400" />,       label: "Integrations" },
+  { href: "/admin/google",       icon: <FaGoogle size={11} className="text-white" />,           label: "Google APIs" },
+  { href: "/admin/newsletter",   icon: <FaNewspaper size={11} className="text-blue-400" />,     label: "Newsletter" },
+  { href: "/admin/sandbox",      icon: <FaFlask size={11} className="text-pink-400" />,         label: "Sandbox" },
+  { href: "/admin/security",     icon: <FaShieldAlt size={11} className="text-red-400" />,      label: "Security", comingSoon: true },
+  { href: "/admin/audit",        icon: <FaHistory size={11} className="text-amber-400" />,      label: "Audit Log", comingSoon: true },
+];
+
+/* Mobile admin nav grouped for the drawer */
+const ADMIN_MOBILE_MANAGEMENT = [
   { href: "/admin/dashboard",    icon: <FaUserShield size={11} className="text-green-400" />,   label: "Dashboard" },
   { href: "/admin/bookings",     icon: <FaCalendarAlt size={11} className="text-purple-400" />, label: "Bookings" },
   { href: "/admin/competitions", icon: <FaTrophy size={11} className="text-orange-400" />,      label: "Comps" },
@@ -99,19 +124,30 @@ const ADMIN_NAV = [
   { href: "/admin/rights",       icon: <FaKey size={11} className="text-yellow-400" />,         label: "Rights" },
 ];
 
+const ADMIN_MOBILE_ADVANCED = [
+  { href: "/admin/integrations", icon: <FaPlug size={11} className="text-emerald-400" />,       label: "Integrations" },
+  { href: "/admin/google",       icon: <FaGoogle size={11} className="text-white" />,           label: "Google APIs" },
+  { href: "/admin/newsletter",   icon: <FaNewspaper size={11} className="text-blue-400" />,     label: "Newsletter" },
+  { href: "/admin/sandbox",      icon: <FaFlask size={11} className="text-pink-400" />,         label: "Sandbox" },
+  { href: "/admin/security",     icon: <FaShieldAlt size={11} className="text-red-400" />,      label: "Security", comingSoon: true },
+  { href: "/admin/audit",        icon: <FaHistory size={11} className="text-amber-400" />,      label: "Audit Log", comingSoon: true },
+];
+
 const Header = () => {
   const { data: session } = useSession();
   const { theme, themes, cycleTheme } = useTheme();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const [adminMoreOpen, setAdminMoreOpen] = useState(false);
+
   const activeRole = session?.user?.activeRole || session?.user?.role;
+  const isAdmin = activeRole === "admin";
+  const isManager = activeRole === "manager";
   const hideDesktopSearch = pathname === "/login" || pathname === "/register" || pathname === "/role-select";
   const onAuthScreen = pathname === "/login" || pathname === "/register";
-  const requestedMode =
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("mode")
-      : null;
+  const requestedMode = searchParams.get("mode");
   const authMode =
     pathname === "/register"
       ? "register"
@@ -119,11 +155,17 @@ const Header = () => {
         ? "register"
         : "login";
 
+  /* 4-tier enforcement: strictly match role to nav set */
   const navLinks =
-    activeRole === "admin"   ? ADMIN_NAV :
-    activeRole === "manager" ? MANAGER_NAV :
-    session                  ? USER_NAV :
-                               GUEST_NAV;
+    isAdmin   ? ADMIN_NAV_PRIMARY :
+    isManager ? MANAGER_NAV :
+    session   ? USER_NAV :
+                GUEST_NAV;
+
+  /* Close admin dropdown on route change */
+  useEffect(() => {
+    setAdminMoreOpen(false);
+  }, [pathname]);
 
   const navClass = () =>
     "flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest whitespace-nowrap";
@@ -204,6 +246,57 @@ const Header = () => {
                 <NavIcon>{tab.icon}</NavIcon> {tab.label}
               </Link>
             ))}
+
+            {/* Admin "More" dropdown */}
+            {isAdmin && (
+              <div className="relative">
+                <button
+                  onClick={() => setAdminMoreOpen((v) => !v)}
+                  className={`${navClass()} ${adminMoreOpen ? "text-green-400 bg-gray-800" : "text-gray-400 hover:text-white hover:bg-gray-800/60"}`}
+                >
+                  <NavIcon><FaCog size={11} className="text-green-400" /></NavIcon> More
+                </button>
+                <AnimatePresence>
+                  {adminMoreOpen && (
+                    <motion.div
+                      className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-gray-800 bg-gray-950/98 shadow-[0_20px_60px_rgba(0,0,0,0.7)] backdrop-blur-xl overflow-hidden z-50"
+                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    >
+                      <div className="py-1.5">
+                        {ADMIN_NAV_MORE.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.comingSoon ? "#" : item.href}
+                            onClick={(e) => {
+                              if (item.comingSoon) e.preventDefault();
+                              else setAdminMoreOpen(false);
+                            }}
+                            className={`flex items-center gap-2.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${
+                              item.comingSoon
+                                ? "text-gray-600 cursor-not-allowed"
+                                : pathname?.startsWith(item.href)
+                                  ? "text-green-400 bg-green-500/10"
+                                  : "text-gray-300 hover:text-white hover:bg-gray-800/60"
+                            }`}
+                          >
+                            {item.icon}
+                            <span>{item.label}</span>
+                            {item.comingSoon && (
+                              <span className="ml-auto text-[8px] font-bold uppercase tracking-wider text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">
+                                Soon
+                              </span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
 
           {/* ── Actions (Profile, Logout, Theme, Mobile Toggle) ── */}
@@ -360,23 +453,81 @@ const Header = () => {
                 )}
 
                 <div className="space-y-2">
-                  {navLinks.map((tab) => (
-                    <Link
-                      key={tab.href}
-                      href={tab.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={`${mobileClass(tab.href)} w-full justify-between border ${
-                        pathname === tab.href
-                          ? "border-green-700 bg-green-500/10 text-white"
-                          : "border-gray-800 bg-gray-900/80 text-gray-300 hover:border-gray-700 hover:bg-gray-900"
-                      }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        {tab.icon} {tab.label}
-                      </span>
-                      <FaChevronRight size={12} className="text-gray-500" />
-                    </Link>
-                  ))}
+                  {isAdmin ? (
+                    <>
+                      {/* Management group */}
+                      <p className="text-[9px] font-black uppercase tracking-[0.25em] text-green-400 px-1 pt-1 pb-0.5">
+                        Management
+                      </p>
+                      {ADMIN_MOBILE_MANAGEMENT.map((tab) => (
+                        <Link
+                          key={tab.href}
+                          href={tab.href}
+                          onClick={() => setMobileOpen(false)}
+                          className={`${mobileClass(tab.href)} w-full justify-between border ${
+                            pathname === tab.href
+                              ? "border-green-700 bg-green-500/10 text-white"
+                              : "border-gray-800 bg-gray-900/80 text-gray-300 hover:border-gray-700 hover:bg-gray-900"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            {tab.icon} {tab.label}
+                          </span>
+                          <FaChevronRight size={12} className="text-gray-500" />
+                        </Link>
+                      ))}
+
+                      {/* Advanced group */}
+                      <p className="text-[9px] font-black uppercase tracking-[0.25em] text-gray-500 px-1 pt-3 pb-0.5">
+                        Advanced
+                      </p>
+                      {ADMIN_MOBILE_ADVANCED.map((tab) => (
+                        <Link
+                          key={tab.href}
+                          href={tab.comingSoon ? "#" : tab.href}
+                          onClick={(e) => {
+                            if (tab.comingSoon) e.preventDefault();
+                            else setMobileOpen(false);
+                          }}
+                          className={`${mobileClass(tab.href)} w-full justify-between border ${
+                            tab.comingSoon
+                              ? "border-gray-800/50 bg-gray-900/40 text-gray-600 cursor-not-allowed"
+                              : pathname === tab.href
+                                ? "border-green-700 bg-green-500/10 text-white"
+                                : "border-gray-800 bg-gray-900/80 text-gray-300 hover:border-gray-700 hover:bg-gray-900"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            {tab.icon} {tab.label}
+                            {tab.comingSoon && (
+                              <span className="text-[8px] font-bold uppercase tracking-wider text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">
+                                Soon
+                              </span>
+                            )}
+                          </span>
+                          <FaChevronRight size={12} className="text-gray-600" />
+                        </Link>
+                      ))}
+                    </>
+                  ) : (
+                    navLinks.map((tab) => (
+                      <Link
+                        key={tab.href}
+                        href={tab.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={`${mobileClass(tab.href)} w-full justify-between border ${
+                          pathname === tab.href
+                            ? "border-green-700 bg-green-500/10 text-white"
+                            : "border-gray-800 bg-gray-900/80 text-gray-300 hover:border-gray-700 hover:bg-gray-900"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          {tab.icon} {tab.label}
+                        </span>
+                        <FaChevronRight size={12} className="text-gray-500" />
+                      </Link>
+                    ))
+                  )}
                 </div>
 
                 {session ? (

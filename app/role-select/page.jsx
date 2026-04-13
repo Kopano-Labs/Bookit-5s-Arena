@@ -1,11 +1,12 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaUserShield, FaUsers, FaFutbol, FaArrowRight } from "react-icons/fa";
 import Image from "next/image";
+import { defaultActiveRole } from "@/lib/roles";
 
 const ROLE_CONFIG = {
   admin: {
@@ -40,7 +41,9 @@ const ROLE_CONFIG = {
 export default function RoleSelectPage() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [switching, setSwitching] = useState(null);
+  const nextPath = searchParams.get("next");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -50,16 +53,18 @@ export default function RoleSelectPage() {
       const roles = session?.user?.roles;
       // Single-role users don't need to select — redirect straight home
       if (!roles || roles.length <= 1) {
-        router.replace("/");
+        const fallbackRole = defaultActiveRole(session?.user?.email, roles || [session?.user?.role || "user"]);
+        const fallbackPath = nextPath || ROLE_CONFIG[fallbackRole]?.redirect || "/";
+        router.replace(fallbackPath);
       }
     }
-  }, [status, session, router]);
+  }, [nextPath, router, session, status]);
 
   const handleSelect = async (role) => {
     setSwitching(role);
     await update({ activeRole: role });
     const cfg = ROLE_CONFIG[role];
-    router.push(cfg?.redirect || "/");
+    router.replace(nextPath || cfg?.redirect || "/");
   };
 
   if (status === "loading" || !session) {

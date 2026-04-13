@@ -1,59 +1,191 @@
-# Bookit 5s Arena Dashboard
+---
+title: Orch Vault — Dashboard
+created: 2026-04-05
+updated: 2026-04-10
+author: Robyn
+tags:
+  - home
+  - dashboard
+  - moc
+  - navigation
+priority: critical
+status: active
+---
 
-## What This Vault Is
+# Orch Vault — Dashboard
 
-This `STRUCTURE/` folder is the project handoff vault for Bookit 5s Arena. It mirrors the Schematics pattern and is tailored for this repo so the next engineer can open it in Obsidian and immediately understand:
+> Central knowledge base for the Orch multi-agent orchestration system and its integration with KasiLink.
+> Owner: [Kholofelo Robyn Rababalela](../05-Training/Owner%20Profile.md) · GitHub: RobynAwesome
+> Current operating mode: `demo hardening` across Phase 6, Phase 7, Phase 8, and Phase 9.
 
-- what has been built
-- what is stable
-- what is protected by auth
-- what still needs work
-- which phase commits introduced which systems
+---
 
-## Current Rollout State
+## Active Right Now
 
-- Core rollout phases `0` through `14` are complete.
-- The public Premier League hub is live in the codebase under `/fixtures`.
-- Admin-only sandbox and integrations surfaces are implemented.
-- Security hardening and BotID protections are in place.
-- The handoff vault exists, but follow-up commits after the initial audit have materially changed the live state and must be read before any new work starts.
+| Priority | Note                     | Status               |
+| -------- | ------------------------ | -------------------- |
+| CRITICAL | [Now](Now.md) | Canonical one-note snapshot |
+| CRITICAL | [Microsoft Demo Day!](../Microsoft%20Demo%20Day!/index.md) | Demo hub, owner checklist, and Azure path |
+| CRITICAL | [Project Status](../04-Updates/Project%20Status.md) | Current phase and delivery truth |
+| CRITICAL | [Demo Countdown - April 8-15, 2026](../Microsoft%20Demo%20Day!/Demo%20Countdown%20-%20April%208-15,%202026.md) | Demo timeline and blockers |
+| HIGH     | [Orch Demo Script - 2026-04-09](../Microsoft%20Demo%20Day!/Orch%20Demo%20Script%20-%202026-04-09.md) | Safe live route |
+| HIGH     | [Schematics Root Index](../index.md) | Whole-vault map and standing second-brain rules |
+| HIGH     | [Training Index](../05-Training/index.md) | Profiling and orchestration corpus |
 
-## Start Here
+---
 
-1. Read [Project Status](../04-Updates/Project%20Status.md).
-2. Review [task-board](../04-Updates/task-board.md).
-3. Open [4-Tier User Interface](../03-Architecture/4-Tier%20User%20Interface.md).
-4. Check [Open Issues](../06-Reference/Open%20Issues.md).
-5. Use [Page Inventory](../06-Reference/Page%20Inventory.md) when tracing routes.
+## 00 — Operating Constitution
 
-## Completed Phase Commits
+- Lead Developer: `Codex`
+- DEV_1: `Germini (Google AI)`
+- DEV_2: `Nother`
+- DEV_3: `Meither`
+- DEV_4: `Cicero`
+- Multi-dev sessions start with the standing dev roster on standby and 20-task boards visible in [MASTER-TODO Session 3](../04-Updates/MASTER-TODO%20Session%203.md).
+- Before any task begins, Lead checks current dev progress, live diffs, and the latest [comms-log](../04-Updates/comms-log.md).
+- All current sessions are `pre-sessions` and training data for Orch.
+- Lead may be `Codex`, `Claude`, or `Codex + Claude`.
+- Lead target: `60% management / 40% coding`.
+- Token-saving mode is mandatory outside Plan Mode and outside Lead-only sessions with Master.
+- If a fact is not proven by the vault or official research, ask Master instead of guessing.
 
-- `2ef7a3a` `phase-0-sports-foundation`
-- `c62ddb0` `phase-1-matches`
-- `2cf76e1` `phase-2-news-media`
-- `0085edc` `phase-3-standings`
-- `994eed6` `phase-4-stats`
-- `5ce02b7` `phase-5-sandbox-integrations`
-- `0c9c444` `phase-6-hardening`
-- `85ad333` `phase-7-responsive-popup-repairs`
-- `22659bb` `phase-8-expanded-fixtures-home-polish`
-- `72c0bb8` `phase-9-regenerate-court-images`
-- `d13807e` `phase-10-security-hardening`
-- `8ef6b3d` `phase-11-botid-anti-bot-hardening`
-- `a50416d` `phase-12-env-integrations-weather-search`
-- `245907a` `phase-13-whatsapp-osint-admin-review`
-- `2b0eb74` `phase-14-obsidian-structure-and-ui-audit`
+---
 
-## Post-Phase Follow-up Commits
+## Critical Systems
 
-- `7781658` `followup-newsletter-mongo-resilience`
-- `1fdba7a` `followup-external-access-blockers`
-- `3bdc468` `homepage-csp-hero-polish`
+- [07-Sessions By Day](../07-Sessions%20By%20Day/index.md) - dated session reconstruction with direct-vs-reconstructed evidence
+- [08-IDEAS AT BIRTH](../08-IDEAS%20AT%20BIRTH/index.md) - incubation-only idea bank with competitor comparison and implementation options
+- [09-ORCH PROGRESSION](../09-ORCH%20PROGRESSION/index.md) - Orch development ladder from observer to co-lead
+- [10-SESSION IMPROVEMENTS](../10-SESSION%20IMPROVEMENTS/index.md) - lead discipline, session smoothness, hierarchy, and token doctrine
+- [11-AI HALLUCINATION - CRITICAL](../11-AI%20HALLUCINATION%20-%20CRITICAL/index.md) - permanent critical hallucination audit system
+- [12-PLAN MODE SESSIONS](../12-PLAN%20MODE%20SESSIONS/index.md) - planning archive for plan-mode outputs that should not stay only in chat
+- [Orch Train Logs](../05-Training/Orch%20Train%20Logs/index.md) - successes, failures, hierarchy events, and self-reflection logs
 
-## High-Signal Current Notes
+---
 
-- `STRUCTURE/` is the right place for the next engineer to start, but older notes that stopped at Phase 14 have now been refreshed to include the follow-up work.
-- Homepage hero, header theme control, Leaflet asset loading, and CSP were all revised after the initial handoff audit.
-- Newsletter subscriptions now degrade to a local fallback store when MongoDB is unavailable locally.
-- MongoDB connection logic now auto-derives a direct Atlas connection path when SRV resolution fails, but authenticated local QA is still blocked if Atlas rejects the current machine IP.
-- Google Search74 and WhatsApp OSINT are wired in code, but current RapidAPI access still returns `403` until the account has the correct API subscriptions/access.
+## 01 — Mission
+
+The core identity and vision for what Orch is.
+
+- [Orch Blueprint](../01-Mission/Orch%20Blueprint.md) — Personality, capabilities, and training specification. Source of truth for orch identity.
+
+---
+
+## 02 — Strategy
+
+Where we're going and how we get there.
+
+- [KasiLink Integration Plan](../02-Strategy/KasiLink%20Integration%20Plan.md) — Orch as AI microservice inside KasiLink. Architecture, tool mapping, phase roadmap.
+- [Orch Labs Strategy](../02-Strategy/Orch%20Labs%20Strategy.md) — Google-Labs-style additive layer for South African AI tools.
+- [Open Source Product-Ready AI Top 50](../02-Strategy/Open%20Source%20Product-Ready%20AI%20Top%2050.md) — Research map for free vs premium product capabilities.
+- [Microsoft Contract Strategy](../02-Strategy/Microsoft%20Contract%20Strategy.md) — Azure partnership pitch, service mapping, action items.
+- [SA Startup Week Demo](../Microsoft%20Demo%20Day!/SA%20Startup%20Week%20Demo.md) — Hack Day demo plan, April 15-17, 2026.
+- [Adoption Checklist](../02-Strategy/Adoption%20Checklist.md) — Steps from prototype to external adoption.
+- [Orch Concept And Future Foresight](../02-Strategy/Orch%20Concept%20And%20Future%20Foresight.md) — long-range framing for Orch as an AI-native operating layer.
+
+---
+
+## 03 — Architecture
+
+How Orch is built.
+
+- [CLI Specification](../03-Architecture/CLI%20Specification.md) — POSIX-style CLI reference: `serve`, `chat`, `agents`, `learn` commands.
+- [Database Schema](../03-Architecture/Database%20Schema.md) — SQLite Data Lake schema: `discussions` and `audit_logs` tables.
+- [WhatsApp Integration](../03-Architecture/WhatsApp%20Integration.md) — Evolution API bridge setup and configuration.
+- [Neural Link](../03-Architecture/Neural%20Link.md) — React/WebSocket real-time agent visualization GUI.
+
+---
+
+## 04 — Updates
+
+Active project coordination and status tracking.
+
+- [Project Status](../04-Updates/Project%20Status.md) — current phase stack, capability truth, and demo-hardening status.
+- [Now](Now.md) — current one-note snapshot.
+- [Implementation Plan](../04-Updates/Implementation%20Plan.md) — Full engineering plan with Labs and accessibility phases.
+- [Phase 1 Walkthrough](../04-Updates/Phase%201%20Walkthrough.md) — Completed Phase 1 tutorial and reference.
+- [Updates Index](../04-Updates/index.md) — Hub for coordination files.
+- [Microsoft Demo Day!](../Microsoft%20Demo%20Day!/index.md) — demo MOC for script, countdown, owner checklist, and Azure playbook.
+- [Demo Countdown - April 8-15, 2026](../Microsoft%20Demo%20Day!/Demo%20Countdown%20-%20April%208-15,%202026.md) — Demo day owners, blockers, and exit criteria.
+- [Orch Demo Script - 2026-04-09](../Microsoft%20Demo%20Day!/Orch%20Demo%20Script%20-%202026-04-09.md) — locked Orch-only demo route.
+- [Comms Log](../04-Updates/comms-log.md) — Agent communication log.
+- [Task Board](../04-Updates/task-board.md) — Sprint task tracker.
+- [Dev Tracker](../04-Updates/dev-tracker.md) — Developer assignment history.
+- [Delegation Protocol](../04-Updates/delegation-protocol.md) — Rules for agent delegation.
+- [DEV_S Reward Program](../04-Updates/DEV_S%20Reward%20Program.md) — Session reset, role reward, and supervision model.
+
+---
+
+## 05 — Training
+
+Data and profiles for training the Orch AI system.
+
+- [Training Index](../05-Training/index.md) — master map for human, AI, and orchestration notes.
+- [Orch Train Logs](../05-Training/Orch%20Train%20Logs/index.md) — active logbook for dev outcomes, hierarchy breaches, token use, and lead self-reflection.
+- [Owner Profile](../05-Training/Owner%20Profile.md) — Robyn's work ethic, communication style, and management patterns.
+- [Robyn Operator Profile - Session 3](../05-Training/Robyn%20Operator%20Profile%20-%20Session%203.md) — current-session operational expectations.
+- [Lead Self Report](../05-Training/Lead%20Self%20Report.md) — Claude Opus 4.6 behavioral audit after MVP sprint.
+- [Codex Terminal Operational Profile](../05-Training/Codex%20Terminal%20Operational%20Profile.md) — operational profile for this Codex agent.
+- [Dev2 Behavioral Analysis](../05-Training/Dev2%20Behavioral%20Analysis.md) — DEV_2 (Gemini) failure patterns and detection strategies.
+- [Claude Codex Gemini Session Analysis](../05-Training/Claude%20Codex%20Gemini%20Session%20Analysis.md) — observed role-fit lessons across sessions.
+- [Multi-Agent Profiling Framework](../05-Training/Multi-Agent%20Profiling%20Framework.md) — reusable profiling rubric.
+- [Vault Hygiene and CRUD Discipline](../05-Training/Vault%20Hygiene%20and%20CRUD%20Discipline.md) — Obsidian-safe organization rule set.
+- [Kairos Reference](../05-Training/Kairos%20Reference.md) — Claude Code's assistant mode architecture (reference).
+
+---
+
+## 06 — Reference
+
+Code samples and archived source files.
+
+- [Schematics Root Index](../index.md) — whole-vault map and standing rules.
+- [Repo Documents Index](../06-Reference/Repo%20Documents%20Index.md) — map of loose root docs and why they stay at repo root.
+- [Open Issues](../06-Reference/Open%20Issues.md) — current blocker ledger.
+- `06-Reference/` — `ci.yml`, `filesystem.py`, `search.py`, `write_file.py`
+- `06-Reference/Archive/` — Original source .txt/.md/.docx files before vault conversion
+- `06-Reference/orch-code-implemtation/` — Reference codebase (Rust + Python)
+
+---
+
+## New Read Order For Master
+
+1. [Now](Now.md)
+2. [Project Status](../04-Updates/Project%20Status.md)
+3. [Microsoft Demo Day!](../Microsoft%20Demo%20Day!/index.md)
+4. [Open Issues](../06-Reference/Open%20Issues.md)
+5. [07-Sessions By Day](../07-Sessions%20By%20Day/index.md)
+6. [10-SESSION IMPROVEMENTS](../10-SESSION%20IMPROVEMENTS/index.md)
+7. [11-AI HALLUCINATION - CRITICAL](../11-AI%20HALLUCINATION%20-%20CRITICAL/index.md)
+8. [12-PLAN MODE SESSIONS](../12-PLAN%20MODE%20SESSIONS/index.md)
+9. [08-IDEAS AT BIRTH](../08-IDEAS%20AT%20BIRTH/index.md)
+10. [09-ORCH PROGRESSION](../09-ORCH%20PROGRESSION/index.md)
+11. [Training Index](../05-Training/index.md)
+
+---
+
+## Assets
+
+- `Assets/ORCH Apprenticeship Training Loop.png`
+- `Assets/Where we are 2026-04-03.jpg`
+
+---
+
+## Calendar
+
+| Date            | Event                                                     |
+| --------------- | --------------------------------------------------------- |
+| Apr 15-17, 2026 | SA Startup Week Hack Day — Demo KasiLink + Orch           |
+| Apr 30, 2026    | Phase 6 baseline: Orch Labs gallery and registry          |
+| May 31, 2026    | Phase 7 target: SA languages and accessibility planning   |
+| Jun 30, 2026    | Phase 7 target: multilingual and speech-access prototypes |
+| Sep 30, 2026    | Phase 8 target: public-impact pilots and metrics          |
+
+---
+
+## Quick Links
+
+- KasiLink live: https://kasi-link.vercel.app
+- Orch repo: https://github.com/RobynAwesome/Introduction-to-MCP
+- KasiLink repo: https://github.com/RobynAwesome/KasiLink
+- Portfolio: https://kholofelorababalela.vercel.app
+- LinkedIn: www.linkedin.com/in/kholofelo-robyn-rababalela-7a26273b7

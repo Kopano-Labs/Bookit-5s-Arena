@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { canAssumeRole, normalizeRoles } from "@/lib/roles";
 
 const PROTECTED_ROUTE_RULES = [
   { prefix: "/admin", requiredRole: "admin" },
@@ -47,7 +48,7 @@ export async function middleware(request) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const roles = Array.isArray(token.roles) ? token.roles : [token.role || "user"];
+  const roles = normalizeRoles(token.email, token.roles || [token.role || "user"]);
   const activeRole = token.activeRole || token.role || "user";
 
   if (isSuperAdmin(token.email)) {
@@ -62,10 +63,8 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  if (roles.includes(rule.requiredRole)) {
-    const roleSelectUrl = new URL("/role-select", request.url);
-    roleSelectUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
-    return NextResponse.redirect(roleSelectUrl);
+  if (canAssumeRole(token.email, roles, rule.requiredRole)) {
+    return NextResponse.next();
   }
 
   return NextResponse.redirect(new URL("/", request.url));

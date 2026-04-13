@@ -1,76 +1,61 @@
 # Reward System Status - Session 3
 
-> [!summary]
-> The reward system is present, but it is not fully verified end-to-end.
+> [!important]
+> Historical Session 3 reward audit.
+> Use [Now](../00-Home/Now.md) and [Open Issues](../06-Reference/Open%20Issues.md) for current live blockers. Keep this note as the reward-specific audit snapshot and QA backlog.
 
-## Confirmed In Code
+Status: `RED`
 
-- `app/rewards/page.jsx` exists and renders a full rewards experience.
-- `app/api/rewards/route.js` exists and derives:
-  - tier
-  - points
-  - total bookings
-  - total hours
-  - total spent
-  - achievements
-  - recent bookings
-- `models/User.js` contains reward/referral fields:
-  - `referralCode`
-  - `referredBy`
-  - `referralPoints`
-  - `referralChain`
-- `app/api/referral/route.js` already implements:
-  - `GET` for current user referral state
-  - `POST` to apply a referral code
-  - 5-level referral point propagation
-  - self-referral and duplicate-referral guards
+## Confirmed In Current Workspace
 
-## What Looks Real
+- `reward` and `referral` are tracked in Schematics docs and task boards
+- forum copy mentions referrals, but that is wording only, not a reward workflow
+- no live reward page, reward API, or referral API route was found in the current `orch` or `KasiLink` app surface
+- `KasiLink/lib/models/User.ts` does not define reward or referral fields
+- no birthday reward, achievement, or perk-redemption implementation was found in the app code
+- manager/admin reward visibility is only documented as intent, not proven by runtime code
 
-- tier progression from confirmed bookings
-- booking-derived points
-- booking-derived achievements like first booking, booking count, hours, courts visited, spending
-- referral display UI on the rewards page
-- referral code application and upstream chain awarding logic
+## Not Present Or Not Proven
 
-## What Is Still Partial Or Placeholder
+- referral flow end-to-end
+- persisted referral points
+- placeholder achievements
+- perk redemption truth
+- manager/admin reward oversight
+- birthday reward points behavior
+- manager dashboard wording versus live rewards implementation
+- any `coming soon` reward claim in the app surface
 
-- several achievements in the rewards API are still placeholders and always `false`
-  - `shared_social`
-  - `referred_teams`
-  - `hosted_tournament`
-  - `customized_profile`
-  - `scavenger_hunt`
-- perk redemption is still UX-heavy and needs data-truth verification
-- manager-facing reward experience is inconsistent:
-  - `/rewards` adapts copy for managers
-  - `app/manager/dashboard/page.jsx` still says rewards/profile management is "coming soon"
-- birthday claim currently increases `referralPoints`, which may be intentional or may be mixing loyalty and referral ledgers
-- referral chain UI exists, but end-to-end validation still depends on authenticated flow testing and the parallel lane is touching the referral route right now
+## Current Follow-Through
 
-## Session 3 Reward Conclusion
+- treat reward/referral as product backlog, not demo-ready runtime truth
+- define a real product spec and implementation target before any QA claim
+- if reward work returns, add the data model, API contract, UI, and admin visibility checks together
+- keep reward and referral out of the demo script until there is a live implementation to verify
 
-Status: `AMBER`
+## Demo Recommendation
 
-Meaning:
-- the system is not missing
-- the system is not fully production-verified either
-- reward completion work should continue only after the parallel lane releases `app/api/referral/route.js`
+- `NO-GO` for demo use as a live reward system
+- `GO` only as a documented backlog item with explicit owner dependencies
 
-## Next Reward Tasks
+## Reward QA Checklist For Future Implementation
 
-- [ ] verify `/api/referral` payload and mutation path with real users
-- [ ] confirm referral points are actually accumulated and persisted
-- [ ] confirm referral registration flow from a new user path
-- [ ] replace placeholder achievements with real tracked events or remove them
-- [ ] verify manager/admin visibility into rewards and perk activity
-- [ ] verify reward messaging and tier thresholds against product intent
-- [ ] confirm whether birthday rewards should land in `referralPoints` or a separate rewards ledger
-- [ ] reconcile manager dashboard wording with the existing rewards implementation
+- confirm auth and data model fields exist in code
+- confirm public and authenticated reward views render from live data
+- confirm referral contract, ladder logic, and persistence work end-to-end
+- confirm birthday, achievements, perks, manager, and admin visibility against actual runtime state
 
-## Files To Revisit Once Safe
+## 2026-04-10 Reward Directive
 
-- `app/rewards/page.jsx`
-- `app/api/rewards/route.js`
-- `app/api/referral/route.js`
-- `models/User.js`
+- reward and referral are now a named standing track in the multi-dev operating model
+- every reward-system checkpoint must also be written into [comms-log](comms-log.md) with exact date and full detail
+- reward-system truth must stay mirrored in [MASTER-TODO Session 3](MASTER-TODO%20Session%203.md) until the live control notes absorb it
+- current live note truth remains: there is no proven reward runtime in this workspace
+- `DEV_1` drafted the QA checklist structure and is now on standby pending real code-path access
+
+## Current Required Follow-Through
+
+- confirm which reward and referral behaviors are actually proven in code
+- confirm which reward UI claims are placeholders, deferred, or false
+- confirm what auth and data access are still required before real end-to-end QA
+- prepare the reward go or no-go call for the demo script
