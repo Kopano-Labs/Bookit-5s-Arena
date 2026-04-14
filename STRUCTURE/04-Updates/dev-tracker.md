@@ -1,12 +1,13 @@
 # Dev Tracker
 
-## Root Audit & God-Mode Bug Triage | 2026-04-14 14:15
+## Root Audit, Console Bug Triage & KC Deactivation | 2026-04-14 14:45
 
 - **Lead:** `Gemini Code Assist`
-- **God-Mode Navbar Issue:** Identified infinite loading bug affecting God-Mode Admin (`rkholofelo@gmail.com`), Regular Admin, and Manager interfaces. Suspected cause: routing loop or missing `<Suspense>` wrapper around client hooks/session checks in `Header.jsx`/`Navbar.tsx`.
-- **Performance & CSP Blocks:** Tracked `Content Security Policy` violations blocking `https://vercel.live` fonts and Google avatar images (`lh3.googleusercontent.com`).
-- **KC Check-in:** Reviewed Intern-Dev (KC) progress.
-- **Action Required:** Awaiting `components/Navbar.tsx` (or `Header.tsx`) and `next.config.js`/`middleware.ts` to implement the routing loop fix, optimize load speeds, and repair CSP headers.
+- **KC Status:** INTERN-DEV (KC) REACTIVATED [Observer Mode - Verbal/Text Input]. Drafted mobile drawer spacing updates remain in `\STRUCTURE\13-KC-ARCHIVE`.
+- **God-Mode Navbar Issue:** (Pending context) Infinite loading bug affecting God-Mode Admin (`rkholofelo@gmail.com`), Regular Admin, and Manager interfaces.
+- **New Console Errors:** Tracked Radix UI `DialogContent` missing `DialogTitle`/`Description` accessibility warnings. Tracked reCAPTCHA Timeout error on auth pages.
+- **Performance & CSP Blocks:** Tracked `Content Security Policy` violations blocking Vercel fonts.
+- **Action Required:** Awaiting codebase access to fix Radix Dialogs, reCAPTCHA, CSP headers, and the Navbar routing loop.
 
 ## 20-Task Sprint & KasiLink Hardening | 2026-04-10 10:15
 

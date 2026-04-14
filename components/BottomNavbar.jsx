@@ -27,7 +27,12 @@ import {
 const USER_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
   { href: "/#courts", icon: FaFutbol, label: "Book", color: "#22c55e" },
-  { href: "/bookings", icon: FaCalendarAlt, label: "Bookings", color: "#a855f7" },
+  {
+    href: "/bookings",
+    icon: FaCalendarAlt,
+    label: "Bookings",
+    color: "#a855f7",
+  },
   { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
   { href: "/leagues", icon: FaTrophy, label: "Leagues", color: "#eab308" },
   { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
@@ -68,11 +73,31 @@ const MANAGER_ITEMS = [
 
 const ADMIN_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
-  { href: "/admin/dashboard", icon: FaUserShield, label: "Dashboard", color: "#22c55e" },
-  { href: "/admin/bookings", icon: FaCalendarAlt, label: "Bookings", color: "#a855f7" },
-  { href: "/admin/competitions", icon: FaTrophy, label: "Comps", color: "#f97316" },
+  {
+    href: "/admin/dashboard",
+    icon: FaUserShield,
+    label: "Dashboard",
+    color: "#22c55e",
+  },
+  {
+    href: "/admin/bookings",
+    icon: FaCalendarAlt,
+    label: "Bookings",
+    color: "#a855f7",
+  },
+  {
+    href: "/admin/competitions",
+    icon: FaTrophy,
+    label: "Comps",
+    color: "#f97316",
+  },
   { href: "/admin/rights", icon: FaKey, label: "Rights", color: "#eab308" },
-  { href: "/admin/dashboard#tools", icon: FaCog, label: "More", color: "#9ca3af" },
+  {
+    href: "/admin/dashboard#tools",
+    icon: FaCog,
+    label: "More",
+    color: "#9ca3af",
+  },
 ];
 
 export default function BottomNavbar() {
@@ -153,13 +178,13 @@ export default function BottomNavbar() {
     /* Hidden on mobile (sm:flex). Positioned at bottom center */
     <div
       ref={menuRef}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-90 hidden sm:flex flex-col items-center pointer-events-none"
+      className="pointer-events-none fixed bottom-6 left-1/2 z-90 hidden -translate-x-1/2 flex-col items-center sm:flex"
     >
       {/* Expanded dock */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="mb-3 flex items-end gap-2 px-4 py-3 rounded-2xl bg-gray-950/95 backdrop-blur-2xl border border-gray-800 shadow-[0_20px_60px_rgba(0,0,0,0.8)] pointer-events-auto"
+            className="pointer-events-auto mb-3 flex items-end gap-2 rounded-2xl border border-gray-800 bg-gray-950/95 px-4 py-3 shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
             initial={{ opacity: 0, y: 20, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.85 }}
@@ -173,14 +198,14 @@ export default function BottomNavbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex flex-col items-center px-2 py-1 rounded-lg transition-all"
+                  className="flex flex-col items-center rounded-lg px-2 py-1 transition-all"
                   style={{
                     color: active ? item.color : "#fff",
                     transform: `scale(${scale})`,
                   }}
                 >
                   <Icon size={24} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">
+                  <span className="mt-0.5 text-[10px] font-bold tracking-widest uppercase">
                     {item.label}
                   </span>
                 </Link>
@@ -193,7 +218,7 @@ export default function BottomNavbar() {
       {/* Trigger button (soccer ball) */}
       <motion.button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative w-14 h-14 rounded-full bg-gray-950/95 backdrop-blur-2xl border border-gray-800 shadow-[0_10px_40px_rgba(0,0,0,0.6)] flex items-center justify-center pointer-events-auto cursor-pointer"
+        className="pointer-events-auto relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border border-gray-800 bg-gray-950/95 shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
         whileHover={{ scale: 1.1, borderColor: "#22c55e" }}
         whileTap={{ scale: 0.9 }}
       >
@@ -216,7 +241,7 @@ export default function BottomNavbar() {
           <motion.span
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute -top-5 left-1/2 -translate-x-1/2 text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded pointer-events-none"
+            className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 rounded px-1.5 py-0.5 text-[7px] font-black tracking-widest uppercase"
             style={{
               color: roleBadge.color,
               background: `${roleBadge.color}18`,
@@ -232,7 +257,7 @@ export default function BottomNavbar() {
       <AnimatePresence>
         {!isOpen && (
           <motion.span
-            className="absolute -top-7 left-1/2 max-w-[8rem] -translate-x-1/2 text-center text-[8px] font-black uppercase tracking-widest text-green-400 bg-gray-950/90 px-2 py-1 rounded-lg border border-green-500/20 pointer-events-none"
+            className="pointer-events-none absolute -top-7 left-1/2 max-w-[8rem] -translate-x-1/2 rounded-lg border border-green-500/20 bg-gray-950/90 px-2 py-1 text-center text-[8px] font-black tracking-widest text-green-400 uppercase"
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 0 }}
             whileHover={{ opacity: 1, y: 0 }}
