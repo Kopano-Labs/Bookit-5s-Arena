@@ -116,19 +116,30 @@ export async function GET(request) {
       return { date, revenue: found?.revenue ?? 0, bookings: found?.bookings ?? 0 };
     });
 
+    // Efficiently calculate payment metrics using targeted counts instead of .find({}).lean()
+    const [
+      paidCount,
+      unpaidConfirmed,
+      refundedCount,
+      paidRevenueResult
+    ] = await Promise.all([
+      Booking.countDocuments({ paymentStatus: 'paid' }),
+      Booking.countDocuments({ status: 'confirmed', paymentStatus: { $ne: 'paid' } }),
+      Booking.countDocuments({ paymentStatus: 'refunded' }),
+      Booking.aggregate([
+        { $match: { paymentStatus: 'paid' } },
+        { $group: { _id: null, total: { $sum: '$total_price' } } }
+      ])
+    ]);
+
+    const paidRevenue = paidRevenueResult[0]?.total ?? 0;
+
     // Format status breakdown as object
     const statusCounts = { confirmed: 0, pending: 0, cancelled: 0 };
     statusBreakdown.forEach((s) => {
       if (s._id in statusCounts) statusCounts[s._id] = s.count;
     });
     statusCounts.cancelled = cancelledCount;
-
-    // Payment breakdown
-    const allBookings = await Booking.find({}).lean();
-    const paidCount = allBookings.filter(b => b.paymentStatus === 'paid').length;
-    const unpaidConfirmed = allBookings.filter(b => b.status === 'confirmed' && b.paymentStatus !== 'paid').length;
-    const refundedCount = allBookings.filter(b => b.paymentStatus === 'refunded').length;
-    const paidRevenue = allBookings.filter(b => b.paymentStatus === 'paid').reduce((sum, b) => sum + (b.total_price || 0), 0);
 
     // Format recent bookings
     const recentBookingsList = recentBookings.map((b) => ({

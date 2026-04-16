@@ -172,9 +172,32 @@ export default function AdminSandboxPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 px-4 py-10 text-white">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-gray-800 bg-gray-900 p-8 text-center text-sm text-gray-400">
-          Loading sandbox console…
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-10">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+          <div className="text-cyan-400 animate-pulse text-sm font-black uppercase tracking-widest">
+            Warming Firecracker...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !config) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-10">
+        <div className="max-w-md w-full bg-gray-900 border border-red-900/30 rounded-3xl p-8 text-center">
+          <FaShieldAlt className="text-red-500 mx-auto mb-4" size={48} />
+          <h2 className="text-xl font-black text-white uppercase tracking-widest mb-2">Sandbox Isolated</h2>
+          <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+            {error || "The secure management terminal could not be initialized. Secure keys may be missing from .env.local"}
+          </p>
+          <button
+            onClick={() => loadSandboxInfo()}
+            className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all"
+          >
+            Reconnect Terminal
+          </button>
         </div>
       </div>
     );
