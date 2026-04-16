@@ -117,20 +117,34 @@ export default function AnalyticsPage() {
     if (status === 'authenticated' && session.user.activeRole !== 'admin') { router.push('/'); return; }
   }, [status, session, router]);
 
-  const fetchData = useCallback(() => {
+  const [error, setError] = useState(null);
+
+  const fetchData = useCallback(async () => {
     if (status !== 'authenticated') return;
     setLoading(true);
+    setError(null);
     setInsights([]);
     setChatMessages([]);
 
-    Promise.all([
-      fetch(`/api/admin/analytics?days=${days}`).then((r) => r.json()),
-      fetch('/api/admin/stats').then((r) => r.json()).catch(() => null),
-    ]).then(([analyticsData, stats]) => {
+    try {
+      const [analyticsRes, statsRes] = await Promise.all([
+        fetch(`/api/admin/analytics?days=${days}`),
+        fetch('/api/admin/stats')
+      ]);
+
+      const analyticsData = await analyticsRes.json();
+      const stats = await statsRes.json();
+
+      if (!analyticsRes.ok) throw new Error(analyticsData.error || "Failed to load analytics");
+
       setData(analyticsData);
       setBookingStats(stats);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }
   }, [status, days]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
@@ -179,10 +193,31 @@ export default function AnalyticsPage() {
     }
   };
 
-  if (status === 'loading' || loading) {
+  if (status === 'loading' || (loading && !error)) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-green-400 animate-pulse text-lg">Loading analytics...</div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+          <div className="text-green-400 animate-pulse text-sm font-black uppercase tracking-widest">Crunching Intelligence...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-gray-900 border border-red-900/30 rounded-3xl p-8 text-center">
+          <FaExclamationTriangle className="text-red-500 mx-auto mb-4" size={48} />
+          <h2 className="text-xl font-black text-white uppercase tracking-widest mb-2">Analytics Error</h2>
+          <p className="text-gray-400 text-sm mb-8">{error}</p>
+          <button
+            onClick={() => fetchData()}
+            className="w-full py-4 bg-green-600 hover:bg-green-500 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all"
+          >
+            Retry Analytics Load
+          </button>
+        </div>
       </div>
     );
   }

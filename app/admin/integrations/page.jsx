@@ -189,11 +189,34 @@ export default function AdminIntegrationsPage() {
     }
   }
 
-  if (loading || !health) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 px-4 py-10 text-white">
-        <div className="mx-auto max-w-6xl rounded-3xl border border-gray-800 bg-gray-900 p-8 text-center text-sm text-gray-400">
-          Loading integrations…
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-10">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+          <div className="text-green-400 animate-pulse text-sm font-black uppercase tracking-widest">
+            Syncing Integrations...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !health) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-10">
+        <div className="max-w-md w-full bg-gray-900 border border-red-900/30 rounded-3xl p-8 text-center">
+          <FaExclamationTriangle className="text-red-500 mx-auto mb-4" size={48} />
+          <h2 className="text-xl font-black text-white uppercase tracking-widest mb-2">Integration Sync Failed</h2>
+          <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+            {error || "One or more critical integrations timed out. Check your environment keys and system health."}
+          </p>
+          <button
+            onClick={() => loadPageData()}
+            className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all"
+          >
+            Retry Sync
+          </button>
         </div>
       </div>
     );

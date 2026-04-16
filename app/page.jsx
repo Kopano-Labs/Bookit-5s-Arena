@@ -2,10 +2,11 @@
 import HeroSection      from '@/components/home/HeroSection';
 import StatsBar         from '@/components/home/StatsBar';
 import WeatherWidget    from '@/components/home/WeatherWidget';
+import HomeLiveFixtures from '@/components/home/HomeLiveFixtures';
 import CourtsSection    from '@/components/home/CourtsSection';
 import AmenitiesStrip   from '@/components/home/AmenitiesStrip';
 import EventsSection    from '@/components/home/EventsSection';
-import FixturesPromo    from '@/components/home/FixturesPromo';
+import HomeMediaHighlights from '@/components/home/HomeMediaHighlights';
 import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
 import TournamentSection from '@/components/home/TournamentSection';
@@ -56,6 +57,9 @@ const HomePage = async () => {
       {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}
       <WeatherWidget />
 
+      {/* ══ LIVE FIXTURES — cinematic global match center ═══════ */}
+      <HomeLiveFixtures />
+
       {/* ══ TOURNAMENT — showstopper World Cup section ══════════ */}
       <TournamentSection />
 
@@ -77,8 +81,8 @@ const HomePage = async () => {
       {/* ══ TOURNAMENT SHOWCASE — live standings + SSE ══════════ */}
       <TournamentShowcase />
 
-      {/* ══ FIXTURES PROMO — massive CTA after social ════════════ */}
-      <FixturesPromo />
+      {/* ══ MEDIA HIGHLIGHTS — cinematic global news feed ════════ */}
+      <HomeMediaHighlights />
 
       {/* ══ CONTACT + FOOTER — animated cards ═══════════════════ */}
       <ContactSection />

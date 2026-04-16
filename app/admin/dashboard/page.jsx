@@ -106,8 +106,10 @@ const AdminDashboard = () => {
     setBanStatus(banStatus === "banned" ? "active" : "banned");
   };
 
+  const [error, setError] = useState(null);
+
   const fetchStats = useCallback(
-    (params) => {
+    async (params) => {
       const p = params || new URLSearchParams();
       if (!params) {
         if (fromDate) p.set("from", fromDate);
@@ -115,21 +117,30 @@ const AdminDashboard = () => {
         if (statusFilter) p.set("status", statusFilter);
       }
       setLoading(true);
-      fetch(`/api/admin/stats?${p.toString()}`)
-        .then((r) => r.json())
-        .then((data) => {
-          setStats(data);
-          setLoading(false);
-        });
+      setError(null);
+      try {
+        const res = await fetch(`/api/admin/stats?${p.toString()}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch stats");
+        setStats(data);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     },
     [fromDate, toDate, statusFilter],
   );
 
-  const fetchTeams = useCallback(() => {
-    fetch("/api/tournament")
-      .then((r) => r.json())
-      .then((data) => setTeams(data.teams || []))
-      .catch(console.error);
+  const fetchTeams = useCallback(async () => {
+    try {
+      const res = await fetch("/api/tournament");
+      const data = await res.json();
+      setTeams(data.teams || []);
+    } catch (err) {
+      console.error("Teams fetch error:", err);
+    }
   }, []);
 
   useEffect(() => {
@@ -163,11 +174,42 @@ const AdminDashboard = () => {
     }
   };
 
-  if (loading || !stats) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-green-400 animate-pulse text-lg">
-          Loading dashboard...
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+          <div className="text-green-400 animate-pulse text-sm font-black uppercase tracking-widest">
+            Locking Pitch Data...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-gray-900 border border-red-900/30 rounded-3xl p-8 text-center shadow-2xl">
+          <FaExclamationTriangle className="text-red-500 mx-auto mb-4" size={48} />
+          <h2 className="text-xl font-black text-white uppercase tracking-widest mb-2">Access Denied or API Error</h2>
+          <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+            {error || "We couldn't initialize the Command Center. Verify your God-Mode permissions or check the server logs."}
+          </p>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => fetchStats()}
+              className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all"
+            >
+              Retry Connection
+            </button>
+            <Link
+              href="/"
+              className="w-full py-4 bg-gray-800 hover:bg-gray-700 text-gray-400 font-black uppercase tracking-widest text-xs rounded-xl transition-all"
+            >
+              Return Home
+            </Link>
+          </div>
         </div>
       </div>
     );
