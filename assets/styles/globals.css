@@ -16,6 +16,12 @@
     --font-body: inherit;
   }
 
+  /* Kill horizontal overflow sitewide — fixes black-bar-right + content-cut-left */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
   /* Theme-aware body — CSS variables drive theme changes */
   body {
     background-color: var(--bg-primary);

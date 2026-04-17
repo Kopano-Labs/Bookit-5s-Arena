@@ -175,7 +175,6 @@ export default function BottomNavbar() {
   if (hideNavbar) return null;
 
   return (
-    /* Hidden on mobile (sm:flex). Positioned at bottom center */
     <div
       ref={menuRef}
       className="pointer-events-none fixed bottom-6 left-1/2 z-90 -translate-x-1/2 flex-col items-center flex"
