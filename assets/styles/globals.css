@@ -19,6 +19,7 @@
   /* Kill horizontal overflow sitewide — fixes black-bar-right + content-cut-left */
   html, body {
     overflow-x: hidden;
+    width: 100%;
     max-width: 100vw;
   }
 

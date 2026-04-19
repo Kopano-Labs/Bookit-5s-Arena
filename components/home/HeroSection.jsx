@@ -32,7 +32,7 @@ const item = {
 
 export default function HeroSection() {
   return (
-    <section className="relative z-0 flex min-h-screen items-center justify-center overflow-hidden pt-24 pb-24">
+    <section className="relative z-0 flex min-h-screen items-center justify-center overflow-hidden px-0 pt-20 pb-20 sm:pt-24 sm:pb-24">
       {/* Ken Burns background (always visible, even in Read Mode) */}
       <div
         className="absolute inset-0 hero-bg"
@@ -56,15 +56,16 @@ export default function HeroSection() {
       />
 
       <motion.div
-        className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-10 px-6 text-center md:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] md:text-left"
+        className="relative z-10 mx-auto grid w-full max-w-6xl max-w-[100vw] items-center gap-8 overflow-hidden px-5 text-center sm:px-6 md:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] md:gap-10 md:text-left"
         variants={container}
         initial="hidden"
         animate="visible"
       >
-        <div className="max-w-2xl">
+        <div className="mx-auto w-full max-w-xl md:mx-0 md:max-w-2xl">
           <motion.p
             variants={item}
-            className="mb-4 text-[9px] font-bold uppercase tracking-[0.35em] text-green-400 sm:text-sm"
+            className="mb-4 text-[8px] font-bold uppercase leading-relaxed tracking-[0.18em] text-green-400 sm:text-sm sm:tracking-[0.35em]"
+            style={{ textWrap: "balance" }}
           >
             Milnerton · Cape Town · Hellenic Football Club
           </motion.p>
@@ -73,9 +74,10 @@ export default function HeroSection() {
             variants={item}
             className="hero-title mb-6 cursor-default font-black uppercase leading-[0.9] text-white"
             style={{
-              fontSize: "clamp(2.9rem, 7vw, 6rem)",
+              fontSize: "clamp(2.2rem, 11vw, 6rem)",
               fontFamily: "Impact, Arial Black, sans-serif",
               textShadow: "0 4px 32px rgba(0,0,0,0.55)",
+              textWrap: "balance",
             }}
           >
             <span className="block text-white/95">Welcome to</span>
@@ -95,7 +97,7 @@ export default function HeroSection() {
 
           <motion.p
             variants={item}
-            className="mb-10 max-w-xl text-lg leading-relaxed text-gray-200 sm:text-xl"
+            className="mb-10 max-w-xl text-base leading-relaxed text-gray-200 sm:text-xl"
           >
             Cape Town&apos;s premier 5-a-side football experience. Book a court,
             gather your squad, and play the beautiful game under the lights.
@@ -162,7 +164,7 @@ export default function HeroSection() {
 
         {/* Scroll indicator */}
         <motion.div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50"
+          className="absolute bottom-10 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 opacity-50 sm:flex"
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.5 }}
           transition={{ delay: 2, duration: 1 }}

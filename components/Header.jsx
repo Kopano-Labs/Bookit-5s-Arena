@@ -170,16 +170,6 @@ const HeaderInner = () => {
     session   ? USER_NAV :
                 GUEST_NAV;
 
-  /* Close admin dropdown on route change */
-  useEffect(() => {
-    setAdminMoreOpen(false);
-  }, [pathname]);
-
-  /* Close mobile menu on route change */
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
   const navClass = (href) => {
     const active = isActive(pathname, href);
     return `flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest whitespace-nowrap ${
@@ -235,9 +225,9 @@ const HeaderInner = () => {
     return (
       <header className="bg-gray-950/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-[100] shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-20 items-center justify-between">
+          <div className="flex h-16 items-center justify-between sm:h-20">
             <div className="flex items-center gap-3">
-              <div className="w-20 h-20 rounded-full bg-gray-800 animate-pulse" />
+              <div className="h-14 w-14 rounded-full bg-gray-800 animate-pulse sm:h-20 sm:w-20" />
             </div>
             <div className="hidden md:flex items-center gap-2">
               {[1, 2, 3].map((i) => (
@@ -254,13 +244,14 @@ const HeaderInner = () => {
   }
 
   return (
-    <header className="bg-gray-950/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-[100] shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
+    <>
+      <header className="bg-gray-950/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-[100] shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-16 items-center justify-between sm:h-20">
           {/* ── Logo Container (Centered Content) ── */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
             <motion.div
-              className="relative w-20 h-20 min-h-20 rounded-full overflow-hidden flex items-center justify-center"
+              className="relative flex h-14 w-14 min-h-14 items-center justify-center overflow-hidden rounded-full sm:h-20 sm:w-20 sm:min-h-20"
               style={{ position: "relative" }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
@@ -353,11 +344,11 @@ const HeaderInner = () => {
           </div>
 
           {/* ── Actions (Profile, Logout, Theme, Mobile Toggle) ── */}
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             {/* Theme Toggle — cycle on click, hover shows name */}
             <motion.button
               onClick={cycleTheme}
-              className="relative flex items-center gap-2 rounded-lg border border-gray-800/70 bg-gray-900/80 px-2.5 py-1.5 text-gray-400 transition-all hover:border-gray-700 hover:text-white hover:bg-gray-800 group"
+              className="group relative flex items-center gap-2 rounded-lg border border-gray-800/70 bg-gray-900/80 px-2 py-1.5 text-gray-400 transition-all hover:border-gray-700 hover:bg-gray-800 hover:text-white md:px-2.5"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.92 }}
               title={`Theme: ${themes[theme].name} — click to cycle`}
@@ -382,7 +373,7 @@ const HeaderInner = () => {
             </motion.button>
 
             {session ? (
-              <div className="flex items-center gap-3">
+              <div className="hidden items-center gap-3 md:flex">
                 <RoleSwitcher />
                 <Link
                   href="/profile"
@@ -424,7 +415,7 @@ const HeaderInner = () => {
                 </motion.button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="hidden items-center gap-2 md:flex">
                 {(!onAuthScreen || authMode !== "login") && (
                   <Link
                     href="/login"
@@ -449,12 +440,16 @@ const HeaderInner = () => {
               onClick={() => setMobileOpen(!mobileOpen)}
               className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg"
               whileTap={{ scale: 0.85 }}
+              aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation-drawer"
             >
               {mobileOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
             </motion.button>
           </div>
         </div>
       </nav>
+      </header>
 
       {/* ── Mobile Sidebar (Minimal Pattern) ── */}
       <AnimatePresence>
@@ -463,21 +458,26 @@ const HeaderInner = () => {
             <motion.button
               type="button"
               aria-label="Close navigation menu"
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[120] bg-black/70 backdrop-blur-sm md:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
             />
             <motion.div
-              className="fixed inset-x-4 bottom-4 top-24 z-40 overflow-hidden rounded-[28px] border border-gray-800 bg-gray-950/98 shadow-[0_30px_90px_rgba(0,0,0,0.65)] md:hidden"
+              id="mobile-navigation-drawer"
+              className="fixed inset-x-3 z-[130] overflow-hidden rounded-[24px] border border-gray-800 bg-gray-950 shadow-[0_30px_90px_rgba(0,0,0,0.7)] md:hidden"
+              style={{
+                top: "calc(4rem + env(safe-area-inset-top, 0px))",
+                bottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)",
+              }}
               initial={{ opacity: 0, y: -16, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 240, damping: 26 }}
             >
               <div
-                className="flex h-full flex-col overflow-y-auto px-4 py-4"
+                className="flex h-full flex-col overflow-y-auto overscroll-contain px-4 py-4"
                 style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1rem)" }}
               >
                 <div className="mb-4 flex items-start justify-between gap-3 border-b border-gray-800 pb-4">
@@ -518,6 +518,7 @@ const HeaderInner = () => {
                           key={tab.href}
                           href={tab.href}
                           prefetch={false}
+                          onClick={() => setMobileOpen(false)}
                           className={`${mobileClass(tab.href)} w-full justify-between border ${
                             isActive(pathname, tab.href)
                               ? "border-green-700 bg-green-500/10 text-white"
@@ -541,7 +542,11 @@ const HeaderInner = () => {
                           href={tab.comingSoon ? "#" : tab.href}
                           prefetch={false}
                           onClick={(e) => {
-                            if (tab.comingSoon) e.preventDefault();
+                            if (tab.comingSoon) {
+                              e.preventDefault();
+                              return;
+                            }
+                            setMobileOpen(false);
                           }}
                           className={`${mobileClass(tab.href)} w-full justify-between border ${
                             tab.comingSoon
@@ -569,6 +574,7 @@ const HeaderInner = () => {
                         key={tab.href}
                         href={tab.href}
                         prefetch={false}
+                        onClick={() => setMobileOpen(false)}
                         className={`${mobileClass(tab.href)} w-full justify-between border ${
                           isActive(pathname, tab.href)
                             ? "border-green-700 bg-green-500/10 text-white"
@@ -589,6 +595,7 @@ const HeaderInner = () => {
                     <Link
                       href="/profile"
                       prefetch={false}
+                      onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 rounded-2xl border border-gray-800 bg-gray-900/80 px-4 py-3"
                     >
                       <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-green-500 bg-gray-900">
@@ -616,6 +623,13 @@ const HeaderInner = () => {
                       </div>
                     </Link>
 
+                    <div className="rounded-2xl border border-gray-800 bg-gray-900/80 px-4 py-3">
+                      <p className="mb-2 text-[9px] font-black uppercase tracking-[0.22em] text-gray-500">
+                        Active Role
+                      </p>
+                      <RoleSwitcher />
+                    </div>
+
                     <button
                       onClick={() => signOut({ callbackUrl: "/" })}
                       className="flex w-full items-center justify-between rounded-2xl border border-red-900/60 bg-red-500/10 px-4 py-3 text-left text-sm font-black uppercase tracking-widest text-red-400"
@@ -631,6 +645,7 @@ const HeaderInner = () => {
                     {(!onAuthScreen || authMode !== "login") && (
                       <Link
                         href="/login"
+                        onClick={() => setMobileOpen(false)}
                         className="rounded-2xl border border-gray-800 bg-gray-900/80 px-4 py-3 text-center text-sm font-black uppercase tracking-widest text-gray-200"
                       >
                         Login
@@ -639,6 +654,7 @@ const HeaderInner = () => {
                     {(!onAuthScreen || authMode !== "register") && (
                       <Link
                         href="/register"
+                        onClick={() => setMobileOpen(false)}
                         className="rounded-2xl bg-green-600 px-4 py-3 text-center text-sm font-black uppercase tracking-widest text-white shadow-[0_0_18px_rgba(34,197,94,0.28)]"
                       >
                         Register
@@ -660,7 +676,7 @@ const HeaderInner = () => {
           </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 };
 

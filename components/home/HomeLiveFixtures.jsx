@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaBolt, FaBroadcastTower, FaChevronRight, FaTrophy } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { FaArrowRight, FaBolt, FaBroadcastTower, FaChevronRight } from "react-icons/fa";
 
 export default function HomeLiveFixtures() {
   const [matches, setMatches] = useState([]);
@@ -40,7 +40,7 @@ export default function HomeLiveFixtures() {
   return (
     <section className="bg-zinc-950 border-y border-zinc-900 py-12 overflow-hidden relative">
         {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-green-500/10 blur-[120px] pointer-events-none" />
+        <div className="pointer-events-none absolute top-1/2 left-1/2 h-[min(42vw,300px)] w-[min(75vw,600px)] -translate-x-1/2 -translate-y-1/2 bg-green-500/10 blur-[120px]" />
 
       <div className="max-w-7xl mx-auto px-6 mb-8 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
@@ -74,7 +74,7 @@ export default function HomeLiveFixtures() {
                 {match.isLive ? (
                   <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20">
                     <span className="w-1 h-1 bg-rose-500 rounded-full animate-pulse" />
-                    <span className="text-[8px] font-black uppercase tracking-widest text-rose-500">{match.minute}' LIVE</span>
+                    <span className="text-[8px] font-black uppercase tracking-widest text-rose-500">{match.minute}&apos; LIVE</span>
                   </div>
                 ) : (
                   <span className="text-[8px] font-black uppercase tracking-widest text-zinc-600">{match.kickoffLabel}</span>
