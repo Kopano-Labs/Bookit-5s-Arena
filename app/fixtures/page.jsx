@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import FootballFixturesHub from "@/components/fixtures/FootballFixturesHub";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const LEAGUES = [
   /* ─── 🌍 International ─── */
@@ -42,22 +44,46 @@ const LEAGUES = [
   { slug: "afc-champions-league-elite", name: "AFC Champions League Elite",    country: "AFC" },
 ];
 
-export default function FixturesPage() {
-  const [selectedLeague, setSelectedLeague] = useState(LEAGUES[0].slug);
+function FixturesPageInner() {
+  const searchParams = useSearchParams();
+  const leagueParam = searchParams.get("league");
+  const initialLeague = LEAGUES.find(l => l.slug === leagueParam)?.slug || LEAGUES[0].slug;
+  const [selectedLeague, setSelectedLeague] = useState(initialLeague);
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-20 pt-10 px-4">
+    <div className="min-h-screen pb-20 pt-10 px-4" style={{ background: "linear-gradient(180deg, #04060a 0%, #0a0f14 60%, #04060a 100%)" }}>
       <div className="mx-auto max-w-6xl space-y-10">
+        {/* Header */}
+        <section className="flex flex-col items-center gap-4 text-center">
+          <h1
+            className="text-4xl md:text-6xl font-black text-white uppercase leading-none"
+            style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif", letterSpacing: "0.08em" }}
+          >
+            LIVE <span className="text-green-400">FIXTURES</span>
+          </h1>
+          <p className="text-zinc-400 text-sm max-w-xl">
+            Real-time scores, schedules, and standings across 27 leagues worldwide. Powered by iSports API.
+          </p>
+        </section>
+
+        {/* League Switcher */}
         <section className="flex flex-col items-center gap-6">
-          <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-white rounded-2xl shadow-sm border border-zinc-200">
+          <div
+            className="flex flex-wrap justify-center gap-2 p-2 rounded-2xl border"
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              borderColor: "rgba(74, 222, 128, 0.1)",
+              backdropFilter: "blur(12px)",
+            }}
+          >
             {LEAGUES.map((league) => (
               <button
                 key={league.slug}
                 onClick={() => setSelectedLeague(league.slug)}
-                className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+                className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all duration-200 ${
                   selectedLeague === league.slug
-                    ? "bg-zinc-950 text-white shadow-lg"
-                    : "text-zinc-500 hover:bg-zinc-100"
+                    ? "bg-green-500 text-black shadow-lg shadow-green-500/30"
+                    : "text-zinc-500 hover:text-white hover:bg-white/5"
                 }`}
               >
                 {league.name}
@@ -66,6 +92,7 @@ export default function FixturesPage() {
           </div>
         </section>
 
+        {/* Fixtures Hub */}
         <motion.div
           key={selectedLeague}
           initial={{ opacity: 0, scale: 0.98 }}
@@ -76,5 +103,17 @@ export default function FixturesPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function FixturesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#04060a" }}>
+        <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <FixturesPageInner />
+    </Suspense>
   );
 }
