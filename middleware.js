@@ -29,6 +29,13 @@ function hasMinRole(activeRole, requiredRole) {
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
+
+  // ── Security: Block x-middleware-subrequest header from external requests ──
+  // Prevents CVE-2025-29927-style middleware bypass attacks
+  if (request.headers.get("x-middleware-subrequest")) {
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+
   const rule = PROTECTED_ROUTE_RULES.find(({ prefix }) =>
     matchesProtectedPrefix(pathname, prefix),
   );

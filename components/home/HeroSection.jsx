@@ -1,8 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { FaFutbol, FaWhatsapp } from "react-icons/fa";
+
+/* ── Lazy-load 3D scene (heavy Three.js bundle) ── */
+const Hero3DScene = dynamic(() => import("@/components/home/Hero3DScene"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const whatsappPulse = {
   animate: {
@@ -33,25 +41,29 @@ const item = {
 export default function HeroSection() {
   return (
     <section className="relative z-0 flex min-h-screen items-center justify-center overflow-hidden px-0 pt-20 pb-20 sm:pt-24 sm:pb-24">
-      {/* Ken Burns background (always visible, even in Read Mode) */}
+      {/* ── 3D Three.js Scene (background layer) ── */}
+      <Suspense fallback={null}>
+        <Hero3DScene />
+      </Suspense>
+
+      {/* ── Gradient underlay for 3D scene ── */}
       <div
-        className="absolute inset-0 hero-bg"
+        className="absolute inset-0 z-[-1]"
         style={{
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80)",
-          backgroundColor: "#eae6df", // fallback for Read Mode
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(74,222,128,0.06) 0%, transparent 70%), linear-gradient(180deg, #04060a 0%, #080d14 50%, #04060a 100%)",
         }}
       />
 
-      {/* Particle dot grid overlay (reduce opacity in Read Mode for clarity) */}
+      {/* Particle dot grid overlay */}
       <div className="absolute inset-0 hero-particles read:opacity-30" />
 
-      {/* Vignette overlay (lighter in Read Mode for image clarity) */}
+      {/* Bottom gradient fade */}
       <div
-        className="absolute inset-0 vignette-overlay"
+        className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.08) 100%)",
+            "linear-gradient(to top, rgba(4,6,10,1) 0%, rgba(4,6,10,0.8) 20%, transparent 50%)",
         }}
       />
 
@@ -75,7 +87,7 @@ export default function HeroSection() {
             className="hero-title mb-6 cursor-default font-black uppercase leading-[0.9] text-white"
             style={{
               fontSize: "clamp(2.2rem, 11vw, 6rem)",
-              fontFamily: "Impact, Arial Black, sans-serif",
+              fontFamily: "'Bebas Neue', Impact, Arial Black, sans-serif",
               textShadow: "0 4px 32px rgba(0,0,0,0.55)",
               textWrap: "balance",
             }}
@@ -151,7 +163,7 @@ export default function HeroSection() {
               </p>
               <p
                 className="mt-3 text-3xl font-black uppercase text-white"
-                style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
+                style={{ fontFamily: "'Bebas Neue', Impact, Arial Black, sans-serif" }}
               >
                 Floodlit 5-A-Side
               </p>

@@ -33,6 +33,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "media-3.api-sports.io" },
       { protocol: "https", hostname: "media-4.api-sports.io" },
       { protocol: "https", hostname: "resources.premierleague.com" },
+      { protocol: "https", hostname: "www.isportsapi.com" },
+      { protocol: "https", hostname: "*.isportsapi.com" },
     ],
   },
 
@@ -42,7 +44,7 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
-          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-DNS-Prefetch-Control", value: "off" },
           { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
@@ -51,7 +53,7 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(self)",
+            value: "camera=(), microphone=(), geolocation=(), payment=(self)",
           },
           {
             key: "Strict-Transport-Security",
