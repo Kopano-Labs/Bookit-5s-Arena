@@ -93,45 +93,45 @@ const USER_NAV = [
 ];
 
 const MANAGER_NAV = [
-  { href: "/manager/dashboard", icon: <FaTachometerAlt size={11} className="text-green-400" />, label: "HQ" },
-  { href: "/manager/squad",     icon: <FaUsers size={11} className="text-blue-400" />,          label: "Squad" },
-  { href: "/manager/fixtures",  icon: <FaListAlt size={11} className="text-orange-400" />,      label: "Fixtures" },
-  { href: "/about",             icon: <FaBookOpen size={11} className="text-green-400" />,      label: "About" },
+  { href: "/manager/dashboard", emoji: "📊", label: "HQ" },
+  { href: "/manager/squad",     emoji: "👥", label: "Squad" },
+  { href: "/manager/fixtures",  emoji: "📅", label: "Fixtures" },
+  { href: "/about",             emoji: "ℹ️", label: "About" },
 ];
 
 const ADMIN_NAV_PRIMARY = [
-  { href: "/admin/dashboard",    icon: <FaUserShield size={11} className="text-green-400" />,   label: "Dashboard" },
-  { href: "/admin/bookings",     icon: <FaCalendarAlt size={11} className="text-purple-400" />, label: "Bookings" },
-  { href: "/admin/competitions", icon: <FaTrophy size={11} className="text-orange-400" />,      label: "Comps" },
+  { href: "/admin/dashboard",    emoji: "🛡️", label: "Dashboard" },
+  { href: "/admin/bookings",     emoji: "📅", label: "Bookings" },
+  { href: "/admin/competitions", emoji: "🏆", label: "Comps" },
 ];
 
 const ADMIN_NAV_MORE = [
-  { href: "/admin/analytics",    icon: <FaChartBar size={11} className="text-cyan-400" />,      label: "Analytics" },
-  { href: "/admin/rights",       icon: <FaKey size={11} className="text-yellow-400" />,         label: "Rights" },
-  { href: "/admin/integrations", icon: <FaPlug size={11} className="text-emerald-400" />,       label: "Integrations" },
-  { href: "/admin/google",       icon: <FaGoogle size={11} className="text-white" />,           label: "Google APIs" },
-  { href: "/admin/newsletter",   icon: <FaNewspaper size={11} className="text-blue-400" />,     label: "Newsletter" },
-  { href: "/admin/sandbox",      icon: <FaFlask size={11} className="text-pink-400" />,         label: "Sandbox" },
-  { href: "/admin/security",     icon: <FaShieldAlt size={11} className="text-red-400" />,      label: "Security", comingSoon: true },
-  { href: "/admin/audit",        icon: <FaHistory size={11} className="text-amber-400" />,      label: "Audit Log", comingSoon: true },
+  { href: "/admin/analytics",    emoji: "📈", label: "Analytics" },
+  { href: "/admin/rights",       emoji: "🔑", label: "Rights" },
+  { href: "/admin/integrations", emoji: "🔌", label: "Integrations" },
+  { href: "/admin/google",       emoji: "🌐", label: "Google APIs" },
+  { href: "/admin/newsletter",   emoji: "📰", label: "Newsletter" },
+  { href: "/admin/sandbox",      emoji: "🧪", label: "Sandbox" },
+  { href: "/admin/security",     emoji: "🛡️", label: "Security", comingSoon: true },
+  { href: "/admin/audit",        emoji: "📜", label: "Audit Log", comingSoon: true },
 ];
 
 /* Mobile admin nav grouped for the drawer */
 const ADMIN_MOBILE_MANAGEMENT = [
-  { href: "/admin/dashboard",    icon: <FaUserShield size={11} className="text-green-400" />,   label: "Dashboard" },
-  { href: "/admin/bookings",     icon: <FaCalendarAlt size={11} className="text-purple-400" />, label: "Bookings" },
-  { href: "/admin/competitions", icon: <FaTrophy size={11} className="text-orange-400" />,      label: "Comps" },
-  { href: "/admin/analytics",    icon: <FaChartBar size={11} className="text-cyan-400" />,      label: "Analytics" },
-  { href: "/admin/rights",       icon: <FaKey size={11} className="text-yellow-400" />,         label: "Rights" },
+  { href: "/admin/dashboard",    emoji: "🛡️", label: "Dashboard" },
+  { href: "/admin/bookings",     emoji: "📅", label: "Bookings" },
+  { href: "/admin/competitions", emoji: "🏆", label: "Comps" },
+  { href: "/admin/analytics",    emoji: "📈", label: "Analytics" },
+  { href: "/admin/rights",       emoji: "🔑", label: "Rights" },
 ];
 
 const ADMIN_MOBILE_ADVANCED = [
-  { href: "/admin/integrations", icon: <FaPlug size={11} className="text-emerald-400" />,       label: "Integrations" },
-  { href: "/admin/google",       icon: <FaGoogle size={11} className="text-white" />,           label: "Google APIs" },
-  { href: "/admin/newsletter",   icon: <FaNewspaper size={11} className="text-blue-400" />,     label: "Newsletter" },
-  { href: "/admin/sandbox",      icon: <FaFlask size={11} className="text-pink-400" />,         label: "Sandbox" },
-  { href: "/admin/security",     icon: <FaShieldAlt size={11} className="text-red-400" />,      label: "Security", comingSoon: true },
-  { href: "/admin/audit",        icon: <FaHistory size={11} className="text-amber-400" />,      label: "Audit Log", comingSoon: true },
+  { href: "/admin/integrations", emoji: "🔌", label: "Integrations" },
+  { href: "/admin/google",       emoji: "🌐", label: "Google APIs" },
+  { href: "/admin/newsletter",   emoji: "📰", label: "Newsletter" },
+  { href: "/admin/sandbox",      emoji: "🧪", label: "Sandbox" },
+  { href: "/admin/security",     emoji: "🛡️", label: "Security", comingSoon: true },
+  { href: "/admin/audit",        emoji: "📜", label: "Audit Log", comingSoon: true },
 ];
 
 /* ── Route-matching helper ── */
@@ -309,7 +309,7 @@ const HeaderInner = () => {
                   onClick={() => setAdminMoreOpen((v) => !v)}
                   className={`${navClass("#more")} ${adminMoreOpen ? "!text-green-400 !bg-gray-800" : ""}`}
                 >
-                  <NavIcon><FaCog size={11} className="text-green-400" /></NavIcon> More
+                  <span className="text-sm">⚙️</span> More
                 </button>
                 <AnimatePresence>
                   {adminMoreOpen && (
@@ -338,7 +338,8 @@ const HeaderInner = () => {
                                   : "text-gray-300 hover:text-white hover:bg-gray-800/60"
                             }`}
                           >
-                            {item.icon}
+                            {item.emoji && <span className="text-sm">{item.emoji}</span>}
+                            {item.icon && item.icon}
                             <span>{item.label}</span>
                             {item.comingSoon && (
                               <span className="ml-auto text-[8px] font-bold uppercase tracking-wider text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">
@@ -537,7 +538,8 @@ const HeaderInner = () => {
                           }`}
                         >
                           <span className="flex items-center gap-2">
-                            {tab.icon} {tab.label}
+                            {tab.emoji && <span className="text-base">{tab.emoji}</span>}
+                            {tab.icon && tab.icon} {tab.label}
                           </span>
                           <FaChevronRight size={12} className="text-gray-500" />
                         </Link>
@@ -568,7 +570,8 @@ const HeaderInner = () => {
                           }`}
                         >
                           <span className="flex items-center gap-2">
-                            {tab.icon} {tab.label}
+                            {tab.emoji && <span className="text-base">{tab.emoji}</span>}
+                            {tab.icon && tab.icon} {tab.label}
                             {tab.comingSoon && (
                               <span className="text-[8px] font-bold uppercase tracking-wider text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">
                                 Soon
@@ -593,7 +596,8 @@ const HeaderInner = () => {
                         }`}
                       >
                         <span className="flex items-center gap-2">
-                          {tab.icon} {tab.label}
+                          {tab.emoji && <span className="text-base">{tab.emoji}</span>}
+                          {tab.icon && tab.icon} {tab.label}
                         </span>
                         <FaChevronRight size={12} className="text-gray-500" />
                       </Link>
