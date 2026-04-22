@@ -28,6 +28,7 @@ import {
   FaHistory,
   FaGoogle,
 } from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa6";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import SearchModal from "@/components/SearchModal";
@@ -76,19 +77,19 @@ const ThemeGlyph = ({ theme }) => {
 };
 
 const GUEST_NAV = [
-  { href: "/#courts",             icon: <FaFutbol size={11} className="text-green-400" />,    label: "Book Court" },
-  { href: "/events-and-services", icon: <FaBolt size={11} className="text-cyan-400" />,       label: "Events" },
-  { href: "/leagues",             icon: <FaTrophy size={11} className="text-yellow-400" />,   label: "Competitions" },
-  { href: "/fixtures",            icon: <FaListAlt size={11} className="text-orange-400" />,  label: "Fixtures" },
-  { href: "/about",               icon: <FaBookOpen size={11} className="text-green-400" />,  label: "About" },
+  { href: "/#courts",             emoji: "⚽",  label: "Book" },
+  { href: "/fixtures",            emoji: "📅",  label: "Fixtures" },
+  { href: "/leagues",             emoji: "🏆",  label: "Leagues" },
+  { href: "/events-and-services", emoji: "🔥",  label: "Events" },
+  { href: "/about",               emoji: "ℹ️",  label: "About" },
 ];
 
 const USER_NAV = [
-  { href: "/#courts",   icon: <FaFutbol size={11} className="text-green-400" />,    label: "Book" },
-  { href: "/bookings",  icon: <FaCalendarAlt size={11} className="text-purple-400" />, label: "My Bookings" },
-  { href: "/leagues",   icon: <FaTrophy size={11} className="text-yellow-400" />,   label: "Competitions" },
-  { href: "/fixtures",  icon: <FaListAlt size={11} className="text-orange-400" />,  label: "Fixtures" },
-  { href: "/about",     icon: <FaBookOpen size={11} className="text-green-400" />,  label: "About" },
+  { href: "/#courts",   emoji: "⚽",  label: "Book" },
+  { href: "/bookings",  emoji: "📅",  label: "Bookings" },
+  { href: "/leagues",   emoji: "🏆",  label: "Leagues" },
+  { href: "/fixtures",  emoji: "📡",  label: "Fixtures" },
+  { href: "/about",     emoji: "ℹ️",  label: "About" },
 ];
 
 const MANAGER_NAV = [
@@ -295,7 +296,9 @@ const HeaderInner = () => {
                 prefetch={false}
                 className={navClass(tab.href)}
               >
-                <NavIcon>{tab.icon}</NavIcon> {tab.label}
+                {tab.emoji && <span className="text-sm">{tab.emoji}</span>}
+                {tab.icon && <NavIcon>{tab.icon}</NavIcon>}
+                {tab.label}
               </Link>
             ))}
 
@@ -350,6 +353,13 @@ const HeaderInner = () => {
                 </AnimatePresence>
               </div>
             )}
+          </div>
+
+          {/* ── Social Icons (Blog-matching) ── */}
+          <div className="hidden lg:flex items-center gap-2 mr-1">
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-green-400 transition-colors"><FaFacebookF size={13} /></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-green-400 transition-colors"><FaInstagram size={13} /></a>
+            <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-green-400 transition-colors"><FaTiktok size={13} /></a>
           </div>
 
           {/* ── Actions (Profile, Logout, Theme, Mobile Toggle) ── */}
@@ -428,17 +438,9 @@ const HeaderInner = () => {
                 {(!onAuthScreen || authMode !== "login") && (
                   <Link
                     href="/login"
-                    className="px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] text-center font-bold text-gray-400 hover:text-white uppercase tracking-widest"
+                    className="py-1.5 px-5 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 rounded-full shadow-[0_0_16px_rgba(34,197,94,0.3)] transition-all"
                   >
-                    LOGIN
-                  </Link>
-                )}
-                {(!onAuthScreen || authMode !== "register") && (
-                  <Link
-                    href="/register"
-                    className="px-3 sm:px-5 py-2 text-[9px] sm:text-[10px] text-center font-black text-white bg-green-600 rounded-lg shadow-[0_0_12px_rgba(34,197,94,0.4)] uppercase tracking-widest"
-                  >
-                    REGISTER
+                    Login
                   </Link>
                 )}
               </div>
