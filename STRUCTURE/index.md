@@ -1,7 +1,7 @@
 ---
-title: Schematics Index
+title: Bookit 5s Arena SUB-BRAIN Index
 created: 2026-04-10
-updated: 2026-04-10
+updated: 2026-04-22
 author: Codex
 tags:
   - schematics
@@ -12,14 +12,14 @@ priority: critical
 status: active
 ---
 
-# Schematics Index
+# Bookit 5s Arena SUB-BRAIN Index
 
-> `Schematics` is Orch's second brain.
+> This is the **Bookit 5s Arena** sub-brain, linked to the **Kopano Context** (KC) ecosystem.
 > It preserves mission, delivery truth, demo readiness, orchestration training, hallucination control, and historical session evidence without replacing the live product repo.
 
 ## Standing Note
 
-- all current sessions are `pre-sessions` and training data for Orch
+- all current sessions are `pre-sessions` and training data for Kopano Context (KC)
 - the standing multi-dev roster is `Germini`, `Nother`, `Meither`, and `Cicero`
 - Lead may be `Codex`, `Claude`, or `Codex + Claude`
 - Lead operates at `60% management / 40% coding`
@@ -38,7 +38,7 @@ status: active
 ## Top-Level Map
 
 - [00-Home](00-Home/index.md) - front door, dashboard, and live current-state notes
-- [01-Mission](01-Mission/index.md) - Orch identity and intent
+- [01-Mission](01-Mission/index.md) - Kopano Context identity and intent
 - [02-Strategy](02-Strategy/index.md) - product direction, Microsoft framing, and long-range positioning
 - [03-Architecture](03-Architecture/index.md) - system design and technical reference
 - [04-Updates](04-Updates/index.md) - control notes, tasking, comms, and active delivery truth
@@ -46,7 +46,7 @@ status: active
 - [06-Reference](06-Reference/index.md) - archives, imported references, and blocker ledgers
 - [07-Sessions By Day](07-Sessions%20By%20Day/index.md) - dated session reconstruction and evidence trail
 - [08-IDEAS AT BIRTH](08-IDEAS%20AT%20BIRTH/index.md) - incubation-only ideas with research gates
-- [09-KOPANO CONTEXT PROGRESSION](09-ORCH%20PROGRESSION/index.md) - Orch capability ladder from observer to co-lead
+- [09-KOPANO CONTEXT PROGRESSION](09-KOPANO%20CONTEXT%20PROGRESSION/index.md) - KC capability ladder from observer to co-lead
 - [10-SESSION IMPROVEMENTS](10-SESSION%20IMPROVEMENTS/index.md) - lead doctrine, hierarchy control, and token discipline
 - [11-AI HALLUCINATION - CRITICAL](11-AI%20HALLUCINATION%20-%20CRITICAL/index.md) - mandatory hallucination audit system
 - [12-PLAN MODE SESSIONS](12-PLAN%20MODE%20SESSIONS/index.md) - archived plan-mode outputs with date, time, participants, and phase

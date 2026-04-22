@@ -67,8 +67,8 @@ export default function PricingPage() {
               fontFamily: "Impact, Arial Black, sans-serif",
             }}
           >
-            Transparent <span className="text-green-500">Pricing</span>
-          </h1>
+            <>Transparent <span className="text-green-500">Pricing</span></>
+          </motion.h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             No hidden fees. No membership dues. Just pay for the time you play and get back on the pitch.
           </p>

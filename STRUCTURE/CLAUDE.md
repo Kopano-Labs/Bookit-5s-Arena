@@ -156,7 +156,7 @@ Additional fields as needed: `author`, `priority`, `audience`, `severity`, `agen
 | Folder | Purpose |
 |--------|---------|
 | `00-Home` | Current truth and navigation (Dashboard, Now) |
-| `01-Mission` | Orch identity and blueprint |
+| `01-Mission` | Kopano Context identity and blueprint |
 | `02-Strategy` | Product direction, partnerships, adoption |
 | `03-Architecture` | CLI, database, WhatsApp, Neural Link GUI |
 | `04-Updates` | Live coordination: comms-log, task-board, dev-tracker, project status |
@@ -164,7 +164,7 @@ Additional fields as needed: `author`, `priority`, `audience`, `severity`, `agen
 | `06-Reference` | Archives, open issues, code reference |
 | `07-Sessions By Day` | Dated session reconstruction and evidence |
 | `08-IDEAS AT BIRTH` | Incubation-only idea bank |
-| `09-KOPANO PROGRESSION` | Capability ladder: Observer → Co-Lead |
+| `09-KOPANO CONTEXT PROGRESSION` | Capability ladder: Observer → Co-Lead (KC) |
 | `10-SESSION IMPROVEMENTS` | Lead doctrine, hierarchy, token discipline |
 | `11-AI HALLUCINATION - CRITICAL` | Hallucination governance with protocols, taxonomy, incidents |
 | `12-PLAN MODE SESSIONS` | Archived plan-mode outputs |
@@ -181,4 +181,4 @@ Additional fields as needed: `author`, `priority`, `audience`, `severity`, `agen
 - **Task board:** `04-Updates/task-board.md`
 - **Delegation rules:** `04-Updates/delegation-protocol.md`
 - **Open blockers:** `06-Reference/Open Issues.md`
-- **Demo script:** `Microsoft Demo Day!/Orch Demo Script - 2026-04-09.md`
+- **Demo script:** `13-DEMO DAY/index.md`

@@ -201,7 +201,7 @@ export default function TournamentSection() {
             <div>
               <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold leading-none mb-0.5">Tournament Dates</p>
               <p className="text-white font-black text-base md:text-lg leading-none" style={{ fontFamily: "Impact, Arial Black, sans-serif" }}>
-                MAY 26 – 31, 2026
+                MAY 29 – 31, 2026
               </p>
             </div>
           </motion.div>

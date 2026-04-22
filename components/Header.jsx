@@ -172,10 +172,10 @@ const HeaderInner = () => {
 
   const navClass = (href) => {
     const active = isActive(pathname, href);
-    return `flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest whitespace-nowrap ${
+    return `relative flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold rounded-md transition-all duration-200 uppercase tracking-widest whitespace-nowrap ${
       active
-        ? "text-green-400 bg-green-500/10"
-        : "text-gray-400 hover:text-white hover:bg-gray-800/60"
+        ? "text-green-400"
+        : "text-gray-500 hover:text-white"
     }`;
   };
 
@@ -245,33 +245,42 @@ const HeaderInner = () => {
 
   return (
     <>
-      <header className="bg-gray-950/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-[100] shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
+      <header
+        className="sticky top-0 z-[100]"
+        style={{
+          background: "rgba(4, 6, 10, 0.92)",
+          backdropFilter: "blur(24px) saturate(1.6)",
+          WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+          borderBottom: "1px solid rgba(74, 222, 128, 0.08)",
+          boxShadow: "0 4px 30px rgba(0,0,0,0.7), inset 0 -1px 0 rgba(74,222,128,0.06)",
+        }}
+      >
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between sm:h-20">
+        <div className="flex h-14 items-center justify-between sm:h-16">
           {/* ── Logo Container (Centered Content) ── */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
             <motion.div
-              className="relative flex h-14 w-14 min-h-14 items-center justify-center overflow-hidden rounded-full sm:h-20 sm:w-20 sm:min-h-20"
+              className="relative flex h-11 w-11 min-h-11 items-center justify-center overflow-hidden rounded-full sm:h-14 sm:w-14 sm:min-h-14"
               style={{ position: "relative" }}
-              whileHover={{ scale: 1.08 }}
+              whileHover={{ scale: 1.08, rotate: 3 }}
               whileTap={{ scale: 0.95 }}
             >
               <Image
                 src="/images/logo.png"
                 alt="5s Arena"
                 fill
-                sizes="80px"
+                sizes="56px"
                 className="object-contain"
                 priority
               />
             </motion.div>
             <span
-              className="hidden sm:block font-black text-white uppercase leading-none text-base tracking-widest"
-              style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
+              className="hidden sm:block font-black text-white uppercase leading-none text-sm tracking-widest"
+              style={{ fontFamily: "'Bebas Neue', 'Impact', 'Arial Black', sans-serif", letterSpacing: "0.12em" }}
             >
               5S
               <br />
-              <span className="text-green-400 text-lg">ARENA</span>
+              <span style={{ color: "#4ade80", fontSize: "1.1rem" }}>ARENA</span>
             </span>
           </Link>
 

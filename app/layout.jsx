@@ -113,7 +113,7 @@ const RootLayout = ({ children }) => {
         <link rel="dns-prefetch" href="https://plausible.io" />
         <link rel="dns-prefetch" href="https://media.api-sports.io" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;900&display=swap"
           rel="stylesheet"
         />
         {/* Plausible Analytics — Lightweight & Privacy-focused */}
