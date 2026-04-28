@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# Google Drive sync temp folder
+.tmp.driveupload/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
