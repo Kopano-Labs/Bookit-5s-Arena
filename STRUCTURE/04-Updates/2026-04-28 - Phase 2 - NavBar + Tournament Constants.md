@@ -1,3 +1,5 @@
+> **Phase 4 follow-up (2026-04-28):** Added [`lib/responsiveMatrix.js`](../../lib/responsiveMatrix.js) and audit report at [`2026-04-28 - Phase 4 - Responsive Matrix.md`](2026-04-28%20-%20Phase%204%20-%20Responsive%20Matrix.md). NavBar fix on Header.jsx + BottomNavbar.jsx still requires Tier 1 (360px) verification per the matrix — scheduled for Phase 5.
+
 # Phase 2 Update — NavBar + Tournament Constants
 
 **Date:** 2026-04-28
