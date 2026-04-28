@@ -73,7 +73,7 @@ const FAQ_CATEGORIES = [
     faqs: [
       {
         q: "When does the tournament start?",
-        a: "The 5s Arena World Cup runs May 26–31, 2026. Sign-ups close one week before (May 19).",
+        a: "The 5s Arena World Cup runs May 29–31, 2026. Sign-ups close one week before (May 22).",
       },
       {
         q: "How many players per team?",

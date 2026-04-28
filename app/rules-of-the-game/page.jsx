@@ -34,7 +34,7 @@ const CHAPTERS = [
       "Each match is played under standard 5-a-side rules (see General Rules below).",
       "A random generator is used to assign fixtures — fair play for everyone.",
       "Teams represent World Cup nations — choose your country at sign-up!",
-      "⚠️ Tournament dates: 26 May – 31 May 2026.",
+      "⚠️ Tournament dates: 29 May – 31 May 2026.",
     ],
     links: [
       { label: "Sign-Up Rules →", href: "#signup" },

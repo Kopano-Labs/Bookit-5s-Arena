@@ -253,7 +253,7 @@ export default function PublicStandingsPage() {
                 <div className="px-5 py-3 border-t border-gray-800/50 flex items-center gap-3">
                   <div className="w-2 h-2 bg-green-500 rounded-sm shrink-0" />
                   <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">
-                    Top 4 advance to Round of 32
+                    Top 2 advance to Round of 16
                   </span>
                 </div>
               </motion.div>

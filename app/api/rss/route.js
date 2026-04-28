@@ -7,7 +7,7 @@ export async function GET() {
   const items = [
     {
       title: '5s Arena World Cup Tournament — Registrations Open',
-      description: 'Sign up your team for the inaugural 5s Arena World Cup. 8 groups, 6 teams each. May 26–31, 2026 at Hellenic Football Club, Milnerton.',
+      description: 'Sign up your team for the inaugural 5s Arena World Cup. 8 groups, 6 teams each. May 29–31, 2026 at Hellenic Football Club, Milnerton.',
       link: `${SITE_URL}/tournament`,
       pubDate: new Date('2026-01-01').toUTCString(),
     },

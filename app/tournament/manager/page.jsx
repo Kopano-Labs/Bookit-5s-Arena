@@ -690,7 +690,7 @@ export default function TournamentManagerPage() {
                   <FaTrophy size={28} className="text-yellow-500 mx-auto mb-3" />
                   <h3 className="text-base font-black uppercase text-white mb-1" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>Rewards Leaderboard</h3>
                   <p className="text-gray-400 text-xs max-w-md mx-auto">
-                    The social media points leaderboard goes live once the tournament kicks off on <strong className="text-white">26 May 2026</strong>.
+                    The social media points leaderboard goes live once the tournament kicks off on <strong className="text-white">29 May 2026</strong>.
                     Top earners win exclusive prizes and merch!
                   </p>
                 </div>
