@@ -71,6 +71,13 @@ const MANAGER_ITEMS = [
   { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
 ];
 
+const SECURITY_ITEMS = [
+  { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
+  { href: "/admin/bookings", icon: FaCalendarAlt, label: "Check-In", color: "#f97316" },
+  { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
+  { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
+];
+
 const ADMIN_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
   {
@@ -114,9 +121,11 @@ export default function BottomNavbar() {
       ? ADMIN_ITEMS
       : role === "manager"
         ? MANAGER_ITEMS
-        : session
-          ? USER_ITEMS
-          : GUEST_ITEMS;
+        : role === "security_guard"
+          ? SECURITY_ITEMS
+          : session
+            ? USER_ITEMS
+            : GUEST_ITEMS;
 
   const hideNavbar =
     pathname === "/login" ||
@@ -129,9 +138,11 @@ export default function BottomNavbar() {
       ? { label: "ADMIN", color: "#f97316", icon: FaUserShield }
       : role === "manager"
         ? { label: "MANAGER", color: "#3b82f6", icon: FaUsers }
-        : session
-          ? { label: "PLAYER", color: "#22c55e", icon: FaFutbol }
-          : null;
+        : role === "security_guard"
+          ? { label: "SECURITY", color: "#eab308", icon: FaUserShield }
+          : session
+            ? { label: "PLAYER", color: "#22c55e", icon: FaFutbol }
+            : null;
 
   // Auto-close after 5 seconds
   useEffect(() => {

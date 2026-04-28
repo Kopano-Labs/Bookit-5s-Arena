@@ -99,6 +99,12 @@ const MANAGER_NAV = [
   { href: "/about",             emoji: "ℹ️", label: "About" },
 ];
 
+const SECURITY_NAV = [
+  { href: "/admin/bookings", emoji: "🛡️", label: "Check-In" },
+  { href: "/fixtures",       emoji: "📅", label: "Fixtures" },
+  { href: "/about",          emoji: "ℹ️", label: "About" },
+];
+
 const ADMIN_NAV_PRIMARY = [
   { href: "/admin/dashboard",    emoji: "🛡️", label: "Dashboard" },
   { href: "/admin/bookings",     emoji: "📅", label: "Bookings" },
@@ -153,6 +159,7 @@ const HeaderInner = () => {
   const activeRole = session?.user?.activeRole || session?.user?.role;
   const isAdmin = activeRole === "admin";
   const isManager = activeRole === "manager";
+  const isSecurityGuard = activeRole === "security_guard";
   const onManagerRoute = pathname?.startsWith("/manager");
   const hideDesktopSearch = pathname === "/login" || pathname === "/register" || pathname === "/role-select";
   const onAuthScreen = pathname === "/login" || pathname === "/register";
@@ -164,12 +171,13 @@ const HeaderInner = () => {
         ? "register"
         : "login";
 
-  /* 4-tier enforcement: strictly match role to nav set */
+  /* 5-tier enforcement: strictly match role to nav set */
   const navLinks =
-    isAdmin   ? ADMIN_NAV_PRIMARY :
-    isManager ? MANAGER_NAV :
-    session   ? USER_NAV :
-                GUEST_NAV;
+    isAdmin         ? ADMIN_NAV_PRIMARY :
+    isManager       ? MANAGER_NAV :
+    isSecurityGuard ? SECURITY_NAV :
+    session         ? USER_NAV :
+                      GUEST_NAV;
 
   const navClass = (href) => {
     const active = isActive(pathname, href);
