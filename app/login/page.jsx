@@ -5,6 +5,7 @@ import { getProviders, signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
+import { TOURNAMENT_DATES } from "@/lib/tournamentConfig";
 import {
   FaSignInAlt,
   FaGoogle,
@@ -566,7 +567,7 @@ function AuthPageInner() {
               <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">
                 <span>Start Date</span>
                 <span className="text-green-400 flex items-center gap-1.5">
-                  <FaBolt /> 29 May 2026
+                  <FaBolt /> {TOURNAMENT_DATES.start}
                 </span>
               </div>
               <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">

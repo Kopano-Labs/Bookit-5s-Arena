@@ -22,6 +22,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { WORLD_CUP_TEAMS } from "@/lib/worldCupTeams";
+import { TOURNAMENT_DATES } from "@/lib/tournamentConfig";
 import PlayerShowcase from "@/components/tournament/PlayerShowcase";
 import CountrySelector from "@/components/tournament/CountrySelector";
 
@@ -231,7 +232,7 @@ export default function TournamentPage() {
                 5s ARENA <span className="text-green-400">WORLD CUP</span>
               </h1>
               <p className="text-gray-400 text-lg mb-2">
-                May 29 – 31, 2026 · Hellenic Football Club
+                {TOURNAMENT_DATES.rangeLong} · Hellenic Football Club
               </p>
               <p className="text-gray-500 text-sm mb-8">
                 {tournamentInfo

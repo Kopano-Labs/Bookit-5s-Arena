@@ -15,6 +15,7 @@ import {
   FaFutbol,
 } from "react-icons/fa";
 import useSSE from "@/hooks/useSSE";
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
 
 /* ── Compact PL-style standings row ── */
 function StandingRow({ team, rank, animate }) {
@@ -238,7 +239,7 @@ export default function TournamentShowcase() {
               World Cup 5s
             </h2>
             <p className="text-gray-500 text-sm font-semibold">
-              5s Arena World Cup · 48 Teams · 8 Groups · May 2026
+              5s Arena World Cup · {TOURNAMENT_FORMAT.totalTeams} Teams · {TOURNAMENT_FORMAT.groupCount} Groups · {TOURNAMENT_DATES.rangeShort}
             </p>
           </motion.div>
 
@@ -479,7 +480,7 @@ export default function TournamentShowcase() {
                   {
                     icon: FaBolt,
                     color: "#22c55e",
-                    text: "Tournament starts 29 May 2026",
+                    text: `Tournament starts ${TOURNAMENT_DATES.start}`,
                   },
                   {
                     icon: FaCalendarAlt,
