@@ -138,7 +138,7 @@ const SearchModal = () => {
       {/* Trigger button */}
       <motion.button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-800/60 border border-gray-700 text-gray-400 text-xs hover:border-green-500/40 hover:text-gray-300 transition-all cursor-pointer shrink-0"
+        className="flex min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800/60 px-2.5 py-1.5 text-sm text-gray-400 transition-all hover:border-green-500/40 hover:text-gray-300"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
@@ -178,7 +178,7 @@ const SearchModal = () => {
                   placeholder="Search pages…"
                   className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-gray-500"
                 />
-                <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-300 cursor-pointer">
+                <button onClick={() => setIsOpen(false)} className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center text-gray-500 hover:text-gray-300">
                   <FaTimes size={12} />
                 </button>
               </div>
@@ -200,7 +200,7 @@ const SearchModal = () => {
                             key={page.href}
                             onClick={() => navigate(page.href)}
                             onMouseEnter={() => setHighlightedIndex(pageIndex)}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all cursor-pointer ${
+                            className={`flex min-h-[44px] w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
                               isHighlighted
                                 ? 'bg-green-600/10 text-white'
                                 : 'text-gray-300 hover:bg-green-600/10 hover:text-white'
