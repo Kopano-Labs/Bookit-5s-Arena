@@ -376,7 +376,7 @@ const HeaderInner = () => {
             {/* Theme Toggle — cycle on click, hover shows name */}
             <motion.button
               onClick={cycleTheme}
-              className="group relative flex items-center gap-2 rounded-lg border border-gray-800/70 bg-gray-900/80 px-2 py-1.5 text-gray-400 transition-all hover:border-gray-700 hover:bg-gray-800 hover:text-white md:px-2.5"
+              className="group relative flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-lg border border-gray-800/70 bg-gray-900/80 px-2 py-1.5 text-gray-400 transition-all hover:border-gray-700 hover:bg-gray-800 hover:text-white md:min-h-0 md:min-w-0 md:px-2.5"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.92 }}
               title={`Theme: ${themes[theme].name} — click to cycle`}
@@ -458,7 +458,7 @@ const HeaderInner = () => {
             {/* Mobile Toggle */}
             <motion.button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg"
+              className="min-h-[44px] min-w-[44px] rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white md:hidden"
               whileTap={{ scale: 0.85 }}
               aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={mobileOpen}
@@ -514,7 +514,7 @@ const HeaderInner = () => {
                   <button
                     type="button"
                     onClick={() => setMobileOpen(false)}
-                    className="rounded-full bg-gray-900 p-2 text-gray-400 transition hover:bg-gray-800 hover:text-white"
+                    className="min-h-[44px] min-w-[44px] rounded-full bg-gray-900 p-2 text-gray-400 transition hover:bg-gray-800 hover:text-white"
                   >
                     <FaTimes size={16} />
                   </button>
