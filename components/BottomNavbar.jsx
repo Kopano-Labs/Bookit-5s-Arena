@@ -188,13 +188,13 @@ export default function BottomNavbar() {
   return (
     <div
       ref={menuRef}
-      className="pointer-events-none fixed bottom-6 left-1/2 z-90 -translate-x-1/2 flex-col items-center flex"
+      className="pointer-events-none fixed bottom-6 left-1/2 z-90 flex -translate-x-1/2 flex-col items-center md:hidden"
     >
       {/* Expanded dock */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="pointer-events-auto mb-3 flex items-end gap-2 rounded-2xl border border-gray-800 bg-gray-950/95 px-4 py-3 shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
+            className="pointer-events-auto mb-3 flex max-w-[calc(100vw-1rem)] items-end gap-1 overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950/95 px-2 py-2 shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
             initial={{ opacity: 0, y: 20, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.85 }}
@@ -209,14 +209,14 @@ export default function BottomNavbar() {
                   key={item.href}
                   href={item.href}
                   prefetch={false}
-                  className="flex flex-col items-center rounded-lg px-2 py-1 transition-all"
+                  className="flex min-h-[44px] min-w-[64px] flex-col items-center justify-center rounded-lg px-2 py-2 transition-all"
                   style={{
                     color: active ? item.color : "#fff",
                     transform: `scale(${scale})`,
                   }}
                 >
                   <Icon size={24} />
-                  <span className="mt-0.5 text-[10px] font-bold tracking-widest uppercase">
+                  <span className="mt-0.5 text-sm font-bold tracking-widest uppercase">
                     {item.label}
                   </span>
                 </Link>
@@ -252,7 +252,7 @@ export default function BottomNavbar() {
           <motion.span
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 rounded px-1.5 py-0.5 text-[7px] font-black tracking-widest uppercase"
+            className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded px-1.5 py-0.5 text-[10px] font-black tracking-widest uppercase"
             style={{
               color: roleBadge.color,
               background: `${roleBadge.color}18`,
