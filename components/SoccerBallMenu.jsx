@@ -26,7 +26,7 @@ const MENU_ITEMS = [
     label: 'Register for Tournament',
     href: '/tournament',
     color: '#eab308',
-    desc: 'World Cup 5s · May 2026',
+    desc: 'World Cup 5s · 29–31 May 2026',
   },
 ];
 
