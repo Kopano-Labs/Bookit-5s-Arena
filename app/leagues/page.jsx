@@ -556,7 +556,6 @@ export default function LeaguesPage() {
                       </p>
                       <div className="mt-4 grid grid-cols-2 gap-2">
                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400">
-                          <FaBolt size={9} style={{ color: "#22c55e" }} /> 26
                           29–31 May 2026
                         </div>
                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400">
