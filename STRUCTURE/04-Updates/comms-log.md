@@ -78,3 +78,12 @@
 **Author:** `RobynAwesome <rkholofelo@kopanolabs.com>`
 **Action:** Performed full audit of all 12 context files. Determined that the infinite loading is NOT a React render loop in the Navbars. It is an upstream Next-Auth redirect loop or DB hang. Implemented `status === "loading"` fallback boundaries in `Header.jsx` and `BottomNavbar.jsx` to prevent client thrashing while the server hangs. Standing by for `middleware.ts` or `route.ts` to fix the actual auth loop.
 **Status:** Active (Awaiting Middleware)
+
+## Entry: Bookit Red Fix Implemented + Sync Failure Logged
+
+**Date:** 2026-05-01
+**Lead:** `Codex GPT-5.5`
+**Author:** `Codex`
+**Action:** Implemented the Revised Red Fix in the live codebase: NextAuth route shield in `app/api/auth/[...nextauth]/route.js`, fail-soft JWT profile refresh in `lib/authOptions.js`, and CSP allowlist alignment in `next.config.ts` plus `proxy.js`. Verified `npm run build` passed, `/api/auth/session` returned valid JSON, and unauthenticated tournament fixtures returned clean JSON `403`.
+**Protocol failure:** Codex reported implementation before completing commit/sync discipline. No commit was made. MAIN-BRAIN and sub-brain comms were not updated until Master challenged the failure.
+**Status:** Code patched locally; commit and owner-proof still pending.
