@@ -4,11 +4,22 @@ import { normalizePremierLeagueSeason } from "@/lib/sports/premierLeagueConfig";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request, { params }) {
+const PREMIER_LEAGUE_SLUG = "premier-league";
+
+export async function GET(request, context) {
   try {
+    const { slug, teamId } = await context.params;
+
+    if (slug !== PREMIER_LEAGUE_SLUG) {
+      return NextResponse.json(
+        { error: "Team analysis is not available for this league" },
+        { status: 404 },
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const { seasonYear } = normalizePremierLeagueSeason(searchParams.get("season"));
-    const payload = await getPremierLeagueTeamAnalysis(params.teamId, seasonYear);
+    const payload = await getPremierLeagueTeamAnalysis(teamId, seasonYear);
 
     return NextResponse.json(payload);
   } catch (error) {

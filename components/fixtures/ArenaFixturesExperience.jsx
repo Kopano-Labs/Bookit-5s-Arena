@@ -1054,7 +1054,7 @@ export default function FixturesPage() {
                     </p>
                   </div>
                   <Link
-                    href="/fixtures"
+                    href="/fixtures?league=premier-league"
                     className="inline-flex items-center gap-2 rounded-full border border-green-700/50 bg-green-600/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-green-400 transition hover:bg-green-600/20"
                   >
                     Premier League Hub <FaChevronRight size={10} />

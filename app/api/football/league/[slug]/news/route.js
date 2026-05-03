@@ -3,9 +3,9 @@ import { getLeagueNews } from "@/lib/sports/football";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
   try {
-    const { slug } = params;
+    const { slug } = await context.params;
     const { searchParams } = new URL(request.url);
     const season = searchParams.get("season") || new Date().getFullYear();
     const payload = await getLeagueNews(slug, season);

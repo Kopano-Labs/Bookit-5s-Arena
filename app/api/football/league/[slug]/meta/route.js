@@ -3,9 +3,9 @@ import { getLeagueMeta } from "@/lib/sports/football";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
   try {
-    const { slug } = params;
+    const { slug } = await context.params;
     const meta = await getLeagueMeta(slug);
     return NextResponse.json(meta);
   } catch (error) {
