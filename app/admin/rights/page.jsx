@@ -21,17 +21,19 @@ import {
 const SUPER_ADMIN_EMAIL = "rkholofelo@gmail.com";
 
 const ROLE_CONFIG = {
-  admin:   { label: "Admin",   color: "#f97316" },
-  manager: { label: "Manager", color: "#3b82f6" },
-  user:    { label: "Player",  color: "#22c55e" },
+  admin:          { label: "Admin",           color: "#f97316" },
+  manager:        { label: "Manager",         color: "#3b82f6" },
+  security_guard: { label: "Security",      color: "#a78bfa" },
+  user:           { label: "Player",          color: "#22c55e" },
 };
 
-const TIER_ORDER = ["guest", "user", "manager", "admin"];
+const TIER_ORDER = ["guest", "user", "security_guard", "manager", "admin"];
 const TIER_COLORS = {
-  guest:   { color: "#6b7280", label: "Guest" },
-  user:    { color: "#22c55e", label: "User" },
-  manager: { color: "#3b82f6", label: "Manager" },
-  admin:   { color: "#f97316", label: "Admin" },
+  guest:          { color: "#6b7280", label: "Guest" },
+  user:           { color: "#22c55e", label: "User" },
+  security_guard: { color: "#a78bfa", label: "Security" },
+  manager:        { color: "#3b82f6", label: "Manager" },
+  admin:          { color: "#f97316", label: "Admin" },
 };
 
 /* ─── User Management ─────────────────────────────────────────── */
@@ -106,7 +108,7 @@ function UserRow({ user, onRolesUpdate }) {
           {editing ? (
             <div className="flex flex-col items-end gap-2">
               <div className="flex gap-2">
-                {["manager", "admin"].map((role) => (
+                {["security_guard", "manager", "admin"].map((role) => (
                   <button
                     key={role}
                     onClick={() => toggleRole(role)}
@@ -116,7 +118,7 @@ function UserRow({ user, onRolesUpdate }) {
                         : "border-gray-700 text-gray-500 hover:border-gray-600"
                     }`}
                   >
-                    {role}
+                    {(ROLE_CONFIG[role] || { label: role }).label}
                   </button>
                 ))}
               </div>
@@ -268,7 +270,7 @@ function FeatureRow({ feature, onUpdate }) {
 
         {/* Per-role overrides */}
         <div className="flex items-center gap-2 flex-wrap">
-          {["admin", "manager", "user"].map((role) => {
+          {["admin", "manager", "security_guard", "user"].map((role) => {
             const cfg = ROLE_CONFIG[role];
             const current = feature.roleOverrides?.[role] ?? null;
             return (
@@ -618,7 +620,8 @@ export default function RightsPage() {
               Users with <span className="text-orange-400 font-bold">Admin</span> can access{" "}
               <span className="text-orange-400">/admin/*</span>, users with{" "}
               <span className="text-blue-400 font-bold">Manager</span> can access{" "}
-              <span className="text-blue-400">/manager/*</span>. Toggle specific features within each interface in the Feature Access tab.
+              <span className="text-blue-400">/manager/*</span>, and{" "}
+              <span className="text-violet-300 font-bold">Security</span> unlocks the venue / security nav. Toggle specific features within each interface in the Feature Access tab.
             </p>
           ) : (
             <p className="text-xs text-gray-400 leading-relaxed">
@@ -632,11 +635,12 @@ export default function RightsPage() {
         {activeTab === "users" && (
           <>
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
               {[
-                { label: "Total Users", value: total,                                                           icon: FaUsers,      color: "#22c55e" },
-                { label: "Managers",    value: users.filter((u) => u.roles?.includes("manager")).length,        icon: FaUsers,      color: "#3b82f6" },
-                { label: "Admins",      value: users.filter((u) => u.roles?.includes("admin")).length,          icon: FaUserShield, color: "#f97316" },
+                { label: "Total Users", value: total, icon: FaUsers, color: "#22c55e" },
+                { label: "Security", value: users.filter((u) => u.roles?.includes("security_guard")).length, icon: FaUserShield, color: "#a78bfa" },
+                { label: "Managers", value: users.filter((u) => u.roles?.includes("manager")).length, icon: FaUsers, color: "#3b82f6" },
+                { label: "Admins", value: users.filter((u) => u.roles?.includes("admin")).length, icon: FaUserShield, color: "#f97316" },
               ].map(({ label, value, icon: Icon, color }) => (
                 <div key={label} className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-1">

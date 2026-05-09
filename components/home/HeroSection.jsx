@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { FaFutbol, FaWhatsapp } from "react-icons/fa";
+import { FaFutbol, FaWhatsapp, FaTrophy } from "react-icons/fa";
+import { TOURNAMENT_DATES } from "@/lib/tournamentConfig";
 
 /* ── Lazy-load 3D scene (heavy Three.js bundle) ── */
 const Hero3DScene = dynamic(() => import("@/components/home/Hero3DScene"), {
@@ -109,11 +110,21 @@ export default function HeroSection() {
 
           <motion.p
             variants={item}
-            className="mb-10 max-w-xl text-base leading-relaxed text-gray-200 sm:text-xl"
+            className="mb-6 max-w-xl text-base leading-relaxed text-gray-200 sm:text-xl"
           >
             Cape Town&apos;s premier 5-a-side football experience. Book a court,
             gather your squad, and play the beautiful game under the lights.
           </motion.p>
+
+          <motion.div variants={item} className="mb-8 flex justify-center md:justify-start">
+            <Link
+              href="/tournament"
+              className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-amber-200 shadow-[0_0_24px_rgba(251,191,36,0.15)] transition hover:border-amber-300/60 hover:bg-amber-500/20"
+            >
+              <FaTrophy className="text-amber-300" size={14} aria-hidden />
+              World Cup 5s · {TOURNAMENT_DATES.rangeShort}
+            </Link>
+          </motion.div>
 
           <motion.div
             variants={item}

@@ -4,8 +4,9 @@ import connectDB from '@/lib/mongodb';
 import TournamentTeam from '@/models/TournamentTeam';
 import { getAuthSession } from '@/lib/getSession';
 import { WORLD_CUP_TEAMS } from '@/lib/worldCupTeams';
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from '@/lib/tournamentConfig';
 
-const TOURNAMENT_DEADLINE = new Date('2026-05-19T23:59:59+02:00'); // 1 week before May 26
+const TOURNAMENT_DEADLINE = new Date(TOURNAMENT_DATES.signupDeadlineISO);
 
 /* ─── GET: list teams + available World Cup teams ─────────── */
 export async function GET() {
@@ -22,7 +23,7 @@ export async function GET() {
       availableTeams,
       deadline: TOURNAMENT_DEADLINE.toISOString(),
       isOpen: new Date() < TOURNAMENT_DEADLINE,
-      totalSlots: 48, // 8 groups × 6 teams
+      totalSlots: TOURNAMENT_FORMAT.totalTeams,
       registeredCount: teams.length,
     });
   } catch (err) {
@@ -36,7 +37,9 @@ export async function POST(request) {
     // Check deadline
     if (new Date() >= TOURNAMENT_DEADLINE) {
       return NextResponse.json(
-        { error: 'Registration has closed. The deadline was 1 week before the tournament.' },
+        {
+          error: `Registration has closed. The deadline was ${TOURNAMENT_DATES.signupDeadline}.`,
+        },
         { status: 400 }
       );
     }
@@ -45,7 +48,7 @@ export async function POST(request) {
 
     // Check if full (48 teams max)
     const currentCount = await TournamentTeam.countDocuments();
-    if (currentCount >= 48) {
+    if (currentCount >= TOURNAMENT_FORMAT.totalTeams) {
       return NextResponse.json(
         { error: 'Tournament is full! All 48 spots have been taken.' },
         { status: 400 }

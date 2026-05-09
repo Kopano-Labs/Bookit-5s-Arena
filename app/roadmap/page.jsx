@@ -1,3 +1,5 @@
+import { TOURNAMENT_DATES } from "@/lib/tournamentConfig";
+
 export const metadata = {
   title: "Roadmap",
   description: "What's coming next to Bookit 5s Arena.",
@@ -27,7 +29,7 @@ const ROADMAP = [
     phase: "Coming Soon",
     color: "text-yellow-400 border-yellow-500",
     items: [
-      "World Cup Tournament kick-off — May 26–31, 2026",
+      `World Cup Tournament live window — ${TOURNAMENT_DATES.rangeShort}`,
       "Leagues feature — Season 1",
       "SMS & WhatsApp fixture notifications",
       "Player statistics & season records",

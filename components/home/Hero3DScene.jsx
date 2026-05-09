@@ -2,7 +2,7 @@
 
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Float, MeshDistortMaterial, Sparkles } from "@react-three/drei";
+import { Float, MeshDistortMaterial, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
 
 /* ── Soccer Ball (Procedural Icosahedron with premium metallic shader) ── */
@@ -26,7 +26,7 @@ function SoccerBall() {
           metalness={0.95}
           distort={0.08}
           speed={1.5}
-          envMapIntensity={2.5}
+          envMapIntensity={1.15}
         />
       </mesh>
       {/* Wireframe overlay for pentagon pattern effect */}
@@ -163,24 +163,22 @@ export default function Hero3DScene() {
       >
         <fog attach="fog" args={["#04060a", 5, 25]} />
         
-        {/* Ambient */}
-        <ambientLight intensity={0.15} />
-        
+        {/* No remote <Environment> — drei's preset fetches HDRIs from raw.githack.com, which strict CSP blocks and can take down WebGL. */}
+        <ambientLight intensity={0.22} />
+        <hemisphereLight args={["#b8e8ff", "#0a1620", 0.35]} />
+
         {/* Key light — top-left green accent */}
         <directionalLight
           position={[-5, 8, 5]}
-          intensity={0.8}
+          intensity={0.95}
           color="#4ade80"
         />
-        
+
         {/* Fill light — cool blue from right */}
-        <pointLight position={[5, 3, 3]} intensity={0.4} color="#3b82f6" />
-        
+        <pointLight position={[5, 3, 3]} intensity={0.48} color="#3b82f6" />
+
         {/* Rim light — white backlight */}
-        <pointLight position={[0, -2, -5]} intensity={0.3} color="#ffffff" />
-        
-        {/* Environment for reflections */}
-        <Environment preset="city" environmentIntensity={0.3} />
+        <pointLight position={[0, -2, -5]} intensity={0.38} color="#ffffff" />
         
         {/* Scene objects */}
         <SoccerBall />

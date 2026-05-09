@@ -7,16 +7,14 @@ Persistent register of items surfaced during MVP fix sessions that were intentio
 ## Admin UI to grant `security_guard` role
 
 **Discovered:** 2026-04-27 (Phase 1)
-**Scope reason:** Phase 1 brief explicitly excluded auth/admin/rights/database changes. Adding the role enum was in scope; building the UI/API to assign it was not. A super-admin currently has no way to grant `security_guard` to a user except by direct DB write.
-**Suggested next session:** Audit `app/admin/rights/page.jsx` and the supporting API route. Extend the role-grant flow to expose `security_guard` alongside `manager` and `admin`. Verify `lib/authOptions.js` propagates the role into the session.
+**Resolved:** 2026-05-09 — `User` schema + pre-save, `PATCH /api/admin/rights/users/[id]/roles`, and `/admin/rights` user row toggles now support `security_guard` (super admin grants; `user` always enforced; admin+manager combo still auto-resolves for non–super-admin).
 
 ---
 
 ## `lib/authOptions.js` may filter out `security_guard`
 
 **Discovered:** 2026-04-27 (Phase 1)
-**Scope reason:** NextAuth session callback was not inspected during Phase 1 fix. If the callback hardcodes role validation against an allowlist, a user with `security_guard` in the DB may have it stripped from `session.user.role` / `activeRole`. This would silently route them to `USER_NAV` despite the new tier existing.
-**Suggested next session:** Read `lib/authOptions.js` end-to-end. Confirm the JWT and session callbacks pass `security_guard` through. Add a test user, grant the role, log in, and confirm `useSession()` returns the role intact.
+**Status:** 2026-05-09 — `lib/authOptions.js` already routes through `normalizeRoles` / `canAssumeRole` from `lib/roles.js`, which includes `security_guard`. Re-verify in browser after first DB grant from the admin UI.
 
 ---
 

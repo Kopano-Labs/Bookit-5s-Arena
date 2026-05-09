@@ -47,6 +47,7 @@ const STATUS_LABEL = {
 const ROUND_LABEL = {
   group: "Group Stage",
   league: "League",
+  r32: "Round of 32",
   r16: "Round of 16",
   qf: "Quarter-Final",
   sf: "Semi-Final",

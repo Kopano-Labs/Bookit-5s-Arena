@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import {
+  ALL_ROLES,
+  SUPER_ADMIN_EMAIL,
+  highestRole,
+} from '@/lib/roles';
 
 const UserSchema = new mongoose.Schema(
   {
@@ -63,18 +68,21 @@ const UserSchema = new mongoose.Schema(
       default: null,
     },
     // Multi-role support: user can hold one or more roles simultaneously
-    // 'user' = regular user, 'manager' = manages squads/tournaments, 'admin' = god-mode
+    // Includes security_guard (venue / access lane) per lib/roles.js ALL_ROLES.
     roles: {
       type: [String],
-      enum: ['user', 'manager', 'admin'],
+      enum: ALL_ROLES,
       default: ['user'],
       validate: {
         validator: function (arr) {
           if (!arr || arr.length < 1) return false;
-          const valid = ['user', 'manager', 'admin'];
-          if (!arr.every((r) => valid.includes(r))) return false;
-          // Only rkholofelo@gmail.com may have all 3 roles
-          if (arr.length === 3 && this.email !== 'rkholofelo@gmail.com') return false;
+          if (!arr.every((r) => ALL_ROLES.includes(r))) return false;
+          if (!arr.includes('user')) return false;
+          const email = String(this.email || '').toLowerCase().trim();
+          if (email === SUPER_ADMIN_EMAIL) return true;
+          if (arr.length > 3) return false;
+          if (new Set(arr).size === ALL_ROLES.length) return false;
+          if (arr.includes('admin') && arr.includes('manager')) return false;
           return true;
         },
         message: 'Invalid roles configuration',
@@ -83,7 +91,7 @@ const UserSchema = new mongoose.Schema(
     // Backward compat: single role field kept as virtual getter
     role: {
       type: String,
-      enum: ['user', 'manager', 'admin'],
+      enum: ALL_ROLES,
     },
     // Referral system
     referralCode: {
@@ -120,21 +128,16 @@ const UserSchema = new mongoose.Schema(
 
 // Enforce super admin roles invariant and backward compat
 UserSchema.pre('save', async function () {
-  // Super admin always gets all 3 roles
-  if (this.email === 'rkholofelo@gmail.com') {
-    this.roles = ['user', 'manager', 'admin'];
-  }
-  // No other user can have all 3 roles
-  if (this.email !== 'rkholofelo@gmail.com' && this.roles?.length === 3) {
+  const email = String(this.email || '').toLowerCase().trim();
+  if (email === SUPER_ADMIN_EMAIL) {
+    this.roles = [...ALL_ROLES];
+  } else if (Array.isArray(this.roles) && this.roles.includes('admin') && this.roles.includes('manager')) {
     this.roles = this.roles.filter((r) => r !== 'admin');
   }
-  // Ensure roles array is never empty
   if (!this.roles || this.roles.length === 0) {
     this.roles = ['user'];
   }
-  // Sync backward-compat role field with highest role in array
-  const hierarchy = { user: 0, manager: 1, admin: 2 };
-  this.role = this.roles.reduce((max, r) => (hierarchy[r] || 0) > (hierarchy[max] || 0) ? r : max, this.roles[0]);
+  this.role = highestRole(this.roles);
 });
 
 // Auto-generate referral code if not set

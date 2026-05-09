@@ -320,7 +320,7 @@ export default function TournamentPage() {
                       Cutoff Deadline
                     </p>
                     <p className="text-red-400 text-sm font-bold">
-                      May 15, 2026 · 17:00
+                      {TOURNAMENT_DATES.signupDeadline} · 23:59 SAST
                     </p>
                   </div>
                   <div>

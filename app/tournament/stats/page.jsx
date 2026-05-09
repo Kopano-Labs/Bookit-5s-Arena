@@ -12,6 +12,7 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import Link from "next/link";
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
 
 const STAT_CARDS = [
   {
@@ -21,8 +22,18 @@ const STAT_CARDS = [
     key: "registeredCount",
   },
   { label: "Total Slots", icon: FaTrophy, color: "#eab308", key: "totalSlots" },
-  { label: "Groups", icon: FaChartBar, color: "#3b82f6", value: 8 },
-  { label: "Teams per Group", icon: FaFutbol, color: "#a855f7", value: 6 },
+  {
+    label: "Groups",
+    icon: FaChartBar,
+    color: "#3b82f6",
+    value: TOURNAMENT_FORMAT.groupCount,
+  },
+  {
+    label: "Teams per Group",
+    icon: FaFutbol,
+    color: "#a855f7",
+    value: TOURNAMENT_FORMAT.teamsPerGroup,
+  },
 ];
 
 export default function TournamentStatsPage() {
@@ -176,7 +187,7 @@ export default function TournamentStatsPage() {
               animate={{
                 width: loading
                   ? "0%"
-                  : `${((data?.registeredCount || 0) / 48) * 100}%`,
+                  : `${((data?.registeredCount || 0) / TOURNAMENT_FORMAT.totalTeams) * 100}%`,
               }}
               transition={{ duration: 1, delay: 0.8 }}
             />
@@ -197,14 +208,23 @@ export default function TournamentStatsPage() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-400">
             {[
-              ["Format", "8 groups of 6 teams (old UEFA CL style)"],
-              ["Group Stage", "Round-robin (15 matches per group)"],
-              ["Advancement", "Top 2 per group advance"],
-              ["Knockout", "R16 → Quarter-Finals → Semi-Finals → Final"],
+              [
+                "Format",
+                `${TOURNAMENT_FORMAT.groupCount} groups × ${TOURNAMENT_FORMAT.teamsPerGroup} teams (${TOURNAMENT_FORMAT.totalTeams} nations)`,
+              ],
+              [
+                "Group Stage",
+                `Round-robin (${TOURNAMENT_FORMAT.groupMatchPerGroup} matches per group)`,
+              ],
+              ["Advancement", TOURNAMENT_FORMAT.qualificationLegend],
+              [
+                "Knockout",
+                `${TOURNAMENT_FORMAT.bracket.join(" → ")} — one winner`,
+              ],
               ["Match Duration", "20 minutes per match"],
-              ["Dates", "May 26–31, 2026"],
+              ["Dates", TOURNAMENT_DATES.rangeLong],
               ["Venue", "Hellenic Football Club, Milnerton"],
-              ["Total Matches", "120 group + 15 knockout = 135 matches"],
+              ["Total Matches", TOURNAMENT_FORMAT.totalMatchSummary],
             ].map(([label, value]) => (
               <div key={label} className="flex items-start gap-2">
                 <FaFutbol size={10} className="text-green-500 mt-1 shrink-0" />

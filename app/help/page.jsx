@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
 import {
   FaQuestionCircle,
   FaChevronDown,
@@ -73,7 +74,7 @@ const FAQ_CATEGORIES = [
     faqs: [
       {
         q: "When does the tournament start?",
-        a: "The 5s Arena World Cup runs May 29–31, 2026. Sign-ups close one week before (May 22).",
+        a: `The 5s Arena World Cup live window is ${TOURNAMENT_DATES.rangeLong}. Sign-ups close ${TOURNAMENT_DATES.signupDeadline}.`,
       },
       {
         q: "How many players per team?",
@@ -81,7 +82,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "How does the format work?",
-        a: "8 groups of 6 teams. Top 2 from each group advance to the Round of 16, then single-elimination knockout to the final.",
+        a: `${TOURNAMENT_FORMAT.groupCount} groups of ${TOURNAMENT_FORMAT.teamsPerGroup} teams. ${TOURNAMENT_FORMAT.qualificationLegend}. Knockout: ${TOURNAMENT_FORMAT.bracket.join(" → ")} — one champion.`,
       },
       {
         q: "Can I change my World Cup team?",

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FaFacebook, FaInstagram, FaTiktok, FaWhatsapp, FaArrowRight } from 'react-icons/fa';
 
@@ -96,10 +97,12 @@ export default function SocialSection() {
             />
             <div className="px-6 pb-6 pt-4 flex flex-col gap-3 flex-1">
               <div className="flex items-center gap-4 -mt-10">
-                <img
+                <Image
                   src="/images/logo.png"
                   alt="Fives Arena"
-                  className="w-20 h-20 rounded-full object-contain flex-shrink-0"
+                  width={80}
+                  height={80}
+                  className="h-20 w-20 rounded-full object-contain flex-shrink-0"
                 />
                 <div className="pt-8">
                   <p className="text-white font-black text-lg leading-none" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>

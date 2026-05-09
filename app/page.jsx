@@ -51,7 +51,7 @@ const HomePage = async () => {
       {/* ══ HERO — animated entrance + particle background ══════ */}
       <HeroSection />
 
-      {/* ══ STATS BAR — count-up animations ════════════════════ */}
+      {/* ══ STATS BAR — live counts from courts (no misleading zero flash) ══ */}
       <StatsBar courtsCount={courts.length || 4} />
 
       {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}

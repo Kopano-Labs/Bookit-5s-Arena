@@ -31,11 +31,15 @@ export default function ManagerDashboard() {
   const fetchTeamData = async () => {
     try {
       const res = await fetch("/api/tournament/my-team");
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        const data = await res.json();
-        setTeam(data.team);
+        setTeam(data.team ?? null);
+      } else if (res.status === 401) {
+        router.replace("/login");
       }
-    } catch {}
+    } catch {
+      setTeam(null);
+    }
     setLoading(false);
   };
 

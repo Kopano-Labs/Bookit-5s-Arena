@@ -1,41 +1,91 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaArrowRight, FaBolt, FaBroadcastTower, FaChevronRight } from "react-icons/fa";
 
+const FEATURED_FETCH_MS = 12_000;
+
+async function fetchFeaturedMatches(signal) {
+  const res = await fetch("/api/football/featured", { signal });
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(data)) return [];
+  return data;
+}
+
 export default function HomeLiveFixtures() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const fetchGeneration = useRef(0);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchMatches() {
+      const run = ++fetchGeneration.current;
+      const ac = new AbortController();
+      const timeoutId = setTimeout(() => ac.abort(), FEATURED_FETCH_MS);
       try {
-        const res = await fetch("/api/football/featured");
-        const data = await res.json();
-        if (res.ok) setMatches(data);
+        const next = await fetchFeaturedMatches(ac.signal);
+        if (cancelled || run !== fetchGeneration.current) return;
+        setMatches(next);
       } catch (err) {
-        console.error("Failed to fetch featured matches", err);
+        if (err?.name === "AbortError") {
+          console.warn("Featured matches request timed out or was aborted");
+        } else {
+          console.error("Failed to fetch featured matches", err);
+        }
+        if (cancelled || run !== fetchGeneration.current) return;
+        setMatches([]);
       } finally {
+        clearTimeout(timeoutId);
+        if (cancelled || run !== fetchGeneration.current) return;
         setLoading(false);
       }
     }
 
     fetchMatches();
     const interval = setInterval(fetchMatches, 60000); // Update every minute
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      fetchGeneration.current += 1;
+      clearInterval(interval);
+    };
   }, []);
 
-  if (loading) return (
-    <div className="h-64 flex flex-col items-center justify-center bg-zinc-950 border-y border-zinc-900">
-      <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mb-4" />
-      <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 animate-pulse">Syncing Arena Data Feed...</span>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="h-64 flex flex-col items-center justify-center bg-zinc-950 border-y border-zinc-900">
+        <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 animate-pulse">Syncing Arena Data Feed...</span>
+      </div>
+    );
+  }
 
-  if (matches.length === 0) return null;
+  if (matches.length === 0) {
+    return (
+      <div className="bg-zinc-950 border-y border-zinc-900 py-6 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <p className="text-xs text-zinc-400">
+            Live match strip is offline or the feed did not respond in time. Schedules and full coverage are still on the fixtures page.
+          </p>
+          <Link
+            href="/fixtures"
+            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-500 hover:text-green-400 shrink-0"
+          >
+            Open fixtures <FaChevronRight size={8} />
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="bg-zinc-950 border-y border-zinc-900 py-12 overflow-hidden relative">
