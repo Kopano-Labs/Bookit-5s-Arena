@@ -23,6 +23,7 @@ import {
   FaBullhorn,
   FaTrophy,
   FaUpload,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import InfoTooltip from "@/components/InfoTooltip";

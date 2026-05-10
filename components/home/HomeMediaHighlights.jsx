@@ -14,8 +14,18 @@ export default function HomeMediaHighlights() {
     async function fetchHighlights() {
       try {
         const res = await fetch("/api/football/league/premier-league/news");
-        const data = await res.json();
-        if (res.ok) setNews(data);
+        const ct = res.headers.get("content-type") || "";
+        if (!res.ok || !ct.includes("application/json")) {
+          return;
+        }
+        const raw = await res.text();
+        let data;
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          return;
+        }
+        if (data && !data.error) setNews(data);
       } catch (err) {
         console.error("Failed to fetch highlights", err);
       } finally {

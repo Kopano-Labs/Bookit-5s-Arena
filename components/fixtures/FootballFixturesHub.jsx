@@ -217,10 +217,20 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
     setNewsLoading(true);
     
     fetch(`/api/football/league/${slug}/news`)
-      .then(r => r.json())
-      .then(data => {
-        if (!cancelled) {
+      .then(async (r) => {
+        const ct = r.headers.get("content-type") || "";
+        if (!r.ok || !ct.includes("application/json")) return null;
+        try {
+          return JSON.parse(await r.text());
+        } catch {
+          return null;
+        }
+      })
+      .then((data) => {
+        if (!cancelled && data && !data.error) {
           setNewsPayload(data);
+          setNewsLoading(false);
+        } else if (!cancelled) {
           setNewsLoading(false);
         }
       })

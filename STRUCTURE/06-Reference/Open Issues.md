@@ -1,7 +1,7 @@
 ---
 title: Open Issues
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-05-09
 author: Codex
 tags:
   - reference
@@ -16,6 +16,13 @@ status: active
 
 > Consolidated blocker ledger sourced directly from the Monday.com `Issues & Bugs` board.
 > These items represent true friction in the Bookit 5s Arena stack.
+
+## Monday / Sidekick parity — sync note (2026-05-09)
+
+- **Cursor MCP:** No Monday.dev or Monday.com API server is configured in this IDE project (`mcps/` has no Monday tools), so Sidekick audit files cannot be pulled from here.
+- **In-IDE browser MCP:** Navigating to the workspace (`rkholofelos-team.monday.com`) stops at **email/password login**; authenticated board data is out of reach until you sign in inside that browser session or paste an export.
+- **Antigravity:** Not invokable from Cursor; use AG on device for live `Issues & Bugs` vs this file, then attach exports or update rows below.
+- **Local substitute (repo):** Deferred technical debt and verification steps are tracked in `FOUND_BUT_OUT_OF_SCOPE.md` (ESLint error triage, full 5-tier navbar browser pass, residual tournament string mentions). Reconcile any **new** Monday items against that file and this table when Sidekick output is available.
 
 ## Critical Technical Blockers
 

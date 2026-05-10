@@ -9,8 +9,8 @@
 
 ## Historical Signals Already Present In Training Notes
 
-- [Lead Self Report](../Lead%20Self%20Report.md) records repeated `DEV_1` check-in failures and optimism bias
-- [Dev2 Behavioral Analysis](../Dev2%20Behavioral%20Analysis.md) records chain-of-command gaps and phantom-completion damage
+- [Lead Self Report](../Lead Self Report.md) records repeated `DEV_1` check-in failures and optimism bias
+- [Dev2 Behavioral Analysis](../Dev2 Behavioral Analysis.md) records chain-of-command gaps and phantom-completion damage
 
 ## Rule
 

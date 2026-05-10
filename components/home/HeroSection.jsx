@@ -12,6 +12,10 @@ const Hero3DScene = dynamic(() => import("@/components/home/Hero3DScene"), {
   ssr: false,
   loading: () => null,
 });
+const Hero3DErrorBoundary = dynamic(
+  () => import("@/components/home/Hero3DErrorBoundary"),
+  { ssr: false },
+);
 
 const whatsappPulse = {
   animate: {
@@ -44,7 +48,9 @@ export default function HeroSection() {
     <section className="relative z-0 flex min-h-screen items-center justify-center overflow-hidden px-0 pt-20 pb-20 sm:pt-24 sm:pb-24">
       {/* ── 3D Three.js Scene (background layer) ── */}
       <Suspense fallback={null}>
-        <Hero3DScene />
+        <Hero3DErrorBoundary>
+          <Hero3DScene />
+        </Hero3DErrorBoundary>
       </Suspense>
 
       {/* ── Gradient underlay for 3D scene ── */}

@@ -1,3 +1,5 @@
+"use client";
+
 import { FaUserShield } from "react-icons/fa";
 
 export default function AdminLoading() {

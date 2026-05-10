@@ -13,6 +13,8 @@ import TournamentSection from '@/components/home/TournamentSection';
 import TournamentShowcase from '@/components/home/TournamentShowcase';
 import ContactSection   from '@/components/home/ContactSection';
 import WelcomePopup     from '@/components/home/WelcomePopup';
+import BlackboxMarketMask from '@/components/marketing/BlackboxMarketMask';
+import { showBlackboxMarketMaskOnHome } from '@/lib/featureFlags';
 import connectDB        from '@/lib/mongodb';
 import { getFallbackCourts } from '@/lib/localData/courts';
 import Court            from '@/models/Court';
@@ -27,12 +29,13 @@ const getCourts = async () => {
     if (data.length === 0) {
       return getFallbackCourts();
     }
-    return data.map(doc => ({ 
-      ...doc, 
-      _id: doc._id.toString(),
-      owner: doc.owner.toString(),
-      createdAt: doc.createdAt?.toISOString(),
-      updatedAt: doc.updatedAt?.toISOString()
+    return data.map((doc) => ({
+      ...doc,
+      _id: doc._id?.toString?.() ?? String(doc._id),
+      owner:
+        doc.owner != null ? String(doc.owner) : '000000000000000000000001',
+      createdAt: doc.createdAt?.toISOString?.(),
+      updatedAt: doc.updatedAt?.toISOString?.(),
     }));
   } catch (err) {
     console.error('Failed to get courts:', err);
@@ -47,6 +50,7 @@ const HomePage = async () => {
   return (
     <div className="min-h-screen w-full" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <WelcomePopup />
+      {showBlackboxMarketMaskOnHome() ? <BlackboxMarketMask /> : null}
 
       {/* ══ HERO — animated entrance + particle background ══════ */}
       <HeroSection />

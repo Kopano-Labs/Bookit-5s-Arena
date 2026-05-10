@@ -49,6 +49,18 @@ const BookingSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    /** Paystack ``reference`` (or other PSP id) — set when initializing checkout and/or on webhook for idempotent lookup */
+    externalPaymentRef: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+    /** Last processed Paystack ``data.id`` — stops replay storms on ``charge.success`` */
+    paystackLastEventId: {
+      type: String,
+      default: null,
+      trim: true,
+    },
   },
   { timestamps: true }
 );
@@ -65,6 +77,22 @@ BookingSchema.index({ court: 1, date: 1, status: 1 });
 
 // Admin dashboard — newest bookings first
 BookingSchema.index({ createdAt: -1 });
+
+// Paystack reference lookup (only documents with a non-empty ref participate)
+BookingSchema.index(
+  { externalPaymentRef: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      externalPaymentRef: { $exists: true, $type: 'string', $gt: '' },
+    },
+  },
+);
+
+BookingSchema.index(
+  { paystackLastEventId: 1 },
+  { sparse: true, partialFilterExpression: { paystackLastEventId: { $gt: '' } } },
+);
 
 // In dev, hot-reload can leave a stale model in mongoose.models with the old schema.
 // Always delete and re-register so schema changes (new fields, new enum values) take effect immediately.

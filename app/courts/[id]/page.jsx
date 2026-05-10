@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { FaFutbol } from 'react-icons/fa';
 import CourtDetailClient from './CourtDetailClient';
 import connectDB from '@/lib/mongodb';
 import { getFallbackCourts } from '@/lib/localData/courts';
@@ -38,7 +37,13 @@ const CourtPage = async ({ params }) => {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="text-center">
-          <FaFutbol className="mx-auto text-5xl text-gray-700 mb-4" />
+          <span
+            className="mx-auto mb-4 block text-5xl text-gray-700"
+            role="img"
+            aria-label="Football"
+          >
+            ⚽
+          </span>
           <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
             Court Not Found
           </h1>

@@ -11,6 +11,7 @@ import {
   FaCheckCircle,
   FaCloud,
   FaComments,
+  FaExclamationTriangle,
   FaExternalLinkAlt,
   FaGlobeAfrica,
   FaPlus,

@@ -1,3 +1,5 @@
+"use client";
+
 import { FaUsers } from "react-icons/fa";
 
 export default function ManagerLoading() {

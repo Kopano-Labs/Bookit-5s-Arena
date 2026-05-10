@@ -1,14 +1,10 @@
 'use client';
 
 import { SessionProvider } from 'next-auth/react';
-import { ThemeProvider } from '@/context/ThemeContext';
 
+/** Session only — root `app/layout.jsx` already wraps the tree with `ThemeProvider`. */
 const AuthProvider = ({ children }) => {
-  return (
-    <ThemeProvider>
-      <SessionProvider>{children}</SessionProvider>
-    </ThemeProvider>
-  );
+  return <SessionProvider>{children}</SessionProvider>;
 };
 
 export default AuthProvider;
