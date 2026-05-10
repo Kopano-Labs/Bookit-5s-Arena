@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
 import { getLeagueNews } from "@/lib/sports/football";
 
-/** Vercel Hobby plan has a strict 10-second limit; removing maxDuration=60 to prevent deployment failure. */
+/** Vercel: allow RSS + OG enrichment time (was hitting 504 when PL path loaded all fixtures first). */
+export const maxDuration = 60;
+
 export async function GET(request, context) {
   try {
     const { slug } = await context.params;
