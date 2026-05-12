@@ -25,7 +25,7 @@
     "leaflet": "^1.9.4",
     "mongodb": "^7.1.1",
     "mongoose": "^9.3.3",
-    "next": "^15.5.14",
+    "next": "^15.5.18",
     "next-auth": "^4.24.13",
     "nodemailer": "^8.0.4",
     "react": "19.2.4",
