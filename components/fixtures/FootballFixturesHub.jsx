@@ -11,6 +11,8 @@ import {
   FaNewspaper,
   FaCalendarAlt,
 } from "react-icons/fa";
+import { loadLeagueHubBundle } from "@/lib/offline/fixturesVaultClient";
+import VaultFreshnessRibbon from "@/components/fixtures/VaultFreshnessRibbon";
 
 function TeamBadge({ team }) {
   return (
@@ -177,37 +179,45 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
   const [loading, setLoading] = useState(true);
   const [newsLoading, setNewsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [vaultMeta, setVaultMeta] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
     setLoading(true);
     setError("");
 
     async function loadData() {
       try {
-        const metaRes = await fetch(`/api/football/league/${slug}/meta`);
-        const metaData = await metaRes.json();
-        if (!metaRes.ok) throw new Error(metaData.error || "Failed to load league");
-
-        const matchesRes = await fetch(`/api/football/league/${slug}/matches`);
-        const matchesData = await matchesRes.json();
-        if (!matchesRes.ok) throw new Error(matchesData.error || "Failed to load matches");
+        const bundle = await loadLeagueHubBundle(slug, {
+          signal: controller.signal,
+          onPartial: (partial) => {
+            if (cancelled) return;
+            setMeta(partial.meta);
+            if (partial.matches) setMatchesPayload(partial.matches);
+            setVaultMeta(partial.vault);
+            setLoading(false);
+          },
+        });
 
         if (!cancelled) {
-          setMeta(metaData);
-          setMatchesPayload(matchesData);
+          setMeta(bundle.meta);
+          setMatchesPayload(bundle.matches);
+          setVaultMeta(bundle.vault);
           setLoading(false);
         }
       } catch (err) {
-        if (!cancelled) {
-          setError(err.message);
-          setLoading(false);
-        }
+        if (cancelled || err?.name === "AbortError") return;
+        setError(err.message || "Could not load fixtures.");
+        setLoading(false);
       }
     }
 
     loadData();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [slug]);
 
   useEffect(() => {
@@ -261,8 +271,10 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
         className="p-8 text-center rounded-[32px] border"
         style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.05)" }}
       >
-        <h3 className="text-lg font-black text-white uppercase tracking-widest mb-2">Network Isolated</h3>
-        <p className="text-zinc-500 text-sm mb-6">{error}</p>
+        <h3 className="text-lg font-black text-white uppercase tracking-widest mb-2">Connection unavailable</h3>
+        <p className="text-zinc-500 text-sm mb-6">
+          {error || "We could not reach the match feed. Saved fixtures will appear when available."}
+        </p>
         <button onClick={() => window.location.reload()} className="px-6 py-3 bg-green-500 text-black font-black uppercase tracking-widest text-[10px] rounded-xl hover:bg-green-400 transition">
           Retry Sync
         </button>
@@ -271,7 +283,8 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
   }
 
   return (
-    <div className="space-y-6">
+    <motion.div className="space-y-6">
+      <VaultFreshnessRibbon vault={vaultMeta?.matches || vaultMeta?.meta} />
       <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between px-2">
         <div className="flex items-center gap-5">
           <div
@@ -385,6 +398,6 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 }

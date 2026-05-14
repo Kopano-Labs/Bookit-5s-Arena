@@ -1,7 +1,16 @@
 'use client';
 
-// ClientOnly: renders nothing server-side, hydrates cleanly on client.
-// Analytics tracking is handled by AnalyticsTracker in layout.jsx.
+import { useEffect } from 'react';
+
 export default function ClientOnly() {
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return undefined;
+    }
+
+    navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+    return undefined;
+  }, []);
+
   return null;
 }

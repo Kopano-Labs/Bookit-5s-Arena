@@ -6,23 +6,12 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaArrowRight, FaBolt, FaBroadcastTower, FaChevronRight } from "react-icons/fa";
 
-const FEATURED_FETCH_MS = 12_000;
-
-async function fetchFeaturedMatches(signal) {
-  const res = await fetch("/api/football/featured", { signal });
-  let data;
-  try {
-    data = await res.json();
-  } catch {
-    return [];
-  }
-  if (!Array.isArray(data)) return [];
-  return data;
-}
+import { loadFeaturedMatches } from "@/lib/offline/fixturesVaultClient";
 
 export default function HomeLiveFixtures() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fromVault, setFromVault] = useState(false);
   const fetchGeneration = useRef(0);
 
   useEffect(() => {
@@ -31,11 +20,12 @@ export default function HomeLiveFixtures() {
     async function fetchMatches() {
       const run = ++fetchGeneration.current;
       const ac = new AbortController();
-      const timeoutId = setTimeout(() => ac.abort(), FEATURED_FETCH_MS);
+      const timeoutId = setTimeout(() => ac.abort(), 12_000);
       try {
-        const next = await fetchFeaturedMatches(ac.signal);
+        const result = await loadFeaturedMatches({ signal: ac.signal });
         if (cancelled || run !== fetchGeneration.current) return;
-        setMatches(next);
+        setMatches(result.matches);
+        setFromVault(Boolean(result.vault?.fromVault));
       } catch (err) {
         if (err?.name === "AbortError") {
           console.warn("Featured matches request timed out or was aborted");
@@ -43,7 +33,6 @@ export default function HomeLiveFixtures() {
           console.error("Failed to fetch featured matches", err);
         }
         if (cancelled || run !== fetchGeneration.current) return;
-        setMatches([]);
       } finally {
         clearTimeout(timeoutId);
         if (cancelled || run !== fetchGeneration.current) return;
@@ -74,7 +63,9 @@ export default function HomeLiveFixtures() {
       <div className="bg-zinc-950 border-y border-zinc-900 py-6 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-xs text-zinc-400">
-            Live match strip is offline or the feed did not respond in time. Schedules and full coverage are still on the fixtures page.
+            {fromVault
+              ? "Showing saved match strip from your device vault while the live feed catches up."
+              : "Live match strip is offline or the feed did not respond in time. Schedules and full coverage are still on the fixtures page."}
           </p>
           <Link
             href="/fixtures"

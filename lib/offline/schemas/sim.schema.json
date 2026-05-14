@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kopano://sim.schema.json",
+  "title": "Kopano Vault — shared ecosystem schema",
+  "description": "Commandment IX — offline-first vault contract for Starfall + FivesArena",
+  "definitions": {
+    "VaultFixture": {
+      "type": "object",
+      "required": ["id", "leagueId", "date", "home", "away", "status", "source", "lastUpdated"],
+      "properties": {
+        "id": { "type": "string" },
+        "leagueId": { "type": "string" },
+        "date": { "type": "string" },
+        "home": { "type": "string" },
+        "away": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["live", "upcoming", "result", "postponed", "scheduled", "completed", "cancelled"]
+        },
+        "score": {
+          "type": "object",
+          "properties": {
+            "home": { "type": "number" },
+            "away": { "type": "number" }
+          }
+        },
+        "source": {
+          "type": "string",
+          "enum": ["iSports", "FPL", "vault", "manual", "network"]
+        },
+        "lastUpdated": { "type": "number" }
+      }
+    },
+    "FixturesSnapshot": {
+      "type": "object",
+      "required": ["cacheKey", "resource", "payload", "lastUpdated", "staleAfterMs", "source"],
+      "properties": {
+        "cacheKey": { "type": "string", "minLength": 1 },
+        "resource": {
+          "type": "string",
+          "enum": ["meta", "matches", "featured", "standings", "stats", "news"]
+        },
+        "leagueSlug": { "type": "string" },
+        "season": { "type": ["string", "number", "null"] },
+        "payload": { "type": "object" },
+        "lastUpdated": { "type": "number" },
+        "staleAfterMs": { "type": "number", "minimum": 1000 },
+        "source": { "type": "string" }
+      }
+    },
+    "VaultState": {
+      "type": "object",
+      "required": ["lastSync", "offlineReceipts"],
+      "properties": {
+        "lastSync": { "type": "number" },
+        "blackboxMaskState": { "type": "object" },
+        "userPicks": { "type": "object" },
+        "offlineReceipts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["at", "kind"],
+            "properties": {
+              "at": { "type": "number" },
+              "kind": { "type": "string" },
+              "cacheKey": { "type": "string" },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
