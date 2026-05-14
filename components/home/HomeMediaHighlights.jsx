@@ -125,11 +125,42 @@ export default function HomeMediaHighlights() {
                 </div>
               </a>
             </motion.div>
+          ) : hasArticles ? (
+            <motion.div
+              className="lg:col-span-8 group relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <a
+                href={news.articles[0].url}
+                target="_blank"
+                rel="noreferrer"
+                className="block relative min-h-[320px] rounded-[40px] overflow-hidden bg-zinc-900 border border-zinc-800 ring-1 ring-white/5 group-hover:ring-green-500/30 transition-all p-10 flex flex-col justify-end"
+                style={{
+                  backgroundImage: news.articles[0].image
+                    ? `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.88)), url("${news.articles[0].image}")`
+                    : undefined,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <span className="inline-block px-3 py-1 rounded-full bg-green-500 text-black text-[9px] font-black uppercase tracking-widest mb-4 w-fit">
+                  Top story
+                </span>
+                <h3 className="text-2xl md:text-4xl font-black text-white leading-tight max-w-3xl">
+                  {news.articles[0].title}
+                </h3>
+                <p className="text-zinc-300 text-sm mt-3 max-w-2xl line-clamp-3">
+                  {news.articles[0].summary}
+                </p>
+              </a>
+            </motion.div>
           ) : (
             <div className="lg:col-span-8 rounded-[40px] border border-zinc-800 bg-zinc-900/50 p-10 flex flex-col justify-center gap-4">
               <FaBroadcastTower className="text-green-500" size={28} />
-              <h3 className="text-2xl font-black text-white uppercase">Articles only</h3>
-              <p className="text-sm text-zinc-400">YouTube clips unavailable — showing latest football news below.</p>
+              <h3 className="text-2xl font-black text-white uppercase">Highlights loading</h3>
+              <p className="text-sm text-zinc-400">Match reactions and headlines will appear here shortly.</p>
             </div>
           )}
 

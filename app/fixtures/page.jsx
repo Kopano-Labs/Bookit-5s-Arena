@@ -4,46 +4,15 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import FootballFixturesHub from "@/components/fixtures/FootballFixturesHub";
 import PremierLeagueFixturesHub from "@/components/fixtures/PremierLeagueFixturesHub";
+import LeagueOnboardingModal from "@/components/fixtures/LeagueOnboardingModal";
+import FavoriteLeaguesRail from "@/components/fixtures/FavoriteLeaguesRail";
 import { resolveLeagueSlug, DEFAULT_LEAGUE_SLUG } from "@/lib/sports/leagueSlug";
+import { LEAGUES_CATALOG } from "@/lib/sports/leaguesCatalog";
+import {
+  hasCompletedLeagueOnboarding,
+  readFavoriteLeagues,
+} from "@/lib/sports/leaguePreferences";
 import { motion } from "framer-motion";
-
-const LEAGUES = [
-  /* ─── 🌍 International ─── */
-  { slug: "fifa-world-cup",           name: "🏆 FIFA World Cup",              country: "INT" },
-  { slug: "uefa-nations-league",      name: "🌍 UEFA Nations League",          country: "EUR" },
-  /* ─── 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England ─── */
-  { slug: "premier-league",           name: "Premier League",                  country: "EN"  },
-  /* ─── 🇪🇺 UEFA Club Comps ─── */
-  { slug: "uefa-champions-league",    name: "Champions League",                country: "EU"  },
-  { slug: "uefa-europa-league",       name: "Europa League",                   country: "EU"  },
-  { slug: "uefa-conference-league",   name: "Conference League",               country: "EU"  },
-  /* ─── 🌍 Big 5 ─── */
-  { slug: "la-liga",                  name: "La Liga",                         country: "ES"  },
-  { slug: "serie-a",                  name: "Serie A",                         country: "IT"  },
-  { slug: "bundesliga",               name: "Bundesliga",                      country: "DE"  },
-  { slug: "ligue-1",                  name: "Ligue 1",                         country: "FR"  },
-  /* ─── 🌍 Other Europe ─── */
-  { slug: "eredivisie",               name: "Eredivisie",                      country: "NL"  },
-  { slug: "primeira-liga",            name: "Primeira Liga",                   country: "PT"  },
-  { slug: "belgian-pro-league",       name: "Belgian Pro League",              country: "BE"  },
-  { slug: "scottish-premiership",     name: "Scottish Premiership",            country: "SCO" },
-  { slug: "turkish-super-lig",        name: "Turkish Süper Lig",               country: "TR"  },
-  /* ─── 🌎 Americas ─── */
-  { slug: "major-league-soccer",      name: "MLS",                             country: "US"  },
-  { slug: "brasileirao",              name: "Brasileirao",                     country: "BR"  },
-  { slug: "argentine-primera",        name: "Argentine Primera",               country: "AR"  },
-  { slug: "liga-mx",                  name: "Liga MX",                         country: "MX"  },
-  /* ─── 🌍 Africa ─── */
-  { slug: "psl",                      name: "PSL (South Africa)",              country: "ZA"  },
-  { slug: "egyptian-premier-league",  name: "Egyptian Premier League",         country: "EG"  },
-  { slug: "caf-champions-league",     name: "CAF Champions League",            country: "CAF" },
-  { slug: "caf-confederation-cup",    name: "CAF Confederation Cup",           country: "CAF" },
-  /* ─── 🌏 Asia & Middle East ─── */
-  { slug: "saudi-pro-league",         name: "Saudi Pro League",                country: "SA"  },
-  { slug: "j1-league",                name: "J1 League",                       country: "JP"  },
-  { slug: "k-league-1",               name: "K League 1",                      country: "KR"  },
-  { slug: "afc-champions-league-elite", name: "AFC Champions League Elite",    country: "AFC" },
-];
 
 function FixturesPageInner() {
   const searchParams = useSearchParams();
@@ -51,90 +20,117 @@ function FixturesPageInner() {
   const leagueParam = searchParams.get("league");
   const resolvedLeague = resolveLeagueSlug(leagueParam);
   const [selectedLeague, setSelectedLeague] = useState(resolvedLeague);
+  const [favorites, setFavorites] = useState([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     setSelectedLeague(resolveLeagueSlug(searchParams.get("league")));
   }, [searchParams]);
+
+  useEffect(() => {
+    const saved = readFavoriteLeagues();
+    setFavorites(saved);
+    setShowOnboarding(!hasCompletedLeagueOnboarding());
+  }, []);
 
   const selectLeague = (slug) => {
     setSelectedLeague(slug);
     router.replace(`/fixtures?league=${slug}`, { scroll: false });
   };
 
+  const handleOnboardingComplete = (saved) => {
+    setFavorites(saved);
+    setShowOnboarding(false);
+    if (saved[0]) {
+      selectLeague(saved[0]);
+    }
+  };
+
   return (
-    <motion.div
-      className="fixtures-page min-h-screen pb-20 pt-10 px-4"
-      style={{
-        background: "var(--fixtures-bg, linear-gradient(180deg, #04060a 0%, #0a0f14 60%, #04060a 100%))",
-        color: "var(--text-primary)",
-      }}
-    >
-      <motion.div className="mx-auto max-w-6xl space-y-10">
-        {/* Header */}
-        <section className="flex flex-col items-center gap-4 text-center">
-          <h1
-            className="text-4xl md:text-6xl font-black uppercase leading-none"
-            style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif", letterSpacing: "0.08em" }}
-          >
-            LIVE <span className="text-green-400">FIXTURES</span>
-          </h1>
-          <p className="text-zinc-400 text-sm max-w-xl">
-            Real-time scores, schedules, and standings across 27 leagues worldwide. Powered by iSports API.
-          </p>
-        </section>
+    <>
+      <LeagueOnboardingModal open={showOnboarding} onComplete={handleOnboardingComplete} />
 
-        {/* League Switcher */}
-        <section className="flex flex-col items-center gap-6">
-          <div
-            className="flex flex-wrap justify-center gap-2 p-2 rounded-2xl border"
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              borderColor: "rgba(74, 222, 128, 0.1)",
-              backdropFilter: "blur(12px)",
-            }}
-          >
-            {LEAGUES.map((league) => (
-              <button
-                key={league.slug}
-                type="button"
-                onClick={() => selectLeague(league.slug)}
-                className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all duration-200 ${
-                  selectedLeague === league.slug
-                    ? "bg-green-500 text-black shadow-lg shadow-green-500/30"
-                    : "text-zinc-500 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                {league.name}
-              </button>
-            ))}
-          </div>
-        </section>
+      <motion.div
+        className="fixtures-page min-h-screen pb-20 pt-10 px-4"
+        style={{
+          background: "var(--fixtures-bg, linear-gradient(180deg, #04060a 0%, #0a0f14 60%, #04060a 100%))",
+          color: "var(--text-primary)",
+        }}
+      >
+        <motion.div className="mx-auto max-w-6xl space-y-10">
+          <section className="flex flex-col items-center gap-4 text-center">
+            <h1
+              className="text-4xl md:text-6xl font-black uppercase leading-none"
+              style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif", letterSpacing: "0.08em" }}
+            >
+              LIVE <span className="text-green-400">FIXTURES</span>
+            </h1>
+            <p className="text-zinc-400 text-sm max-w-xl">
+              Your match centre for 27 leagues — live scores, tables, headlines, and highlights in one place.
+            </p>
+          </section>
 
-        {/* Fixtures Hub */}
-        <motion.div
-          key={selectedLeague}
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          {selectedLeague === DEFAULT_LEAGUE_SLUG ? (
-            <PremierLeagueFixturesHub />
-          ) : (
-            <FootballFixturesHub slug={selectedLeague} />
-          )}
+          {!showOnboarding && favorites.length > 0 ? (
+            <FavoriteLeaguesRail
+              favorites={favorites}
+              activeSlug={selectedLeague}
+              onSelect={selectLeague}
+              onEdit={() => setShowOnboarding(true)}
+            />
+          ) : null}
+
+          <section className="flex flex-col items-center gap-6">
+            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
+              Browse all competitions
+            </p>
+            <motion.div
+              className="flex flex-wrap justify-center gap-2 p-2 rounded-2xl border"
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                borderColor: "rgba(74, 222, 128, 0.1)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              {LEAGUES_CATALOG.map((league) => (
+                <button
+                  key={league.slug}
+                  type="button"
+                  onClick={() => selectLeague(league.slug)}
+                  className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all duration-200 ${
+                    selectedLeague === league.slug
+                      ? "bg-green-500 text-black shadow-lg shadow-green-500/30"
+                      : favorites.includes(league.slug)
+                        ? "text-green-300 hover:text-white hover:bg-white/5 border border-green-500/20"
+                        : "text-zinc-500 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {league.emoji} {league.shortName}
+                </button>
+              ))}
+            </motion.div>
+          </section>
+
+          <motion.div
+            key={selectedLeague}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {selectedLeague === DEFAULT_LEAGUE_SLUG ? (
+              <PremierLeagueFixturesHub />
+            ) : (
+              <FootballFixturesHub slug={selectedLeague} />
+            )}
+          </motion.div>
         </motion.div>
       </motion.div>
-    </motion.div>
+    </>
   );
 }
 
 export default function FixturesPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-primary, #04060a)" }}>
-        <motion.div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense fallback={<motion.div className="min-h-screen bg-black" />}>
       <FixturesPageInner />
     </Suspense>
   );

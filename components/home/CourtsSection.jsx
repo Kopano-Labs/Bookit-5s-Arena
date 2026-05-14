@@ -5,10 +5,14 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { FaFutbol, FaArrowRight, FaChevronLeft, FaChevronRight, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
 import { normalizeAvailabilityLabel } from '@/lib/bookingSlots';
+import { courtImageFallbackUrl, courtImageUrl, normalizeCourtImageFilename } from '@/lib/courtImage';
 
 // ─── Court Card ──────────────────────────────────────────────────────────────
 
 function CourtCard({ court, index }) {
+  const imageSrc = courtImageUrl(court.image);
+  const imageFallback = courtImageFallbackUrl(normalizeCourtImageFilename(court.image));
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50, rotateX: 8 }}
@@ -30,13 +34,18 @@ function CourtCard({ court, index }) {
       >
         {/* Image */}
         <div className="relative h-56 overflow-hidden">
-          {court.image ? (
+          {imageSrc ? (
             <>
               <motion.img
-                src={`/images/courts/${court.image}`}
+                src={imageSrc}
                 alt={court.name}
                 loading="lazy"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  if (imageFallback && e.currentTarget.src !== imageFallback) {
+                    e.currentTarget.src = imageFallback;
+                  }
+                }}
                 whileHover={{ scale: 1.1, filter: 'brightness(1.15)' }}
                 animate={{ scale: [1, 1.04, 1] }}
                 transition={{

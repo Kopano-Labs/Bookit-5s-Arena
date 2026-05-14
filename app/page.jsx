@@ -18,6 +18,7 @@ import BlackboxMarketMask from '@/components/marketing/BlackboxMarketMask';
 import { showBlackboxMarketMaskOnHome } from '@/lib/featureFlags';
 import connectDB        from '@/lib/mongodb';
 import { getFallbackCourts } from '@/lib/localData/courts';
+import { normalizeCourtImageFilename } from '@/lib/courtImage';
 import Court            from '@/models/Court';
 
 export const revalidate = 60; // ISR — revalidate every 60 seconds
@@ -32,6 +33,7 @@ const getCourts = async () => {
     }
     return data.map((doc) => ({
       ...doc,
+      image: normalizeCourtImageFilename(doc.image),
       _id: doc._id?.toString?.() ?? String(doc._id),
       owner:
         doc.owner != null ? String(doc.owner) : '000000000000000000000001',
@@ -56,6 +58,7 @@ const HomePage = async () => {
       {/* ══ HERO — animated entrance + particle background ══════ */}
       <HeroSection />
 
+      <HomeLiveFixtures />
       <FixturesPromo />
 
       {/* ══ STATS BAR — live counts from courts (no misleading zero flash) ══ */}
@@ -63,9 +66,6 @@ const HomePage = async () => {
 
       {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}
       <WeatherWidget />
-
-      {/* ══ LIVE FIXTURES — cinematic global match center ═══════ */}
-      <HomeLiveFixtures />
 
       {/* ══ TOURNAMENT — showstopper World Cup section ══════════ */}
       <TournamentSection />

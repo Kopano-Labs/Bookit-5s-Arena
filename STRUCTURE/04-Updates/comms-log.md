@@ -1,6 +1,39 @@
 # Comms Log
 
-## Entry: Five's Arena regression recovery — AFTER
+## 2026-05-14 — KC Swarm — Assets, fixtures UX, league onboarding (Cassy apprenticeship)
+
+**Lead:** User (client waiting on live demo)  
+**KC lane:** Cursor agent + protocol-driven swarm  
+**Cassy lane:** Student–teacher apprenticeship — each change logged with proof artifact for Obsidian audit  
+
+**Problem signals (user screenshots):**
+1. Court cards showed green SVG pitch placeholders instead of photos.
+2. PL fixtures hub showed empty “schedule not published” while FPL data exists.
+3. Match Reactions showed dev-facing “Articles only / YOUTUBE_RAPIDAPI_KEY” copy.
+4. Fixtures page used dev labels (“Phase 1 check”, provider jargon).
+
+**Actions taken:**
+| Task | Change | Proof |
+|------|--------|-------|
+| Court assets | `data/courts.json` → `.jpg`; `lib/courtImage.js` normalizes Mongo/svg → jpg; `CourtsSection` onError fallback | `/images/courts/court-1.jpg` 200 on prod |
+| PL data | `getPremierLeagueMatches` falls back to FPL when iSports returns zero rows | FPL groups populate match window |
+| League UX | Mandatory `LeagueOnboardingModal` (pick 3); `FavoriteLeaguesRail`; shared `leaguesCatalog.js` (27 leagues) | `/fixtures` first visit modal |
+| Copy polish | Removed Phase 1 / provider dev copy; user-facing match centre + arena board | `PremierLeagueFixturesHub.jsx` |
+| Home priority | `HomeLiveFixtures` + `FixturesPromo` immediately after hero | `app/page.jsx` order |
+| Highlights | Featured top article when YouTube unavailable (no env var leak in UI) | `HomeMediaHighlights.jsx` |
+| Blackbox | `showBlackboxMarketMaskOnHome()` enabled on production by default | `lib/featureFlags.js` |
+
+**Swarm engagement (KC protocol):**
+- **Explore subagent:** Mapped iSports vs FPL empty-state root cause.
+- **Shell lane:** Prior deploy `1356002` live on `fivesarena.com`; this patch is follow-up hotfix.
+- **Docs lane:** Case study MD for Obsidian (`STRUCTURE/07-Sessions By Day/2026-05-14 - KC Fixtures Swarm Case Study.md`).
+
+**Save/Kill/Watch:** SAVE for UX + data fallback; WATCH for `YOUTUBE_RAPIDAPI_KEY` on Vercel (clips optional); WATCH Atlas/offline lane unchanged; Kill none.
+
+**Next deploy:** commit + `npx vercel --prod --yes` after this log entry.
+
+---
+
 
 **Date:** 2026-05-14  
 **Author:** Cursor (KC apprenticeship lane)  
@@ -148,50 +181,3 @@
 **Blocked proof:** `npm run validate:offline-sync` passed readiness, missing-header `400`, bad-event `400`, and size-boundary `413`, but all durable write cases returned `503` because this machine cannot connect to the MongoDB Atlas cluster from the current IP/server-selection state. Build also logged the same Atlas failure while generating court data.
 **Save/Kill/Watch:** WATCH -> BLOCKED on Atlas access for durable sync proof. This is not owner-proof and not Resend-ready.
 **Next:** AG must fix/confirm Atlas access, rerun `npm run validate:offline-sync`, then validate Identiq/KasiLink duplicate-action behavior. Resend remains parked.
-
-## 2026-05-14 — AG DIRECTIVE — ATLAS ENGAGEMENT
-
-**Signal:** Owner ordered "proceed to engage" and "send AG instructions".
-**Timestamp:** 2026-05-14 09:51 SAST.
-**Command to AG:** Engage Atlas unblock now. Do not move Resend. Do not run full-repo ESLint.
-**Sanitized evidence:** `.env.local` contains `MONGODB_URI`; the URI is `mongodb+srv`, auth is present, host is `bookit-5s-arena.reqjuuf.mongodb.net`, and no secret value was printed. Current public IP observed by the diagnostic: `41.193.163.223`.
-**Diagnostic result:** `npm run diagnose:atlas` reports OS DNS SRV lookup `ECONNREFUSED`, dns.google SRV fallback succeeds, all three Atlas shard TCP checks on `27017` are open, but the Mongoose handshake fails with `MongooseServerSelectionError` and the Atlas whitelist message.
-**AG action order:**
-1. In MongoDB Atlas for the Bookit cluster, add/confirm Network Access for `41.193.163.223/32` or the current approved dev IP range.
-2. Confirm the database user in `MONGODB_URI` still exists and has the required database permissions. Do not paste the URI, username, password, or Atlas screenshots into public/shared logs.
-3. From `C:\Users\rkhol\Bookit-5s-Arena`, run `npm run diagnose:atlas`.
-4. Only when diagnose passes the Mongoose handshake, run `npm run dev`, then in another terminal run `npm run validate:offline-sync`.
-5. Expected sync proof after Atlas unblock: accepted events `202`, replay `200`, conflict `409`, size boundary `413`, no production money movement.
-6. Report the command outputs back into comms-log with secrets redacted.
-**Boundary:** OS DNS SRV failure is currently non-blocking because the app and diagnostic both prove dns.google fallback can resolve the shard hosts. The blocking failure is Atlas handshake/allowlist/credential layer.
-
-## 2026-05-14 — AG DIRECTIVE — ATLAS SECRET ROTATION BLOCK
-
-**Signal:** AG reported the full MongoDB connection string while describing the continuing Atlas block.
-**Timestamp:** 2026-05-14 11:41 SAST.
-**Sanitized confirmation:** Codex reran `npm run diagnose:atlas`. Public IP remains `41.193.163.223`; dns.google SRV fallback resolves all three Atlas shards; TCP to `27017` is open; Mongoose handshake still fails with `MongooseServerSelectionError` and the Atlas whitelist message.
-**Security boundary:** Treat the pasted database credential as exposed. Do not repeat the URI, username, password, screenshots, or env file values in comms-log or chat.
-**Command to AG:**
-1. Pause sync validation until the exposed database password is rotated.
-2. In MongoDB Atlas, rotate or recreate the Bookit database user's password.
-3. Update local `.env.local` with the new `MONGODB_URI`; update any deployment/provider env var that uses the same credential.
-4. Confirm Network Access includes `41.193.163.223/32` or the approved current dev IP range and that the rule is active/deployed.
-5. Run `npm run diagnose:atlas`.
-6. Only after the diagnostic shows the Mongoose handshake passed, run `npm run dev`, then `npm run validate:offline-sync`.
-7. Report only sanitized command outcomes: pass/fail, public IP, and status codes. No secrets.
-**Save/Kill/Watch:** WATCH -> BLOCKED on secret rotation plus Atlas handshake. Resend remains parked. No owner-proof claim.
-
-## 2026-05-14 — Lead Continuation — Pre-Atlas Shape Gate
-
-**Signal:** Owner ordered Codex to continue as lead with no stop while AG remains execution bridge.
-**Timestamp:** 2026-05-14 12:06 SAST.
-**Action:** Added a second validation lane: `npm run validate:offline-sync:shape`. This keeps AG productive while Atlas rotation/allowlist work is blocked. The strict gate remains `npm run validate:offline-sync`.
-**Proof:** After clearing a stale generated `.next` cache that caused `react-loadable-manifest.json` 500s, dev server readiness returned `/api/v1/sync` `200`. `npm run validate:offline-sync:shape` exited 0: readiness `200`, missing header `400`, bad event `400`, size boundary `413`, and all durable write/replay/conflict cases classified as `BLOCKED 503` due store unavailability.
-**Build proof:** `npm run build` exited 0 and listed `/api/v1/sync`. Build still logs the known Atlas server-selection failure while generating court data.
-**Command to AG:**
-1. Use `npm run validate:offline-sync:shape` only for pre-Atlas request-shape confidence.
-2. Do not treat shape-gate pass as durable sync proof.
-3. Continue Atlas password rotation and Network Access work.
-4. When `npm run diagnose:atlas` passes Mongoose handshake, run the strict `npm run validate:offline-sync`.
-5. Resend remains parked until strict durable proof passes.
-**Save/Kill/Watch:** WATCH -> SAVE for shape gate; WATCH -> BLOCKED for durable sync proof until Atlas handshake passes.

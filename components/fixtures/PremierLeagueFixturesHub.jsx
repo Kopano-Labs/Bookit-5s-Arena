@@ -1041,10 +1041,10 @@ export default function PremierLeagueFixturesHub() {
                 ) : (
                   <EmptyTabState
                     icon={<FaTrophy size={20} />}
-                    title="Schedule window not published yet"
+                    title="No matches in this window"
                     description={
                       matchesPayload?.emptyState ||
-                      "The next Premier League slate has not been published yet for this season selection."
+                      "We could not find fixtures for this season right now. Try another season or check back closer to kick-off."
                     }
                   />
                 )}
@@ -1352,41 +1352,39 @@ export default function PremierLeagueFixturesHub() {
         <section className="grid gap-4 lg:grid-cols-[1.4fr_0.9fr]">
           <div className="rounded-[28px] border border-zinc-200 bg-white p-6">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">
-              Phase 1 check
+              Match centre
             </p>
             <h3 className="mt-2 text-2xl font-black text-zinc-950">
-              Premier League-first fixtures are now the default
+              Follow the season your way
             </h3>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">
-              The old mixed arena/world view has been preserved under a separate route, while the new shell puts Premier League schedule cards, official club badges, season switching, and provider-aware fallbacks at the front.
+              Switch tabs for fixtures, headlines, tables, and player form. When live data is quiet, we fall back to the official Premier League schedule so you still see what is coming up.
             </p>
           </div>
 
           <div className="rounded-[28px] border border-zinc-200 bg-zinc-950 p-6 text-white">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-              Shortcut
+              Local arena
             </p>
             <Link
               href="/fixtures/arena"
               className="mt-3 flex items-center justify-between gap-4 rounded-[22px] bg-white/10 px-4 py-4 transition hover:bg-white/15"
             >
               <div>
-                <div className="text-lg font-black">Open Arena Fixtures</div>
+                <div className="text-lg font-black">Arena fixtures board</div>
                 <div className="text-sm text-zinc-300">
-                  Keep using the legacy local competition board while EPL tabs roll out.
+                  Hellenic FC tournaments, local leagues, and in-house competitions.
                 </div>
               </div>
               <FaChevronRight className="shrink-0 text-zinc-300" />
             </Link>
-            <a
-              href="https://fantasy.premierleague.com"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              href="/"
               className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-zinc-300 hover:text-white"
             >
-              Current fallback provider reference
+              Book a court at Five&apos;s Arena
               <FaExternalLinkAlt size={12} />
-            </a>
+            </Link>
           </div>
         </section>
       </div>
