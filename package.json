@@ -8,6 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "build:css": "npx tailwindcss -i ./assets/styles/globals.css -o ./public/styles.css --minify",
+    "diagnose:atlas": "node --env-file=.env.local scripts/diagnose-atlas-access.mjs",
+    "validate:offline-sync": "node --env-file=.env.local scripts/validate-offline-sync-contract.mjs",
+    "validate:offline-sync:shape": "node --env-file=.env.local scripts/validate-offline-sync-shape.mjs",
+    "validate:court-assets": "node scripts/validate-court-assets.mjs",
     "test": "jest"
   },
   "dependencies": {
