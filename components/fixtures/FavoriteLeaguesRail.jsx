@@ -8,7 +8,7 @@ export default function FavoriteLeaguesRail({ favorites = [], activeSlug, onSele
 
   return (
     <section className="space-y-4">
-      <motion.div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.32em] text-green-400">
             Your leagues
@@ -16,7 +16,7 @@ export default function FavoriteLeaguesRail({ favorites = [], activeSlug, onSele
           <h2 className="mt-1 text-2xl font-black uppercase text-white">
             Jump back in
           </h2>
-        </motion.div>
+        </div>
         <button
           type="button"
           onClick={onEdit}
@@ -24,7 +24,7 @@ export default function FavoriteLeaguesRail({ favorites = [], activeSlug, onSele
         >
           Change leagues
         </button>
-      </motion.div>
+      </div>
 
       <div className="grid gap-3 md:grid-cols-3">
         {favorites.map((slug, index) => {
@@ -45,13 +45,13 @@ export default function FavoriteLeaguesRail({ favorites = [], activeSlug, onSele
                   : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
               }`}
             >
-              <motion.div className="text-2xl">{league.emoji}</motion.div>
-              <motion.div className="mt-3 text-lg font-black text-white">{league.shortName}</motion.div>
+              <div className="text-2xl">{league.emoji}</div>
+              <div className="mt-3 text-lg font-black text-white">{league.shortName}</div>
               <p className="mt-1 text-xs text-zinc-400">Live scores, tables, and headlines</p>
             </motion.button>
           );
         })}
-      </motion.div>
+      </div>
     </section>
   );
 }

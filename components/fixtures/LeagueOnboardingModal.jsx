@@ -60,10 +60,10 @@ export default function LeagueOnboardingModal({ open, onComplete }) {
             exit={{ opacity: 0, y: 24 }}
             className="w-full max-w-3xl overflow-hidden rounded-[32px] border border-white/10 bg-zinc-950 shadow-2xl"
           >
-            <motion.div className="relative overflow-hidden border-b border-white/10 px-6 py-6 sm:px-8">
-              <motion.div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.18),transparent_55%)]" />
+            <div className="relative overflow-hidden border-b border-white/10 px-6 py-6 sm:px-8">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.18),transparent_55%)]" />
               <div className="relative flex items-start justify-between gap-4">
-                <motion.div>
+                <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.35em] text-green-400">
                     Service in society
                   </p>
@@ -73,21 +73,21 @@ export default function LeagueOnboardingModal({ open, onComplete }) {
                   <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-400">
                     We will pin these to the top of Live Fixtures so you jump straight to the competitions you care about. You can change them any time.
                   </p>
-                </motion.div>
+                </div>
                 <FaFutbol className="hidden shrink-0 text-green-500 sm:block" size={28} />
               </div>
               <div className="relative mt-5 flex items-center gap-3">
-                <motion.div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
                   <motion.div
                     className="h-full rounded-full bg-green-500"
                     animate={{ width: `${(selected.length / FAVORITE_LEAGUE_COUNT) * 100}%` }}
                   />
-                </motion.div>
+                </div>
                 <span className="text-xs font-bold text-zinc-300">
                   {selected.length}/{FAVORITE_LEAGUE_COUNT} selected
                 </span>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
             <div className="max-h-[52vh] overflow-y-auto px-4 py-5 sm:px-6">
               {grouped.map(([region, leagues]) => (
@@ -121,10 +121,10 @@ export default function LeagueOnboardingModal({ open, onComplete }) {
                         </button>
                       );
                     })}
-                  </motion.div>
+                  </div>
                 </section>
               ))}
-            </motion.div>
+            </div>
 
             <div className="border-t border-white/10 px-6 py-5 sm:px-8">
               <button
@@ -135,7 +135,7 @@ export default function LeagueOnboardingModal({ open, onComplete }) {
               >
                 Save my leagues
               </button>
-            </motion.div>
+            </div>
           </motion.div>
         </motion.div>
       ) : null}
