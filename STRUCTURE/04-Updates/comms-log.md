@@ -1,6 +1,20 @@
 # Comms Log
 
-## 2026-05-14 — KC Swarm — Assets, fixtures UX, league onboarding (Cassy apprenticeship)
+## 2026-05-14 — FIXTURES CLIENT DEMO FAILURE — Main Brain seeded
+
+**Verdict:** COMPLETE SWARM FAILURE (client demo bar).  
+**Accountability:** Cursor (Composer/KC) + KC swarm + Grok lead.  
+**Budget:** USD 1,200 (~ZAR 19,740).  
+**Main Brain brief:** `Schematics (Main Brain)/04-Updates/Failure Brief - FivesArena Fixtures Client Incident - 2026-05-14.md`  
+**Session record:** `Schematics (Main Brain)/07-Sessions By Day/2026-05-14 - FivesArena Fixtures Swarm FAILURE.md`  
+**Schematics comms:** dispatch appended 2026-05-14 ~15:10 SAST  
+
+**Repo follow-up (this commit):** fixtures refactor shield banner, Blackbox on `/fixtures`, seasonNotice UI, isports date + standings future-season fallback.
+
+**Next trigger:** `heavy blackbox mask refactor`
+
+---
+
 
 **Lead:** User (client waiting on live demo)  
 **KC lane:** Cursor agent + protocol-driven swarm  

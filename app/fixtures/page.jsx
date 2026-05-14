@@ -6,12 +6,18 @@ import FootballFixturesHub from "@/components/fixtures/FootballFixturesHub";
 import PremierLeagueFixturesHub from "@/components/fixtures/PremierLeagueFixturesHub";
 import LeagueOnboardingModal from "@/components/fixtures/LeagueOnboardingModal";
 import FavoriteLeaguesRail from "@/components/fixtures/FavoriteLeaguesRail";
+import FixturesRefactorShield from "@/components/fixtures/FixturesRefactorShield";
+import BlackboxMarketMask from "@/components/marketing/BlackboxMarketMask";
 import { resolveLeagueSlug, DEFAULT_LEAGUE_SLUG } from "@/lib/sports/leagueSlug";
 import { LEAGUES_CATALOG } from "@/lib/sports/leaguesCatalog";
 import {
   hasCompletedLeagueOnboarding,
   readFavoriteLeagues,
 } from "@/lib/sports/leaguePreferences";
+import {
+  showBlackboxMarketMaskOnFixtures,
+  showFixturesRefactorShield,
+} from "@/lib/featureFlags";
 import { motion } from "framer-motion";
 
 function FixturesPageInner() {
@@ -58,6 +64,8 @@ function FixturesPageInner() {
         }}
       >
         <motion.div className="mx-auto max-w-6xl space-y-10">
+          {showFixturesRefactorShield() ? <FixturesRefactorShield /> : null}
+
           <section className="flex flex-col items-center gap-4 text-center">
             <h1
               className="text-4xl md:text-6xl font-black uppercase leading-none"
@@ -124,6 +132,7 @@ function FixturesPageInner() {
           </motion.div>
         </motion.div>
       </motion.div>
+      {showBlackboxMarketMaskOnFixtures() ? <BlackboxMarketMask /> : null}
     </>
   );
 }

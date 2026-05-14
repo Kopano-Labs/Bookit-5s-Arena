@@ -1233,6 +1233,12 @@ export default function PremierLeagueFixturesHub() {
                       </Reorder.Group>
                     </div>
 
+                    {standingsPayload?.seasonNotice ? (
+                      <div className="px-6 pt-6">
+                        <InlineNotice tone="info">{standingsPayload.seasonNotice}</InlineNotice>
+                      </div>
+                    ) : null}
+
                     {standingsError && (
                       <div className="px-6 pt-6">
                         <InlineNotice tone="warning">{standingsError}</InlineNotice>
@@ -1305,6 +1311,12 @@ export default function PremierLeagueFixturesHub() {
                         ))}
                       </div>
                     </div>
+
+                    {statsPayload?.seasonNotice ? (
+                      <div className="px-6 pt-6">
+                        <InlineNotice tone="info">{statsPayload.seasonNotice}</InlineNotice>
+                      </div>
+                    ) : null}
 
                     {statsError && (
                       <div className="px-6 pt-6">
