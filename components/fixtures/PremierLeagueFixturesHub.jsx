@@ -1172,7 +1172,7 @@ export default function PremierLeagueFixturesHub() {
                         </div>
                       ) : (
                         <div className="px-6 py-6 text-sm leading-6 text-zinc-500">
-                          The curated reactor rail is wired but the YouTube provider is unavailable right now. Add `YOUTUBE_RAPIDAPI_KEY` and `YOUTUBE_RAPIDAPI_HOST` to populate it automatically.
+                          Highlight reels are not available right now. Browse match news above or check back closer to kick-off.
                         </div>
                       )}
                     </div>

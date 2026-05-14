@@ -58,8 +58,7 @@ export default function HomeMediaHighlights() {
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Highlights feed</span>
             </div>
             <p className="text-sm text-zinc-400 max-w-xl">
-              Video reactions are pulled on demand from YouTube (RapidAPI). No inbound webhook — configure{" "}
-              <code className="text-zinc-500">YOUTUBE_RAPIDAPI_KEY</code> on production to enable clips.
+              Match reactions and highlight clips will appear here when coverage is available for the current round.
             </p>
           </div>
           <Link href="/fixtures?league=premier-league" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-500 hover:text-green-400 shrink-0">

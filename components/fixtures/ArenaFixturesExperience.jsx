@@ -1343,8 +1343,7 @@ export default function FixturesPage() {
                 ) : (
                   <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6 flex flex-col items-center justify-center text-center gap-3 md:col-span-2">
                     <FaPlay size={24} className="text-gray-700" />
-                    <p className="text-gray-600 text-sm font-bold">Highlight clips load via YouTube RapidAPI pull</p>
-                    <p className="text-gray-700 text-xs">No inbound YouTube webhook — set YOUTUBE_RAPIDAPI_KEY on production</p>
+                    <p className="text-gray-600 text-sm font-bold">Highlight clips appear here when match coverage is published</p>
                   </div>
                 )}
               </div>
