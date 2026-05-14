@@ -12,6 +12,7 @@
     "validate:offline-sync": "node --env-file=.env.local scripts/validate-offline-sync-contract.mjs",
     "validate:offline-sync:shape": "node --env-file=.env.local scripts/validate-offline-sync-shape.mjs",
     "validate:court-assets": "node scripts/validate-court-assets.mjs",
+    "fixtures:health-check": "node scripts/fixtures-health-check.mjs",
     "test": "jest"
   },
   "dependencies": {

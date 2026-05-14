@@ -64,7 +64,11 @@ function FixturesPageInner() {
         }}
       >
         <motion.div className="mx-auto max-w-6xl space-y-10">
-          {showFixturesRefactorShield() ? <FixturesRefactorShield /> : null}
+          {showFixturesRefactorShield() && selectedLeague !== DEFAULT_LEAGUE_SLUG ? (
+            <FixturesRefactorShield
+              onContinuePremierLeague={() => selectLeague(DEFAULT_LEAGUE_SLUG)}
+            />
+          ) : null}
 
           <section className="flex flex-col items-center gap-4 text-center">
             <h1

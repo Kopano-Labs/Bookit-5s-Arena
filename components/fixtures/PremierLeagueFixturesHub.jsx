@@ -1234,9 +1234,9 @@ export default function PremierLeagueFixturesHub() {
                     </div>
 
                     {standingsPayload?.seasonNotice ? (
-                      <div className="px-6 pt-6">
+                      <motion.div className="px-6 pt-6">
                         <InlineNotice tone="info">{standingsPayload.seasonNotice}</InlineNotice>
-                      </div>
+                      </motion.div>
                     ) : null}
 
                     {standingsError && (
