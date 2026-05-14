@@ -19,7 +19,7 @@
 
 | Route | Purpose | Current Status | Improvement Note |
 | --- | --- | --- | --- |
-| `/fixtures` | Premier League hub | verified `200` | production keys determine depth of news/search enrichment |
+| `/fixtures` | Multi-league hub (default **Premier League**); PL uses `PremierLeagueFixturesHub` | verified `200` | `?league=` accepts slug or iSports id |
 | `/fixtures/arena` | local fixtures and global live board | verified `200` | continue visual polish and data QA |
 | `/tournament` | tournament landing | verified `200` | auth-path cross-links should be reviewed with seeded data |
 | `/tournament/bracket` | bracket page | verified `200` | seed-data QA recommended |

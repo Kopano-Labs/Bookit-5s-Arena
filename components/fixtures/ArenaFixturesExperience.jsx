@@ -769,6 +769,7 @@ export default function FixturesPage() {
 
   // News tab state
   const [newsArticles, setNewsArticles] = useState([]);
+  const [newsVideos, setNewsVideos] = useState([]);
   const [newsLoading, setNewsLoading] = useState(false);
 
   // Standings tab state
@@ -832,9 +833,17 @@ export default function FixturesPage() {
   const fetchNews = useCallback(async () => {
     setNewsLoading(true);
     try {
-      const res = await fetch("/api/external/football-news");
-      const data = await res.json();
+      const [externalRes, plRes] = await Promise.all([
+        fetch("/api/external/football-news"),
+        fetch("/api/football/league/premier-league/news"),
+      ]);
+      const data = await externalRes.json();
       if (data.articles) setNewsArticles(data.articles);
+      const plCt = plRes.headers.get("content-type") || "";
+      if (plRes.ok && plCt.includes("application/json")) {
+        const plData = await plRes.json();
+        if (plData?.videos?.length) setNewsVideos(plData.videos);
+      }
     } catch {
       /* keep stale */
     } finally {
@@ -1327,15 +1336,17 @@ export default function FixturesPage() {
                 <span className="text-[9px] text-gray-600">YouTube · Vimeo · Dailymotion</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <VideoEmbed
-                  url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                  title="Latest Match Highlights"
-                />
-                <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6 flex flex-col items-center justify-center text-center gap-3">
-                  <FaPlay size={24} className="text-gray-700" />
-                  <p className="text-gray-600 text-sm font-bold">More highlights coming soon</p>
-                  <p className="text-gray-700 text-xs">Embed any YouTube, Vimeo, or Dailymotion link</p>
-                </div>
+                {newsVideos.length > 0 ? (
+                  newsVideos.slice(0, 2).map((video) => (
+                    <VideoEmbed key={video.id || video.url} url={video.url} title={video.title} />
+                  ))
+                ) : (
+                  <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6 flex flex-col items-center justify-center text-center gap-3 md:col-span-2">
+                    <FaPlay size={24} className="text-gray-700" />
+                    <p className="text-gray-600 text-sm font-bold">Highlight clips load via YouTube RapidAPI pull</p>
+                    <p className="text-gray-700 text-xs">No inbound YouTube webhook — set YOUTUBE_RAPIDAPI_KEY on production</p>
+                  </div>
+                )}
               </div>
             </div>
 

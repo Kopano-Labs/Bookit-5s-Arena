@@ -35,15 +35,46 @@ export default function HomeMediaHighlights() {
     fetchHighlights();
   }, []);
 
-  if (loading) return null;
-  if (!news?.videos?.length) return null;
+  if (loading) {
+    return (
+      <section className="py-16 bg-zinc-950 border-y border-zinc-900">
+        <motion.div className="max-w-7xl mx-auto px-6 text-center text-[10px] font-black uppercase tracking-widest text-zinc-500 animate-pulse">
+          Loading match reactions…
+        </motion.div>
+      </section>
+    );
+  }
 
-  const featuredVideo = news.videos[0];
-  const sideVideos = news.videos.slice(1, 4);
+  const hasVideos = Boolean(news?.videos?.length);
+  const hasArticles = Boolean(news?.articles?.length);
+
+  if (!hasVideos && !hasArticles) {
+    return (
+      <section className="py-16 bg-zinc-950 border-y border-zinc-900">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <FaYoutube className="text-rose-500" size={20} />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Highlights feed</span>
+            </div>
+            <p className="text-sm text-zinc-400 max-w-xl">
+              Video reactions are pulled on demand from YouTube (RapidAPI). No inbound webhook — configure{" "}
+              <code className="text-zinc-500">YOUTUBE_RAPIDAPI_KEY</code> on production to enable clips.
+            </p>
+          </div>
+          <Link href="/fixtures?league=premier-league" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-500 hover:text-green-400 shrink-0">
+            Premier League hub <FaArrowRight />
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  const featuredVideo = hasVideos ? news.videos[0] : null;
+  const sideVideos = hasVideos ? news.videos.slice(1, 4) : [];
 
   return (
     <section className="py-24 bg-zinc-950 relative overflow-hidden">
-      {/* Background patterns */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] bg-green-500/20 blur-[160px] rounded-full" />
         <div className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full" />
@@ -53,51 +84,55 @@ export default function HomeMediaHighlights() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-3">
-               <FaYoutube className="text-rose-500" size={24} />
-               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Live Global Feed</span>
+              <FaYoutube className="text-rose-500" size={24} />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Live Global Feed</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-white uppercase leading-[0.9]" style={{ fontFamily: 'Impact, sans-serif' }}>
+            <h2 className="text-4xl md:text-6xl font-black text-white uppercase leading-[0.9]" style={{ fontFamily: "Impact, sans-serif" }}>
               MATCH <span className="text-green-500">REACTIONS</span>
             </h2>
           </div>
-          <Link href="/fixtures" className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all group">
+          <Link href="/fixtures?league=premier-league" className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all group">
             Watch More <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Main Featured Video */}
-          <motion.div 
-            className="lg:col-span-8 group relative"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <a href={featuredVideo.url} target="_blank" rel="noreferrer" className="block relative aspect-video rounded-[40px] overflow-hidden bg-zinc-900 border border-zinc-800 ring-1 ring-white/5 group-hover:ring-green-500/30 transition-all">
-              <Image src={featuredVideo.thumbnail} alt={featuredVideo.title} fill className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" unoptimized />
-              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent" />
-              
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-                  <FaPlay className="text-zinc-950 ml-1" size={24} />
+        <motion.div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {featuredVideo ? (
+            <motion.div
+              className="lg:col-span-8 group relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <a href={featuredVideo.url} target="_blank" rel="noreferrer" className="block relative aspect-video rounded-[40px] overflow-hidden bg-zinc-900 border border-zinc-800 ring-1 ring-white/5 group-hover:ring-green-500/30 transition-all">
+                <Image src={featuredVideo.thumbnail} alt={featuredVideo.title} fill className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" unoptimized />
+                <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                    <FaPlay className="text-zinc-950 ml-1" size={24} />
+                  </div>
                 </div>
-              </div>
+                <div className="absolute bottom-10 left-10 right-10">
+                  <span className="inline-block px-3 py-1 rounded-full bg-green-500 text-black text-[9px] font-black uppercase tracking-widest mb-4">
+                    Featured Reaction
+                  </span>
+                  <h3 className="text-2xl md:text-4xl font-black text-white leading-tight">
+                    {featuredVideo.title}
+                  </h3>
+                  <p className="text-zinc-400 text-sm mt-2 font-bold uppercase tracking-widest">
+                    {featuredVideo.reactor?.name || featuredVideo.channelName}
+                  </p>
+                </div>
+              </a>
+            </motion.div>
+          ) : (
+            <div className="lg:col-span-8 rounded-[40px] border border-zinc-800 bg-zinc-900/50 p-10 flex flex-col justify-center gap-4">
+              <FaBroadcastTower className="text-green-500" size={28} />
+              <h3 className="text-2xl font-black text-white uppercase">Articles only</h3>
+              <p className="text-sm text-zinc-400">YouTube clips unavailable — showing latest football news below.</p>
+            </div>
+          )}
 
-              <div className="absolute bottom-10 left-10 right-10">
-                <span className="inline-block px-3 py-1 rounded-full bg-green-500 text-black text-[9px] font-black uppercase tracking-widest mb-4">
-                  Featured Reaction
-                </span>
-                <h3 className="text-2xl md:text-4xl font-black text-white leading-tight">
-                  {featuredVideo.title}
-                </h3>
-                <p className="text-zinc-400 text-sm mt-2 font-bold uppercase tracking-widest">
-                  {featuredVideo.reactor?.name || featuredVideo.channelName}
-                </p>
-              </div>
-            </a>
-          </motion.div>
-
-          {/* Side List */}
           <div className="lg:col-span-4 space-y-6">
             {sideVideos.map((video, idx) => (
               <motion.a
@@ -130,25 +165,27 @@ export default function HomeMediaHighlights() {
               </motion.a>
             ))}
 
-            <div className="pt-6 border-t border-zinc-800">
+            {hasArticles && (
+              <div className="pt-6 border-t border-zinc-800">
                 <div className="bg-zinc-900/50 rounded-3xl p-6 border border-zinc-800">
-                    <div className="flex items-center gap-3 mb-4">
-                        <FaBroadcastTower className="text-green-500" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Latest Intelligence</span>
-                    </div>
-                    <ul className="space-y-4">
-                        {news.articles.slice(0, 3).map(article => (
-                            <li key={article.url}>
-                                <a href={article.url} target="_blank" rel="noreferrer" className="block text-xs text-zinc-400 hover:text-white transition-colors line-clamp-2 leading-relaxed">
-                                    • {article.title}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
+                  <div className="flex items-center gap-3 mb-4">
+                    <FaBroadcastTower className="text-green-500" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white">Latest Intelligence</span>
+                  </div>
+                  <ul className="space-y-4">
+                    {news.articles.slice(0, 3).map((article) => (
+                      <li key={article.url}>
+                        <a href={article.url} target="_blank" rel="noreferrer" className="block text-xs text-zinc-400 hover:text-white transition-colors line-clamp-2 leading-relaxed">
+                          • {article.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-            </div>
+              </div>
+            )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

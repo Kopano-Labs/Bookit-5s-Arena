@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Third Court">
+  <rect width="800" height="500" fill="#15803d"/>
+  <rect x="40" y="40" width="720" height="420" fill="none" stroke="#bbf7d0" stroke-width="6"/>
+  <text x="400" y="470" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" fill="#ecfdf5">Third Court</text>
+</svg>

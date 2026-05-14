@@ -14,6 +14,7 @@ const AnalyticsTracker = dynamic(() => import("@/components/AnalyticsTracker"));
 const CookieBanner = dynamic(() => import("@/components/CookieBanner"));
 const PageTransition = dynamic(() => import("@/components/PageTransition"));
 const Analytics = dynamic(() => import("@vercel/analytics/react").then(m => m.Analytics));
+const OfflineBanner = dynamic(() => import("@/packages/ui/src/OfflineBanner"));
 
 const SITE_URL =
   process.env.NODE_ENV === "production"
@@ -116,6 +117,11 @@ const RootLayout = ({ children }) => {
           href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;900&display=swap"
           rel="stylesheet"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('5s_theme');var ok=t==='dark'||t==='light'||t==='crazy'||t==='read';if(ok){document.documentElement.classList.add(t);}}catch(e){}})();`,
+          }}
+        />
         {/* Plausible Analytics — Lightweight & Privacy-focused */}
         <script
           defer
@@ -124,7 +130,8 @@ const RootLayout = ({ children }) => {
         ></script>
       </head>
       <body
-        className="overflow-x-hidden bg-gray-950 text-white antialiased selection:bg-green-500/30"
+        className="overflow-x-hidden antialiased selection:bg-green-500/30"
+        style={{ backgroundColor: "var(--bg-primary, #030712)", color: "var(--text-primary, #f9fafb)" }}
         suppressHydrationWarning
       >
         <AuthProvider>
@@ -132,6 +139,7 @@ const RootLayout = ({ children }) => {
             <ThemeProvider>
               <AnalyticsTracker />
               <ClientOnly />
+              <OfflineBanner />
               <Header />
               <main>
                 <PageTransition>{children}</PageTransition>

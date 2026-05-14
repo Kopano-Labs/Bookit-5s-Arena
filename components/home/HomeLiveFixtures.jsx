@@ -158,7 +158,7 @@ export default function HomeLiveFixtures() {
                     <FaBroadcastTower className="text-zinc-600" size={10} />
                     <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">iSports Edge Feed</span>
                 </div>
-                <Link href={`/fixtures?league=${match.league.id}`} className="p-2 rounded-full bg-zinc-800/50 hover:bg-green-500/20 hover:text-green-400 transition-all">
+                <Link href={`/fixtures?league=${match.league.slug || "premier-league"}`} className="p-2 rounded-full bg-zinc-800/50 hover:bg-green-500/20 hover:text-green-400 transition-all">
                     <FaChevronRight size={8} />
                 </Link>
               </div>

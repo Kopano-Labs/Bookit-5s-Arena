@@ -10,7 +10,7 @@
     "amenities": "Floodlights, Clubhouse access, Change rooms, Wi-Fi, Secure Parking and a Bar",
     "availability": "10:00 AM - 10:00 PM",
     "price_per_hour": 400,
-    "image": "court-1.jpg"
+    "image": "court-1.svg"
   },
   {
     "$id": "2",
@@ -23,7 +23,7 @@
     "amenities": "Floodlights, Clubhouse Restaurant, Kids Party Packages, Secure Parking and a Bar",
     "availability": "10:00 AM - 10:00 PM",
     "price_per_hour": 400,
-    "image": "court-2.jpg"
+    "image": "court-2.svg"
   },
   {
     "$id": "3",
@@ -36,7 +36,7 @@
     "amenities": "Floodlights, Coaching Support, Whiteboard, Secure Parking and a Bar",
     "availability": "10:00 AM - 10:00 PM",
     "price_per_hour": 400,
-    "image": "court-3.jpg"
+    "image": "court-3.svg"
   },
   {
     "$id": "4",
@@ -49,6 +49,6 @@
     "amenities": "Floodlights, Sound System, Clubhouse Restaurant, Secure Parking and a Bar",
     "availability": "10:00 AM - 10:00 PM",
     "price_per_hour": 400,
-    "image": "court-4.jpg"
+    "image": "court-4.svg"
   }
 ]

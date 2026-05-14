@@ -30,7 +30,7 @@ export default function FixturesPromo() {
           <motion.div
             className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage: 'url(/images/events/football-legends.png)',
+              backgroundImage: 'url(/images/events/football-legends.svg), url(/images/events/football-legends.png)',
               filter: 'brightness(0.35) saturate(1.3)',
             }}
             animate={{ scale: [1, 1.05, 1] }}

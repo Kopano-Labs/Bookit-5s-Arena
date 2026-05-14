@@ -29,6 +29,18 @@ const THEMES = {
     btnFrom: '#166534',
     btnTo: '#16a34a',
   },
+  crazy: {
+    name: 'Crazy',
+    icon: 'crazy',
+    bg: '#0d0520',
+    text: '#f3e8ff',
+    accent: '#a855f7',
+    card: '#160830',
+    border: '#3b1a6b',
+    glow: 'rgba(168,85,247,0.6)',
+    btnFrom: '#6b21a8',
+    btnTo: '#a855f7',
+  },
   read: {
     name: 'Read',
     icon: 'read',
@@ -51,11 +63,6 @@ export function ThemeProvider({ children }) {
     }
 
     const saved = localStorage.getItem('5s_theme');
-    if (saved === 'crazy') {
-      localStorage.setItem('5s_theme', 'dark');
-      return 'dark';
-    }
-
     return saved && THEMES[saved] ? saved : 'dark';
   });
 

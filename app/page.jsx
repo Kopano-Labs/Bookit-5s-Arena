@@ -1,5 +1,6 @@
 // Server Component — keeps ISR data fetching; passes data to client components for animations
 import HeroSection      from '@/components/home/HeroSection';
+import FixturesPromo    from '@/components/home/FixturesPromo';
 import StatsBar         from '@/components/home/StatsBar';
 import WeatherWidget    from '@/components/home/WeatherWidget';
 import HomeLiveFixtures from '@/components/home/HomeLiveFixtures';
@@ -54,6 +55,8 @@ const HomePage = async () => {
 
       {/* ══ HERO — animated entrance + particle background ══════ */}
       <HeroSection />
+
+      <FixturesPromo />
 
       {/* ══ STATS BAR — live counts from courts (no misleading zero flash) ══ */}
       <StatsBar courtsCount={courts.length || 4} />

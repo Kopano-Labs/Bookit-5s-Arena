@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import FootballFixturesHub from "@/components/fixtures/FootballFixturesHub";
+import PremierLeagueFixturesHub from "@/components/fixtures/PremierLeagueFixturesHub";
+import { resolveLeagueSlug, DEFAULT_LEAGUE_SLUG } from "@/lib/sports/leagueSlug";
 import { motion } from "framer-motion";
-import Link from "next/link";
 
 const LEAGUES = [
   /* ─── 🌍 International ─── */
@@ -46,17 +47,33 @@ const LEAGUES = [
 
 function FixturesPageInner() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const leagueParam = searchParams.get("league");
-  const initialLeague = LEAGUES.find(l => l.slug === leagueParam)?.slug || LEAGUES[0].slug;
-  const [selectedLeague, setSelectedLeague] = useState(initialLeague);
+  const resolvedLeague = resolveLeagueSlug(leagueParam);
+  const [selectedLeague, setSelectedLeague] = useState(resolvedLeague);
+
+  useEffect(() => {
+    setSelectedLeague(resolveLeagueSlug(searchParams.get("league")));
+  }, [searchParams]);
+
+  const selectLeague = (slug) => {
+    setSelectedLeague(slug);
+    router.replace(`/fixtures?league=${slug}`, { scroll: false });
+  };
 
   return (
-    <div className="min-h-screen pb-20 pt-10 px-4" style={{ background: "linear-gradient(180deg, #04060a 0%, #0a0f14 60%, #04060a 100%)" }}>
-      <div className="mx-auto max-w-6xl space-y-10">
+    <motion.div
+      className="fixtures-page min-h-screen pb-20 pt-10 px-4"
+      style={{
+        background: "var(--fixtures-bg, linear-gradient(180deg, #04060a 0%, #0a0f14 60%, #04060a 100%))",
+        color: "var(--text-primary)",
+      }}
+    >
+      <motion.div className="mx-auto max-w-6xl space-y-10">
         {/* Header */}
         <section className="flex flex-col items-center gap-4 text-center">
           <h1
-            className="text-4xl md:text-6xl font-black text-white uppercase leading-none"
+            className="text-4xl md:text-6xl font-black uppercase leading-none"
             style={{ fontFamily: "'Bebas Neue', 'Impact', sans-serif", letterSpacing: "0.08em" }}
           >
             LIVE <span className="text-green-400">FIXTURES</span>
@@ -79,7 +96,8 @@ function FixturesPageInner() {
             {LEAGUES.map((league) => (
               <button
                 key={league.slug}
-                onClick={() => setSelectedLeague(league.slug)}
+                type="button"
+                onClick={() => selectLeague(league.slug)}
                 className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all duration-200 ${
                   selectedLeague === league.slug
                     ? "bg-green-500 text-black shadow-lg shadow-green-500/30"
@@ -99,18 +117,22 @@ function FixturesPageInner() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <FootballFixturesHub slug={selectedLeague} />
+          {selectedLeague === DEFAULT_LEAGUE_SLUG ? (
+            <PremierLeagueFixturesHub />
+          ) : (
+            <FootballFixturesHub slug={selectedLeague} />
+          )}
         </motion.div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
 export default function FixturesPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#04060a" }}>
-        <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-primary, #04060a)" }}>
+        <motion.div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <FixturesPageInner />

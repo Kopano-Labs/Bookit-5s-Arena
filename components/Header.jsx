@@ -69,6 +69,14 @@ const ThemeGlyph = ({ theme }) => {
     );
   }
 
+  if (theme === "crazy") {
+    return (
+      <span className="relative flex h-4 w-4 items-center justify-center rounded-full bg-purple-500/20 shadow-[0_0_12px_rgba(168,85,247,0.55)]">
+        <span className="h-2.5 w-2.5 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+      </span>
+    );
+  }
+
   return (
     <span className="relative flex h-4 w-4 items-center justify-center rounded-full bg-emerald-400/15 shadow-[0_0_0_1px_rgba(74,222,128,0.35)]">
       <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(74,222,128,0.55)]" />
@@ -275,7 +283,7 @@ const HeaderInner = () => {
               whileTap={{ scale: 0.95 }}
             >
               <Image
-                src="/images/logo.png"
+                src="/images/logo.svg"
                 alt="5s Arena"
                 fill
                 sizes="56px"
