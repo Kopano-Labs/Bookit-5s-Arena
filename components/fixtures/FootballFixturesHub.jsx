@@ -99,7 +99,7 @@ function MatchCard({ match, index }) {
       <div className="flex min-w-[140px] flex-col items-start justify-between gap-3 sm:items-end">
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill status={match.status} minute={match.minute} />
-          {match.provider === "isports" && (
+          {match.provider === "isports" && match.status?.state === "live" && (
             <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-green-400 border border-green-500/20">
               <FaBroadcastTower size={9} />
               Live
@@ -365,7 +365,18 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
                         {group.dateLabel}
                       </div>
                       <div>
-                        {group.matches.map((match, idx) => (
+                        {group.matches
+                          .filter((match, index, all) => {
+                            const key = `${match.home?.name || ""}|${match.away?.name || ""}|${match.kickoffLabel || ""}`;
+                            return (
+                              all.findIndex(
+                                (entry) =>
+                                  `${entry.home?.name || ""}|${entry.away?.name || ""}|${entry.kickoffLabel || ""}` ===
+                                  key,
+                              ) === index
+                            );
+                          })
+                          .map((match, idx) => (
                           <MatchCard key={match.id} match={match} index={idx} />
                         ))}
                       </div>

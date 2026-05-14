@@ -59,7 +59,7 @@ export default function FixturesRefactorShield({ onContinuePremierLeague }) {
           >
             Back to home
           </Link>
-        </motion.div>
+        </div>
       </motion.div>
     </motion.div>
   );

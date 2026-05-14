@@ -23,7 +23,7 @@ Feature: Fixtures page reliability
   Scenario: Some leagues are empty but others have data
     Given the provider returns fixtures for 1 of 27 leagues
     And the remaining 26 leagues return empty arrays
-    When the user opens the Fixtures page
+    When the fixtures page is opened
     Then leagues with fixtures should render normally
     And leagues without fixtures should show graceful empty states
     And the page layout should remain intact
@@ -74,7 +74,7 @@ Feature: Fixtures page reliability
   Scenario: Provider times out but cached fixtures exist
     Given the user has a previously cached fixtures snapshot on this device
     And the provider request times out
-    When the user opens the Fixtures page
+    When the fixtures page is opened
     Then the page should show the cached fixtures
     And the page should label the data as last updated or saved
     And the user should see a way to retry or refresh
@@ -83,7 +83,7 @@ Feature: Fixtures page reliability
   Scenario: User is offline with cached fixtures
     Given the device is offline
     And league fixtures were previously cached on this device
-    When the user opens the Fixtures page
+    When the fixtures page is opened
     Then cached fixtures should be shown
     And the page should indicate that the content may be stale
     And no raw network error should be shown
@@ -92,7 +92,7 @@ Feature: Fixtures page reliability
   Scenario: User is offline with no cached fixtures
     Given the device is offline
     And no fixtures have been cached before on this device
-    When the user opens the Fixtures page
+    When the fixtures page is opened
     Then the user should see an offline empty state
     And the message should explain what to do next
     And the page should not render blank cards
@@ -101,7 +101,7 @@ Feature: Fixtures page reliability
   Scenario: Vault freshness is visible while refreshing
     Given the user has a cached fixtures snapshot on this device
     And the network is available
-    When the user opens the Fixtures page
+    When the fixtures page is opened
     Then the user should see fixtures immediately from saved data or live data
     And while a refresh is in progress the page should indicate saved data is being updated
     And the layout should not flash blank between states
@@ -243,7 +243,7 @@ Feature: Fixtures page reliability
   @target
   Scenario: Local Arena fixtures are distinguishable from global leagues
     Given local arena fixtures exist for the user's region
-    When the user opens the Fixtures page
+    When the fixtures page is opened
     Then local arena fixtures should appear in a dedicated section
     And global league fixtures should not hide local arena content
 
