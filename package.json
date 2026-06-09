@@ -14,14 +14,17 @@
     "validate:court-assets": "node scripts/validate-court-assets.mjs",
     "fixtures:health-check": "node scripts/fixtures-health-check.mjs",
     "validate:fixtures-vault": "node scripts/validate-fixtures-vault-shape.mjs",
-    "test": "jest"
+    "test": "jest",
+    "audit": "npm audit --audit-level=moderate",
+    "audit:fix": "npm audit fix",
+    "audit:fix:force": "npm audit fix --force"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/sandbox": "^1.9.3",
-    "bcryptjs": "^3.0.3",
+    "bcryptjs": "^3.0.5",
     "botid": "^1.5.11",
     "dotenv": "^17.3.1",
     "eslint-plugin-react": "^7.37.5",
@@ -57,7 +60,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9.4.0",
-    "eslint-config-next": "16.2.1",
+    "eslint-config-next": "^15.5.18",
     "jest": "^29.7.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.4.5"

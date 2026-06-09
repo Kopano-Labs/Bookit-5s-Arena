@@ -1,0 +1,50 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "security"
+    reviewers:
+      - "Kopano-labs/maintainers"
+    allow:
+      - dependency-type: "all"
+    commit-message:
+      prefix: "chore(deps):"
+      prefix-major: "chore(deps-major):"
+      prefix-minor: "chore(deps):"
+      include: "scope"
+
+  # Security updates get priority
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    security-updates-only: true
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "security"
+      - "urgent"
+    reviewers:
+      - "Kopano-labs/maintainers"
+    commit-message:
+      prefix: "security(deps):"
+      include: "scope"
+
+  # GitHub Actions updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    labels:
+      - "ci"
+      - "github-actions"
