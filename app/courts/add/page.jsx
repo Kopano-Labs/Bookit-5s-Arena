@@ -58,7 +58,7 @@ const AddCourtPage = () => {
       }
 
       setSuccess(true);
-    } catch (err) {
+    } catch {
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);

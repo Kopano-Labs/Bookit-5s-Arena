@@ -26,7 +26,7 @@ const MENU_ITEMS = [
     label: 'Register for Tournament',
     href: '/tournament',
     color: '#eab308',
-    desc: 'World Cup 5s · May 2026',
+    desc: 'World Cup 5s · 29–31 May 2026',
   },
 ];
 
@@ -93,7 +93,7 @@ export default function SoccerBallMenu() {
   if (hideMenu) return null;
 
   return (
-    <div ref={menuRef} className="fixed left-0 top-[60%] sm:top-1/2 -translate-y-1/2 z-[100] hidden sm:block">
+    <div ref={menuRef} className="fixed left-0 top-[60%] sm:top-1/2 -translate-y-1/2 z-[100] block">
 
       {/* Expanded dock menu */}
       <AnimatePresence>

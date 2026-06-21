@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaTimes, FaFutbol, FaArrowRight } from 'react-icons/fa';
 import Link from 'next/link';
-
-const STORAGE_KEY = '5sa_hide_welcome_popup';
+import { WELCOME_POPUP_STORAGE_KEY } from '@/lib/popupPreferences';
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from '@/lib/tournamentConfig';
 
 export default function WelcomePopup() {
   const [isVisible, setIsVisible] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
-    const hidden = localStorage.getItem(STORAGE_KEY);
+    const hidden = localStorage.getItem(WELCOME_POPUP_STORAGE_KEY);
     if (!hidden) {
       const timer = setTimeout(() => setIsVisible(true), 3000);
       return () => clearTimeout(timer);
@@ -22,7 +22,7 @@ export default function WelcomePopup() {
   const handleClose = () => {
     setIsVisible(false);
     if (dontShowAgain) {
-      localStorage.setItem(STORAGE_KEY, '1');
+      localStorage.setItem(WELCOME_POPUP_STORAGE_KEY, '1');
     }
   };
 
@@ -58,7 +58,8 @@ export default function WelcomePopup() {
                 WELCOME TO <span className="text-green-400">5S ARENA</span>
               </h2>
               <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto">
-                Are you here for our regular social competitions or the ultimate 5s Arena World Cup 2026?
+                Courts and bookings run live every day. Choose social leagues or the{" "}
+                <span className="text-amber-200/90">World Cup 5s</span> path — both stay on this site.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -91,7 +92,9 @@ export default function WelcomePopup() {
                       <FaTrophy size={28} />
                     </div>
                     <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-2">World Cup &apos;26</h3>
-                    <p className="text-xs text-gray-400 mb-4">The ultimate 48-team tournament. Global glory awaits.</p>
+                    <p className="text-xs text-gray-400 mb-4">
+                      {TOURNAMENT_FORMAT.totalTeams}-team World Cup · live {TOURNAMENT_DATES.rangeShort}. Global glory awaits.
+                    </p>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                       Register Team <FaArrowRight />
                     </span>

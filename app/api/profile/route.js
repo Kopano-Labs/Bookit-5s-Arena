@@ -5,7 +5,7 @@ import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 
 // GET — return current user profile
-export async function GET(request) {
+export async function GET() {
   const session = await getAuthSession();
   if (!session) return Response.json({ error: 'Unauthorised' }, { status: 401 });
 

@@ -76,15 +76,23 @@ export default function ManagerSquadPage() {
     try {
       setLoading(true);
       const res = await fetch("/api/tournament/my-team");
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        const data = await res.json();
-        setTeam(data.team);
-        setEditedPlayers(JSON.parse(JSON.stringify(data.team.players || [])));
-        setEditedSupport(
-          JSON.parse(JSON.stringify(data.team.supportGuests || [])),
-        );
-      } else if (res.status === 404) {
+        const t = data.team ?? null;
+        setTeam(t);
+        if (t) {
+          setEditedPlayers(JSON.parse(JSON.stringify(t.players || [])));
+          setEditedSupport(JSON.parse(JSON.stringify(t.supportGuests || [])));
+        } else {
+          setEditedPlayers([]);
+          setEditedSupport([]);
+        }
+      } else if (res.status === 401) {
+        router.replace("/login");
+      } else {
         setTeam(null);
+        setEditedPlayers([]);
+        setEditedSupport([]);
       }
     } catch (err) {
       console.error(err);

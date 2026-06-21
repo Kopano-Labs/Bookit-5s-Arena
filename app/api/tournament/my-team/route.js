@@ -25,10 +25,15 @@ export async function GET() {
     }).lean();
 
     if (!team) {
-      return NextResponse.json({ error: 'No team found for your account.' }, { status: 404 });
+      // 200 (not 404): no team is a valid state for the manager UI — avoids "failed resource" noise in DevTools.
+      return NextResponse.json({
+        team: null,
+        registered: false,
+        message: 'No tournament team is registered for this account yet.',
+      });
     }
 
-    return NextResponse.json({ team: { ...team, _id: team._id.toString() } });
+    return NextResponse.json({ team: { ...team, _id: team._id.toString() }, registered: true });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

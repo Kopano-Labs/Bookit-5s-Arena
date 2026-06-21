@@ -15,6 +15,7 @@ import {
   FaFutbol,
 } from "react-icons/fa";
 import useSSE from "@/hooks/useSSE";
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
 
 /* ── Compact PL-style standings row ── */
 function StandingRow({ team, rank, animate }) {
@@ -135,10 +136,10 @@ export default function TournamentShowcase() {
       })
       .catch(() => setLoaded(true));
 
-    fetch("/api/admin/competitions/tournament/fixtures?status=live")
+    fetch("/api/fixtures/tournament?status=live&limit=4")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data?.fixtures?.length) setLiveFixtures(data.fixtures.slice(0, 4));
+        if (data?.fixtures?.length) setLiveFixtures(data.fixtures);
       })
       .catch(() => {});
   }, []);
@@ -238,8 +239,50 @@ export default function TournamentShowcase() {
               World Cup 5s
             </h2>
             <p className="text-gray-500 text-sm font-semibold">
-              5s Arena World Cup · 48 Teams · 8 Groups · May 2026
+              5s Arena World Cup · {TOURNAMENT_FORMAT.totalTeams} Teams · {TOURNAMENT_FORMAT.groupCount} Groups · {TOURNAMENT_DATES.rangeShort}
             </p>
+            <motion.div
+              className="mt-4 flex flex-wrap justify-center lg:justify-start gap-2 max-w-2xl"
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={{
+                hidden: {},
+                show: {
+                  transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+                },
+              }}
+            >
+              {TOURNAMENT_FORMAT.bracket.map((label) => (
+                <motion.span
+                  key={label}
+                  variants={{
+                    hidden: { opacity: 0, y: 10, rotateX: -25 },
+                    show: {
+                      opacity: 1,
+                      y: 0,
+                      rotateX: 0,
+                      transition: { type: "spring", stiffness: 380, damping: 22 },
+                    },
+                  }}
+                  className="inline-flex items-center px-3 py-1.5 rounded-xl border border-green-500/20 bg-gradient-to-br from-green-500/10 to-emerald-950/40 text-[10px] font-black uppercase tracking-widest text-green-300/95 shadow-[0_6px_24px_rgba(34,197,94,0.12)]"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  {label}
+                </motion.span>
+              ))}
+            </motion.div>
+            <motion.p
+              className="mt-3 text-center lg:text-left text-[11px] font-bold text-gray-500 max-w-xl leading-relaxed"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.35 }}
+            >
+              <span className="text-green-400/90">{TOURNAMENT_FORMAT.qualificationLegend}</span>
+              <span className="text-gray-600"> · </span>
+              <span>{TOURNAMENT_FORMAT.bracket.join(" → ")}</span>
+            </motion.p>
           </motion.div>
 
           {/* Quick stats */}
@@ -251,9 +294,21 @@ export default function TournamentShowcase() {
             transition={{ delay: 0.3 }}
           >
             {[
-              { icon: FaUsers, label: "Teams", value: teams.length || "48" },
-              { icon: FaGlobe, label: "Nations", value: "48" },
-              { icon: FaCalendarAlt, label: "Match Days", value: "6" },
+              {
+                icon: FaUsers,
+                label: "Teams",
+                value: teams.length || String(TOURNAMENT_FORMAT.totalTeams),
+              },
+              {
+                icon: FaGlobe,
+                label: "Nations",
+                value: String(TOURNAMENT_FORMAT.totalTeams),
+              },
+              {
+                icon: FaCalendarAlt,
+                label: "Live days",
+                value: "3",
+              },
               { icon: FaTrophy, label: "Prize Pool", value: "R50K" },
             ].map((stat) => {
               const Icon = stat.icon;
@@ -479,7 +534,7 @@ export default function TournamentShowcase() {
                   {
                     icon: FaBolt,
                     color: "#22c55e",
-                    text: "Tournament starts 29 May 2026",
+                    text: `Tournament starts ${TOURNAMENT_DATES.start}`,
                   },
                   {
                     icon: FaCalendarAlt,

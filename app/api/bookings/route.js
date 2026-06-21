@@ -5,7 +5,10 @@ import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Court from '@/models/Court';
 import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
+import { sendBookingWATip } from '@/lib/integrations/whatsapp';
 import { rateLimit } from '@/lib/rateLimit';
+import { verifyBotRequest } from '@/lib/security/botid';
+import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
 
 // GET /api/bookings — get all bookings for the logged-in user
 export async function GET() {
@@ -34,6 +37,11 @@ export async function GET() {
 // POST /api/bookings — create a new booking
 export async function POST(request) {
   try {
+    const botVerification = await verifyBotRequest();
+    if (botVerification.isBot) {
+      return NextResponse.json({ error: 'Automated booking attempts are blocked.' }, { status: 403 });
+    }
+
     // Rate limit: max 10 booking attempts per minute per IP
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     if (rateLimit(ip, 10, 60000)) {
@@ -94,9 +102,11 @@ export async function POST(request) {
     const OPEN_MINUTES = 10 * 60;   // 10:00
     const CLOSE_MINUTES = 22 * 60;  // 22:00
 
-    const timeRegex = /^\d{2}:\d{2}$/;
-    if (!timeRegex.test(start_time)) {
-      return NextResponse.json({ error: 'Invalid start time format' }, { status: 400 });
+    if (!isAllowedBookingStartTime(start_time, duration)) {
+      return NextResponse.json(
+        { error: 'Start time must be on the hour and the booking must finish by 22:00.' },
+        { status: 400 }
+      );
     }
 
     const newStart = toMinutes(start_time);
@@ -142,7 +152,7 @@ export async function POST(request) {
       paymentStatus: payAtVenue ? 'reserved' : 'unpaid',
     });
 
-    // Send confirmation email (non-blocking — won't fail the booking if email fails)
+    // Send confirmation email (non-blocking)
     try {
         await sendBookingConfirmation({
           to: session.user.email,
@@ -155,6 +165,21 @@ export async function POST(request) {
         });
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
+    }
+
+    // Phase 4: Send WhatsApp Notification (Non-blocking)
+    if (session.user.phone) {
+        try {
+            await sendBookingWATip({
+              to: session.user.phone,
+              name: session.user.name,
+              courtName: court.name,
+              date,
+              time: start_time
+            });
+        } catch (waError) {
+            console.error('Failed to send WhatsApp notification:', waError);
+        }
     }
 
     return NextResponse.json(booking, { status: 201 });

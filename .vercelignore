@@ -1,0 +1,8 @@
+.git
+.next
+.tmp.driveupload
+node_modules
+coverage
+test-results
+*.log
+*.tsbuildinfo

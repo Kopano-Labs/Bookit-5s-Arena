@@ -35,6 +35,7 @@ import {
   SiNodedotjs,
   SiJavascript,
 } from "react-icons/si";
+import BlackboxMarketMask from "@/components/marketing/BlackboxMarketMask";
 
 /* ════════════════════════════════════════════════════════════════
    WELCOME ANIMATION — 5-second intro sequence
@@ -546,6 +547,7 @@ export default function CreatorPage() {
             transition={{ duration: 0.8 }}
             className="bg-gray-950 min-h-screen"
           >
+            <BlackboxMarketMask />
             {/* ═══ HERO ═══════════════════════════════════════════ */}
             <section className="relative overflow-hidden pt-28 pb-20 px-4">
               {/* Background gradient */}

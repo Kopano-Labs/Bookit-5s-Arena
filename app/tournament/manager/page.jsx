@@ -13,6 +13,7 @@ import {
 import useSSE from '@/hooks/useSSE';
 
 import { WORLD_CUP_TEAMS, teamImage } from '@/lib/worldCupTeams';
+import { TOURNAMENT_DATES } from '@/lib/tournamentConfig';
 
 const POSITIONS = ['GK', 'DEF', 'MID', 'FWD'];
 
@@ -41,8 +42,16 @@ export default function TournamentManagerPage() {
     if (data.type === 'standings-update' || data.type === 'fixture-update') {
       // Re-fetch team data on updates
       fetch('/api/tournament/my-team')
-        .then(r => r.ok ? r.json() : null)
-        .then(d => { if (d?.team) { setTeam(d.team); if (!editMode) setEditForm(JSON.parse(JSON.stringify(d.team))); } })
+        .then(async (r) => {
+          const d = await r.json().catch(() => ({}));
+          return r.ok ? d : null;
+        })
+        .then((d) => {
+          if (!d) return;
+          const t = d.team ?? null;
+          setTeam(t);
+          if (t && !editMode) setEditForm(JSON.parse(JSON.stringify(t)));
+        })
         .catch(() => {});
     }
   });
@@ -52,13 +61,19 @@ export default function TournamentManagerPage() {
       router.push('/login');
     } else if (status === 'authenticated') {
       fetch('/api/tournament/my-team')
-        .then(res => res.ok ? res.json() : Promise.reject(res.status))
-        .then(data => {
-          setTeam(data.team);
-          setEditForm(JSON.parse(JSON.stringify(data.team)));
+        .then(async (res) => {
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || res.status);
+          return data;
+        })
+        .then((data) => {
+          const t = data.team ?? null;
+          setTeam(t);
+          setEditForm(t ? JSON.parse(JSON.stringify(t)) : null);
         })
         .catch(() => {
           setTeam(null);
+          setEditForm(null);
         })
         .finally(() => setLoading(false));
     }
@@ -417,7 +432,8 @@ export default function TournamentManagerPage() {
                   Tournament Not Started
                 </h2>
                 <p className="text-gray-400 max-w-md">
-                  Live scores, group standings, and knockout brackets will appear here once the 5s Arena World Cup kicks off on May 26, 2026.
+                  Live scores, group standings, and knockout brackets will appear here once the 5s Arena World Cup kicks off on{' '}
+                  <strong className="text-white">{TOURNAMENT_DATES.rangeShort}</strong>.
                 </p>
               </motion.div>
             )}
@@ -690,7 +706,8 @@ export default function TournamentManagerPage() {
                   <FaTrophy size={28} className="text-yellow-500 mx-auto mb-3" />
                   <h3 className="text-base font-black uppercase text-white mb-1" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>Rewards Leaderboard</h3>
                   <p className="text-gray-400 text-xs max-w-md mx-auto">
-                    The social media points leaderboard goes live once the tournament kicks off on <strong className="text-white">26 May 2026</strong>.
+                    The social media points leaderboard goes live once the tournament kicks off on{' '}
+                    <strong className="text-white">{TOURNAMENT_DATES.rangeShort}</strong>.
                     Top earners win exclusive prizes and merch!
                   </p>
                 </div>

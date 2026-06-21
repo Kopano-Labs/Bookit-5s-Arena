@@ -4,33 +4,50 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -p 3002",
+    "dev:bdd": "cross-env NEXT_PUBLIC_FIXTURES_REFACTOR_SHIELD=false NEXT_PUBLIC_BLACKBOX_MARKET_MASK=false NEXT_PUBLIC_BDD_TEST_HOOKS=true next dev -p 3002",
     "build": "next build --no-lint",
     "start": "next start",
     "lint": "eslint",
     "build:css": "npx tailwindcss -i ./assets/styles/globals.css -o ./public/styles.css --minify",
+    "diagnose:atlas": "node --env-file=.env.local scripts/diagnose-atlas-access.mjs",
+    "validate:offline-sync": "node --env-file=.env.local scripts/validate-offline-sync-contract.mjs",
+    "validate:offline-sync:shape": "node --env-file=.env.local scripts/validate-offline-sync-shape.mjs",
+    "validate:court-assets": "node scripts/validate-court-assets.mjs",
+    "fixtures:health-check": "node scripts/fixtures-health-check.mjs",
+    "validate:fixtures-vault": "node scripts/validate-fixtures-vault-shape.mjs",
+    "test:bdd:fixtures:run": "node --import tsx ./node_modules/@cucumber/cucumber/bin/cucumber.js --config tests/bdd/cucumber.mjs",
+    "test:bdd:fixtures": "start-server-and-test dev:bdd http://localhost:3002 test:bdd:fixtures:run",
+    "test:bdd:fixtures:smoke:run": "cross-env BDD_TAGS=\"@critical and not @target and not @release-gate and not @provider-failure\" node --import tsx ./node_modules/@cucumber/cucumber/bin/cucumber.js --config tests/bdd/cucumber.mjs",
+    "test:bdd:fixtures:smoke": "start-server-and-test dev:bdd http://localhost:3002 test:bdd:fixtures:smoke:run",
+    "test:bdd:fixtures:outline": "cross-env BDD_TAGS=\"@critical and @provider-failure\" npm run test:bdd:fixtures",
     "test": "jest"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.0",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/sandbox": "^1.9.3",
     "bcryptjs": "^3.0.3",
+    "botid": "^1.5.11",
     "dotenv": "^17.3.1",
     "eslint-plugin-react": "^7.37.5",
     "framer-motion": "^12.38.0",
-    "gsap": "^3.14.2",
+    "gsap": "^3.15.0",
     "html-to-image": "^1.11.13",
     "leaflet": "^1.9.4",
     "mongodb": "^7.1.1",
     "mongoose": "^9.3.3",
-    "next": "^15.5.14",
+    "next": "^15.5.18",
     "next-auth": "^4.24.13",
-    "nodemailer": "^8.0.4",
+    "nodemailer": "^9.0.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-google-recaptcha": "^3.1.0",
     "react-icons": "^5.6.0",
     "react-leaflet": "^5.0.0",
     "resend": "^6.9.4",
-    "stripe": "^20.4.1"
+    "stripe": "^20.4.1",
+    "three": "^0.184.0"
   },
   "overrides": {
     "next-auth": {
@@ -38,6 +55,8 @@
     }
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^11.3.0",
+    "@playwright/test": "^1.52.0",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/cli": "^4.2.2",
     "@tailwindcss/postcss": "^4",
@@ -48,7 +67,10 @@
     "eslint": "^9.4.0",
     "eslint-config-next": "16.2.1",
     "jest": "^29.7.0",
+    "start-server-and-test": "^2.0.11",
+    "cross-env": "^7.0.3",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.22.4",
     "typescript": "^5.4.5"
   }
 }

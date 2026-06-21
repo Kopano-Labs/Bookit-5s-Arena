@@ -53,7 +53,7 @@ export default function RoleSwitcher() {
     <div ref={ref} className="relative">
       <motion.button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-black uppercase tracking-widest transition-all"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm font-black uppercase tracking-widest transition-all"
         style={{
           color: current.color,
           borderColor: `${current.color}40`,
@@ -97,11 +97,11 @@ export default function RoleSwitcher() {
                 <button
                   key={role}
                   onClick={() => handleSwitch(role)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-gray-800/80 transition-all"
+                  className="flex min-h-[44px] w-full items-center gap-2.5 px-3 py-2.5 text-left transition-all hover:bg-gray-800/80"
                 >
                   <Icon size={13} style={{ color: cfg.color }} />
                   <span
-                    className="text-xs font-bold uppercase tracking-wide flex-1"
+                    className="flex-1 text-sm font-bold uppercase tracking-wide"
                     style={{ color: isActive ? cfg.color : "#9ca3af" }}
                   >
                     {cfg.label}

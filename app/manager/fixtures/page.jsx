@@ -30,9 +30,9 @@ export default function ManagerFixturesPage() {
   const fetchTeam = async () => {
     try {
       const res = await fetch('/api/tournament/my-team');
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        const data = await res.json();
-        setMyTeam(data.team);
+        setMyTeam(data.team ?? null);
       }
     } catch {}
   };

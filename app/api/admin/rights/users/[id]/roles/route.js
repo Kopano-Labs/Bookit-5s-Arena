@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/getSession';
-import { isSuperAdmin, SUPER_ADMIN_EMAIL } from '@/lib/roles';
+import { isSuperAdmin, SUPER_ADMIN_EMAIL, ALL_ROLES } from '@/lib/roles';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 
@@ -19,21 +19,35 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ error: 'roles must be a non-empty array.' }, { status: 400 });
     }
 
-    const validRoles = ['user', 'manager', 'admin'];
-    if (!roles.every((r) => validRoles.includes(r))) {
-      return NextResponse.json({ error: 'Invalid role value.' }, { status: 400 });
+    let nextRoles = [...new Set(roles)].filter((r) => ALL_ROLES.includes(r));
+    if (!nextRoles.includes('user')) {
+      nextRoles = ['user', ...nextRoles.filter((r) => r !== 'user')];
+    }
+    if (!nextRoles.length) {
+      return NextResponse.json({ error: 'roles must include at least user.' }, { status: 400 });
     }
 
     await connectDB();
     const target = await User.findById(id);
     if (!target) return NextResponse.json({ error: 'User not found.' }, { status: 404 });
 
-    // Prevent granting all 3 roles to anyone except the super admin
-    if (target.email !== SUPER_ADMIN_EMAIL && roles.length === 3) {
-      return NextResponse.json(
-        { error: 'Only the super admin can hold all 3 roles.' },
-        { status: 403 }
-      );
+    const targetEmail = String(target.email || '').toLowerCase().trim();
+    if (targetEmail !== SUPER_ADMIN_EMAIL) {
+      if (nextRoles.length > 3) {
+        return NextResponse.json(
+          { error: 'A user may hold at most three roles (super admin excluded).' },
+          { status: 400 },
+        );
+      }
+      if (new Set(nextRoles).size === ALL_ROLES.length) {
+        return NextResponse.json(
+          { error: 'Only the super admin may hold every role slot.' },
+          { status: 403 },
+        );
+      }
+      if (nextRoles.includes('admin') && nextRoles.includes('manager')) {
+        nextRoles = nextRoles.filter((r) => r !== 'admin');
+      }
     }
 
     // Cannot modify the super admin's roles
@@ -44,7 +58,7 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    target.roles = roles;
+    target.roles = nextRoles;
     await target.save();
 
     return NextResponse.json({ success: true, user: { _id: target._id, email: target.email, roles: target.roles } });

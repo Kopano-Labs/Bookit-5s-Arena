@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { TOURNAMENT_DATES } from '@/lib/tournamentConfig';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPoll, FaCheckCircle, FaFutbol, FaStar } from 'react-icons/fa';
 
@@ -31,7 +32,7 @@ const POLLS = [
   {
     id: 3,
     title: 'Best Goalkeeper',
-    description: 'Voting closed on May 28th.',
+    description: `Voting closed ${TOURNAMENT_DATES.end}.`,
     options: [
       { id: 'opt8', text: 'Emi Martinez (Argentina)', votes: 340 },
       { id: 'opt9', text: 'Mike Maignan (France)', votes: 210 },

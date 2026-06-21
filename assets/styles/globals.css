@@ -16,6 +16,13 @@
     --font-body: inherit;
   }
 
+  /* Kill horizontal overflow sitewide — fixes black-bar-right + content-cut-left */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
   /* Theme-aware body — CSS variables drive theme changes */
   body {
     background-color: var(--bg-primary);
@@ -1004,4 +1011,23 @@ html.crazy ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
 .no-scrollbar {
   -ms-overflow-style: none;
   /* scrollbar-width: none;  Not supported by Chrome < 121, Safari, iOS, Samsung Internet */
+}
+
+/* Fixtures page — theme-aware shell (avoids hardcoded dark-only gradient bleed) */
+html.light .fixtures-page {
+  --fixtures-bg: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 60%, #f8fafc 100%);
+}
+html.read .fixtures-page {
+  --fixtures-bg: linear-gradient(180deg, #faf7f2 0%, #f5f0e8 60%, #faf7f2 100%);
+}
+html.crazy .fixtures-page {
+  --fixtures-bg: linear-gradient(180deg, #0d0520 0%, #160830 60%, #0d0520 100%);
+}
+html.read .fixtures-page .text-zinc-400,
+html.light .fixtures-page .text-zinc-400 {
+  color: #57534e !important;
+}
+html.read .fixtures-page .text-zinc-500,
+html.light .fixtures-page .text-zinc-500 {
+  color: #78716c !important;
 }

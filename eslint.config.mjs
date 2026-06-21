@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Sub-Brain mirror — large minified Obsidian plugin bundles cause OOM.
+    "STRUCTURE/**",
   ]),
 ]);
 

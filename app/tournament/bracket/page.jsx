@@ -6,6 +6,7 @@ import { FaDownload, FaShareAlt, FaTrophy } from "react-icons/fa";
 import { toPng } from "html-to-image";
 import Image from "next/image";
 import { WORLD_CUP_TEAMS, teamImage } from "@/lib/worldCupTeams";
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
 
 // Helper to determine if a team is on the winner's path
 function isWinnerPath(roundIdx, match, rounds) {
@@ -135,8 +136,17 @@ export default function BracketPage() {
           KNOCKOUT <span className="text-purple-500">BRACKET</span>
         </h1>
         <p className="text-gray-400 text-sm max-w-xl mx-auto">
-          The road to the 5s Arena World Cup Final. Export this bracket and
-          share it with your squad.
+          The road to the 5s Arena World Cup Final ({TOURNAMENT_DATES.rangeShort}
+          ). Full path: {TOURNAMENT_FORMAT.bracket.join(" → ")}. Export this
+          bracket and share it with your squad.
+        </p>
+        <p className="text-amber-200/90 text-xs max-w-xl mx-auto mt-3 leading-relaxed">
+          <span className="font-black uppercase tracking-widest text-amber-300/95">
+            Preview
+          </span>{" "}
+          — pairings below illustrate the knockout layout. The final row shows
+          no score until the match is played. Live data will replace this after
+          the draw and as admins publish results.
         </p>
 
         <div className="flex justify-center gap-4 mt-8">
@@ -275,17 +285,19 @@ export default function BracketPage() {
                               {match.teamA}
                             </span>
                           </span>
-                          <div className="flex gap-2">
-                            {match.pensA && (
-                              <span className="text-[10px] text-gray-500 font-mono">
-                                ({match.pensA})
-                              </span>
-                            )}
+                          <div className="flex items-center gap-1.5">
                             <span
                               className={`font-mono text-sm font-black ${match.winner === match.teamA ? "text-purple-400" : "text-gray-500"}`}
                             >
-                              {match.scoreA !== null ? match.scoreA : "-"}
+                              {match.scoreA !== null && match.scoreA !== undefined
+                                ? match.scoreA
+                                : "—"}
                             </span>
+                            {match.pensA != null && (
+                              <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tight">
+                                pens {match.pensA}
+                              </span>
+                            )}
                           </div>
                         </div>
 
@@ -331,19 +343,34 @@ export default function BracketPage() {
                               {match.teamB}
                             </span>
                           </span>
-                          <div className="flex gap-2">
-                            {match.pensB && (
-                              <span className="text-[10px] text-gray-500 font-mono">
-                                ({match.pensB})
-                              </span>
-                            )}
+                          <div className="flex items-center gap-1.5">
                             <span
                               className={`font-mono text-sm font-black ${match.winner === match.teamB ? "text-purple-400" : "text-gray-500"}`}
                             >
-                              {match.scoreB !== null ? match.scoreB : "-"}
+                              {match.scoreB !== null && match.scoreB !== undefined
+                                ? match.scoreB
+                                : "—"}
                             </span>
+                            {match.pensB != null && (
+                              <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tight">
+                                pens {match.pensB}
+                              </span>
+                            )}
                           </div>
                         </div>
+                        {match.scoreA == null &&
+                          match.scoreB == null &&
+                          match.winner == null && (
+                            <div className="px-3 py-2 bg-gray-950/90 text-center border-t border-gray-800/80">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                                Not yet played
+                              </p>
+                              <p className="text-[9px] text-gray-600 mt-0.5">
+                                Full-time score and winner appear here after the
+                                final.
+                              </p>
+                            </div>
+                          )}
                       </div>
                     </motion.div>
                   );

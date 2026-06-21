@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaTrophy, FaCircle, FaSync } from "react-icons/fa";
 import useSSE from "@/hooks/useSSE";
+import { TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
 
 export default function PublicStandingsPage() {
   const [groups, setGroups] = useState({});
@@ -184,7 +185,7 @@ export default function PublicStandingsPage() {
                         >
                           <td
                             className={`px-4 py-3 font-black ${
-                              idx < 2
+                              idx < TOURNAMENT_FORMAT.advancePerGroup
                                 ? "text-green-400 border-l-2 border-l-green-500"
                                 : "text-gray-500"
                             }`}
@@ -253,7 +254,7 @@ export default function PublicStandingsPage() {
                 <div className="px-5 py-3 border-t border-gray-800/50 flex items-center gap-3">
                   <div className="w-2 h-2 bg-green-500 rounded-sm shrink-0" />
                   <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">
-                    Top 2 qualify for knockout stage
+                    {TOURNAMENT_FORMAT.qualificationLegend}
                   </span>
                 </div>
               </motion.div>

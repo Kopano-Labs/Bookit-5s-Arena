@@ -1,30 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
-
-function CountUp({ to, duration = 1600 }) {
-  const [value, setValue] = useState(0);
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
-
-  useEffect(() => {
-    if (!inView) return;
-    let start;
-    const num = parseFloat(to);
-    const step = (ts) => {
-      if (!start) start = ts;
-      const progress = Math.min((ts - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(eased * num));
-      if (progress < 1) requestAnimationFrame(step);
-      else setValue(num);
-    };
-    requestAnimationFrame(step);
-  }, [inView, to, duration]);
-
-  return <span ref={ref}>{value}</span>;
-}
+import { motion } from 'framer-motion';
 
 export default function StatsBar({ courtsCount = 4 }) {
   const stats = [
@@ -54,7 +30,9 @@ export default function StatsBar({ courtsCount = 4 }) {
               >
                 {s.numeric ? (
                   <>
-                    {s.prefix}<CountUp to={s.value} />{s.suffix}
+                    {s.prefix}
+                    {s.value}
+                    {s.suffix}
                   </>
                 ) : s.display}
               </span>

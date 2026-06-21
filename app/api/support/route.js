@@ -2,8 +2,15 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { answerSupportQuestion, QUICK_QUESTIONS } from '@/lib/supportAI';
 import { rateLimit } from '@/lib/rateLimit';
+import { verifyBotRequest } from '@/lib/security/botid';
+import { logBraintrustEvent } from '@/lib/integrations/braintrust';
 
 export async function POST(request) {
+  const botVerification = await verifyBotRequest();
+  if (botVerification.isBot) {
+    return NextResponse.json({ error: 'Automated support spam is blocked.' }, { status: 403 });
+  }
+
   const ip = request.headers.get('x-forwarded-for') || 'unknown';
   if (rateLimit(ip, 5, 60000)) {
     return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429 });
@@ -21,6 +28,23 @@ export async function POST(request) {
     }
 
     const result = answerSupportQuestion(message);
+
+    void logBraintrustEvent({
+      input: {
+        route: "/api/support",
+        message,
+      },
+      output: {
+        answer: result.answer,
+        confidence: result.confidence,
+      },
+      metadata: {
+        category: "support-faq",
+      },
+      scores: {
+        confidence: result.confidence,
+      },
+    });
 
     return NextResponse.json({
       answer: result.answer,

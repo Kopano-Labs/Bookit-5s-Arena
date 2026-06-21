@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { getProviders, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect, Suspense } from "react";
+import { getProviders, signIn, useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
+import { TOURNAMENT_DATES } from "@/lib/tournamentConfig";
 import {
   FaSignInAlt,
   FaGoogle,
@@ -21,6 +22,7 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { defaultActiveRole } from "@/lib/roles";
 
 // ─── Animated background (no footballs — geometric particles + scanning lines) ─
 
@@ -153,24 +155,6 @@ function ParticleField() {
   );
 }
 
-// ─── Feature badge ───────────────────────────────────────────────────────────
-
-function FeatureBadge({ icon, text, delay }) {
-  return (
-    <motion.div
-      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-800/40 border border-gray-700/30 backdrop-blur-sm"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.5 }}
-    >
-      <span className="text-green-400">{icon}</span>
-      <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
-        {text}
-      </span>
-    </motion.div>
-  );
-}
-
 // ─── Security Notice Modal ────────────────────────────────────────────────────
 
 function SecurityNotice({ onAccept }) {
@@ -259,8 +243,10 @@ function SecurityNotice({ onAccept }) {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
-export default function AuthPage() {
+function AuthPageInner() {
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const recaptchaRef = useRef(null);
   const recaptchaSiteKey =
     typeof process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY === "string"
@@ -286,20 +272,53 @@ export default function AuthPage() {
   const [rememberMe, setRememberMe] = useState(true);
 
   useEffect(() => {
+    if (status !== "authenticated" || !session?.user) {
+      return;
+    }
+
+    const callbackUrl = searchParams.get("callbackUrl");
+    const activeRole = defaultActiveRole(
+      session.user.email,
+      session.user.roles || [session.user.activeRole || session.user.role || "user"],
+    );
+    const fallbackPath =
+      callbackUrl ||
+      (activeRole === "admin"
+        ? "/admin/dashboard"
+        : activeRole === "manager"
+          ? "/manager/dashboard"
+          : "/");
+
+    router.replace(fallbackPath);
+  }, [router, searchParams, session, status]);
+
+  useEffect(() => {
     const requestedMode = new URLSearchParams(window.location.search).get("mode");
-    if (requestedMode === "register" || requestedMode === "login") {
+    if (requestedMode !== "register" && requestedMode !== "login") {
+      return undefined;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
       setMode(requestedMode);
       setError("");
-    }
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   useEffect(() => {
     const authError = new URLSearchParams(window.location.search).get("error");
-    if (authError === "google") {
+    if (authError !== "google") {
+      return undefined;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
       setError(
         "Google sign-in is unavailable right now. Use your email and password instead.",
       );
-    }
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   useEffect(() => {
@@ -328,7 +347,6 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (!recaptchaSiteKey) {
-      setRecaptchaAvailable(false);
       return;
     }
     // Detect if ReCAPTCHA script can load (ad-blockers block google.com/recaptcha)
@@ -454,6 +472,14 @@ export default function AuthPage() {
         : "border-gray-700/40"
     }`;
 
+  if (status === "authenticated") {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden bg-gray-950">
       <AnimatePresence>
@@ -541,7 +567,7 @@ export default function AuthPage() {
               <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">
                 <span>Start Date</span>
                 <span className="text-green-400 flex items-center gap-1.5">
-                  <FaBolt /> 29 May 2026
+                  <FaBolt /> {TOURNAMENT_DATES.start}
                 </span>
               </div>
               <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">
@@ -921,5 +947,13 @@ export default function AuthPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={null}>
+      <AuthPageInner />
+    </Suspense>
   );
 }

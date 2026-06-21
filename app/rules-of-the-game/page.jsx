@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
 import {
   FaTrophy,
   FaHandshake,
@@ -25,16 +26,16 @@ const CHAPTERS = [
     title: "Tournament Rules",
     icon: FaTrophy,
     color: "#eab308",
-    desc: "Learn how our World Cup-style tournament works — 8 groups, 6 teams each, classic knockout format.",
+    desc: `Learn how our World Cup-style tournament works — ${TOURNAMENT_FORMAT.groupCount} groups, ${TOURNAMENT_FORMAT.teamsPerGroup} teams each, then knockout to one winner.`,
     content: [
-      "🏆 Our tournament follows the classic UEFA Champions League group-stage format.",
-      "8 groups with 6 teams each — every team plays against every other team in the group (home & away style).",
-      "Top 2 teams from each group advance to the Round of 16.",
-      "From the Round of 16 onwards, it's single-elimination knockout matches.",
+      `🏆 Group stage: ${TOURNAMENT_FORMAT.groupCount} groups × ${TOURNAMENT_FORMAT.teamsPerGroup} teams — every team plays every other team in the group once (${TOURNAMENT_FORMAT.groupMatchPerGroup} matches per group).`,
+      `✅ Qualification: ${TOURNAMENT_FORMAT.qualificationLegend}.`,
+      `⚔️ Knockout (single elimination): ${TOURNAMENT_FORMAT.bracket.join(" → ")}.`,
+      `📊 ${TOURNAMENT_FORMAT.totalMatchSummary}.`,
       "Each match is played under standard 5-a-side rules (see General Rules below).",
       "A random generator is used to assign fixtures — fair play for everyone.",
       "Teams represent World Cup nations — choose your country at sign-up!",
-      "⚠️ Tournament dates: 26 May – 31 May 2026.",
+      `📅 Live tournament window: ${TOURNAMENT_DATES.rangeLong} (NB — all public dates use this window).`,
     ],
     links: [
       { label: "Sign-Up Rules →", href: "#signup" },
@@ -84,7 +85,7 @@ const CHAPTERS = [
     desc: "Everything you need to know about registering your team for the tournament.",
     content: [
       "📝 Sign-ups open the day after the website launches.",
-      "⚠️ DEADLINE: Sign-ups close exactly ONE WEEK before the tournament starts.",
+      `⚠️ DEADLINE: Registration closes ${TOURNAMENT_DATES.signupDeadline} (23:59 SAST) — one week before the live tournament window (${TOURNAMENT_DATES.rangeShort}).`,
       "**IF YOU DO NOT COMPLY WITH THE DEADLINE, YOUR TEAM WILL NOT BE ALLOWED TO SIGN UP. IF YOU MISS THE DEADLINE, YOUR TEAM WILL BE REMOVED FROM OUR SYSTEM AND NETWORK ENTIRELY.**",
       "Each team must have exactly 5 registered players + 1 team manager.",
       "The team manager is responsible for all communications and compliance.",

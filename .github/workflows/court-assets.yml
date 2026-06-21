@@ -1,0 +1,26 @@
+name: Court assets guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/courts.json"
+      - "public/images/courts/**"
+      - "scripts/validate-court-assets.mjs"
+      - ".github/workflows/court-assets.yml"
+  pull_request:
+    paths:
+      - "data/courts.json"
+      - "public/images/courts/**"
+      - "scripts/validate-court-assets.mjs"
+      - ".github/workflows/court-assets.yml"
+
+jobs:
+  validate-court-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm run validate:court-assets

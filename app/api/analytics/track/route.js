@@ -53,7 +53,7 @@ export async function POST(request) {
     try {
       const session = await getAuthSession();
       if (session?.user?.id) userId = session.user.id;
-    } catch (_) {
+    } catch {
       // ignore auth errors for public tracking
     }
 

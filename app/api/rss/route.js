@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from '@/lib/tournamentConfig';
 
 const SITE_URL = process.env.NEXTAUTH_URL || 'https://fivesarena.com';
 
@@ -7,7 +8,7 @@ export async function GET() {
   const items = [
     {
       title: '5s Arena World Cup Tournament — Registrations Open',
-      description: 'Sign up your team for the inaugural 5s Arena World Cup. 8 groups, 6 teams each. May 26–31, 2026 at Hellenic Football Club, Milnerton.',
+      description: `Sign up for the 5s Arena World Cup — ${TOURNAMENT_FORMAT.groupCount} groups × ${TOURNAMENT_FORMAT.teamsPerGroup} teams; top ${TOURNAMENT_FORMAT.advancePerGroup} per group → ${TOURNAMENT_FORMAT.bracket[0]}. Live window ${TOURNAMENT_DATES.rangeRSS} at Hellenic Football Club, Milnerton. Registration closes ${TOURNAMENT_DATES.signupDeadline}.`,
       link: `${SITE_URL}/tournament`,
       pubDate: new Date('2026-01-01').toUTCString(),
     },

@@ -6,6 +6,8 @@ export const dynamic = 'force-dynamic';
 //   3. Rule-based local engine (lib/supportAI.js — always works, no key needed)
 
 import { answerSupportQuestion } from '@/lib/supportAI';
+import { verifyBotRequest } from '@/lib/security/botid';
+import { logBraintrustEvent } from '@/lib/integrations/braintrust';
 
 const SYSTEM_PROMPT = `You are the friendly AI assistant for 5s Arena, a 5-a-side football venue in Cape Town, South Africa.
 
@@ -111,7 +113,16 @@ import { rateLimit } from '@/lib/rateLimit';
 
 // ── Route handler ─────────────────────────────────────────────────────────
 export async function POST(request) {
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
+  const botVerification = await verifyBotRequest();
+  if (botVerification.isBot) {
+    return Response.json({ error: 'Automated chat abuse is blocked.' }, { status: 403 });
+  }
+
+  const ip =
+    request.headers
+      .get('x-forwarded-for')
+      ?.split(',')[0]
+      ?.trim() || 'unknown';
   if (rateLimit(ip, 10, 60000)) {
     return Response.json({ error: 'Too many requests. Please slow down.' }, { status: 429 });
   }
@@ -149,6 +160,24 @@ export async function POST(request) {
     if (!reply) {
       return Response.json({ error: 'AI service temporarily unavailable.' }, { status: 503 });
     }
+
+    void logBraintrustEvent({
+      input: {
+        route: "/api/chat",
+        provider,
+        message,
+      },
+      output: {
+        reply,
+      },
+      metadata: {
+        category: "support-chat",
+        provider,
+      },
+      scores: {
+        response_length: reply.length,
+      },
+    });
 
     return Response.json({ reply, provider });
   } catch (err) {

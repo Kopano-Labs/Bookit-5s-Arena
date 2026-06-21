@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ReCAPTCHA from 'react-google-recaptcha';
 import {
-  FaUserShield, FaSignInAlt, FaUserPlus, FaEnvelope, FaLock,
-  FaUser, FaShieldAlt, FaTrophy, FaStar, FaBolt,
-  FaGithub, FaApple, FaMicrosoft, FaGlobe, FaTicketAlt
+  FaUserShield, FaEnvelope,
+  FaUser, FaShieldAlt, FaTrophy, FaStar, FaGlobe
 } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 function ParticleField() {
   return (
@@ -62,7 +61,6 @@ export default function ManagerRegisterPage() {
       ? process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY.trim()
       : '';
 
-  const [mode, setMode] = useState('register');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -72,12 +70,6 @@ export default function ManagerRegisterPage() {
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
   const [recaptchaAvailable, setRecaptchaAvailable] = useState(Boolean(recaptchaSiteKey));
-
-  useEffect(() => {
-    if (!recaptchaSiteKey) {
-      setRecaptchaAvailable(false);
-    }
-  }, [recaptchaSiteKey]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
