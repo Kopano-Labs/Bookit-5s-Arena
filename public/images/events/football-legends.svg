@@ -11,5 +11,5 @@
   <circle cx="760" cy="430" r="72" fill="#f8fafc" opacity="0.92"/>
   <path d="M760 358 L790 410 L720 410 Z" fill="#111827"/>
   <text x="800" y="180" text-anchor="middle" font-family="Impact,Arial Black,sans-serif" font-size="96" fill="#22c55e">LIVE FIXTURES</text>
-  <text x="800" y="280" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" fill="#d1fae5">Premier League · Global Coverage</text>
+  <text x="800" y="280" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" fill="#d1fae5">Premier League Â· Global Coverage</text>
 </svg>

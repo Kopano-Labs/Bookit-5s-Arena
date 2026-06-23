@@ -12,4 +12,4 @@ Kopano Context (KC) journal entries specific to the Bookit 5s Arena sub-brain. T
 
 ## Contents
 
-- Pending KC session entries from Bookit work.
+- [2026-05-13 - Offline Sync Apprenticeship](2026-05-13%20-%20Offline%20Sync%20Apprenticeship.md)

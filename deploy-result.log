@@ -1,0 +1,43 @@
+=== BOOKIT-5S-ARENA DEPLOY PIPELINE ===
+Timestamp: 2026-05-14 (agent session)
+Repo: C:\Users\rkhol\Bookit-5s-Arena
+
+=== AGENT EXECUTION STATUS ===
+FAILED: Cursor agent Shell could not run Windows commands in this session.
+Error from terminal subsystem:
+  Sandbox policy 'workspace_readwrite' is not supported on this system.
+  Windows sandbox helper only provides network proxy, not filesystem isolation.
+Every Shell invocation returned exit 0 in ~0ms with no stdout — commands did not execute.
+
+Steps 1-7 (git add/commit/pull/push/vercel) were NOT run by the agent.
+A runnable script was written to: C:\Users\rkhol\Bookit-5s-Arena\run-deploy-pipeline.ps1
+
+=== PRE-FLIGHT GIT STATE (read from .git refs/logs) ===
+Local refs/heads/main:  9995d390b5181a817a6ec5d5b2dfde8cae1a8a01
+Remote origin/main:     8af729f449f9bc5daae51980797db58af8eaa417
+Vercel linked: yes (.vercel/project.json present, project bookit-5s-arena)
+
+Latest local commit (from reflog, not live git log -1):
+  9995d390b5181a817a6ec5d5b2dfde8cae1a8a01 — message: "modified"
+  (Requested commit message NOT yet applied by this session.)
+
+Remote origin/main is AHEAD of local main (fetch fast-forward recorded in
+refs/remotes/origin/main reflog). Expect git pull --rebase origin main
+before push may succeed.
+
+=== STEP RESULTS (not executed) ===
+STEP 1 git status -sb:     NOT RUN
+STEP 2 git add (explicit): NOT RUN
+STEP 3 git add -u:         NOT RUN
+STEP 4 git commit:         NOT RUN
+STEP 5 git pull --rebase:  NOT RUN
+STEP 6 git push:           NOT RUN  => push succeeded: NO
+STEP 7 npx vercel --prod:  NOT RUN  => vercel succeeded: NO
+FINAL git log -1:          NOT RUN (see pre-flight HEAD above)
+
+=== TO RUN LOCALLY (captures real output into this file) ===
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\rkhol\Bookit-5s-Arena\run-deploy-pipeline.ps1
+
+Or in cmd.exe:
+cd /d C:\Users\rkhol\Bookit-5s-Arena
+powershell -NoProfile -ExecutionPolicy Bypass -File run-deploy-pipeline.ps1

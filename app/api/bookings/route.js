@@ -5,6 +5,7 @@ import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Court from '@/models/Court';
 import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
+import { sendResendConfirmation, isResendBookingConfirmationConfigured } from '@/lib/messaging/bookingResendConfirmation';
 import { sendBookingWATip } from '@/lib/integrations/whatsapp';
 import { rateLimit } from '@/lib/rateLimit';
 import { verifyBotRequest } from '@/lib/security/botid';
@@ -154,6 +155,25 @@ export async function POST(request) {
 
     // Send confirmation email (non-blocking)
     try {
+      let emailSent = false;
+      if (isResendBookingConfirmationConfigured()) {
+        const resendResponse = await sendResendConfirmation({
+          id: booking._id.toString(),
+          date,
+          time: start_time,
+          court: court.name,
+          amount: total_price,
+          type: 'confirmation'
+        }, session.user.email);
+        
+        if (resendResponse.success) {
+          emailSent = true;
+        } else {
+          console.warn('Resend confirmation failed, falling back to Nodemailer:', resendResponse.error);
+        }
+      }
+
+      if (!emailSent) {
         await sendBookingConfirmation({
           to: session.user.email,
           name: session.user.name,
@@ -163,6 +183,7 @@ export async function POST(request) {
           duration,
           total_price,
         });
+      }
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
     }

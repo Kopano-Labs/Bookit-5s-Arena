@@ -6,6 +6,7 @@ import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import '@/models/Court';
 import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
+import { sendResendConfirmation, isResendBookingConfirmationConfigured } from '@/lib/messaging/bookingResendConfirmation';
 import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
 
 // GET /api/bookings/:id — fetch a single booking (owner or admin)
@@ -135,16 +136,36 @@ export async function PUT(request, { params }) {
         await booking.save();
 
           try {
-            await sendBookingConfirmation({
-              to: session.user.email,
-              name: session.user.name,
-              courtName: booking.court.name,
-              date: booking.date,
-              start_time: booking.start_time,
-              duration: booking.duration,
-              total_price: booking.total_price,
-              type: 'update',
-            });
+            let emailSent = false;
+            if (isResendBookingConfirmationConfigured()) {
+              const resendResponse = await sendResendConfirmation({
+                id: booking._id.toString(),
+                date: booking.date,
+                time: booking.start_time,
+                court: booking.court.name,
+                amount: booking.total_price,
+                type: 'update'
+              }, session.user.email);
+              
+              if (resendResponse.success) {
+                emailSent = true;
+              } else {
+                console.warn('Resend update email failed, falling back to Nodemailer:', resendResponse.error);
+              }
+            }
+      
+            if (!emailSent) {
+              await sendBookingConfirmation({
+                to: session.user.email,
+                name: session.user.name,
+                courtName: booking.court.name,
+                date: booking.date,
+                start_time: booking.start_time,
+                duration: booking.duration,
+                total_price: booking.total_price,
+                type: 'update',
+              });
+            }
           } catch (emailError) {
             console.error('Failed to send update email:', emailError);
           }

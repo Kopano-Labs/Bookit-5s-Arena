@@ -15,3 +15,9 @@
 ## Rule
 
 - every phase boundary should log one lead success, one lead risk, and one corrective action
+
+## 2026-05-13 | Bookit Offline-First Lead Pass
+
+- **Lead success:** Codex wrote before/after comms, preserved dirty-worktree boundaries, and kept AG's next step focused on sync validation instead of widening into Resend.
+- **Lead risk:** route-contract proof can be mistaken for owner-proof if the mobile offline booking/payment flow is not physically exercised.
+- **Corrective action:** Cassy/KC has a bounded apprenticeship prompt in `STRUCTURE/17-KC-JOURNAL/2026-05-13 - Offline Sync Apprenticeship.md` and must report remaining owner-proof gaps after AG's validation matrix.

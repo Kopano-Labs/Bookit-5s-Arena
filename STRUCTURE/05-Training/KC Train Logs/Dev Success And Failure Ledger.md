@@ -24,3 +24,10 @@
 ## Legacy Historical Failure Signals
 
 - `DEV_2` phantom completion and fabricated technical detail patterns are already logged in [Dev2 Behavioral Analysis](../Dev2%20Behavioral%20Analysis.md)
+
+## 2026-05-13 | Cassy/KC Offline Sync Apprenticeship
+
+- **Role:** student observer for the Bookit offline-first validation lane.
+- **Success criterion:** Cassy/KC can distinguish route-contract proof from owner-proof mobile booking/payment proof.
+- **Evidence required:** AG validation matrix against `app/api/v1/sync/route.js`, including accepted events, missing-header rejection, bad-event rejection, replay, conflict, dead-letter, and duplicate logical action behavior.
+- **Boundary:** Resend remains parked until the sync validation matrix is clean.
