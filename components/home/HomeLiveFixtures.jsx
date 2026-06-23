@@ -65,7 +65,7 @@ export default function HomeLiveFixtures() {
           <p className="text-xs text-zinc-400">
             {fromVault
               ? "Showing saved match strip from your device vault while the live feed catches up."
-              : "Live match strip is offline or the feed did not respond in time. Schedules and full coverage are still on the fixtures page."}
+              : null}
           </p>
           <Link
             href="/fixtures"
@@ -177,3 +177,4 @@ export default function HomeLiveFixtures() {
     </section>
   );
 }
+

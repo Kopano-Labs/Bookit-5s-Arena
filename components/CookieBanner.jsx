@@ -31,7 +31,7 @@ const CookieBanner = () => {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[9999] p-4 md:p-6"
+      className="fixed bottom-4 right-4 z-[9999] max-w-sm"
       style={{ backdropFilter: 'blur(4px)' }}
     >
       <div className="max-w-4xl mx-auto">
@@ -86,3 +86,4 @@ const CookieBanner = () => {
 };
 
 export default CookieBanner;
+
