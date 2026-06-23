@@ -103,7 +103,7 @@ export default function SupportChatbot() {
           >
             {/* Header */}
             <div className="bg-green-800 px-4 py-3 flex items-center gap-3 flex-shrink-0">
-              <div className="w-9 h-9 rounded-full bg-green-600 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-yellow-700 flex items-center justify-center">
                 <FaFutbol size={14} className="text-white" />
               </div>
               <div className="flex-1">
@@ -123,7 +123,7 @@ export default function SupportChatbot() {
 
             {/* Quick booking links */}
             <div className="px-3 py-2 flex gap-2 border-b border-gray-800/50 flex-shrink-0">
-              <Link href="/bookings" className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-green-900/30 border border-green-800/40 text-green-400 text-[10px] font-bold uppercase tracking-wider hover:bg-green-900/50 transition-colors">
+              <Link href="/bookings" className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-green-900/30 border border-green-800/40 text-yellow-500 text-[10px] font-bold uppercase tracking-wider hover:bg-green-900/50 transition-colors">
                 <FaFutbol size={9} /> Courts
               </Link>
               <Link href="/events" className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-amber-900/30 border border-amber-800/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider hover:bg-amber-900/50 transition-colors">
@@ -149,13 +149,13 @@ export default function SupportChatbot() {
                 >
                   <div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-green-700 text-white rounded-br-md'
+                      ? 'bg-yellow-800 text-white rounded-br-md'
                       : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700'
                   }`}>
                     {msg.role === 'bot' && (
                       <div className="flex items-center gap-1.5 mb-1">
-                        <FaRobot size={10} className="text-green-400" />
-                        <span className="text-[9px] text-green-400 font-bold uppercase tracking-wider">5s Bot</span>
+                        <FaRobot size={10} className="text-yellow-500" />
+                        <span className="text-[9px] text-yellow-500 font-bold uppercase tracking-wider">5s Bot</span>
                       </div>
                     )}
                     <div className="whitespace-pre-wrap text-[13px]">{msg.text}</div>
@@ -183,9 +183,9 @@ export default function SupportChatbot() {
                 >
                   <div className="bg-gray-800 border border-gray-700 rounded-2xl rounded-bl-md px-4 py-3">
                     <div className="flex gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-green-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 rounded-full bg-green-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 rounded-full bg-green-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-yellow-600 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-yellow-600 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-yellow-600 animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 </motion.div>
@@ -199,7 +199,7 @@ export default function SupportChatbot() {
                   <button
                     key={i}
                     onClick={() => sendMessage(q)}
-                    className="text-[9px] font-bold text-gray-400 bg-gray-800 border border-gray-700 rounded-full px-2.5 py-1.5 hover:border-green-700 hover:text-green-400 transition-colors cursor-pointer"
+                    className="text-[9px] font-bold text-gray-400 bg-gray-800 border border-gray-700 rounded-full px-2.5 py-1.5 hover:border-yellow-800 hover:text-yellow-500 transition-colors cursor-pointer"
                   >
                     {q}
                   </button>
@@ -216,7 +216,7 @@ export default function SupportChatbot() {
                 onKeyDown={handleKeyDown}
                 placeholder="Type your question..."
                 maxLength={500}
-                className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-green-700 transition-colors"
+                className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-800 transition-colors"
               />
               <motion.button
                 onClick={() => sendMessage()}
@@ -225,7 +225,7 @@ export default function SupportChatbot() {
                 disabled={!input.trim() || loading}
                 className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                   input.trim() && !loading
-                    ? 'bg-green-600 text-white hover:bg-green-500'
+                    ? 'bg-yellow-700 text-white hover:bg-yellow-600'
                     : 'bg-gray-800 text-gray-600'
                 }`}
               >
@@ -238,3 +238,4 @@ export default function SupportChatbot() {
     </>
   );
 }
+

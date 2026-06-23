@@ -191,7 +191,7 @@ const HeaderInner = () => {
     const active = isActive(pathname, href);
     return `relative flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold rounded-md transition-all duration-200 uppercase tracking-widest whitespace-nowrap ${
       active
-        ? "text-green-400"
+        ? "text-yellow-500"
         : "text-gray-500 hover:text-white"
     }`;
   };
@@ -323,7 +323,7 @@ const HeaderInner = () => {
               <div className="relative">
                 <button
                   onClick={() => setAdminMoreOpen((v) => !v)}
-                  className={`${navClass("#more")} ${adminMoreOpen ? "!text-green-400 !bg-gray-800" : ""}`}
+                  className={`${navClass("#more")} ${adminMoreOpen ? "!text-yellow-500 !bg-gray-800" : ""}`}
                 >
                   <span className="text-sm">⚙️</span> More
                 </button>
@@ -350,7 +350,7 @@ const HeaderInner = () => {
                               item.comingSoon
                                 ? "text-gray-600 cursor-not-allowed"
                                 : isActive(pathname, item.href)
-                                  ? "text-green-400 bg-green-500/10"
+                                  ? "text-yellow-500 bg-yellow-600/10"
                                   : "text-gray-300 hover:text-white hover:bg-gray-800/60"
                             }`}
                           >
@@ -374,9 +374,9 @@ const HeaderInner = () => {
 
           {/* ── Social Icons (Blog-matching) ── */}
           <div className="hidden lg:flex items-center gap-2 mr-1">
-            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-green-400 transition-colors"><FaFacebookF size={13} /></a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-green-400 transition-colors"><FaInstagram size={13} /></a>
-            <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-green-400 transition-colors"><FaTiktok size={13} /></a>
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-yellow-500 transition-colors"><FaFacebookF size={13} /></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-yellow-500 transition-colors"><FaInstagram size={13} /></a>
+            <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="p-1.5 text-gray-500 hover:text-yellow-500 transition-colors"><FaTiktok size={13} /></a>
           </div>
 
           {/* ── Actions (Profile, Logout, Theme, Mobile Toggle) ── */}
@@ -416,7 +416,7 @@ const HeaderInner = () => {
                   prefetch={false}
                   className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-gray-800 transition-all border border-transparent hover:border-gray-800"
                 >
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-green-500 bg-gray-900 flex items-center justify-center">
+                  <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-yellow-600 bg-gray-900 flex items-center justify-center">
                     {session.user.image && !imgError ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -426,7 +426,7 @@ const HeaderInner = () => {
                         onError={() => setImgError(true)}
                       />
                     ) : (
-                      <div className="w-full h-full rounded-full bg-linear-to-br from-green-600 to-emerald-800 flex items-center justify-center text-white text-[10px] font-black">
+                      <div className="w-full h-full rounded-full bg-linear-to-br from-yellow-700 to-emerald-800 flex items-center justify-center text-white text-[10px] font-black">
                         {session.user.name?.[0]?.toUpperCase() || "P"}
                       </div>
                     )}
@@ -435,7 +435,7 @@ const HeaderInner = () => {
                     <p className="text-white text-[10px] font-black uppercase tracking-widest">
                       {session.user.name?.split(" ")[0]}
                     </p>
-                    <p className="text-green-500 text-[9px] font-bold uppercase">
+                    <p className="text-yellow-600 text-[9px] font-bold uppercase">
                       {session.user.activeRole || "Player"}
                     </p>
                   </div>
@@ -455,7 +455,7 @@ const HeaderInner = () => {
                 {(!onAuthScreen || authMode !== "login") && (
                   <Link
                     href="/login"
-                    className="py-1.5 px-5 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 rounded-full shadow-[0_0_16px_rgba(34,197,94,0.3)] transition-all"
+                    className="py-1.5 px-5 text-sm font-semibold text-white bg-yellow-700 hover:bg-yellow-600 rounded-full shadow-[0_0_16px_rgba(34,197,94,0.3)] transition-all"
                   >
                     Login
                   </Link>
@@ -510,7 +510,7 @@ const HeaderInner = () => {
               >
                 <div className="mb-4 flex items-start justify-between gap-3 border-b border-gray-800 pb-4">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-green-400">
+                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-yellow-500">
                       Navigation
                     </p>
                     <p className="mt-1 text-sm text-gray-400">
@@ -538,7 +538,7 @@ const HeaderInner = () => {
                   {isAdmin ? (
                     <>
                       {/* Management group */}
-                      <p className="text-[9px] font-black uppercase tracking-[0.25em] text-green-400 px-1 pt-1 pb-0.5">
+                      <p className="text-[9px] font-black uppercase tracking-[0.25em] text-yellow-500 px-1 pt-1 pb-0.5">
                         Management
                       </p>
                       {ADMIN_MOBILE_MANAGEMENT.map((tab) => (
@@ -549,7 +549,7 @@ const HeaderInner = () => {
                           onClick={() => setMobileOpen(false)}
                           className={`${mobileClass(tab.href)} w-full justify-between border ${
                             isActive(pathname, tab.href)
-                              ? "border-green-700 bg-green-500/10 text-white"
+                              ? "border-yellow-800 bg-yellow-600/10 text-white"
                               : "border-gray-800 bg-gray-900/80 text-gray-300 hover:border-gray-700 hover:bg-gray-900"
                           }`}
                         >
@@ -581,7 +581,7 @@ const HeaderInner = () => {
                             tab.comingSoon
                               ? "border-gray-800/50 bg-gray-900/40 text-gray-600 cursor-not-allowed"
                               : isActive(pathname, tab.href)
-                                ? "border-green-700 bg-green-500/10 text-white"
+                                ? "border-yellow-800 bg-yellow-600/10 text-white"
                                 : "border-gray-800 bg-gray-900/80 text-gray-300 hover:border-gray-700 hover:bg-gray-900"
                           }`}
                         >
@@ -607,7 +607,7 @@ const HeaderInner = () => {
                         onClick={() => setMobileOpen(false)}
                         className={`${mobileClass(tab.href)} w-full justify-between border ${
                           isActive(pathname, tab.href)
-                            ? "border-green-700 bg-green-500/10 text-white"
+                            ? "border-yellow-800 bg-yellow-600/10 text-white"
                             : "border-gray-800 bg-gray-900/80 text-gray-300 hover:border-gray-700 hover:bg-gray-900"
                         }`}
                       >
@@ -629,7 +629,7 @@ const HeaderInner = () => {
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 rounded-2xl border border-gray-800 bg-gray-900/80 px-4 py-3"
                     >
-                      <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-green-500 bg-gray-900">
+                      <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-yellow-600 bg-gray-900">
                         {session.user.image && !imgError ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -639,7 +639,7 @@ const HeaderInner = () => {
                             onError={() => setImgError(true)}
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center rounded-full bg-linear-to-br from-green-600 to-emerald-800 text-sm font-black text-white">
+                          <div className="flex h-full w-full items-center justify-center rounded-full bg-linear-to-br from-yellow-700 to-emerald-800 text-sm font-black text-white">
                             {session.user.name?.[0]?.toUpperCase() || "P"}
                           </div>
                         )}
@@ -648,7 +648,7 @@ const HeaderInner = () => {
                         <p className="truncate text-sm font-black uppercase tracking-[0.18em] text-white">
                           {session.user.name || "Player"}
                         </p>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-green-400">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-yellow-500">
                           {session.user.activeRole || "Player"}
                         </p>
                       </div>
@@ -686,7 +686,7 @@ const HeaderInner = () => {
                       <Link
                         href="/register"
                         onClick={() => setMobileOpen(false)}
-                        className="rounded-2xl bg-green-600 px-4 py-3 text-center text-sm font-black uppercase tracking-widest text-white shadow-[0_0_18px_rgba(34,197,94,0.28)]"
+                        className="rounded-2xl bg-yellow-700 px-4 py-3 text-center text-sm font-black uppercase tracking-widest text-white shadow-[0_0_18px_rgba(34,197,94,0.28)]"
                       >
                         Register
                       </Link>
@@ -718,3 +718,4 @@ const Header = () => (
 );
 
 export default Header;
+

@@ -120,7 +120,7 @@ const SocialSection = () => {
             href="https://wa.me/27637820245"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg transition-colors"
           >
             <FaWhatsapp className="text-lg" /> WhatsApp Us
           </a>
@@ -138,3 +138,4 @@ const SocialSection = () => {
 };
 
 export default SocialSection;
+

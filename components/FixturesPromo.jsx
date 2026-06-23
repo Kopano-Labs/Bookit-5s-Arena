@@ -8,7 +8,7 @@ const FixturesPromo = () => {
   return (
     <section className="relative overflow-hidden py-16 px-4">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-linear-to-br from-green-950 via-gray-950 to-gray-950" />
+      <div className="absolute inset-0 bg-linear-to-br from-yellow-950 via-gray-950 to-gray-950" />
       <div
         className="absolute inset-0 opacity-10"
         style={{
@@ -72,7 +72,7 @@ const FixturesPromo = () => {
         >
           Keep Up With Your{" "}
           <span
-            className="text-green-400"
+            className="text-yellow-500"
             style={{ textShadow: "0 0 30px rgba(34,197,94,0.4)" }}
           >
             Favourites
@@ -118,7 +118,7 @@ const FixturesPromo = () => {
           </Link>
           <Link href="/fixtures">
             <motion.div
-              className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white font-semibold text-xs uppercase tracking-widest border border-gray-700 hover:border-green-700 cursor-pointer transition-colors"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white font-semibold text-xs uppercase tracking-widest border border-gray-700 hover:border-yellow-800 cursor-pointer transition-colors"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
             >
@@ -158,3 +158,4 @@ const FixturesPromo = () => {
 };
 
 export default FixturesPromo;
+

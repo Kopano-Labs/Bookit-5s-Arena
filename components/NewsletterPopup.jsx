@@ -91,8 +91,8 @@ export default function NewsletterPopup() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-600/20 border border-green-500 flex items-center justify-center">
-                  <FaFutbol className="text-green-400" size={24} />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-yellow-700/20 border border-yellow-600 flex items-center justify-center">
+                  <FaFutbol className="text-yellow-500" size={24} />
                 </div>
                 <h3 className="text-white text-xl font-black uppercase tracking-widest mb-2">
                   You&apos;re In! ⚽
@@ -106,17 +106,17 @@ export default function NewsletterPopup() {
               <>
                 <div className="text-center mb-6">
                   <motion.div
-                    className="w-14 h-14 mx-auto mb-4 rounded-full bg-green-900/30 border border-green-500/50 flex items-center justify-center"
+                    className="w-14 h-14 mx-auto mb-4 rounded-full bg-green-900/30 border border-yellow-600/50 flex items-center justify-center"
                     animate={{ rotate: [0, 5, -5, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <FaEnvelope className="text-green-400" size={20} />
+                    <FaEnvelope className="text-yellow-500" size={20} />
                   </motion.div>
                   <h3
                     className="text-white text-xl font-black uppercase tracking-widest mb-2"
                     style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
                   >
-                    Never Miss a <span className="text-green-400">Match</span>
+                    Never Miss a <span className="text-yellow-500">Match</span>
                   </h3>
                   <p className="text-gray-400 text-sm">
                     Get tournament updates, fixture alerts, exclusive deals, and
@@ -131,7 +131,7 @@ export default function NewsletterPopup() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="your@email.com"
-                      className="w-full px-4 py-3 pl-10 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-green-500 transition-colors"
+                      className="w-full px-4 py-3 pl-10 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm outline-none focus:border-yellow-600 transition-colors"
                       required
                     />
                     <FaEnvelope
@@ -142,7 +142,7 @@ export default function NewsletterPopup() {
                   <motion.button
                     type="submit"
                     disabled={status === "loading"}
-                    className="w-full py-3 rounded-xl bg-green-600 text-white font-bold uppercase tracking-widest text-sm cursor-pointer disabled:opacity-50"
+                    className="w-full py-3 rounded-xl bg-yellow-700 text-white font-bold uppercase tracking-widest text-sm cursor-pointer disabled:opacity-50"
                     style={{ boxShadow: "0 0 20px rgba(34,197,94,0.3)" }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -165,7 +165,7 @@ export default function NewsletterPopup() {
                       type="checkbox"
                       checked={dontShow}
                       onChange={(e) => setDontShow(e.target.checked)}
-                      className="w-3 h-3 rounded accent-green-500 cursor-pointer"
+                      className="w-3 h-3 rounded accent-yellow-600 cursor-pointer"
                     />
                     <span className="text-[9px] font-bold uppercase tracking-widest text-gray-600 group-hover:text-gray-400 transition-colors">
                       Don&apos;t show again
@@ -180,3 +180,4 @@ export default function NewsletterPopup() {
     </AnimatePresence>
   );
 }
+

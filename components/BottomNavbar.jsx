@@ -235,13 +235,13 @@ export default function BottomNavbar() {
       >
         <FaFutbol
           size={22}
-          className={isOpen ? "text-green-400" : "text-gray-400"}
+          className={isOpen ? "text-yellow-500" : "text-gray-400"}
         />
 
         {/* Pulse ring */}
         {!isOpen && (
           <motion.div
-            className="absolute inset-0 rounded-full border-2 border-green-500/30"
+            className="absolute inset-0 rounded-full border-2 border-yellow-600/30"
             animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
             transition={{ duration: 2.5, repeat: Infinity }}
           />
@@ -268,7 +268,7 @@ export default function BottomNavbar() {
       <AnimatePresence>
         {!isOpen && (
           <motion.span
-            className="pointer-events-none absolute -top-7 left-1/2 max-w-[8rem] -translate-x-1/2 rounded-lg border border-green-500/20 bg-gray-950/90 px-2 py-1 text-center text-[8px] font-black tracking-widest text-green-400 uppercase"
+            className="pointer-events-none absolute -top-7 left-1/2 max-w-[8rem] -translate-x-1/2 rounded-lg border border-yellow-600/20 bg-gray-950/90 px-2 py-1 text-center text-[8px] font-black tracking-widest text-yellow-500 uppercase"
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 0 }}
             whileHover={{ opacity: 1, y: 0 }}
@@ -280,3 +280,4 @@ export default function BottomNavbar() {
     </div>
   );
 }
+
