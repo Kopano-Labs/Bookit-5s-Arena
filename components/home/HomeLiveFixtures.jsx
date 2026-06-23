@@ -52,7 +52,7 @@ export default function HomeLiveFixtures() {
   if (loading) {
     return (
       <div className="h-64 flex flex-col items-center justify-center bg-zinc-950 border-y border-zinc-900">
-        <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <div className="w-8 h-8 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin mb-4" />
         <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 animate-pulse">Syncing Arena Data Feed...</span>
       </div>
     );
@@ -69,7 +69,7 @@ export default function HomeLiveFixtures() {
           </p>
           <Link
             href="/fixtures"
-            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-500 hover:text-green-400 shrink-0"
+            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-yellow-600 hover:text-yellow-500 shrink-0"
           >
             Open fixtures <FaChevronRight size={8} />
           </Link>
@@ -81,19 +81,19 @@ export default function HomeLiveFixtures() {
   return (
     <section className="bg-zinc-950 border-y border-zinc-900 py-12 overflow-hidden relative">
         {/* Subtle background glow */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 h-[min(42vw,300px)] w-[min(75vw,600px)] -translate-x-1/2 -translate-y-1/2 bg-green-500/10 blur-[120px]" />
+        <div className="pointer-events-none absolute top-1/2 left-1/2 h-[min(42vw,300px)] w-[min(75vw,600px)] -translate-x-1/2 -translate-y-1/2 bg-yellow-600/10 blur-[120px]" />
 
       <div className="max-w-7xl mx-auto px-6 mb-8 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-            <FaBolt className="text-green-500" />
+          <div className="w-10 h-10 rounded-xl bg-yellow-600/10 border border-yellow-600/20 flex items-center justify-center">
+            <FaBolt className="text-yellow-600" />
           </div>
           <div>
             <h2 className="text-xl font-black uppercase tracking-tight text-white leading-none">Live Match Center</h2>
             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">Global Coverage · PSL Tracked</p>
           </div>
         </div>
-        <Link href="/fixtures" className="text-[10px] font-black uppercase tracking-widest text-green-500 hover:text-green-400 flex items-center gap-2 group transition-all">
+        <Link href="/fixtures" className="text-[10px] font-black uppercase tracking-widest text-yellow-600 hover:text-yellow-500 flex items-center gap-2 group transition-all">
             See All Leagues <FaChevronRight className="transition-transform group-hover:translate-x-1" size={8} />
         </Link>
       </div>
@@ -106,10 +106,10 @@ export default function HomeLiveFixtures() {
               initial={{ opacity: 0, scale: 0.9, x: 20 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="flex-shrink-0 w-[280px] bg-zinc-900/50 backdrop-blur-md border border-zinc-800 rounded-3xl p-5 hover:border-green-500/40 hover:bg-zinc-900 transition-all cursor-default group"
+              className="flex-shrink-0 w-[280px] bg-zinc-900/50 backdrop-blur-md border border-zinc-800 rounded-3xl p-5 hover:border-yellow-600/40 hover:bg-zinc-900 transition-all cursor-default group"
             >
               <div className="flex items-center justify-between mb-4">
-                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-green-400 transition-colors">
+                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-yellow-500 transition-colors">
                   {match.league.shortName || match.league.name}
                 </span>
                 {match.isLive ? (
@@ -149,7 +149,7 @@ export default function HomeLiveFixtures() {
                     <FaBroadcastTower className="text-zinc-600" size={10} />
                     <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">iSports Edge Feed</span>
                 </div>
-                <Link href={`/fixtures?league=${match.league.slug || "premier-league"}`} className="p-2 rounded-full bg-zinc-800/50 hover:bg-green-500/20 hover:text-green-400 transition-all">
+                <Link href={`/fixtures?league=${match.league.slug || "premier-league"}`} className="p-2 rounded-full bg-zinc-800/50 hover:bg-yellow-600/20 hover:text-yellow-500 transition-all">
                     <FaChevronRight size={8} />
                 </Link>
               </div>
@@ -157,11 +157,11 @@ export default function HomeLiveFixtures() {
           ))}
           
           {/* View More Card */}
-          <Link href="/fixtures" className="flex-shrink-0 w-[120px] rounded-3xl border border-dashed border-zinc-800 flex flex-col items-center justify-center gap-3 group hover:border-green-500/50 hover:bg-green-500/5 transition-all">
+          <Link href="/fixtures" className="flex-shrink-0 w-[120px] rounded-3xl border border-dashed border-zinc-800 flex flex-col items-center justify-center gap-3 group hover:border-yellow-600/50 hover:bg-yellow-600/5 transition-all">
              <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <FaArrowRight className="text-zinc-500 group-hover:text-green-500" size={12} />
+                <FaArrowRight className="text-zinc-500 group-hover:text-yellow-600" size={12} />
              </div>
-             <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600 group-hover:text-green-500">View All</span>
+             <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600 group-hover:text-yellow-600">View All</span>
           </Link>
         </div>
       </div>
@@ -177,4 +177,5 @@ export default function HomeLiveFixtures() {
     </section>
   );
 }
+
 

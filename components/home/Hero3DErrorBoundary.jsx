@@ -22,3 +22,4 @@ export default class Hero3DErrorBoundary extends Component {
     return this.props.children;
   }
 }
+

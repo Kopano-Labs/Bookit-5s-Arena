@@ -73,7 +73,7 @@ export default function WeatherWidget() {
   const getTempColor = (temp) => {
     if (temp >= 35) return 'text-red-400';
     if (temp >= 28) return 'text-orange-400';
-    if (temp >= 20) return 'text-green-400';
+    if (temp >= 20) return 'text-yellow-500';
     if (temp >= 12) return 'text-blue-300';
     return 'text-blue-500';
   };
@@ -88,7 +88,7 @@ export default function WeatherWidget() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="text-lg text-green-400">📍</span>
+            <span className="text-lg text-yellow-500">📍</span>
             <div>
               <p className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
                 Matchday Weather Pulse
@@ -176,13 +176,13 @@ export default function WeatherWidget() {
 
                 {activeWeather.footballReady ? (
                   <motion.div
-                    className="flex items-center gap-1.5 rounded-full border border-green-700/50 bg-green-900/40 px-3 py-1"
+                    className="flex items-center gap-1.5 rounded-full border border-yellow-800/50 bg-green-900/40 px-3 py-1"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3 }}
                   >
                     <span className="text-sm">⚽</span>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-green-400">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-yellow-500">
                       Perfect Football Weather!
                     </span>
                   </motion.div>
@@ -199,7 +199,7 @@ export default function WeatherWidget() {
                   onClick={() => setActiveSlug(location.slug)}
                   className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] transition ${
                     activeSlug === location.slug
-                      ? 'border-green-500 bg-green-500/15 text-green-300'
+                      ? 'border-yellow-600 bg-yellow-600/15 text-green-300'
                       : 'border-gray-800 bg-gray-900/70 text-gray-400 hover:border-gray-700 hover:text-white'
                   }`}
                 >
@@ -234,3 +234,4 @@ export default function WeatherWidget() {
     </motion.div>
   );
 }
+

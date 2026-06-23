@@ -52,7 +52,7 @@ export default function SocialSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-green-400 font-bold tracking-widest uppercase text-sm mb-2">
+          <p className="text-yellow-500 font-bold tracking-widest uppercase text-sm mb-2">
             Stay connected
           </p>
           <h2
@@ -160,7 +160,7 @@ export default function SocialSection() {
                   <p className="text-white font-bold text-sm leading-none mb-0.5">{s.label}</p>
                   <p className="text-gray-500 text-xs truncate">{s.sub}</p>
                 </div>
-                <FaArrowRight className="text-gray-600 group-hover:text-green-400 transition-colors flex-shrink-0" size={12} />
+                <FaArrowRight className="text-gray-600 group-hover:text-yellow-500 transition-colors flex-shrink-0" size={12} />
               </motion.a>
             ))}
           </motion.div>
@@ -169,3 +169,4 @@ export default function SocialSection() {
     </section>
   );
 }
+

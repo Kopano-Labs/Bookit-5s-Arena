@@ -46,3 +46,4 @@ export default function StatsBar({ courtsCount = 4 }) {
     </div>
   );
 }
+

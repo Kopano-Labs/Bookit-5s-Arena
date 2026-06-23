@@ -61,7 +61,7 @@ export default function HomeMediaHighlights() {
               Match reactions and highlight clips will appear here when coverage is available for the current round.
             </p>
           </div>
-          <Link href="/fixtures?league=premier-league" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-500 hover:text-green-400 shrink-0">
+          <Link href="/fixtures?league=premier-league" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-yellow-600 hover:text-yellow-500 shrink-0">
             Premier League hub <FaArrowRight />
           </Link>
         </div>
@@ -75,7 +75,7 @@ export default function HomeMediaHighlights() {
   return (
     <section className="py-24 bg-zinc-950 relative overflow-hidden">
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] bg-green-500/20 blur-[160px] rounded-full" />
+        <div className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] bg-yellow-600/20 blur-[160px] rounded-full" />
         <div className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full" />
       </div>
 
@@ -87,7 +87,7 @@ export default function HomeMediaHighlights() {
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Live Global Feed</span>
             </div>
             <h2 className="text-4xl md:text-6xl font-black text-white uppercase leading-[0.9]" style={{ fontFamily: "Impact, sans-serif" }}>
-              MATCH <span className="text-green-500">REACTIONS</span>
+              MATCH <span className="text-yellow-600">REACTIONS</span>
             </h2>
           </div>
           <Link href="/fixtures?league=premier-league" className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all group">
@@ -103,7 +103,7 @@ export default function HomeMediaHighlights() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <a href={featuredVideo.url} target="_blank" rel="noreferrer" className="block relative aspect-video rounded-[40px] overflow-hidden bg-zinc-900 border border-zinc-800 ring-1 ring-white/5 group-hover:ring-green-500/30 transition-all">
+              <a href={featuredVideo.url} target="_blank" rel="noreferrer" className="block relative aspect-video rounded-[40px] overflow-hidden bg-zinc-900 border border-zinc-800 ring-1 ring-white/5 group-hover:ring-yellow-600/30 transition-all">
                 <Image src={featuredVideo.thumbnail} alt={featuredVideo.title} fill className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" unoptimized />
                 <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent" />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -112,7 +112,7 @@ export default function HomeMediaHighlights() {
                   </div>
                 </div>
                 <div className="absolute bottom-10 left-10 right-10">
-                  <span className="inline-block px-3 py-1 rounded-full bg-green-500 text-black text-[9px] font-black uppercase tracking-widest mb-4">
+                  <span className="inline-block px-3 py-1 rounded-full bg-yellow-600 text-black text-[9px] font-black uppercase tracking-widest mb-4">
                     Featured Reaction
                   </span>
                   <h3 className="text-2xl md:text-4xl font-black text-white leading-tight">
@@ -135,7 +135,7 @@ export default function HomeMediaHighlights() {
                 href={news.articles[0].url}
                 target="_blank"
                 rel="noreferrer"
-                className="block relative min-h-[320px] rounded-[40px] overflow-hidden bg-zinc-900 border border-zinc-800 ring-1 ring-white/5 group-hover:ring-green-500/30 transition-all p-10 flex flex-col justify-end"
+                className="block relative min-h-[320px] rounded-[40px] overflow-hidden bg-zinc-900 border border-zinc-800 ring-1 ring-white/5 group-hover:ring-yellow-600/30 transition-all p-10 flex flex-col justify-end"
                 style={{
                   backgroundImage: news.articles[0].image
                     ? `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.88)), url("${news.articles[0].image}")`
@@ -144,7 +144,7 @@ export default function HomeMediaHighlights() {
                   backgroundPosition: "center",
                 }}
               >
-                <span className="inline-block px-3 py-1 rounded-full bg-green-500 text-black text-[9px] font-black uppercase tracking-widest mb-4 w-fit">
+                <span className="inline-block px-3 py-1 rounded-full bg-yellow-600 text-black text-[9px] font-black uppercase tracking-widest mb-4 w-fit">
                   Top story
                 </span>
                 <h3 className="text-2xl md:text-4xl font-black text-white leading-tight max-w-3xl">
@@ -157,7 +157,7 @@ export default function HomeMediaHighlights() {
             </motion.div>
           ) : (
             <div className="lg:col-span-8 rounded-[40px] border border-zinc-800 bg-zinc-900/50 p-10 flex flex-col justify-center gap-4">
-              <FaBroadcastTower className="text-green-500" size={28} />
+              <FaBroadcastTower className="text-yellow-600" size={28} />
               <h3 className="text-2xl font-black text-white uppercase">Highlights loading</h3>
               <p className="text-sm text-zinc-400">Match reactions and headlines will appear here shortly.</p>
             </div>
@@ -185,7 +185,7 @@ export default function HomeMediaHighlights() {
                   </div>
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h4 className="text-sm font-bold text-zinc-200 line-clamp-2 leading-snug group-hover:text-green-400 transition-colors">
+                  <h4 className="text-sm font-bold text-zinc-200 line-clamp-2 leading-snug group-hover:text-yellow-500 transition-colors">
                     {video.title}
                   </h4>
                   <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mt-2">
@@ -199,7 +199,7 @@ export default function HomeMediaHighlights() {
               <div className="pt-6 border-t border-zinc-800">
                 <div className="bg-zinc-900/50 rounded-3xl p-6 border border-zinc-800">
                   <div className="flex items-center gap-3 mb-4">
-                    <FaBroadcastTower className="text-green-500" />
+                    <FaBroadcastTower className="text-yellow-600" />
                     <span className="text-[10px] font-black uppercase tracking-widest text-white">Latest Intelligence</span>
                   </div>
                   <ul className="space-y-4">
@@ -220,3 +220,4 @@ export default function HomeMediaHighlights() {
     </section>
   );
 }
+

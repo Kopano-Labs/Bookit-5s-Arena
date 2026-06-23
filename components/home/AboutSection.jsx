@@ -51,7 +51,7 @@ export default function AboutSection({ courtsCount = 4 }) {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="text-green-400 font-bold tracking-widest uppercase text-sm mb-4">
+            <p className="text-yellow-500 font-bold tracking-widest uppercase text-sm mb-4">
               About Us
             </p>
             <h2
@@ -63,7 +63,7 @@ export default function AboutSection({ courtsCount = 4 }) {
             >
               WHAT IS
               <br />
-              <span className="text-green-400">5S ARENA?</span>
+              <span className="text-yellow-500">5S ARENA?</span>
             </h2>
             <p className="text-gray-300 text-lg leading-relaxed mb-4">
               5s Arena is played on state-of-the-art, all-weather, floodlit,
@@ -90,7 +90,7 @@ export default function AboutSection({ courtsCount = 4 }) {
                   transition={{ duration: 0.5, delay: 0.3 + i * 0.12 }}
                 >
                   <div
-                    className="font-black text-3xl text-green-400"
+                    className="font-black text-3xl text-yellow-500"
                     style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
                   >
                     {s.val}
@@ -105,7 +105,7 @@ export default function AboutSection({ courtsCount = 4 }) {
 
           {/* Right — Animated Venue Showcase Card (replaces Google Maps) */}
           <motion.div
-            className="rounded-2xl border border-green-900/60 overflow-hidden bg-linear-to-br from-gray-900 via-gray-900 to-green-950/40 relative"
+            className="rounded-2xl border border-green-900/60 overflow-hidden bg-linear-to-br from-gray-900 via-gray-900 to-yellow-950/40 relative"
             initial={{ opacity: 0, x: 60 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
@@ -116,14 +116,14 @@ export default function AboutSection({ courtsCount = 4 }) {
             }}
           >
             {/* Decorative background glow */}
-            <div className="absolute top-0 right-0 w-48 h-48 bg-green-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-yellow-600/5 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-600/5 rounded-full blur-2xl pointer-events-none" />
 
             {/* Header with animated pin */}
             <div className="relative px-6 pt-6 pb-4 border-b border-green-900/40">
               <div className="flex items-start gap-4">
                 <motion.div
-                  className="w-12 h-12 rounded-xl bg-green-600/20 border border-green-700/40 flex items-center justify-center shrink-0"
+                  className="w-12 h-12 rounded-xl bg-yellow-700/20 border border-yellow-800/40 flex items-center justify-center shrink-0"
                   animate={{ y: [0, -4, 0] }}
                   transition={{
                     duration: 2,
@@ -131,7 +131,7 @@ export default function AboutSection({ courtsCount = 4 }) {
                     ease: "easeInOut",
                   }}
                 >
-                  <FaMapMarkerAlt className="text-green-400 text-xl" />
+                  <FaMapMarkerAlt className="text-yellow-500 text-xl" />
                 </motion.div>
                 <div>
                   <h3
@@ -206,7 +206,7 @@ export default function AboutSection({ courtsCount = 4 }) {
                   Opening Hours
                 </p>
                 <motion.span
-                  className="ml-auto px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-green-900/40 text-green-400 border border-green-700/40"
+                  className="ml-auto px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-green-900/40 text-yellow-500 border border-yellow-800/40"
                   animate={{ opacity: [1, 0.6, 1] }}
                   transition={{
                     duration: 2,
@@ -237,8 +237,8 @@ export default function AboutSection({ courtsCount = 4 }) {
             {/* Footer CTA */}
             <div className="px-6 py-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-green-400 text-xs font-bold uppercase tracking-widest">
+                <div className="w-2 h-2 rounded-full bg-yellow-600 animate-pulse" />
+                <span className="text-yellow-500 text-xs font-bold uppercase tracking-widest">
                   All-Weather · Synthetic Turf
                 </span>
               </div>
@@ -246,7 +246,7 @@ export default function AboutSection({ courtsCount = 4 }) {
                 href="https://maps.google.com/?q=Hellenic+Football+Club,+Pringle+Rd,+Milnerton,+Cape+Town"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-600/20 border border-green-700/50 text-green-400 text-xs font-bold uppercase tracking-widest hover:bg-green-600/30 transition-colors shrink-0"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-700/20 border border-yellow-800/50 text-yellow-500 text-xs font-bold uppercase tracking-widest hover:bg-yellow-700/30 transition-colors shrink-0"
                 whileHover={{
                   scale: 1.05,
                   transition: { duration: 0.15, type: "tween" },
@@ -262,3 +262,4 @@ export default function AboutSection({ courtsCount = 4 }) {
     </section>
   );
 }
+

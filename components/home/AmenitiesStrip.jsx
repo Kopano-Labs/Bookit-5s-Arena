@@ -13,7 +13,7 @@ const AMENITIES = [
 
 export default function AmenitiesStrip() {
   return (
-    <div className="bg-green-600 py-8 overflow-hidden">
+    <div className="bg-yellow-700 py-8 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-wrap justify-center gap-6 md:gap-10">
           {AMENITIES.map((a, i) => (
@@ -41,3 +41,4 @@ export default function AmenitiesStrip() {
     </div>
   );
 }
+

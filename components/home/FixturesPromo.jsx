@@ -71,7 +71,7 @@ export default function FixturesPromo() {
                 ease: 'easeInOut',
               }}
             >
-              <FaFutbol className="text-green-400" size={10 + i * 2} />
+              <FaFutbol className="text-yellow-500" size={10 + i * 2} />
             </motion.div>
           ))}
         </div>
@@ -103,7 +103,7 @@ export default function FixturesPromo() {
               }}
               transition={{ duration: 3, repeat: Infinity }}
             >
-              <FaTrophy className="text-green-400 text-3xl" />
+              <FaTrophy className="text-yellow-500 text-3xl" />
             </motion.div>
           </motion.div>
 
@@ -182,7 +182,7 @@ export default function FixturesPromo() {
             <span className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/80">
               Arena local fixtures redesigned
             </span>
-            <span className="rounded-full border border-green-500/25 bg-green-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-green-300">
+            <span className="rounded-full border border-yellow-600/25 bg-yellow-600/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-green-300">
               Top 25 leagues tracked
             </span>
             <span className="rounded-full border border-yellow-500/25 bg-yellow-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-yellow-300">
@@ -228,3 +228,4 @@ export default function FixturesPromo() {
     </Link>
   );
 }
+

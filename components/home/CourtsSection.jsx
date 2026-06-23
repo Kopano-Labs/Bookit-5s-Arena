@@ -28,7 +28,7 @@ function CourtCard({ court, index }) {
         onClick={() => window.location.href = `/courts/${court._id}`}
         className="group block relative overflow-hidden rounded-2xl border border-gray-700/50 backdrop-blur-sm cursor-pointer
           transition-all duration-500
-          hover:border-green-500/60
+          hover:border-yellow-600/60
           hover:shadow-[0_0_0_1px_rgba(74,222,128,0.3),0_0_50px_rgba(74,222,128,0.25),0_20px_60px_rgba(0,0,0,0.5)]"
         style={{ background: 'linear-gradient(180deg, rgba(17,24,39,0.9) 0%, rgba(5,10,20,0.95) 100%)' }}
       >
@@ -61,17 +61,17 @@ function CourtCard({ court, index }) {
               {/* Live pulse dot */}
               <div className="absolute top-4 right-4 flex items-center gap-1.5">
                 <motion.div
-                  className="w-2 h-2 rounded-full bg-green-400"
+                  className="w-2 h-2 rounded-full bg-yellow-500"
                   animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <span className="text-[9px] uppercase tracking-wider text-green-400 font-bold">Available</span>
+                <span className="text-[9px] uppercase tracking-wider text-yellow-500 font-bold">Available</span>
               </div>
             </>
           ) : (
             <div className="h-56 bg-gray-800/80 flex items-center justify-center">
               <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}>
-                <FaFutbol className="text-green-400/40 text-6xl" />
+                <FaFutbol className="text-yellow-500/40 text-6xl" />
               </motion.div>
             </div>
           )}
@@ -97,18 +97,18 @@ function CourtCard({ court, index }) {
           <div className="flex items-center gap-4 mb-4 text-[11px] text-gray-500 uppercase tracking-wider">
             {court.address && (
               <span className="flex items-center gap-1">
-                <FaMapMarkerAlt className="text-green-500/70" size={10} /> Milnerton
+                <FaMapMarkerAlt className="text-yellow-600/70" size={10} /> Milnerton
               </span>
             )}
             <span className="flex items-center gap-1">
-              <FaClock className="text-green-500/70" size={10} /> {normalizeAvailabilityLabel(court.availability)}
+              <FaClock className="text-yellow-600/70" size={10} /> {normalizeAvailabilityLabel(court.availability)}
             </span>
           </div>
 
           {/* Price + CTA */}
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-3xl font-black text-green-400" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+              <span className="text-3xl font-black text-yellow-500" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 R{court.price_per_hour}
               </span>
               <span className="text-gray-500 text-sm"> /hour</span>
@@ -134,7 +134,7 @@ function CourtCard({ court, index }) {
 
         {/* Bottom accent line */}
         <motion.div
-          className="absolute bottom-0 left-0 h-[3px] bg-gradient-to-r from-green-500 via-emerald-400 to-green-600"
+          className="absolute bottom-0 left-0 h-[3px] bg-gradient-to-r from-yellow-600 via-emerald-400 to-yellow-700"
           initial={{ width: '0%' }}
           whileHover={{ width: '100%' }}
           transition={{ duration: 0.4 }}
@@ -243,7 +243,7 @@ export default function CourtsSection({ courts = [] }) {
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-green-400/30"
+            className="absolute w-1 h-1 rounded-full bg-yellow-500/30"
             style={{ left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%` }}
             animate={{
               y: [-10, 10, -10],
@@ -265,7 +265,7 @@ export default function CourtsSection({ courts = [] }) {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-4 py-1.5 mb-4"
+            className="inline-flex items-center gap-2 bg-yellow-600/10 border border-yellow-600/20 rounded-full px-4 py-1.5 mb-4"
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -275,9 +275,9 @@ export default function CourtsSection({ courts = [] }) {
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
             >
-              <FaFutbol className="text-green-400" size={12} />
+              <FaFutbol className="text-yellow-500" size={12} />
             </motion.span>
-            <span className="text-green-400 text-xs font-bold uppercase tracking-widest">Ready to play?</span>
+            <span className="text-yellow-500 text-xs font-bold uppercase tracking-widest">Ready to play?</span>
           </motion.div>
 
           <h2
@@ -297,7 +297,7 @@ export default function CourtsSection({ courts = [] }) {
           </h2>
 
           <motion.div
-            className="h-1.5 w-32 bg-gradient-to-r from-transparent via-green-500 to-transparent rounded-full mx-auto mb-4"
+            className="h-1.5 w-32 bg-gradient-to-r from-transparent via-yellow-600 to-transparent rounded-full mx-auto mb-4"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
@@ -323,7 +323,7 @@ export default function CourtsSection({ courts = [] }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   onClick={() => scrollTo(-1)}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-green-600/90 text-white flex items-center justify-center shadow-lg shadow-green-900/50 -ml-2"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-yellow-700/90 text-white flex items-center justify-center shadow-lg shadow-green-900/50 -ml-2"
                   whileTap={{ scale: 0.9 }}
                 >
                   <FaChevronLeft size={14} />
@@ -334,7 +334,7 @@ export default function CourtsSection({ courts = [] }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   onClick={() => scrollTo(1)}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-green-600/90 text-white flex items-center justify-center shadow-lg shadow-green-900/50 -mr-2"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-yellow-700/90 text-white flex items-center justify-center shadow-lg shadow-green-900/50 -mr-2"
                   whileTap={{ scale: 0.9 }}
                 >
                   <FaChevronRight size={14} />
@@ -409,3 +409,4 @@ export default function CourtsSection({ courts = [] }) {
     </section>
   );
 }
+

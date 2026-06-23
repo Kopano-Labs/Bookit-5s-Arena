@@ -9,7 +9,7 @@ const EVENTS = [
     image: '/images/events/birthday-parties.png',
     title: 'Birthday Parties',
     desc: 'Private court hire with full access to our bar & clubhouse. Catering options available. Perfect for groups of all sizes — book the pitch, celebrate in style.',
-    border: 'border-t-green-500',
+    border: 'border-t-yellow-600',
     glow: 'rgba(34,197,94,0.25)',
   },
   {
@@ -54,7 +54,7 @@ export default function EventsSection() {
             transition={{ duration: 0.6 }}
           >
             <motion.p
-              className="text-green-400 font-bold tracking-widest uppercase text-sm mb-2 flex items-center justify-center gap-2"
+              className="text-yellow-500 font-bold tracking-widest uppercase text-sm mb-2 flex items-center justify-center gap-2"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -81,7 +81,7 @@ export default function EventsSection() {
             >
               EVENTS &amp; SERVICES
             </h2>
-            <div className="h-1 w-24 bg-gradient-to-r from-green-500 via-emerald-400 to-green-500 rounded-full mx-auto mt-3" />
+            <div className="h-1 w-24 bg-gradient-to-r from-yellow-600 via-emerald-400 to-yellow-600 rounded-full mx-auto mt-3" />
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -160,3 +160,4 @@ export default function EventsSection() {
     </Link>
   );
 }
+

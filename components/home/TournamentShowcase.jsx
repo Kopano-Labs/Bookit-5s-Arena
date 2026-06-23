@@ -60,7 +60,7 @@ function StandingRow({ team, rank, animate }) {
         <span className="text-gray-500 w-4 text-center">
           {team.standings?.l ?? 0}
         </span>
-        <span className="text-green-400 w-5 text-center">
+        <span className="text-yellow-500 w-5 text-center">
           {team.standings?.pts ?? 0}
         </span>
       </div>
@@ -265,7 +265,7 @@ export default function TournamentShowcase() {
                       transition: { type: "spring", stiffness: 380, damping: 22 },
                     },
                   }}
-                  className="inline-flex items-center px-3 py-1.5 rounded-xl border border-green-500/20 bg-gradient-to-br from-green-500/10 to-emerald-950/40 text-[10px] font-black uppercase tracking-widest text-green-300/95 shadow-[0_6px_24px_rgba(34,197,94,0.12)]"
+                  className="inline-flex items-center px-3 py-1.5 rounded-xl border border-yellow-600/20 bg-gradient-to-br from-yellow-600/10 to-emerald-950/40 text-[10px] font-black uppercase tracking-widest text-green-300/95 shadow-[0_6px_24px_rgba(34,197,94,0.12)]"
                   style={{ transformStyle: "preserve-3d" }}
                 >
                   {label}
@@ -279,7 +279,7 @@ export default function TournamentShowcase() {
               viewport={{ once: true }}
               transition={{ delay: 0.35 }}
             >
-              <span className="text-green-400/90">{TOURNAMENT_FORMAT.qualificationLegend}</span>
+              <span className="text-yellow-500/90">{TOURNAMENT_FORMAT.qualificationLegend}</span>
               <span className="text-gray-600"> · </span>
               <span>{TOURNAMENT_FORMAT.bracket.join(" → ")}</span>
             </motion.p>
@@ -314,7 +314,7 @@ export default function TournamentShowcase() {
               const Icon = stat.icon;
               return (
                 <div key={stat.label} className="text-center">
-                  <Icon className="mx-auto text-green-500/60 mb-1" size={14} />
+                  <Icon className="mx-auto text-yellow-600/60 mb-1" size={14} />
                   <div className="text-lg font-black text-white leading-none">
                     {stat.value}
                   </div>
@@ -350,7 +350,7 @@ export default function TournamentShowcase() {
                     onClick={() => setTab(t)}
                     className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${
                       tab === t
-                        ? "bg-green-600 text-white"
+                        ? "bg-yellow-700 text-white"
                         : "text-gray-600 hover:text-gray-400"
                     }`}
                   >
@@ -389,7 +389,7 @@ export default function TournamentShowcase() {
                   <span className="w-4 text-center">W</span>
                   <span className="w-4 text-center">D</span>
                   <span className="w-4 text-center">L</span>
-                  <span className="w-5 text-center text-green-600">P</span>
+                  <span className="w-5 text-center text-yellow-700">P</span>
                 </div>
               </div>
             )}
@@ -457,14 +457,14 @@ export default function TournamentShowcase() {
             <div className="px-5 pb-5">
               <Link href="/tournament">
                 <motion.div
-                  className="flex items-center justify-between px-5 py-3 rounded-2xl bg-gray-900 border border-gray-800 hover:border-green-500/30 transition-all cursor-pointer group"
+                  className="flex items-center justify-between px-5 py-3 rounded-2xl bg-gray-900 border border-gray-800 hover:border-yellow-600/30 transition-all cursor-pointer group"
                   whileHover={{ x: 4 }}
                 >
                   <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest group-hover:text-white transition-colors">
                     View Full Tournament
                   </span>
                   <FaArrowRight
-                    className="text-gray-700 group-hover:text-green-500 transition-colors"
+                    className="text-gray-700 group-hover:text-yellow-600 transition-colors"
                     size={12}
                   />
                 </motion.div>
@@ -482,7 +482,7 @@ export default function TournamentShowcase() {
           >
             {/* Main CTA card */}
             <div
-              className="relative rounded-3xl overflow-hidden border border-green-500/20 p-7 flex-1"
+              className="relative rounded-3xl overflow-hidden border border-yellow-600/20 p-7 flex-1"
               style={{
                 background:
                   "linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(234,179,8,0.05) 100%)",
@@ -522,7 +522,7 @@ export default function TournamentShowcase() {
               >
                 Secure Your
                 <br />
-                <span className="text-green-400">Nation Now</span>
+                <span className="text-yellow-500">Nation Now</span>
               </h3>
               <p className="text-gray-500 text-sm mb-5 leading-relaxed">
                 48 nations. One champion. Choose your World Cup team and
@@ -650,3 +650,4 @@ export default function TournamentShowcase() {
     </section>
   );
 }
+

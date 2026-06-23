@@ -83,7 +83,7 @@ export default function HeroSection() {
         <div className="mx-auto w-full max-w-xl md:mx-0 md:max-w-2xl">
           <motion.p
             variants={item}
-            className="mb-4 text-[8px] font-bold uppercase leading-relaxed tracking-[0.18em] text-green-400 sm:text-sm sm:tracking-[0.35em]"
+            className="mb-4 text-[8px] font-bold uppercase leading-relaxed tracking-[0.18em] text-yellow-500 sm:text-sm sm:tracking-[0.35em]"
             style={{ textWrap: "balance" }}
           >
             Milnerton · Cape Town · Hellenic Football Club
@@ -101,7 +101,7 @@ export default function HeroSection() {
           >
             <span className="block text-white/95">Welcome to</span>
             <motion.span
-              className="mt-2 block text-green-400"
+              className="mt-2 block text-yellow-500"
               initial={{ opacity: 0, x: -28 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{
@@ -138,7 +138,7 @@ export default function HeroSection() {
           >
             <Link
               href="/#courts"
-              className="w-full sm:w-auto px-8 py-4 bg-green-600 text-white rounded-xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(34,197,94,0.4)] hover:bg-green-500 hover:scale-105 active:scale-95 transition-all text-center"
+              className="w-full sm:w-auto px-8 py-4 bg-yellow-700 text-white rounded-xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(34,197,94,0.4)] hover:bg-yellow-600 hover:scale-105 active:scale-95 transition-all text-center"
             >
               <motion.span
                 animate={{ rotate: [0, 20, -20, 0] }}
@@ -202,7 +202,7 @@ export default function HeroSection() {
             Scroll
           </span>
           <motion.div
-            className="w-px h-10 bg-green-500 origin-top"
+            className="w-px h-10 bg-yellow-600 origin-top"
             animate={{ scaleY: [0, 1, 0] }}
             transition={{
               duration: 1.4,
@@ -216,3 +216,4 @@ export default function HeroSection() {
     </section>
   );
 }
+

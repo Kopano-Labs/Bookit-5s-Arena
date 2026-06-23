@@ -5,7 +5,7 @@ import { FaPhone, FaEnvelope, FaWhatsapp } from 'react-icons/fa';
 
 const CONTACT_CARDS = [
   {
-    icon: <FaPhone className="text-green-400 text-3xl" />,
+    icon: <FaPhone className="text-yellow-500 text-3xl" />,
     label: 'Phone',
     main: '063 782 0245',
     sub: 'Mashoto',
@@ -13,7 +13,7 @@ const CONTACT_CARDS = [
     hoverBorder: '#4ade80',
   },
   {
-    icon: <FaEnvelope className="text-green-400 text-3xl" />,
+    icon: <FaEnvelope className="text-yellow-500 text-3xl" />,
     label: 'Email',
     main: 'fivearena@gmail.com',
     sub: 'We reply within 24hrs',
@@ -21,7 +21,7 @@ const CONTACT_CARDS = [
     hoverBorder: '#4ade80',
   },
   {
-    icon: <FaWhatsapp className="text-green-400 text-3xl" />,
+    icon: <FaWhatsapp className="text-yellow-500 text-3xl" />,
     label: 'WhatsApp',
     main: '063 782 0245',
     sub: 'Instant response',
@@ -45,7 +45,7 @@ export default function ContactSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-green-400 font-bold tracking-widest uppercase text-sm mb-2">
+          <p className="text-yellow-500 font-bold tracking-widest uppercase text-sm mb-2">
             We&apos;d love to hear from you
           </p>
           <h2
@@ -96,3 +96,4 @@ export default function ContactSection() {
     </section>
   );
 }
+

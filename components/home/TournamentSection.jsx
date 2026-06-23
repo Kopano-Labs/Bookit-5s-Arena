@@ -110,7 +110,7 @@ export default function TournamentSection() {
       {BALLS.map((i) => (
         <motion.div
           key={i}
-          className="absolute text-green-500/10 pointer-events-none"
+          className="absolute text-yellow-600/10 pointer-events-none"
           style={{
             top: `${15 + i * 16}%`,
             left: i % 2 === 0 ? `${3 + i * 4}%` : "auto",
@@ -132,7 +132,7 @@ export default function TournamentSection() {
         {/* Badge */}
         <div className="flex justify-center mb-8">
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-600/20 border border-green-500/30 text-green-400 text-xs font-bold uppercase tracking-widest"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-700/20 border border-yellow-600/30 text-yellow-500 text-xs font-bold uppercase tracking-widest"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -166,7 +166,7 @@ export default function TournamentSection() {
           >
             <span className="text-white">5s ARENA </span>
             <motion.span
-              className="text-green-400 inline-block"
+              className="text-yellow-500 inline-block"
               animate={{ textShadow: ["0 0 0px #4ade80", "0 0 40px #4ade80", "0 0 0px #4ade80"] }}
               transition={{ duration: 2.5, repeat: Infinity }}
             >
@@ -196,7 +196,7 @@ export default function TournamentSection() {
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              <FaCalendarAlt className="text-green-400" size={18} />
+              <FaCalendarAlt className="text-yellow-500" size={18} />
             </motion.div>
             <div>
               <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold leading-none mb-0.5">Tournament Dates</p>
@@ -216,7 +216,7 @@ export default function TournamentSection() {
               animate={{ y: [0, -4, 0] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
             >
-              <FaMapMarkerAlt className="text-green-400" size={18} />
+              <FaMapMarkerAlt className="text-yellow-500" size={18} />
             </motion.div>
             <div>
               <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold leading-none mb-0.5">Venue</p>
@@ -236,7 +236,7 @@ export default function TournamentSection() {
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
-              <FaUsers className="text-green-400" size={18} />
+              <FaUsers className="text-yellow-500" size={18} />
             </motion.div>
             <div>
               <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold leading-none mb-0.5">Format</p>
@@ -257,7 +257,7 @@ export default function TournamentSection() {
         >
           <div className="mb-4 flex flex-col gap-3 rounded-[28px] border border-white/10 bg-black/25 p-4 backdrop-blur-sm md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-green-400">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-yellow-500">
                 Interactive Flag Carousel
               </p>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-400">
@@ -271,14 +271,14 @@ export default function TournamentSection() {
                 onClick={() =>
                   setActiveTeamIndex((current) => (current - 1 + TEAMS.length) % TEAMS.length)
                 }
-                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white transition hover:border-green-400/40 hover:bg-white/10"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white transition hover:border-yellow-500/40 hover:bg-white/10"
               >
                 <FaChevronLeft size={14} />
               </button>
               <button
                 type="button"
                 onClick={() => setIsCarouselPaused((value) => !value)}
-                className="inline-flex items-center gap-2 rounded-2xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-green-300 transition hover:bg-green-500/20"
+                className="inline-flex items-center gap-2 rounded-2xl border border-yellow-600/30 bg-yellow-600/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-green-300 transition hover:bg-yellow-600/20"
               >
                 {isCarouselPaused ? <FaPlay size={12} /> : <FaPause size={12} />}
                 {isCarouselPaused ? "Resume Wheel" : "Pause Wheel"}
@@ -286,7 +286,7 @@ export default function TournamentSection() {
               <button
                 type="button"
                 onClick={() => setActiveTeamIndex((current) => (current + 1) % TEAMS.length)}
-                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white transition hover:border-green-400/40 hover:bg-white/10"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white transition hover:border-yellow-500/40 hover:bg-white/10"
               >
                 <FaChevronRight size={14} />
               </button>
@@ -308,7 +308,7 @@ export default function TournamentSection() {
                 }}
                 className={`group relative h-24 w-24 shrink-0 snap-center overflow-hidden rounded-2xl border bg-white shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition md:h-28 md:w-28 ${
                   activeTeamIndex === index
-                    ? "border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.35),0_14px_34px_rgba(0,0,0,0.35)]"
+                    ? "border-yellow-500 shadow-[0_0_30px_rgba(34,197,94,0.35),0_14px_34px_rgba(0,0,0,0.35)]"
                     : "border-white/10"
                 }`}
                 whileHover={{
@@ -342,7 +342,7 @@ export default function TournamentSection() {
                 <Image src={activeTeam.logo} alt={activeTeam.name} fill className="object-cover" sizes="128px" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-green-400">
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-yellow-500">
                   Spotlight
                 </p>
                 <h3 className="mt-2 text-2xl font-black text-white">{activeTeam.name}</h3>
@@ -458,7 +458,7 @@ export default function TournamentSection() {
             <div className="flex flex-col gap-3 shrink-0 w-full md:w-auto">
               <Link href="/tournament">
                 <motion.button
-                  className="flex w-full items-center justify-center gap-2 px-5 py-4 rounded-xl bg-green-600 text-white font-black uppercase tracking-widest text-sm text-center cursor-pointer md:w-auto"
+                  className="flex w-full items-center justify-center gap-2 px-5 py-4 rounded-xl bg-yellow-700 text-white font-black uppercase tracking-widest text-sm text-center cursor-pointer md:w-auto"
                   style={{ fontFamily: "Impact, Arial Black, sans-serif", boxShadow: "0 0 30px rgba(34,197,94,0.4)" }}
                   whileHover={{ scale: 1.07, boxShadow: "0 0 55px rgba(34,197,94,0.65)" }}
                   whileTap={{ scale: 0.94 }}
@@ -485,3 +485,4 @@ export default function TournamentSection() {
     </section>
   );
 }
+
