@@ -19,7 +19,6 @@
     "test:bdd:fixtures": "start-server-and-test dev:bdd http://localhost:3002 test:bdd:fixtures:run",
     "test:bdd:fixtures:smoke:run": "cross-env BDD_TAGS=\"@critical and not @target and not @release-gate and not @provider-failure\" node --import tsx ./node_modules/@cucumber/cucumber/bin/cucumber.js --config tests/bdd/cucumber.mjs",
     "test:bdd:fixtures:smoke": "start-server-and-test dev:bdd http://localhost:3002 test:bdd:fixtures:smoke:run",
-    "test:bdd:fixtures:outline": "cross-env BDD_TAGS=\"@critical and @provider-failure\" npm run test:bdd:fixtures",
     "test": "jest"
   },
   "dependencies": {
@@ -49,11 +48,6 @@
     "stripe": "^20.4.1",
     "three": "^0.184.0"
   },
-  "overrides": {
-    "next-auth": {
-      "nodemailer": "^8.0.4"
-    }
-  },
   "devDependencies": {
     "@cucumber/cucumber": "^11.3.0",
     "@playwright/test": "^1.52.0",
@@ -72,5 +66,11 @@
     "tailwindcss": "^4.2.2",
     "tsx": "^4.22.4",
     "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "uuid": ">=11.1.1",
+    "postcss": ">=8.5.6",
+    "js-yaml": ">=3.13.1",
+    "@babel/core": ">=7.29.6"
   }
 }
