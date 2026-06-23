@@ -132,7 +132,7 @@ const RootLayout = ({ children }) => {
       </head>
       <body
         className="overflow-x-hidden antialiased selection:bg-green-500/30"
-        style={{ backgroundColor: "var(--bg-primary, #030712)", color: "var(--text-primary, #f9fafb)" }}
+        style={{ backgroundColor: "var(--bg-primary, #0a1628)", color: "var(--text-primary, #f9fafb)" }}
         suppressHydrationWarning
       >
         <AuthProvider>
@@ -162,3 +162,4 @@ const RootLayout = ({ children }) => {
 };
 
 export default RootLayout;
+

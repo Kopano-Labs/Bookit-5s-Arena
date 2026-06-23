@@ -74,7 +74,7 @@ const TEAM_CARDS = [
     image: "/images/admin-photos/kholofelo-robyn-rababalela-footer-picture.png",
     linkedin:
       "https://www.linkedin.com/in/kholofelo-robyn-rababalela-7a26273b6/",
-    gradient: "from-green-600/20 to-emerald-900/30",
+    gradient: "from-yellow-700/20 to-emerald-900/30",
     glow: "rgba(34,197,94,0.4)",
   },
   {
@@ -105,6 +105,45 @@ const BOTTOM_TABS = [
   { label: "RSS Feed", href: "/api/rss" },
 ];
 
+const ECOSYSTEM_LINKS = [
+  {
+    label: "KRRababalela",
+    href: "https://krrababalela.com",
+    note: "Chief portfolio",
+    status: "LIVE",
+  },
+  {
+    label: "Kopano Labs",
+    href: "https://kopanolabs.com",
+    note: "Studio lane",
+    status: "LIVE",
+  },
+  {
+    label: "KasiLink",
+    href: "https://kasilink.com",
+    note: "Township network",
+    status: "LIVE",
+  },
+  {
+    label: "5s Arena Blog",
+    href: "https://blog.fivesarena.com",
+    note: "Editorial surface",
+    status: "LIVE",
+  },
+  {
+    label: "Starfall Salvage",
+    href: "https://starfallsalvage.kopanolabs.com",
+    note: "Game lane",
+    status: "LIVE",
+  },
+  {
+    label: "Kopano Context",
+    href: "https://context.kopanolabs.com",
+    note: "Reserved domain",
+    status: "RESERVED",
+  },
+];
+
 /* ═══════════════════════════════════════════════════════════ */
 const Footer = () => {
   const { data: session, status } = useSession();
@@ -131,7 +170,7 @@ const Footer = () => {
   return (
     <footer className="bg-gray-950 border-t border-gray-800 relative overflow-hidden pb-20 sm:pb-24">
       {/* Gradient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-px bg-linear-to-r from-transparent via-green-500/50 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-px bg-linear-to-r from-transparent via-yellow-600/50 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
         {/* ─── LinkedIn Business Cards ─────────────────────── */}
@@ -143,7 +182,7 @@ const Footer = () => {
           className="mb-16"
         >
           <motion.h3
-            className="text-center text-green-400 font-bold text-xs uppercase tracking-[0.3em] mb-8"
+            className="text-center text-yellow-500 font-bold text-xs uppercase tracking-[0.3em] mb-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -184,7 +223,7 @@ const Footer = () => {
                 />
                 <div className="relative z-10">
                   <motion.div
-                    className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-2 border-gray-700 group-hover:border-green-500 transition-colors duration-300"
+                    className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-2 border-gray-700 group-hover:border-yellow-600 transition-colors duration-300"
                     whileHover={{ scale: 1.1, rotate: 3 }}
                   >
                     <Image
@@ -238,7 +277,7 @@ const Footer = () => {
                   className="font-black uppercase text-white text-lg tracking-wider"
                   style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
                 >
-                  5S <span className="text-green-400">ARENA</span>
+                  5S <span className="text-yellow-500">ARENA</span>
                 </p>
               </div>
             </motion.div>
@@ -274,7 +313,7 @@ const Footer = () => {
             <div className="flex gap-2">
               <motion.button
                 onClick={handleShare}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800/40 border border-gray-700 text-gray-400 text-xs hover:text-green-400 hover:border-green-500/30 transition-all cursor-pointer"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800/40 border border-gray-700 text-gray-400 text-xs hover:text-yellow-500 hover:border-yellow-600/30 transition-all cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -299,7 +338,7 @@ const Footer = () => {
           {/* Quick Links — role-based */}
           <div>
             <motion.h4
-              className="text-green-400 font-bold text-xs uppercase tracking-[0.2em] mb-5"
+              className="text-yellow-500 font-bold text-xs uppercase tracking-[0.2em] mb-5"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -315,9 +354,9 @@ const Footer = () => {
                   >
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white text-sm transition-all flex items-center gap-2 bg-gray-800/40 hover:bg-green-600/20 px-3 py-2 rounded-lg border border-gray-800/60 hover:border-green-500/30"
+                      className="text-gray-400 hover:text-white text-sm transition-all flex items-center gap-2 bg-gray-800/40 hover:bg-yellow-700/20 px-3 py-2 rounded-lg border border-gray-800/60 hover:border-yellow-600/30"
                     >
-                      <span className="text-green-500 text-xs">→</span>
+                      <span className="text-yellow-600 text-xs">→</span>
                       {link.label}
                     </Link>
                   </motion.div>
@@ -329,7 +368,7 @@ const Footer = () => {
           {/* Contact */}
           <div>
             <motion.h4
-              className="text-green-400 font-bold text-xs uppercase tracking-[0.2em] mb-5"
+              className="text-yellow-500 font-bold text-xs uppercase tracking-[0.2em] mb-5"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -340,10 +379,10 @@ const Footer = () => {
               <li>
                 <a
                   href="tel:+27637820245"
-                  className="flex items-center gap-3 hover:text-green-400 transition-colors group"
+                  className="flex items-center gap-3 hover:text-yellow-500 transition-colors group"
                 >
-                  <span className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-green-600/20 transition-colors">
-                    <FaPhone size={12} className="text-green-400" />
+                  <span className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-yellow-700/20 transition-colors">
+                    <FaPhone size={12} className="text-yellow-500" />
                   </span>
                   063 782 0245
                 </a>
@@ -351,10 +390,10 @@ const Footer = () => {
               <li>
                 <a
                   href="mailto:fivearena@gmail.com"
-                  className="flex items-center gap-3 hover:text-green-400 transition-colors group"
+                  className="flex items-center gap-3 hover:text-yellow-500 transition-colors group"
                 >
-                  <span className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-green-600/20 transition-colors">
-                    <FaEnvelope size={12} className="text-green-400" />
+                  <span className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-yellow-700/20 transition-colors">
+                    <FaEnvelope size={12} className="text-yellow-500" />
                   </span>
                   fivearena@gmail.com
                 </a>
@@ -364,17 +403,17 @@ const Footer = () => {
                   href="https://wa.me/27637820245"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 hover:text-green-400 transition-colors group"
+                  className="flex items-center gap-3 hover:text-yellow-500 transition-colors group"
                 >
-                  <span className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-green-600/20 transition-colors">
-                    <FaWhatsapp size={12} className="text-green-400" />
+                  <span className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-yellow-700/20 transition-colors">
+                    <FaWhatsapp size={12} className="text-yellow-500" />
                   </span>
                   WhatsApp Us
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
-                  <FaMapMarkerAlt size={12} className="text-green-400" />
+                  <FaMapMarkerAlt size={12} className="text-yellow-500" />
                 </span>
                 <span>
                   Pringle Rd, Milnerton,
@@ -388,7 +427,7 @@ const Footer = () => {
           {/* Opening Hours */}
           <div>
             <motion.h4
-              className="text-green-400 font-bold text-xs uppercase tracking-[0.2em] mb-5"
+              className="text-yellow-500 font-bold text-xs uppercase tracking-[0.2em] mb-5"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -418,12 +457,68 @@ const Footer = () => {
           </div>
         </div>
 
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 rounded-3xl border border-gray-800/70 bg-gray-900/60 p-6"
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-yellow-500">
+                Kopano-Phu ecosystem
+              </p>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-gray-400">
+                Five&apos;s Arena is one public lane in the same ecosystem as the chief portfolio,
+                Kopano Labs, KasiLink, the blog, and Starfall. Kopano Context stays visible, but
+                truthfully marked as reserved until the public runtime is owner-proven.
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {ECOSYSTEM_LINKS.map((item) => (
+              <motion.a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-2xl border border-gray-800/80 bg-black/20 p-4 no-underline"
+                whileHover={{
+                  y: -3,
+                  borderColor: "rgba(74,222,128,0.35)",
+                  boxShadow: "0 16px 42px rgba(34,197,94,0.08)",
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-bold uppercase tracking-[0.12em] text-white">
+                    {item.label}
+                  </p>
+                  <span
+                    className={`rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${
+                      item.status === "RESERVED"
+                        ? "bg-amber-500/15 text-amber-300"
+                        : "bg-yellow-600/15 text-green-300"
+                    }`}
+                  >
+                    {item.status}
+                  </span>
+                </div>
+                <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-gray-500">
+                  {item.note}
+                </p>
+              </motion.a>
+            ))}
+          </div>
+        </motion.div>
+
         {/* ─── Bottom bar ──────────────────────────────────── */}
         <div className="border-t border-gray-800/60 pt-6">
           {/* Built with ❤️ */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-gray-600 text-xs">
-              <FaFutbol className="text-green-600" size={10} />
+              <FaFutbol className="text-yellow-700" size={10} />
               <p>&copy; {currentYear} Bookit 5s Arena. All rights reserved.</p>
             </div>
 
@@ -453,3 +548,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

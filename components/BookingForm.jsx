@@ -16,6 +16,10 @@ import {
   getAllowedStartTimes,
   normalizeDuration,
 } from '@/lib/bookingSlots';
+import {
+  deriveOfflineIdempotencyKey,
+  enqueueOfflineEvent,
+} from '@/lib/offline/kopanoOfflineQueue';
 
 const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const { data: session } = useSession();
@@ -32,6 +36,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [guestReserveLoading, setGuestReserveLoading] = useState(false);
+  const [reservationMode, setReservationMode] = useState('reserved');
 
   const totalPrice = pricePerHour * Number(duration);
   const slotOptions = getAllowedStartTimes(duration);
@@ -54,20 +59,103 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
     return true;
   };
 
+  const buildOfflineBookingIntent = (actorType) => {
+    const safeDuration = Number(duration);
+    const normalizedPhone = guestPhone.replace(/\s/g, '');
+    const stableActor =
+      actorType === 'guest'
+        ? {
+            type: 'guest',
+            email: guestEmail.trim().toLowerCase(),
+            phone: normalizedPhone,
+          }
+        : {
+            type: 'user',
+            id: session?.user?.id || null,
+            email: session?.user?.email || null,
+          };
+
+    return {
+      stableParts: {
+        lane: 'bookit-court-booking',
+        actor: stableActor,
+        courtId,
+        date,
+        start_time: startTime,
+        duration: safeDuration,
+        payAtVenue: true,
+      },
+      payload: {
+        source: 'bookit-court-form',
+        intent: 'pay-at-venue-court-booking',
+        dryRun: true,
+        moneyMovement: false,
+        courtId,
+        courtName,
+        date,
+        start_time: startTime,
+        duration: safeDuration,
+        total_price: totalPrice,
+        actor:
+          actorType === 'guest'
+            ? {
+                type: 'guest',
+                contact_present: Boolean(guestEmail && guestPhone),
+                email_domain: guestEmail.includes('@') ? guestEmail.split('@').pop().toLowerCase() : null,
+                phone_last4: normalizedPhone.slice(-4),
+              }
+            : {
+                type: 'user',
+                userId: session?.user?.id || null,
+              },
+        queued_at: new Date().toISOString(),
+      },
+    };
+  };
+
+  const queueOfflineBookingIntent = async (actorType) => {
+    const intent = buildOfflineBookingIntent(actorType);
+    const idempotencyKey = await deriveOfflineIdempotencyKey('booking', intent.stableParts);
+
+    await enqueueOfflineEvent({
+      eventType: 'booking',
+      payload: intent.payload,
+      idempotencyKey,
+    });
+
+    setReservationMode('queued');
+    setReserved(true);
+  };
+
   const handleReserve = async () => {
     setError('');
     if (!session) { router.push('/login'); return; }
     if (!validateForm()) return;
     setReserveLoading(true);
-    const res = await fetch('/api/bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ courtId, date, start_time: startTime, duration: Number(duration), payAtVenue: true }),
-    });
-    const data = await res.json();
-    setReserveLoading(false);
-    if (!res.ok) { setError(data.error || 'Failed to reserve. Please try again.'); return; }
-    setReserved(true);
+    try {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        await queueOfflineBookingIntent('user');
+        return;
+      }
+
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ courtId, date, start_time: startTime, duration: Number(duration), payAtVenue: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || 'Failed to reserve. Please try again.'); return; }
+      setReservationMode('reserved');
+      setReserved(true);
+    } catch {
+      try {
+        await queueOfflineBookingIntent('user');
+      } catch (queueError) {
+        setError(queueError?.message || 'Unable to save this booking request offline.');
+      }
+    } finally {
+      setReserveLoading(false);
+    }
   };
 
   const handleGuestReserve = async () => {
@@ -86,22 +174,37 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
       return;
     }
     setGuestReserveLoading(true);
-    const res = await fetch('/api/bookings/guest', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        courtId, date, start_time: startTime, duration: Number(duration),
-        guestName, guestEmail, guestPhone,
-      }),
-    });
-    const data = await res.json();
-    setGuestReserveLoading(false);
-    if (!res.ok) { setError(data.error || 'Failed to reserve. Please try again.'); return; }
-    setReserved(true);
+    try {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        await queueOfflineBookingIntent('guest');
+        return;
+      }
+
+      const res = await fetch('/api/bookings/guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courtId, date, start_time: startTime, duration: Number(duration),
+          guestName, guestEmail, guestPhone,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || 'Failed to reserve. Please try again.'); return; }
+      setReservationMode('reserved');
+      setReserved(true);
+    } catch {
+      try {
+        await queueOfflineBookingIntent('guest');
+      } catch (queueError) {
+        setError(queueError?.message || 'Unable to save this guest request offline.');
+      }
+    } finally {
+      setGuestReserveLoading(false);
+    }
   };
 
   const inputClass =
-    'w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all placeholder-gray-500';
+    'w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-yellow-600 focus:border-transparent outline-none transition-all placeholder-gray-500';
   const labelClass = 'block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest';
 
   if (reserved) {
@@ -110,32 +213,40 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="mt-8 bg-green-900/20 border border-green-700/50 rounded-2xl p-6"
+        className="mt-8 bg-green-900/20 border border-yellow-800/50 rounded-2xl p-6"
       >
         <div className="text-center mb-6">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-900/40 border-2 border-green-500 mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-900/40 border-2 border-yellow-600 mb-4"
           >
-            <FaCheckCircle className="text-3xl text-green-400" />
+            <FaCheckCircle className="text-3xl text-yellow-500" />
           </motion.div>
           <h2 className="text-xl font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-            Court Reserved!
+            {reservationMode === 'queued' ? 'Request Queued' : 'Court Reserved!'}
           </h2>
-          <p className="text-green-400 text-sm mt-1 font-semibold">
+          <p className="text-yellow-500 text-sm mt-1 font-semibold">
             {courtName} · {date} at {formatBookingTimeLabel(startTime)} · {duration}h
           </p>
         </div>
 
         <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 mb-5">
           <div className="flex items-center gap-3 mb-2">
-            <FaMoneyBillWave className="text-green-400 flex-shrink-0" size={16} />
-            <p className="text-white text-sm font-bold">Pay at Venue — R{totalPrice}</p>
+            <FaMoneyBillWave className="text-yellow-500 flex-shrink-0" size={16} />
+            <p className="text-white text-sm font-bold">
+              {reservationMode === 'queued' ? 'Offline Request Saved' : `Pay at Venue — R${totalPrice}`}
+            </p>
           </div>
           <p className="text-gray-400 text-xs leading-relaxed">
-            Your slot is reserved. Please arrive at the venue and pay <strong className="text-white">R{totalPrice} cash</strong> on the day. Your booking will be confirmed once payment is received by our staff.
+            {reservationMode === 'queued'
+              ? 'This device saved your booking request for sync when the connection returns. No court slot is held until the request syncs and staff confirm availability.'
+              : (
+                <>
+                  Your slot is reserved. Please arrive at the venue and pay <strong className="text-white">R{totalPrice} cash</strong> on the day. Your booking will be confirmed once payment is received by our staff.
+                </>
+              )}
           </p>
         </div>
 
@@ -162,12 +273,14 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
           </motion.a>
         </div>
         <div className="mt-4 pt-4 border-t border-gray-800 flex items-center gap-2 text-xs text-gray-500">
-          <FaMapMarkerAlt className="text-green-500 flex-shrink-0" />
+          <FaMapMarkerAlt className="text-yellow-600 flex-shrink-0" />
           Bookit 5s Arena · Pringle Rd, Milnerton, Cape Town
         </div>
-        <Link href="/bookings" className="mt-4 block text-center text-xs text-green-400 hover:text-green-300 transition-colors">
-          View My Bookings
-        </Link>
+        {reservationMode !== 'queued' && (
+          <Link href="/bookings" className="mt-4 block text-center text-xs text-yellow-500 hover:text-green-300 transition-colors">
+            View My Bookings
+          </Link>
+        )}
       </motion.div>
     );
   }
@@ -175,12 +288,12 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   return (
     <div className="mt-8 bg-gray-900 border border-gray-800 rounded-2xl p-6">
       <h2 className="text-lg font-black uppercase tracking-widest text-white mb-6 flex items-center gap-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-        <FaFutbol className="text-green-400" /> Book This Court
+        <FaFutbol className="text-yellow-500" /> Book This Court
       </h2>
 
       {/* Physical payment notice */}
       <div className="mb-5 p-3 bg-green-900/20 border border-green-800/40 rounded-xl flex items-start gap-3">
-        <FaMoneyBillWave className="text-green-400 flex-shrink-0 mt-0.5" size={14} />
+        <FaMoneyBillWave className="text-yellow-500 flex-shrink-0 mt-0.5" size={14} />
         <p className="text-green-300 text-xs font-semibold leading-relaxed">
           All court bookings are <strong>pay at venue (cash)</strong>. Reserve your slot online, then pay our staff on arrival.
         </p>
@@ -202,7 +315,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               <p className="text-xs text-amber-200/80">Create an account to track your booking history and earn exclusive loyalty rewards.</p>
             </div>
             <div className="flex gap-2">
-              <Link href="/login" className="flex-1 text-center py-2.5 px-3 rounded-lg bg-green-700 hover:bg-green-600 text-white text-xs font-black uppercase tracking-widest transition-colors shadow-lg shadow-green-900/50">
+              <Link href="/login" className="flex-1 text-center py-2.5 px-3 rounded-lg bg-yellow-800 hover:bg-yellow-700 text-white text-xs font-black uppercase tracking-widest transition-colors shadow-lg shadow-green-900/50">
                 Sign In
               </Link>
               <Link href="/register" className="flex-1 text-center py-2.5 px-3 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white text-xs font-bold uppercase tracking-widest transition-colors">
@@ -218,7 +331,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               <button
                 type="button"
                 onClick={() => setShowGuestForm((v) => !v)}
-                className="bg-gray-900 px-3 flex items-center gap-1 text-gray-500 hover:text-green-400 text-xs uppercase tracking-widest transition-colors"
+                className="bg-gray-900 px-3 flex items-center gap-1 text-gray-500 hover:text-yellow-500 text-xs uppercase tracking-widest transition-colors"
               >
                 <FaUser size={9} /> or reserve as guest (pay cash on arrival)
               </button>
@@ -234,9 +347,9 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                 transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 className="overflow-hidden"
               >
-                <div className="bg-gray-800/60 border border-green-700/40 rounded-xl p-4 space-y-3">
+                <div className="bg-gray-800/60 border border-yellow-800/40 rounded-xl p-4 space-y-3">
                   <p className="text-green-300 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                    <FaMapMarkerAlt className="text-green-400" /> Guest Reservation — Pay at Venue
+                    <FaMapMarkerAlt className="text-yellow-500" /> Guest Reservation — Pay at Venue
                     <InfoTooltip text="No account needed! We'll hold your court slot. Pay cash when you arrive at the venue." position="right" />
                   </p>
                   <p className="text-gray-500 text-xs">Fill in your details to hold this slot. Pay R{totalPrice} cash when you arrive.</p>
@@ -247,21 +360,21 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                       placeholder="Full Name *"
                       value={guestName}
                       onChange={(e) => setGuestName(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none placeholder-gray-500"
+                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-yellow-600 focus:border-transparent outline-none placeholder-gray-500"
                     />
                     <input
                       type="email"
                       placeholder="Email Address *"
                       value={guestEmail}
                       onChange={(e) => setGuestEmail(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none placeholder-gray-500"
+                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-yellow-600 focus:border-transparent outline-none placeholder-gray-500"
                     />
                     <input
                       type="tel"
                       placeholder="Phone Number * (e.g. 0821234567)"
                       value={guestPhone}
                       onChange={(e) => setGuestPhone(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none placeholder-gray-500"
+                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-yellow-600 focus:border-transparent outline-none placeholder-gray-500"
                     />
                   </div>
 
@@ -327,7 +440,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
         {date && startTime && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-green-900/20 border border-green-800/40 rounded-xl text-sm text-green-300">
             <span className="font-bold text-white">Total: R{totalPrice}</span>
-            <span className="text-green-500 ml-2">({formatBookingTimeLabel(startTime)} · {duration} hr × R{pricePerHour}/hr) — pay cash at venue</span>
+            <span className="text-yellow-600 ml-2">({formatBookingTimeLabel(startTime)} · {duration} hr × R{pricePerHour}/hr) — pay cash at venue</span>
           </motion.div>
         )}
 
@@ -354,7 +467,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
         )}
 
         <p className="text-center text-xs text-gray-600 flex items-center justify-center gap-1.5">
-          <FaMapMarkerAlt size={10} className="text-green-600" /> Bookit 5s Arena · Pringle Rd, Milnerton, Cape Town
+          <FaMapMarkerAlt size={10} className="text-yellow-700" /> Bookit 5s Arena · Pringle Rd, Milnerton, Cape Town
         </p>
       </div>
     </div>
@@ -362,3 +475,4 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
 };
 
 export default BookingForm;
+

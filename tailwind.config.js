@@ -12,8 +12,8 @@ const config = {
   theme: {
     extend: {
       colors: {
-        primary: "#030712",
-        accent: "#22c55e",
+        primary: "#0a1628",
+        accent: "#d4a843",
       },
       fontFamily: {
         impact: ["Impact", "Arial Black", "sans-serif"],
@@ -45,3 +45,4 @@ const config = {
 };
 
 export default config;
+
