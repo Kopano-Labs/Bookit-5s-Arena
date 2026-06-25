@@ -1,0 +1,30 @@
+{
+  "schema": "kpgs_gssb_config_v1",
+  "trinity": {
+    "core": "Father — Source of all agents",
+    "altar": "Son — Validation gate",
+    "engine": "Holy Spirit — Distribution power"
+  },
+  "gssb": "Bookit-5s-Arena",
+  "slug": "fivesarena",
+  "domain": "fivesarena.com",
+  "nso_group": "NSO-SPORTS",
+  "governance": {
+    "named_agents": [
+      "YASSIE",
+      "CASSIE",
+      "ANCHOR"
+    ],
+    "named_count": 3,
+    "utility_agents": 50,
+    "total_agents": 53,
+    "pillars": [
+      "COMMUNITY",
+      "BODY"
+    ]
+  },
+  "apwa_status": "WC2026",
+  "scripture": "1 Corinthians 12:4-6",
+  "constraint": "I_AM_STATELESS_RENTER_NOT_LANDLORD",
+  "distributed_at": "2026-06-24T07:42:01.933683+00:00"
+}
