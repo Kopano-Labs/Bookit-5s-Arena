@@ -6,6 +6,59 @@
 
 ---
 
+## 🚀 What’s Next: APWA Triage Layer v0.3
+
+We’re building the next reliability upgrade for Bookit 5’s Arena in public.
+
+### Why this matters
+In South Africa, connectivity and power stability are not equal for everyone.  
+Our next phase focuses on users and venues operating under constrained conditions (including load-shedding windows), without degrading the experience for users with stable access.
+
+### Our direction
+This is an **additive upgrade**, not a rewrite.
+
+- We are **not replacing** the existing PWA or booking stack.
+- We are adding a **new Triage + Continuity layer** to improve:
+  - persistence
+  - consistency
+  - delivery confidence
+  - context-aware adaptiveness
+
+### APWA Triage Layer v0.3 (Planned)
+Core goals:
+
+1. **Context-aware runtime triage**
+   - Detect constrained environments (device/network/power/load-shedding context)
+   - Dynamically choose FULL vs LITE booking experience
+
+2. **LITE mode for constrained communities**
+   - Prioritize essential booking actions
+   - Reduce heavy/non-critical operations
+   - Strengthen offline queue behavior
+
+3. **PostgreSQL continuity layer**
+   - Introduce relational guarantees for:
+     - idempotency
+     - notification dispatch logs
+     - booking continuity events
+     - reconciliation workflows
+
+4. **Operational proof + observability**
+   - Build auditable booking state transitions
+   - Track user/business notification outcomes by channel
+
+### Communication policy (already in progress)
+- Default confirmations: **WhatsApp** (user + business)
+- Always-on receipts: **Email** (user + business)
+- Optional user override: Email/SMS
+
+### Build in public
+We are intentionally building this in the open.  
+If you care about resilient infrastructure, African-first product engineering, offline-first UX, or reliability systems — contributions and technical feedback are welcome.
+
+> We don’t just optimize for ideal networks.  
+> We design for the real world.
+
 ## ≡ƒ¢á∩╕Å **Tech Stack**
 
 <div align="center">
