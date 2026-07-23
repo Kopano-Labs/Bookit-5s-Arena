@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/next";
 import dynamic from "next/dynamic";
 import AuthProvider from "@/components/AuthProvider";
 import Header from "@/components/Header";
@@ -162,4 +161,3 @@ const RootLayout = ({ children }) => {
 };
 
 export default RootLayout;
-
