@@ -1,0 +1,96 @@
+name: TypeScript 7 Evaluation
+
+on:
+  push:
+    branches:
+      - chore/typescript-7-fivesarena
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    name: Compare current TypeScript with TypeScript 7
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run current TypeScript diagnostics
+        id: current
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run typecheck 2>&1 | tee typescript-current.log
+
+      - name: Run TypeScript 7 native diagnostics
+        id: ts7
+        continue-on-error: true
+        shell: bash
+        env:
+          TYPESCRIPT_7_VERSION: 7.0.2
+          TYPESCRIPT_7_CHECKERS: 2
+        run: |
+          set -o pipefail
+          npm run typecheck:ts7 2>&1 | tee typescript-7.log
+
+      - name: Publish evaluation summary
+        if: always()
+        shell: bash
+        env:
+          CURRENT_OUTCOME: ${{ steps.current.outcome }}
+          TS7_OUTCOME: ${{ steps.ts7.outcome }}
+        run: |
+          {
+            echo "## FivesArena TypeScript 7 evaluation"
+            echo
+            echo "| Compiler lane | Outcome |"
+            echo "| --- | --- |"
+            echo "| Current repository TypeScript | ${CURRENT_OUTCOME} |"
+            echo "| TypeScript 7.0.2 native compiler | ${TS7_OUTCOME} |"
+            echo
+            echo "Full diagnostics are attached as workflow artifacts."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload diagnostic receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-7-evaluation-${{ github.run_id }}
+          path: |
+            typescript-current.log
+            typescript-7.log
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Enforce no new compiler regression
+        if: always()
+        shell: bash
+        env:
+          CURRENT_OUTCOME: ${{ steps.current.outcome }}
+          TS7_OUTCOME: ${{ steps.ts7.outcome }}
+        run: |
+          if [[ "$CURRENT_OUTCOME" == "success" && "$TS7_OUTCOME" != "success" ]]; then
+            echo "::error::TypeScript 7 failed while the current compiler passed."
+            exit 1
+          fi
+
+          if [[ "$CURRENT_OUTCOME" != "success" ]]; then
+            echo "::warning::The current compiler already reports diagnostics; inspect both receipt logs before promotion."
+          fi
