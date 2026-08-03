@@ -37,7 +37,7 @@
     "mongodb": "^7.1.1",
     "mongoose": "^9.3.3",
     "next": "^15.5.18",
-    "next-auth": "^4.24.13",
+    "next-auth": "^4.24.15",
     "nodemailer": "^6.9.16",
     "react": "19.2.4",
     "react-dom": "19.2.4",
