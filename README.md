@@ -100,7 +100,7 @@ Visit `http://localhost:3000` to see the application running.
 
 ---
 
-## ≡ƒñ¥ **Contributing**
+## **Contributing**
 
 We welcome contributions from the community!
 1. Fork the repository
@@ -111,11 +111,11 @@ We welcome contributions from the community!
 
 ---
 
-## ≡ƒô₧ **Support The Creator**
+## **Support The Creator**
 
 Built with Γ¥ñ∩╕Å by **Kholofelo Robyn Rababalela**.
 If you found this project useful or have any questions:
 * [Buy me a coffee on Ko-fi](https://ko-fi.com/robynawesome)
 * [Support via PayPal](https://www.paypal.me/osheenviews)
 
-Γ¡ÉΓ¡ÉΓ¡É **Don't forget to star this repository!** Γ¡ÉΓ¡ÉΓ¡É
+**Don't forget to star this repository!**
