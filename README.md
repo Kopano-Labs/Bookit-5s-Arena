@@ -6,11 +6,11 @@
 
 ---
 
-## ≡ƒ¢á∩╕Å **Tech Stack**
+## ≡**Tech Stack**
 
 <div align="center">
 
-### ΓÜ¢∩╕Å Frontend
+###  Frontend
 ![Next.js](https://img.shields.io/badge/Next.js-16.1.6-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-19.2.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
@@ -19,7 +19,7 @@
 ![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white)
 ![React Leaflet](https://img.shields.io/badge/React_Leaflet-5.0.0-199900?style=for-the-badge&logo=leaflet&logoColor=white)
 
-### ≡ƒöº Backend & Services
+### ≡Backend & Services
 ![MongoDB](https://img.shields.io/badge/MongoDB-8.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Mongoose](https://img.shields.io/badge/Mongoose-9.3.0-880000?style=for-the-badge&logo=mongoose&logoColor=white)
 ![NextAuth.js](https://img.shields.io/badge/NextAuth.js-4.24.13-000000?style=for-the-badge&logo=auth0&logoColor=white)
