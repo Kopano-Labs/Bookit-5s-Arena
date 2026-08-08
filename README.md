@@ -19,7 +19,7 @@
 ![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white)
 ![React Leaflet](https://img.shields.io/badge/React_Leaflet-5.0.0-199900?style=for-the-badge&logo=leaflet&logoColor=white)
 
-### ≡Backend & Services
+### Backend & Services
 ![MongoDB](https://img.shields.io/badge/MongoDB-8.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Mongoose](https://img.shields.io/badge/Mongoose-9.3.0-880000?style=for-the-badge&logo=mongoose&logoColor=white)
 ![NextAuth.js](https://img.shields.io/badge/NextAuth.js-4.24.13-000000?style=for-the-badge&logo=auth0&logoColor=white)
@@ -29,28 +29,28 @@
 
 ---
 
-## ≡ƒÜÇ **Pro-Level Features**
+## ≡**Pro-Level Features**
 
-### ≡ƒÅƒ∩╕Å **Arena Booking & Management**
+### **Arena Booking & Management**
 * **Instant Court Bookings:** Real-time scheduling that automatically prevents double-booking. Choose from 1hr, 2hr, or 3hr slots.
 * **Online Payments:** Fully integrated **Stripe Checkout** for fast, secure credit card transactions.
 * **Guest Reservation:** Allow guests to hold their slots and pay on arrival (cash or card) directly at the venue.
 * **Intelligent AI Integration:** Built-in AI support bot powered by Anthropic's Claude to handle user queries about hours, pricing, and bookings.
 
-### ≡ƒÅå **Admin Suite (The Dashboard)**
+### **Admin Suite (The Dashboard)**
 * **Centralized Command:** Manage all bookings, cancel appointments, and oversee finances from a secure admin dashboard.
 * **AI Venue Analytics:** Automatically gain insights into peak hours, user engagement, and revenue trends via AI.
 * **Automated Confirmations:** Email confirmations sent via **Nodemailer** instantly upon successful booking.
 * **Data-driven CMS:** Add, edit, or remove courts, update pricing dynamically, and manage newsletters.
 
-### ≡ƒîƒ **User Experience & Rewards**
+### **User Experience & Rewards**
 * **Modern Interface:** Highly interactive UI built with **Framer Motion** and **Tailwind CSS**.
 * **Referral System & Loyalty Points:** Dedicated user portal for tracking historical bookings.
 * **Secure Authentication:** Integrated **NextAuth.js** supporting Google, Facebook, and local password logins.
 
 ---
 
-## ΓÜÖ∩╕Å **Installation & Setup**
+## **Installation & Setup**
 
 **1. Clone the Repository:**
 ```bash
