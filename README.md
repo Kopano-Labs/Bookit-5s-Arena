@@ -1,6 +1,6 @@
 <div align="center">
   <img src="public/images/logo.png" alt="Bookit 5s Arena Logo" width="200"/>
-  <h1>ΓÜ╜ Bookit 5's Arena | Next.js Full-Stack App</h1>
+  <h1>Bookit 5's Arena | Next.js Full-Stack App</h1>
   <p><strong>A professional-grade, custom-built court management system and booking engine designed specifically for the South African 5-a-side football industry.</strong></p>
 </div>
 
