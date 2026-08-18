@@ -1,0 +1,72 @@
+name: APU Progressive Sync Proof
+
+on:
+  pull_request:
+    paths:
+      - 'app/api/v1/sync/**'
+      - 'lib/offline/**'
+      - 'models/OfflineSyncEvent.js'
+      - 'scripts/validate-apu-progressive-sync.mjs'
+      - 'tests/unit/apu-progressive-update.test.mjs'
+      - 'docs/apwa/APU_PROGRESSIVE_SYNC_CONTRACT.md'
+      - 'package.json'
+      - '.github/workflows/apu-progressive-sync-proof.yml'
+  push:
+    branches:
+      - main
+      - feat/apu-progressive-sync-governance
+    paths:
+      - 'app/api/v1/sync/**'
+      - 'lib/offline/**'
+      - 'models/OfflineSyncEvent.js'
+      - 'scripts/validate-apu-progressive-sync.mjs'
+      - 'tests/unit/apu-progressive-update.test.mjs'
+      - 'docs/apwa/APU_PROGRESSIVE_SYNC_CONTRACT.md'
+      - 'package.json'
+      - '.github/workflows/apu-progressive-sync-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fivesarena-apu-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apu-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: APU stage and CRUD unit proof
+        run: npm run test:apu
+
+      - name: APU → CRUD → SWFUS contract proof
+        run: npm run validate:apu-sync
+
+      - name: Production compiler typecheck
+        run: npm run typecheck
+
+      - name: Production build integration
+        run: npm run build
+
+      - name: Upload APU proof receipt
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: fivesarena-apu-proof-${{ github.sha }}
+          path: .kpgs/receipts/apu-progressive-sync.json
+          if-no-files-found: ignore
+          retention-days: 14

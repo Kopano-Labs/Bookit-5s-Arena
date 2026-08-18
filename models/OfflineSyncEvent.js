@@ -1,5 +1,48 @@
 import mongoose from "mongoose";
 
+const ApuReceiptSchema = new mongoose.Schema(
+  {
+    receipt_id: { type: String, required: true, trim: true },
+    kind: { type: String, required: true, trim: true },
+    evidence: { type: String, required: true, trim: true },
+    at: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
+const ApuProgressiveUpdateSchema = new mongoose.Schema(
+  {
+    schema: {
+      type: String,
+      required: true,
+      enum: ["fivesarena.apu.progressive-update.v1"],
+    },
+    update_id: { type: String, required: true, trim: true },
+    resource: { type: String, required: true, trim: true },
+    resource_id: { type: String, default: null, trim: true },
+    operation: {
+      type: String,
+      required: true,
+      enum: ["create", "read", "update", "delete"],
+    },
+    base_version: { type: Number, default: null, min: 0 },
+    stage: {
+      type: String,
+      required: true,
+      enum: [
+        "S0_CONCEPT",
+        "S1_IMPLEMENTED",
+        "S2_POC",
+        "S3_SYNCED",
+        "S4_PSO",
+        "S5_GOVERNED",
+      ],
+    },
+    receipts: { type: [ApuReceiptSchema], default: [] },
+  },
+  { _id: false },
+);
+
 const OfflineSyncEventSchema = new mongoose.Schema(
   {
     idempotencyKey: {
@@ -22,6 +65,10 @@ const OfflineSyncEventSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+    },
+    apu: {
+      type: ApuProgressiveUpdateSchema,
+      default: null,
     },
     status: {
       type: String,
@@ -54,6 +101,8 @@ const OfflineSyncEventSchema = new mongoose.Schema(
 OfflineSyncEventSchema.index({ eventType: 1, createdAt: -1 });
 OfflineSyncEventSchema.index({ status: 1, updatedAt: -1 });
 OfflineSyncEventSchema.index({ user: 1, createdAt: -1 });
+OfflineSyncEventSchema.index({ "apu.update_id": 1 }, { sparse: true });
+OfflineSyncEventSchema.index({ "apu.stage": 1, createdAt: -1 }, { sparse: true });
 
 if (mongoose.models.OfflineSyncEvent) {
   try {

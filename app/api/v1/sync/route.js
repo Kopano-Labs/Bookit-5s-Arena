@@ -6,6 +6,12 @@ import { NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/getSession";
 import connectDB from "@/lib/mongodb";
 import { rateLimit } from "@/lib/rateLimit";
+import {
+  APU_SCHEMA,
+  APU_STAGES,
+  assertApuReceivableBySwfus,
+  markApuSwfusSynced,
+} from "@/lib/offline/apuProgressiveUpdate";
 import OfflineSyncEvent from "@/models/OfflineSyncEvent";
 
 const VALID_EVENT_TYPES = new Set([
@@ -79,12 +85,29 @@ function isStoreUnavailable(error) {
   );
 }
 
+function replayPayload(existing, idempotencyKey, eventType) {
+  return {
+    ok: true,
+    replay: true,
+    idempotencyKey,
+    eventType,
+    status: existing?.status || "ACCEPTED",
+    ...(existing?.apu ? { apu: existing.apu } : {}),
+  };
+}
+
 export async function GET() {
   return NextResponse.json({
     ok: true,
     endpoint: "/api/v1/sync",
     eventTypes: Array.from(VALID_EVENT_TYPES),
     idempotency: "X-Idempotency-Key",
+    apu: {
+      schema: APU_SCHEMA,
+      intakeStage: APU_STAGES.POC,
+      acceptedStage: APU_STAGES.SYNCED,
+      semantics: "CRUD progressive-update synchronization; S4/S5 are not claimed by this endpoint.",
+    },
     status: "ready",
   });
 }
@@ -131,7 +154,16 @@ export async function POST(request) {
     return badRequest("Body must include an object payload.");
   }
 
-  const payloadHash = sha256(stableJson({ eventType, payload }));
+  let incomingApu = null;
+  if (body?.apu !== undefined && body?.apu !== null) {
+    try {
+      incomingApu = assertApuReceivableBySwfus(body.apu);
+    } catch (error) {
+      return badRequest(error?.message || "Invalid APU progressive update envelope.");
+    }
+  }
+
+  const payloadHash = sha256(stableJson({ eventType, payload, ...(incomingApu ? { apu: incomingApu } : {}) }));
   const session = await getOptionalSession();
 
   try {
@@ -150,22 +182,25 @@ export async function POST(request) {
         );
       }
 
-      return NextResponse.json({
-        ok: true,
-        replay: true,
-        idempotencyKey,
-        eventType,
-        status: existing.status,
-      });
+      return NextResponse.json(replayPayload(existing, idempotencyKey, eventType));
     }
 
-    await OfflineSyncEvent.create({
+    const acceptedAt = new Date().toISOString();
+    const syncedApu = incomingApu
+      ? markApuSwfusSynced(incomingApu, {
+          receiptId: `swfus:${sha256(`${idempotencyKey}:${payloadHash}`).slice(0, 48)}`,
+          at: acceptedAt,
+        })
+      : null;
+
+    const created = await OfflineSyncEvent.create({
       idempotencyKey,
       eventType,
       payload,
       payloadHash,
+      ...(syncedApu ? { apu: syncedApu } : {}),
       status: "ACCEPTED",
-      source: "bookit_offline_queue",
+      source: syncedApu ? "fivesarena_apu_swfus" : "bookit_offline_queue",
       user: session?.user?.id || null,
       requestMeta: {
         ipHash: sha256(ip),
@@ -180,18 +215,24 @@ export async function POST(request) {
         idempotencyKey,
         eventType,
         status: "ACCEPTED",
+        ...(created.apu ? { apu: created.apu.toObject?.() || created.apu } : {}),
       },
       { status: 202 },
     );
   } catch (error) {
     if (error?.code === 11000) {
-      return NextResponse.json({
-        ok: true,
-        replay: true,
-        idempotencyKey,
-        eventType,
-        status: "ACCEPTED",
-      });
+      try {
+        const duplicate = await OfflineSyncEvent.findOne({ idempotencyKey }).lean();
+        return NextResponse.json(replayPayload(duplicate, idempotencyKey, eventType));
+      } catch {
+        return NextResponse.json({
+          ok: true,
+          replay: true,
+          idempotencyKey,
+          eventType,
+          status: "ACCEPTED",
+        });
+      }
     }
 
     if (isStoreUnavailable(error)) {
