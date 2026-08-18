@@ -93,11 +93,16 @@ test('province state drives weather and editorial surface without leaving the sh
   await expect(organism).toBeVisible();
   await expect(organism).toHaveAttribute('data-province', 'western-cape');
   await expect(page.getByTestId('current-province')).toHaveText('Western Cape');
-  await expect(page.getByText('Western Cape football pulse')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: 'Western Cape football pulse' })).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId('kpgs-adapter-state')).toHaveAttribute(
     'data-adapter-status',
     'contract-only',
   );
+
+  const arena = page.locator('[data-football-ready="true"]');
+  await expect(arena).toBeVisible({ timeout: 10_000 });
+  await expect(arena).toContainText('Play ready');
+  await expect(arena).toContainText('Western Cape football pulse');
 
   const gautengResponse = page.waitForResponse(
     (response) =>
@@ -109,7 +114,8 @@ test('province state drives weather and editorial surface without leaving the sh
 
   await expect(organism).toHaveAttribute('data-province', 'gauteng');
   await expect(page.getByTestId('current-province')).toHaveText('Gauteng');
-  await expect(page.getByText('Gauteng football pulse')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: 'Gauteng football pulse' })).toBeVisible({ timeout: 10_000 });
+  await expect(arena).toContainText('Gauteng football pulse');
   await expect(page).toHaveURL(/\/news$/);
   await expectNoHorizontalOverflow(page);
 });
@@ -136,7 +142,7 @@ test('reduced-motion users receive the static organism lane instead of forced Th
 
   const staticLane = page.locator('[data-experience-tier="static"]');
   await expect(staticLane).toBeVisible();
-  await expect(staticLane).toContainText('static lane');
+  await expect(staticLane).toContainText('adaptive static arena');
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 
