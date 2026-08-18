@@ -1,0 +1,48 @@
+name: Living Organism Proof
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'hooks/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'scripts/validate-living-organism.mjs'
+      - '.github/workflows/living-organism-proof.yml'
+  push:
+    branches:
+      - feat/fivesarena-living-organism
+
+permissions:
+  contents: read
+
+jobs:
+  organism-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Living organism contract
+        run: node scripts/validate-living-organism.mjs
+
+      - name: Production compiler typecheck
+        run: npm run typecheck
+
+      - name: TypeScript 7 compatibility
+        run: npm run typecheck:ts7
+
+      - name: APWA architecture proof
+        run: npx tsx scripts/validate-apwa-proof.ts
+
+      - name: Production build
+        run: npm run build
