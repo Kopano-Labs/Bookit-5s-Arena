@@ -1,146 +1,162 @@
-# Five's Arena Adaptive Progressive Update → SWFUS Contract
+# Five's Arena Adaptive Progressive Updates → #NB → CRUD → SWFUS
 
-**Status:** implementation slice; proof may advance only through the stage actually evidenced.  
-**KPGS authority:** `RobynAwesome/Introduction-to-MCP` / `Kopano-Labs/Introduction-to-MCP` guidance.  
-**Canonical APU source:** `kopano-core/kopano/apu_vector_matrix.py`.  
-**Canonical synchronization source:** `kopano-core/kopano/swfus_engine.py`.
+**Status:** application adapter / non-authoritative synchronization surface. Proof may advance only through consequences actually evidenced.  
+**KPGS authority:** `RobynAwesome/Introduction-to-MCP` current `master`.  
+**Canonical contract:** `governance/kpgs-vnext/progressive-updates/README.md`.  
+**Canonical machine schema:** `governance/kpgs-vnext/progressive-updates/progressive-update.schema.json`.  
+**Canonical runtime:** `kopano-core/kopano/swfus_engine.py`.
 
-## Canonical lifecycle preserved
+Five's Arena preserves its existing APWA lifecycle while adapting its mutation path to the current KPGS vNext contract.
+
+```text
+LIVE / VIRTUAL USER ACTION
+        ↓
+Five's Arena APU adapter
+S1_IMPLEMENTED
+        ↓
+IndexedDB persistence consequence
+S2_POC
+        ↓
+kpgs.progressive-update.v1
+        ↓
+#NB
+        ↓
+bounded CRUD projection
+        ↓
+SWFUS
+State-Wide Framework Universal Synchronization
+        ↓
+kpgs.swfus.receipt.v1
+        ↓
+Five's Arena S3_SYNCED
+```
+
+`#NB` is the literal operator boundary marker defined by the canonical contract. This adapter does not invent an expansion for it.
+
+## Canonical law
+
+> **CRUD changes bounded state. SWFUS aligns governed system reality. Synchronization is not authority.**
+
+Five's Arena therefore treats the synchronized Mongo projection as **non-authoritative application state**, never as canonical booking, payment, account, authentication, or governance truth.
+
+## Adapter lifecycle
+
+The existing Five's Arena adapter stages remain:
 
 ```text
 S0_CONCEPT
   ↓
-S1_IMPLEMENTED   ← CRUD capability exists
+S1_IMPLEMENTED
   ↓
-S2_POC           ← executable local consequence is persisted
+S2_POC
   ↓
-S3_SYNCED        ← SWFUS/server synchronization consequence is observed
+S3_SYNCED
   ↓
 S4_PSO
   ↓
 S5_GOVERNED
 ```
 
-Five's Arena does **not** rename or collapse these stages. The application adapter is intentionally bounded to `S1 → S2 → S3`.
+The application currently proves only the `S1 → S2 → S3` slice. `S4_PSO` and `S5_GOVERNED` require separate evidence and are never manufactured by `/api/v1/sync`.
 
-`S4_PSO` and `S5_GOVERNED` require separate evidence and are not emitted by `/api/v1/sync`.
+At `S1_IMPLEMENTED`, the browser holds a `progressive_draft`; it does **not** prematurely claim a canonical mutating `kpgs.progressive-update.v1`, because the canonical mutation schema itself requires POC evidence.
 
-## Why this sits beside the Living Organism APWA work
+A successful IndexedDB queue transaction creates the POC receipt and materializes the canonical progressive update at `S2_POC` with:
 
-The existing Living Organism runtime adapts presentation and compute to the current session: province context, data truth, weather, football readiness, and the `full | balanced | lite | static` immersive lane.
+- `poc_validated=true`;
+- `foc_detected=false`;
+- at least one evidence reference;
+- `authority_effect="none"`;
+- an admitted non-authoritative state class;
+- the literal `#NB` boundary marker;
+- the exact queue idempotency identity and payload.
 
-Adaptive Progressive Update governance solves a different problem: **how a mutation survives degraded connectivity and proves its own progression without being silently promoted.**
+## Canonical S2 → S3 path
+
+`POST /api/v1/sync` accepts an APU envelope at `S2_POC`, requires the embedded progressive update idempotency key to match `X-Idempotency-Key`, and runs the mutation through the canonical ordering:
 
 ```text
-LIVE USER ACTION
-    ↓
-APU S1_IMPLEMENTED
-    ↓
-CRUD / local deterministic mutation semantics
-    ↓
-IndexedDB queue transaction
-    ↓
-APU S2_POC receipt
-    ↓
-existing /api/v1/sync transport
-    ↓
-server idempotency + exact-content hash
-    ↓
-SWFUS persistence receipt
-    ↓
-APU S3_SYNCED
+1. TELEMETRY
+2. CLASSIFICATION
+3. ROUTING
+4. PROTOCOL_SELECTION
+5. INVARIANT_AUDIT
+6. POC_FOC_CHECK
+7. STATE_UPDATE
+8. DISTRIBUTION
 ```
 
-The adaptive scene never receives authority over booking, payment, account, authentication, or administrative mutations.
+A `YELLOW` update is held before mutation. A rejected/FOC update cannot reach state update or distribution. A stale `expected_version` is held instead of overwriting the current projection. `CREATE`, `UPDATE`, and `DELETE` operate only against `SwfusProjection`, whose admitted state classes are `non_authoritative`, `derived_projection`, or `pending_proposal`.
 
-## Five's Arena APU envelope
+Only an `APPLIED` canonical receipt with `synchronized=true` can promote the Five's Arena envelope to `S3_SYNCED`. Server persistence by itself is not enough.
 
-Schema: `fivesarena.apu.progressive-update.v1`
+## Live / virtual adaptation
 
-```json
-{
-  "schema": "fivesarena.apu.progressive-update.v1",
-  "update_id": "booking:apu:example-001",
-  "resource": "booking",
-  "resource_id": "booking-001",
-  "operation": "update",
-  "base_version": 4,
-  "stage": "S1_IMPLEMENTED",
-  "receipts": []
-}
+The Living Organism APWA runtime may continue adapting presentation, connectivity behavior, compute/immersion lane, and offline interaction while a user is operating under degraded or changing conditions. That adaptive surface remains separate from mutation authority.
+
+```text
+USER CONTINUES INTERACTING
+        ↓
+local APWA projection / offline queue
+        ↓
+connectivity returns
+        ↓
+exact idempotent S2 proposal replayed
+        ↓
+#NB + governed CRUD membrane
+        ↓
+SWFUS alignment receipt
+        ↓
+UI may consume the synchronized projection as a live virtual view
 ```
 
-CRUD operations are `create | read | update | delete`.
+Web transport, browser persistence, MongoDB, WebSocket/SSE or any future realtime layer can carry evidence and projections; none can widen the authority of the admitted update.
 
-`base_version` is carried as provenance for resource-specific adapters. The generic sync endpoint does **not** claim that it has performed optimistic domain-write conflict checking merely because this field exists. A future resource adapter must enforce that comparison before claiming domain mutation safety.
+## Projection and rollback boundary
 
-## Proof transitions
+`models/SwfusProjection.js` is intentionally a bounded projection store. It is not canonical domain ownership.
 
-### `S1_IMPLEMENTED → S2_POC`
+The server evaluates the progressive update first, then applies the admitted projection using optimistic version matching. The synchronization event and receipt are persisted beside the offline event. If event/distribution evidence persistence fails after projection application, the adapter performs a compensating rollback so the local projection does not claim a synchronization consequence that was not durably recorded.
 
-All **new browser-queued events** are progressively wrapped by `enqueueOfflineEvent()` by default. The queue derives a stable update identity from the existing event type + idempotency key and models the queued item as creation of a bounded `<event-type>-intent` resource.
+This is a bounded application consistency mechanism. It is **not** a claim of distributed consensus or cross-provider ACID semantics.
 
-A caller may supply a more specific S1 APU envelope when it has stronger resource semantics. Either way, the existing IndexedDB queue remains the only browser persistence mechanism; no second offline transport is created.
+## Idempotency
 
-A successful queue transaction appends a `crud-local-persistence` receipt and stores the envelope at `S2_POC`.
+The existing HTTP idempotency contract remains authoritative for this endpoint:
 
-### `S2_POC → S3_SYNCED`
-
-`POST /api/v1/sync` accepts only `S2_POC` APU envelopes. It:
-
-1. validates the APU schema and CRUD operation;
-2. includes the exact APU envelope in the idempotency content hash;
-3. preserves existing `X-Idempotency-Key` semantics;
-4. persists the event and typed APU receipt;
-5. appends a `swfus-server-persistence` receipt;
-6. returns the server-authored `S3_SYNCED` envelope.
-
-The browser queue refuses to delete an APU record unless the response contains a matching `update_id` at `S3_SYNCED`. This prevents an older or partially deployed sync endpoint from accidentally being interpreted as proof of synchronization.
+- same key + same exact content → replay existing receipt/evidence;
+- same key + different content → `409 CONFLICT`;
+- progressive update idempotency identity must match the HTTP key;
+- browser queue deletion requires the matching `update_id`, `S3_SYNCED`, and an `APPLIED` synchronized canonical SWFUS receipt.
 
 ## Backwards compatibility
 
-The HTTP APU envelope remains optional so existing direct sync clients and already-persisted legacy events keep their prior behavior.
+The HTTP APU envelope remains optional. Existing direct clients without APU data keep the previous event-only synchronization path. New browser queue writes use the progressive path by default.
 
-The browser migration is additive and forward-moving:
+Legacy persisted APU envelopes that already reached `S2_POC` can be adapted into the canonical progressive-update surface using their existing POC receipt as migration evidence. Legacy evidence is not promoted beyond what it actually proves.
 
-```text
-legacy persisted/direct event without apu
-    → existing sync behavior
+## What S3 proves
 
-new browser queue event
-    → default S1 APU wrapper
-    → IndexedDB S2 receipt
-    → SWFUS S3 receipt
+`S3_SYNCED` proves that the exact POC-admitted progressive proposal passed the Five's Arena #NB/CRUD/SWFUS adapter, produced an `APPLIED` synchronization receipt, and updated the bounded non-authoritative projection.
 
-explicit APU-aware caller
-    → caller-specific S1 resource semantics
-    → IndexedDB S2 receipt
-    → SWFUS S3 receipt
-```
-
-## What S3 proves — and what it does not
-
-`S3_SYNCED` proves that the exact idempotent progressive-update proposal was persisted by the Five's Arena synchronization boundary.
-
-It does **not** by itself prove:
-
-- a domain booking/payment mutation was applied;
-- a payment settled;
-- a remote provider accepted a write;
-- PSO operationalization completed;
-- KPGS governance promotion completed.
-
-Those consequences require their own adapters and receipts.
+It does **not** prove canonical booking truth, payment settlement, provider acceptance, PSO operationalization, KPGS governance promotion, or production-readiness of unrelated functionality.
 
 ## Hard laws
 
 ```text
 IMPLEMENTED != POC
 POC != SYNCED
-SYNCED != DOMAIN WRITE APPLIED
+S1 DRAFT != CANONICAL MUTATING PROGRESSIVE UPDATE
+S3 REQUIRES APPLIED kpgs.swfus.receipt.v1
+YELLOW => HOLD BEFORE MUTATION
+RED / FOC => NO MUTATION OR DISTRIBUTION
+STALE EXPECTED_VERSION => HOLD
+DISTRIBUTION FAILURE => ROLLBACK PROJECTION
+SYNCED != CANONICAL DOMAIN TRUTH
 SYNCED != PSO
 SYNCED != GOVERNED
+TRANSPORT != AUTHORITY
 CLIENT MAY NOT SELF-CLAIM S3_SYNCED
 IDEMPOTENCY KEY REUSE WITH DIFFERENT CONTENT => CONFLICT
-OLD SERVER RESPONSE WITHOUT APU RECEIPT => NO APU QUEUE DELETION
+OLD SERVER RESPONSE WITHOUT APPLIED SWFUS RECEIPT => NO APU QUEUE DELETION
 ```
