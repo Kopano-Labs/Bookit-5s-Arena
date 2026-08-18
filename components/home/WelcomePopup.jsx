@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaTimes, FaFutbol, FaArrowRight } from 'react-icons/fa';
+import { FaTimes, FaFutbol, FaArrowRight, FaMapMarkedAlt } from 'react-icons/fa';
 import Link from 'next/link';
 import { WELCOME_POPUP_STORAGE_KEY } from '@/lib/popupPreferences';
-import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from '@/lib/tournamentConfig';
 
 export default function WelcomePopup() {
   const [isVisible, setIsVisible] = useState(false);
@@ -30,104 +29,107 @@ export default function WelcomePopup() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/80 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/80 p-4 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="relative w-full max-w-xl bg-gray-900 border border-gray-800 rounded-3xl p-8 overflow-hidden shadow-2xl"
+            className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-gray-800 bg-gray-900 p-6 shadow-2xl sm:p-8"
             initial={{ scale: 0.9, y: 30, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.9, y: 30, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           >
-            {/* Background effects */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+            <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 -translate-y-1/2 translate-x-1/2 rounded-full bg-yellow-600/10 blur-3xl" />
+            <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 -translate-x-1/2 translate-y-1/2 rounded-full bg-green-500/10 blur-3xl" />
 
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition"
+              aria-label="Close welcome dialog"
+              className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-gray-800 text-gray-400 transition hover:bg-gray-700 hover:text-white"
             >
               <FaTimes size={14} />
             </button>
 
-            <div className="text-center relative z-10">
-              <h2 className="text-3xl font-black uppercase tracking-widest text-white mb-2" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+            <div className="relative z-10 text-center">
+              <h2
+                className="mb-2 pr-10 text-3xl font-black uppercase tracking-widest text-white"
+                style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+              >
                 WELCOME TO <span className="text-yellow-500">5S ARENA</span>
               </h2>
-              <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto">
-                Courts and bookings run live every day. Choose social leagues or the{" "}
-                <span className="text-amber-200/90">World Cup 5s</span> path — both stay on this site.
+              <p className="mx-auto mb-8 max-w-md text-sm leading-6 text-gray-400">
+                Book and play in Milnerton, or switch your South African province to make weather and football intelligence adapt around you.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Social Competitions Option */}
-                <Link href="/leagues" onClick={handleClose}>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Link href="/#courts" onClick={handleClose}>
                   <motion.div
-                    className="h-full flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-2xl cursor-pointer group hover:bg-gray-800 hover:border-gray-500 transition-all"
+                    className="group flex h-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-gray-700 bg-gray-800/50 p-6 transition-all hover:border-gray-500 hover:bg-gray-800"
                     whileHover={{ scale: 1.03, y: -5 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    <div className="w-16 h-16 rounded-full bg-blue-900/30 text-blue-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-900/30 text-blue-400 transition-transform group-hover:scale-110">
                       <FaFutbol size={28} />
                     </div>
-                    <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-2">Social Competitions</h3>
-                    <p className="text-xs text-gray-400 mb-4">Join our weekly social divisions and build your squad rankings.</p>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Explore Competitions <FaArrowRight />
+                    <h3 className="mb-2 text-lg font-bold uppercase tracking-wider text-white">
+                      Book & Play
+                    </h3>
+                    <p className="mb-4 text-xs leading-5 text-gray-400">
+                      See courts and move directly into the booking flow.
+                    </p>
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-blue-400 transition-transform group-hover:translate-x-1">
+                      View courts <FaArrowRight />
                     </span>
                   </motion.div>
                 </Link>
 
-                {/* World Cup Option */}
-                <Link href="/tournament" onClick={handleClose}>
+                <Link href="/news" onClick={handleClose}>
                   <motion.div
-                    className="h-full flex flex-col items-center justify-center p-6 bg-green-900/20 border border-yellow-700/30 rounded-2xl cursor-pointer group hover:bg-green-900/40 hover:border-yellow-600 transition-all"
+                    className="group flex h-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-green-700/30 bg-green-900/20 p-6 transition-all hover:border-green-500/50 hover:bg-green-900/35"
                     whileHover={{ scale: 1.03, y: -5 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    <div className="w-16 h-16 rounded-full bg-yellow-700/20 text-yellow-500 flex items-center justify-center mb-4 animate-pulse group-hover:animate-none group-hover:scale-110 transition-transform">
-                      <FaTrophy size={28} />
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-300 transition-transform group-hover:scale-110">
+                      <FaMapMarkedAlt size={28} />
                     </div>
-                    <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-2">World Cup &apos;26</h3>
-                    <p className="text-xs text-gray-400 mb-4">
-                      {TOURNAMENT_FORMAT.totalTeams}-team World Cup · live {TOURNAMENT_DATES.rangeShort}. Global glory awaits.
+                    <h3 className="mb-2 text-lg font-bold uppercase tracking-wider text-white">
+                      South Africa Pulse
+                    </h3>
+                    <p className="mb-4 text-xs leading-5 text-gray-400">
+                      Choose your province and watch weather, news relevance and the adaptive scene change together.
                     </p>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-yellow-500 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Register Team <FaArrowRight />
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-green-300 transition-transform group-hover:translate-x-1">
+                      Set locality <FaArrowRight />
                     </span>
                   </motion.div>
                 </Link>
               </div>
 
-              {/* Footer row */}
               <div className="mt-6 flex flex-col items-center gap-3">
+                <Link
+                  href="/tournament"
+                  onClick={handleClose}
+                  className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-200 hover:text-amber-100"
+                >
+                  World Cup 2026 is now an archive →
+                </Link>
                 <button
                   onClick={handleClose}
-                  className="text-xs text-gray-500 font-bold uppercase tracking-widest hover:text-gray-300 transition-colors cursor-pointer"
+                  className="cursor-pointer text-xs font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-gray-300"
                 >
                   Just browsing, thanks
                 </button>
 
-                {/* Don't show again checkbox */}
-                <label className="flex items-center gap-2 cursor-pointer group select-none">
-                  <div
-                    onClick={() => setDontShowAgain((v) => !v)}
-                    className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                      dontShowAgain
-                        ? 'bg-yellow-700 border-yellow-600'
-                        : 'bg-gray-800 border-gray-600 group-hover:border-gray-500'
-                    }`}
-                  >
-                    {dontShowAgain && (
-                      <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 10 8">
-                        <path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className="text-[10px] text-gray-600 group-hover:text-gray-400 transition-colors uppercase tracking-wider">
+                <label className="group flex cursor-pointer select-none items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={dontShowAgain}
+                    onChange={(event) => setDontShowAgain(event.target.checked)}
+                    className="h-4 w-4 accent-yellow-600"
+                  />
+                  <span className="text-[10px] uppercase tracking-wider text-gray-600 transition-colors group-hover:text-gray-400">
                     Don&apos;t show this again
                   </span>
                 </label>
@@ -139,4 +141,3 @@ export default function WelcomePopup() {
     </AnimatePresence>
   );
 }
-
