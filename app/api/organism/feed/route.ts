@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getKpgsDomainAdapterState } from '@/lib/kpgs/domainAdapterClient';
+import {
+  parseEditorialOrganPayload,
+  type EditorialOrganPayload,
+} from '@/lib/organism/editorialContract';
+import { getProvinceBySlug } from '@/lib/organism/southAfrica';
 import { getLeagueNews } from '@/lib/sports/football';
 import { getProvinceWeather } from '@/lib/weather/openMeteo';
-import { getProvinceBySlug } from '@/lib/organism/southAfrica';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -11,7 +15,14 @@ const EDITORIAL_ORIGIN =
   process.env.FIVESARENA_EDITORIAL_ORIGIN || 'https://blog.fivesarena.com';
 
 function articleText(article: Record<string, unknown>) {
-  return [article.title, article.summary, article.description]
+  return [
+    article.title,
+    article.summary,
+    article.description,
+    ...(Array.isArray(article.locations) ? article.locations : []),
+    ...(Array.isArray(article.provinceSlugs) ? article.provinceSlugs : []),
+    ...(Array.isArray(article.tags) ? article.tags : []),
+  ]
     .filter((value): value is string => typeof value === 'string')
     .join(' ')
     .toLowerCase();
@@ -69,6 +80,8 @@ function normalizeArticles(
               ? '5s Arena Blog'
               : 'South Africa football feed',
       sourceUrl: typeof article.url === 'string' ? article.url : null,
+      canonicalPath:
+        typeof article.canonicalPath === 'string' ? article.canonicalPath : null,
       sourceKind,
       localityScore: localityScore(article, terms),
     }))
@@ -76,7 +89,7 @@ function normalizeArticles(
     .slice(0, 6);
 }
 
-async function fetchEditorialOrgan(provinceSlug: string) {
+async function fetchEditorialOrgan(provinceSlug: string): Promise<EditorialOrganPayload | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 1800);
 
@@ -93,7 +106,8 @@ async function fetchEditorialOrgan(provinceSlug: string) {
     if (!response.ok) return null;
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) return null;
-    return await response.json();
+
+    return parseEditorialOrganPayload(await response.json());
   } catch {
     return null;
   } finally {
@@ -108,6 +122,7 @@ export async function GET(request: Request) {
   const localityTerms = [
     province.label,
     province.weatherLabel,
+    province.slug,
     ...province.aliases,
     'South Africa',
     'PSL',
@@ -168,6 +183,8 @@ export async function GET(request: Request) {
         status: editorialArticles.length ? 'live' : 'fallback',
         requestedOrigin: EDITORIAL_ORIGIN,
         contractPath: '/api/v1/organism/feed',
+        schema: editorial?.schema || 'fivesarena.editorial-organ.v1',
+        persistence: editorial?.persistence || null,
         articles,
       },
       governance: {
