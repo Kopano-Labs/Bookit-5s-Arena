@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import {
@@ -99,5 +99,13 @@ const receipt = {
     domainWriteAppliedClaimed: false,
   },
 };
+
+const receiptDir = resolve(ROOT, ".kpgs", "receipts");
+mkdirSync(receiptDir, { recursive: true });
+writeFileSync(
+  resolve(receiptDir, "apu-progressive-sync.json"),
+  `${JSON.stringify(receipt, null, 2)}\n`,
+  "utf8",
+);
 
 console.log(JSON.stringify(receipt, null, 2));
