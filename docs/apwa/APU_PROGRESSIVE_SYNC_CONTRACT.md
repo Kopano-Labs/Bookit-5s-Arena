@@ -78,7 +78,9 @@ CRUD operations are `create | read | update | delete`.
 
 ### `S1_IMPLEMENTED → S2_POC`
 
-`enqueueOfflineEvent()` accepts an optional APU envelope. The existing IndexedDB queue remains the persistence mechanism; no second offline transport is created.
+All **new browser-queued events** are progressively wrapped by `enqueueOfflineEvent()` by default. The queue derives a stable update identity from the existing event type + idempotency key and models the queued item as creation of a bounded `<event-type>-intent` resource.
+
+A caller may supply a more specific S1 APU envelope when it has stronger resource semantics. Either way, the existing IndexedDB queue remains the only browser persistence mechanism; no second offline transport is created.
 
 A successful queue transaction appends a `crud-local-persistence` receipt and stores the envelope at `S2_POC`.
 
@@ -97,16 +99,23 @@ The browser queue refuses to delete an APU record unless the response contains a
 
 ## Backwards compatibility
 
-The APU envelope is optional. Existing Five's Arena offline events without `apu` keep their previous behavior and payload shape.
+The HTTP APU envelope remains optional so existing direct sync clients and already-persisted legacy events keep their prior behavior.
 
-That makes the migration additive:
+The browser migration is additive and forward-moving:
 
 ```text
-legacy queue event
+legacy persisted/direct event without apu
     → existing sync behavior
 
-APU-aware queue event
-    → S1 → S2 → S3 proof path
+new browser queue event
+    → default S1 APU wrapper
+    → IndexedDB S2 receipt
+    → SWFUS S3 receipt
+
+explicit APU-aware caller
+    → caller-specific S1 resource semantics
+    → IndexedDB S2 receipt
+    → SWFUS S3 receipt
 ```
 
 ## What S3 proves — and what it does not
