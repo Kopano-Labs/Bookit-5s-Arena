@@ -129,6 +129,29 @@ function replayPayload(existing, idempotencyKey, eventType) {
   };
 }
 
+function bindLegacyProgressiveIdempotency(apu, idempotencyKey) {
+  const progressive = apu?.progressive_update;
+  if (!progressive || progressive.idempotency_key === idempotencyKey) return apu;
+
+  const legacyMarker = ":apu:";
+  const markerIndex = apu.update_id.indexOf(legacyMarker);
+  const legacyKey = markerIndex >= 0 ? apu.update_id.slice(markerIndex + legacyMarker.length) : null;
+  const isLegacyAdapter = progressive.source === "fivesarena-apu-legacy-adapter";
+
+  if (isLegacyAdapter && legacyKey === idempotencyKey) {
+    return {
+      ...apu,
+      progressive_update: {
+        ...progressive,
+        idempotency_key: idempotencyKey,
+        correlation_id: progressive.correlation_id || idempotencyKey,
+      },
+    };
+  }
+
+  return apu;
+}
+
 export async function GET() {
   return NextResponse.json({
     ok: true,
@@ -195,6 +218,7 @@ export async function POST(request) {
   if (body?.apu !== undefined && body?.apu !== null) {
     try {
       incomingApu = assertApuReceivableBySwfus(body.apu);
+      incomingApu = bindLegacyProgressiveIdempotency(incomingApu, idempotencyKey);
     } catch (error) {
       return badRequest(error?.message || "Invalid APU progressive update envelope.");
     }
@@ -274,19 +298,27 @@ export async function POST(request) {
         );
       }
 
-      await applySwfusProjection({
-        update: evaluation.update,
-        previousProjection,
-        nextProjection: evaluation.nextProjection,
-        receiptId: finalized.receipt.receipt_id,
-      });
-      appliedUpdate = evaluation.update;
-      swfusDistribution = finalized.distribution;
-      syncedApu = markApuSwfusSynced(incomingApu, {
-        receiptId: finalized.receipt.receipt_id,
-        swfusReceipt: finalized.receipt,
-        at: acceptedAt,
-      });
+      try {
+        await applySwfusProjection({
+          update: evaluation.update,
+          previousProjection,
+          nextProjection: evaluation.nextProjection,
+          receiptId: finalized.receipt.receipt_id,
+        });
+        appliedUpdate = evaluation.update;
+        swfusDistribution = finalized.distribution;
+        syncedApu = markApuSwfusSynced(incomingApu, {
+          receiptId: finalized.receipt.receipt_id,
+          swfusReceipt: finalized.receipt,
+          at: acceptedAt,
+        });
+      } catch (error) {
+        if (appliedUpdate) {
+          await rollbackSwfusProjection({ update: appliedUpdate, previousProjection });
+          appliedUpdate = null;
+        }
+        throw error;
+      }
     }
 
     let created;
@@ -309,6 +341,7 @@ export async function POST(request) {
     } catch (error) {
       if (appliedUpdate) {
         await rollbackSwfusProjection({ update: appliedUpdate, previousProjection });
+        appliedUpdate = null;
       }
       throw error;
     }
