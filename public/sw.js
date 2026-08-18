@@ -1,6 +1,10 @@
-const CACHE_NAME = '5s-arena-v6-apwa';
-const STATIC_ASSETS = ['/', '/manifest.json'];
-const FOOTBALL_API_PREFIX = '/api/football/';
+const CACHE_NAME = '5s-arena-v7-organism';
+const STATIC_ASSETS = ['/', '/manifest.json', '/news', '/tournament'];
+const PUBLIC_DATA_PREFIXES = [
+  '/api/football/',
+  '/api/weather/',
+  '/api/organism/',
+];
 const PRIVATE_PREFIXES = [
   '/api/auth/',
   '/api/admin/',
@@ -23,7 +27,13 @@ function isSameOrigin(url) {
 }
 
 function isPrivateOrTransactional(url) {
-  return PRIVATE_PREFIXES.some((prefix) => url.pathname === prefix || url.pathname.startsWith(prefix));
+  return PRIVATE_PREFIXES.some((prefix) =>
+    url.pathname === prefix || url.pathname.startsWith(prefix),
+  );
+}
+
+function isPublicData(url) {
+  return PUBLIC_DATA_PREFIXES.some((prefix) => url.pathname.startsWith(prefix));
 }
 
 function mayCacheStatic(request, url, response) {
@@ -32,7 +42,9 @@ function mayCacheStatic(request, url, response) {
   if (request.headers.has('Authorization')) return false;
   const cacheControl = response.headers.get('Cache-Control') || '';
   if (/private|no-store/i.test(cacheControl)) return false;
-  return ['document', 'script', 'style', 'image', 'font', 'manifest'].includes(request.destination);
+  return ['document', 'script', 'style', 'image', 'font', 'manifest'].includes(
+    request.destination,
+  );
 }
 
 self.addEventListener('install', (event) => {
@@ -49,13 +61,15 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
+      Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)),
+      ),
     ),
   );
   self.clients.claim();
 });
 
-async function staleWhileRevalidateFootball(request) {
+async function staleWhileRevalidatePublicData(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
 
@@ -77,10 +91,19 @@ async function staleWhileRevalidateFootball(request) {
   const networkResponse = await networkPromise;
   if (networkResponse) return networkResponse;
 
-  return new Response(JSON.stringify({ error: 'Offline — no cached public fixtures response.', truthState: 'unavailable' }), {
-    status: 503,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-  });
+  return new Response(
+    JSON.stringify({
+      error: 'Offline — no cached public data is available for this context.',
+      truthState: 'unavailable',
+    }),
+    {
+      status: 503,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store',
+      },
+    },
+  );
 }
 
 self.addEventListener('fetch', (event) => {
@@ -94,9 +117,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Only explicitly public football reads get stale-while-revalidate semantics.
-  if (isSameOrigin(url) && url.pathname.startsWith(FOOTBALL_API_PREFIX)) {
-    event.respondWith(staleWhileRevalidateFootball(request));
+  // Explicitly public football, weather and locality/editorial membrane reads may use stale-while-revalidate.
+  if (isSameOrigin(url) && isPublicData(url)) {
+    event.respondWith(staleWhileRevalidatePublicData(request));
     return;
   }
 
