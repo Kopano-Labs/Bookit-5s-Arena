@@ -52,6 +52,7 @@ const SwfusStageReceiptSchema = new mongoose.Schema(
 const SwfusReceiptSchema = new mongoose.Schema(
   {
     schema: { type: String, required: true, enum: ["kpgs.swfus.receipt.v1"] },
+    receipt_id: { type: String, required: true, trim: true },
     update_id: { type: String, required: true, trim: true },
     node_id: { type: String, required: true, trim: true },
     operation: { type: String, required: true, enum: ["CREATE", "READ", "UPDATE", "DELETE"] },
@@ -59,11 +60,12 @@ const SwfusReceiptSchema = new mongoose.Schema(
     stages: { type: [SwfusStageReceiptSchema], default: [] },
     synchronized: { type: Boolean, required: true },
     canonical_authority_changed: { type: Boolean, required: true, default: false },
-    state: { type: mongoose.Schema.Types.Mixed, default: null },
+    state_digest: { type: String, default: null, trim: true },
     evidence_refs: { type: [String], default: [] },
     correlation_id: { type: String, default: "" },
     boundary_marker: { type: String, required: true, enum: ["#NB"] },
     replayed: { type: Boolean, default: false },
+    created_at: { type: String, required: true, trim: true },
   },
   { _id: false },
 );
