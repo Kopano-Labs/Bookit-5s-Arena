@@ -6,12 +6,18 @@ const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 const [
   home,
   about,
+  blogIndex,
   tournamentPage,
+  tournamentStats,
+  tournamentStandings,
+  tournamentBracket,
+  tournamentPolls,
   tournamentApi,
   tournamentConfig,
   manifestRaw,
   serviceWorker,
   locality,
+  editorialContract,
   organismFeed,
   organismSurface,
   domainAdapterClient,
@@ -22,12 +28,18 @@ const [
 ] = await Promise.all([
   read('app/page.jsx'),
   read('app/about/page.jsx'),
+  read('app/blog/page.jsx'),
   read('app/tournament/page.jsx'),
+  read('app/tournament/stats/page.jsx'),
+  read('app/tournament/standings/page.jsx'),
+  read('app/tournament/bracket/page.jsx'),
+  read('app/tournament/polls/page.jsx'),
   read('app/api/tournament/route.js'),
   read('lib/tournamentConfig.js'),
   read('public/manifest.json'),
   read('public/sw.js'),
   read('lib/organism/southAfrica.ts'),
+  read('lib/organism/editorialContract.ts'),
   read('app/api/organism/feed/route.ts'),
   read('components/home/LivingOrganismSurface.tsx'),
   read('lib/kpgs/domainAdapterClient.ts'),
@@ -51,10 +63,27 @@ assert.doesNotMatch(home, /<TournamentShowcase\s*\/>/);
 assert.doesNotMatch(about, /Join Tournament/);
 assert.match(about, /World Cup Archive/);
 assert.match(about, /South Africa Pulse/);
+assert.match(blogIndex, /redirect\('\/news\?organ=blog'\)/);
 
 assert.match(tournamentPage, /has concluded|Archived · concluded/i);
 assert.doesNotMatch(tournamentPage, /Register Your Team/i);
 assert.doesNotMatch(tournamentPage, /Proof of Payment/i);
+assert.match(tournamentStats, /Historical statistics/);
+assert.doesNotMatch(tournamentStats, /Register Your Team/i);
+assert.doesNotMatch(tournamentStats, /Closes In/i);
+assert.match(tournamentStandings, /Group standings/);
+assert.doesNotMatch(tournamentStandings, /useSSE/);
+assert.doesNotMatch(tournamentStandings, /Live · Auto-updating/);
+assert.doesNotMatch(tournamentStandings, /Register Your Team/);
+assert.match(tournamentBracket, /No winner path is published from synthetic data/);
+assert.doesNotMatch(tournamentBracket, /Mock Knockout Data/);
+assert.doesNotMatch(tournamentBracket, /Brazil/);
+assert.doesNotMatch(tournamentBracket, /Argentina/);
+assert.match(tournamentPolls, /No poll winner is asserted without receipts/);
+assert.doesNotMatch(tournamentPolls, /Lionel Messi/);
+assert.doesNotMatch(tournamentPolls, /Kylian Mbappé/);
+assert.doesNotMatch(tournamentPolls, /Ronaldo vs Spain/);
+
 assert.match(tournamentApi, /status:\s*410/);
 assert.match(tournamentApi, /getTournamentLifecycle/);
 assert.match(tournamentConfig, /startISO:\s*["']2026-05-29T00:00:00\+02:00["']/);
@@ -92,9 +121,17 @@ assert.match(serviceWorker, /\/api\/weather\//);
 assert.match(serviceWorker, /truthState:\s*'unavailable'/);
 assert.match(serviceWorker, /request\.headers\.has\('Authorization'\)/);
 
+assert.match(editorialContract, /fivesarena\.editorial-organ\.v1/);
+assert.match(editorialContract, /'mongo' \| 'postgres' \| 'hybrid'/);
+assert.match(editorialContract, /parseEditorialOrganPayload/);
+assert.match(editorialContract, /canonicalPath/);
+assert.match(editorialContract, /provinceSlugs/);
+assert.match(editorialContract, /locations/);
+
 assert.match(organismFeed, /https:\/\/blog\.fivesarena\.com/);
 assert.match(organismFeed, /https:\/\/news\.fivesarena\.com/);
 assert.match(organismFeed, /getLeagueNews\('psl'/);
+assert.match(organismFeed, /parseEditorialOrganPayload/);
 assert.match(organismFeed, /render-inside-fivesarena-shell/);
 assert.match(organismFeed, /getKpgsDomainAdapterState/);
 assert.match(organismFeed, /canonical-dotnet-boundary-ready/);
