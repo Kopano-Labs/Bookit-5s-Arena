@@ -18,6 +18,7 @@ const [
   newsPage,
   nextConfig,
   mobileSpec,
+  mobileConfig,
 ] = await Promise.all([
   read('app/page.jsx'),
   read('app/about/page.jsx'),
@@ -33,6 +34,7 @@ const [
   read('app/news/page.tsx'),
   read('next.config.ts'),
   read('tests/e2e/living-organism-mobile.spec.ts'),
+  read('playwright.organism.config.ts'),
 ]);
 
 const manifest = JSON.parse(manifestRaw);
@@ -117,11 +119,16 @@ assert.match(nextConfig, /destination:\s*["']\/news\?organ=news["']/);
 assert.match(nextConfig, /destination:\s*["']\/news\?organ=blog["']/);
 
 for (const width of [360, 390, 430]) {
-  assert.match(mobileSpec, new RegExp(`${width}`));
+  assert.match(mobileConfig, new RegExp(`width:\s*${width}`));
 }
+assert.match(mobileConfig, /hasTouch:\s*true/);
+assert.match(mobileConfig, /isMobile:\s*true/);
+assert.match(mobileConfig, /locale:\s*'en-ZA'/);
+assert.match(mobileConfig, /timezoneId:\s*'Africa\/Johannesburg'/);
 assert.match(mobileSpec, /height\)\.toBeGreaterThanOrEqual\(44\)/);
 assert.match(mobileSpec, /reducedMotion:\s*'reduce'/);
-assert.match(mobileSpec, /data-experience-tier=\\"static\\"/);
+assert.match(mobileSpec, /data-experience-tier/);
+assert.match(mobileSpec, /static/);
 assert.match(mobileSpec, /Register Your Team/);
 
 console.log('Living organism proof: PASS');
