@@ -123,7 +123,7 @@ test.beforeEach(async ({ page }) => {
   await Promise.all([mockOrganismFeed(page), mockFeaturedMatches(page)]);
 });
 
-test('province state drives weather editorial and verified match state without leaving the shell', async ({ page }) => {
+test('province state drives weather and editorial surface without leaving the shell', async ({ page }) => {
   await page.goto('/news');
 
   const organism = page.getByTestId('living-organism');
@@ -182,7 +182,7 @@ test('province controls retain mobile touch targets and horizontal scroll stays 
   await expectNoHorizontalOverflow(page);
 });
 
-test('reduced-motion users receive verified match truth without forced Three.js motion', async ({ page }) => {
+test('reduced-motion users receive the static organism lane instead of forced Three.js motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/news');
 
