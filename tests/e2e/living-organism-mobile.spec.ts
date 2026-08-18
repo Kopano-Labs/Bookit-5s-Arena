@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 function organismPayload(province = 'western-cape') {
   const labels: Record<string, string> = {
@@ -59,7 +59,7 @@ function organismPayload(province = 'western-cape') {
   };
 }
 
-async function mockOrganismFeed(page: Parameters<typeof test>[0]['page']) {
+async function mockOrganismFeed(page: Page) {
   await page.route('**/api/organism/feed?province=*', async (route) => {
     const url = new URL(route.request().url());
     const province = url.searchParams.get('province') || 'western-cape';
@@ -71,7 +71,7 @@ async function mockOrganismFeed(page: Parameters<typeof test>[0]['page']) {
   });
 }
 
-async function expectNoHorizontalOverflow(page: Parameters<typeof test>[0]['page']) {
+async function expectNoHorizontalOverflow(page: Page) {
   const overflow = await page.evaluate(() => ({
     viewport: window.innerWidth,
     body: document.body.scrollWidth,
