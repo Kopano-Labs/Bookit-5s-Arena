@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getKpgsDomainAdapterState } from '@/lib/kpgs/domainAdapterClient';
 import { getLeagueNews } from '@/lib/sports/football';
 import { getProvinceWeather } from '@/lib/weather/openMeteo';
 import { getProvinceBySlug } from '@/lib/organism/southAfrica';
@@ -112,17 +113,30 @@ export async function GET(request: Request) {
     'PSL',
   ];
 
-  const [weatherResult, editorialResult, pslResult] = await Promise.allSettled([
-    getProvinceWeather(province.slug),
-    fetchEditorialOrgan(province.slug),
-    getLeagueNews('psl', String(currentYear)),
-  ]);
+  const [weatherResult, editorialResult, pslResult, adapterResult] =
+    await Promise.allSettled([
+      getProvinceWeather(province.slug),
+      fetchEditorialOrgan(province.slug),
+      getLeagueNews('psl', String(currentYear)),
+      getKpgsDomainAdapterState(),
+    ]);
 
   const weather =
     weatherResult.status === 'fulfilled' ? weatherResult.value : null;
   const editorial =
     editorialResult.status === 'fulfilled' ? editorialResult.value : null;
   const pslNews = pslResult.status === 'fulfilled' ? pslResult.value : null;
+  const adapter =
+    adapterResult.status === 'fulfilled'
+      ? adapterResult.value
+      : {
+          configured: false,
+          status: 'degraded',
+          origin: null,
+          health: null,
+          version: null,
+          checkedAt: new Date().toISOString(),
+        };
 
   const editorialArticles = normalizeArticles(
     editorial?.articles,
@@ -155,6 +169,13 @@ export async function GET(request: Request) {
         requestedOrigin: EDITORIAL_ORIGIN,
         contractPath: '/api/v1/organism/feed',
         articles,
+      },
+      governance: {
+        adapter,
+        executionPolicy:
+          adapter.status === 'ready'
+            ? 'canonical-dotnet-boundary-ready'
+            : 'domain-runtime-direct-with-canonical-adapter-not-promoted',
       },
       organs: {
         blog: 'https://blog.fivesarena.com',
