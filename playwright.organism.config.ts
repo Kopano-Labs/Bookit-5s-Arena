@@ -18,7 +18,10 @@ export default defineConfig({
     timezoneId: 'Africa/Johannesburg',
     hasTouch: true,
     isMobile: true,
-    serviceWorkers: 'allow',
+    // Deterministic UI tests mock /api/organism/feed. Playwright page.route cannot
+    // reliably intercept requests claimed by a service worker, so SW behavior is
+    // proved separately by the APWA architecture/service-worker contract gate.
+    serviceWorkers: 'block',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
