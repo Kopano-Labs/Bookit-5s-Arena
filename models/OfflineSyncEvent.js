@@ -132,6 +132,10 @@ const OfflineSyncEventSchema = new mongoose.Schema(
       type: ApuProgressiveUpdateSchema,
       default: null,
     },
+    swfusDistribution: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
     status: {
       type: String,
       enum: ["ACCEPTED", "CONFLICT", "DEAD_LETTER", "RESOLVED"],
@@ -167,6 +171,7 @@ OfflineSyncEventSchema.index({ "apu.update_id": 1 }, { sparse: true });
 OfflineSyncEventSchema.index({ "apu.stage": 1, createdAt: -1 }, { sparse: true });
 OfflineSyncEventSchema.index({ "apu.progressive_update.node_id": 1 }, { sparse: true });
 OfflineSyncEventSchema.index({ "apu.swfus_receipt.disposition": 1, createdAt: -1 }, { sparse: true });
+OfflineSyncEventSchema.index({ "swfusDistribution.node_id": 1, createdAt: -1 }, { sparse: true });
 
 if (mongoose.models.OfflineSyncEvent) {
   try {
