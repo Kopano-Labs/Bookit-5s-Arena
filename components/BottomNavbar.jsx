@@ -10,9 +10,7 @@ import {
   FaCalendarAlt,
   FaTrophy,
   FaHome,
-  FaGift,
   FaStar,
-  FaBolt,
   FaUsers,
   FaTachometerAlt,
   FaListAlt,
@@ -20,7 +18,7 @@ import {
   FaUserShield,
   FaBookOpen,
   FaKey,
-  FaCog,
+  FaNewspaper,
 } from "react-icons/fa";
 
 /* ─── Nav items per role (4-tier) ───────────────────── */
@@ -35,7 +33,7 @@ const USER_ITEMS = [
   },
   { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
   { href: "/leagues", icon: FaTrophy, label: "Leagues", color: "#eab308" },
-  { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
+  { href: "/news", icon: FaNewspaper, label: "Pulse", color: "#39d98a" },
 ];
 
 const GUEST_ITEMS = [
@@ -43,7 +41,7 @@ const GUEST_ITEMS = [
   { href: "/#courts", icon: FaFutbol, label: "Book", color: "#22c55e" },
   { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
   { href: "/leagues", icon: FaTrophy, label: "Leagues", color: "#eab308" },
-  { href: "/tournament", icon: FaStar, label: "Tournament", color: "#f97316" },
+  { href: "/news", icon: FaNewspaper, label: "Pulse", color: "#39d98a" },
   { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
 ];
 
@@ -64,17 +62,18 @@ const MANAGER_ITEMS = [
   },
   {
     href: "/tournament/standings",
-    icon: FaTrophy,
-    label: "Standings",
+    icon: FaStar,
+    label: "WC Archive",
     color: "#eab308",
   },
-  { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
+  { href: "/news", icon: FaNewspaper, label: "Pulse", color: "#39d98a" },
 ];
 
 const SECURITY_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
   { href: "/admin/bookings", icon: FaCalendarAlt, label: "Check-In", color: "#f97316" },
   { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
+  { href: "/news", icon: FaNewspaper, label: "Pulse", color: "#39d98a" },
   { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
 ];
 
@@ -132,7 +131,6 @@ export default function BottomNavbar() {
     pathname === "/register" ||
     pathname === "/role-select";
 
-  // Badge colour, icon, and label per role
   const roleBadge =
     role === "admin"
       ? { label: "ADMIN", color: "#f97316", icon: FaUserShield }
@@ -144,7 +142,6 @@ export default function BottomNavbar() {
             ? { label: "PLAYER", color: "#22c55e", icon: FaFutbol }
             : null;
 
-  // Auto-close after 5 seconds
   useEffect(() => {
     if (isOpen) {
       closeTimer.current = setTimeout(() => setIsOpen(false), 5000);
@@ -152,7 +149,6 @@ export default function BottomNavbar() {
     return () => clearTimeout(closeTimer.current);
   }, [isOpen]);
 
-  // Close on outside click
   useEffect(() => {
     const handleClick = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -163,7 +159,6 @@ export default function BottomNavbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // MacOS dock magnification
   const getScale = (index) => {
     if (hoveredIndex === null) return 1;
     const dist = Math.abs(index - hoveredIndex);
@@ -190,7 +185,6 @@ export default function BottomNavbar() {
       ref={menuRef}
       className="pointer-events-none fixed bottom-6 left-1/2 z-90 flex -translate-x-1/2 flex-col items-center md:hidden"
     >
-      {/* Expanded dock */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -209,6 +203,8 @@ export default function BottomNavbar() {
                   key={item.href}
                   href={item.href}
                   prefetch={false}
+                  onMouseEnter={() => setHoveredIndex(i)}
+                  onMouseLeave={() => setHoveredIndex(null)}
                   className="flex min-h-[44px] min-w-[64px] flex-col items-center justify-center rounded-lg px-2 py-2 transition-all"
                   style={{
                     color: active ? item.color : "#fff",
@@ -226,19 +222,19 @@ export default function BottomNavbar() {
         )}
       </AnimatePresence>
 
-      {/* Trigger button (soccer ball) */}
       <motion.button
         onClick={() => setIsOpen((prev) => !prev)}
         className="pointer-events-auto relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border border-gray-800 bg-gray-950/95 shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
         whileHover={{ scale: 1.1, borderColor: "#22c55e" }}
         whileTap={{ scale: 0.9 }}
+        aria-label={isOpen ? "Close navigation" : "Open navigation"}
+        aria-expanded={isOpen}
       >
         <FaFutbol
           size={22}
           className={isOpen ? "text-yellow-500" : "text-gray-400"}
         />
 
-        {/* Pulse ring */}
         {!isOpen && (
           <motion.div
             className="absolute inset-0 rounded-full border-2 border-yellow-600/30"
@@ -247,7 +243,6 @@ export default function BottomNavbar() {
           />
         )}
 
-        {/* Role badge */}
         {roleBadge && !isOpen && (
           <motion.span
             initial={{ opacity: 0, y: 4 }}
@@ -264,7 +259,6 @@ export default function BottomNavbar() {
         )}
       </motion.button>
 
-      {/* Tooltip */}
       <AnimatePresence>
         {!isOpen && (
           <motion.span
@@ -280,4 +274,3 @@ export default function BottomNavbar() {
     </div>
   );
 }
-

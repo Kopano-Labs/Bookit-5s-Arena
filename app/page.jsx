@@ -2,7 +2,8 @@
 import HeroSection      from '@/components/home/HeroSection';
 import FixturesPromo    from '@/components/home/FixturesPromo';
 import StatsBar         from '@/components/home/StatsBar';
-import WeatherWidget    from '@/components/home/WeatherWidget';
+import LivingOrganismSurface from '@/components/home/LivingOrganismSurface';
+import TournamentArchiveSection from '@/components/home/TournamentArchiveSection';
 import HomeLiveFixtures from '@/components/home/HomeLiveFixtures';
 import CourtsSection    from '@/components/home/CourtsSection';
 import AmenitiesStrip   from '@/components/home/AmenitiesStrip';
@@ -10,8 +11,6 @@ import EventsSection    from '@/components/home/EventsSection';
 import HomeMediaHighlights from '@/components/home/HomeMediaHighlights';
 import AboutSection     from '@/components/home/AboutSection';
 import SocialSection    from '@/components/home/SocialSection';
-import TournamentSection from '@/components/home/TournamentSection';
-import TournamentShowcase from '@/components/home/TournamentShowcase';
 import ContactSection   from '@/components/home/ContactSection';
 import WelcomePopup     from '@/components/home/WelcomePopup';
 import BlackboxMarketMask from '@/components/marketing/BlackboxMarketMask';
@@ -23,7 +22,6 @@ import Court            from '@/models/Court';
 
 export const revalidate = 60; // ISR — revalidate every 60 seconds
 
-// ─── server-side fetch ────────────────────────────────────────
 const getCourts = async () => {
   try {
     await connectDB();
@@ -46,7 +44,6 @@ const getCourts = async () => {
   }
 };
 
-// ─── page component ───────────────────────────────────────────
 const HomePage = async () => {
   const courts = await getCourts();
   const ecosystemRoutes = [
@@ -69,10 +66,11 @@ const HomePage = async () => {
       status: "LIVE",
     },
     {
-      label: "5s Arena Blog",
-      href: "https://blog.fivesarena.com",
-      note: "Editorial surface",
+      label: "5s Arena News",
+      href: "/news",
+      note: "Blog + news organs rendered in the arena shell",
       status: "LIVE",
+      internal: true,
     },
     {
       label: "Starfall Salvage",
@@ -93,40 +91,26 @@ const HomePage = async () => {
       <WelcomePopup />
       {showBlackboxMarketMaskOnHome() ? <BlackboxMarketMask /> : null}
 
-      {/* ══ HERO — animated entrance + particle background ══════ */}
       <HeroSection />
 
       <HomeLiveFixtures />
       <FixturesPromo />
 
-      {/* ══ STATS BAR — live counts from courts (no misleading zero flash) ══ */}
       <StatsBar courtsCount={courts.length || 4} />
 
-      {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}
-      <WeatherWidget />
+      {/* One province context now drives weather, editorial relevance and adaptive Three.js. */}
+      <LivingOrganismSurface />
 
-      {/* ══ TOURNAMENT — showstopper World Cup section ══════════ */}
-      <TournamentSection />
+      {/* World Cup 2026 is historical evidence, not an active registration surface. */}
+      <TournamentArchiveSection />
 
-      {/* ══ COURTS — staggered scroll-reveal + hover glow ═══════ */}
       <CourtsSection courts={courts} />
-
-      {/* ══ AMENITIES — spring pop-in ════════════════════════════ */}
       <AmenitiesStrip />
-
-      {/* ══ EVENTS — staggered cards + coloured glows ════════════ */}
       <EventsSection />
-
-      {/* ══ ABOUT — slide in from sides ══════════════════════════ */}
       <AboutSection courtsCount={courts.length || 4} />
-
-      {/* ══ SOCIAL — staggered slide reveal ═════════════════════ */}
       <SocialSection />
 
-      {/* ══ TOURNAMENT SHOWCASE — live standings + SSE ══════════ */}
-      <TournamentShowcase />
-
-      {/* ══ MEDIA HIGHLIGHTS — cinematic global news feed ════════ */}
+      {/* Existing global match feed remains a secondary layer beneath South Africa locality. */}
       <HomeMediaHighlights />
 
       <section className="px-4 py-12 sm:px-6 lg:px-8">
@@ -139,9 +123,8 @@ const HomePage = async () => {
               Five&apos;s Arena is one lane in a wider public graph
             </h2>
             <p className="mt-4 text-sm leading-7 text-gray-400">
-              The arena should route cleanly to the chief portfolio, studio, township work
-              network, editorial lane, and game layer. Kopano Context stays visible, but honestly
-              marked as reserved until the public runtime is owner-proven.
+              The arena stays the sovereign user surface. Editorial and news organs now resolve
+              back into this shell while the wider ecosystem remains explicitly linked.
             </p>
           </div>
 
@@ -150,8 +133,8 @@ const HomePage = async () => {
               <a
                 key={item.label}
                 href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={item.internal ? undefined : "_blank"}
+                rel={item.internal ? undefined : "noopener noreferrer"}
                 className="rounded-2xl border border-gray-800/80 bg-black/20 p-4 no-underline transition-all hover:border-yellow-600/35 hover:bg-yellow-600/5"
               >
                 <div className="flex items-center justify-between gap-3">
@@ -177,12 +160,9 @@ const HomePage = async () => {
         </div>
       </section>
 
-      {/* ══ CONTACT + FOOTER — animated cards ═══════════════════ */}
       <ContactSection />
-
     </div>
   );
 };
 
 export default HomePage;
-
