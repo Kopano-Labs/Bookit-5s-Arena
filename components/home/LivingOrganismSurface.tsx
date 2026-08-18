@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   FaCrosshairs,
   FaMapMarkerAlt,
@@ -78,6 +78,24 @@ function adapterClasses(status: AdapterStatus) {
   return 'border-amber-300/20 bg-amber-300/8 text-amber-200';
 }
 
+function StaticOrganismScene() {
+  return (
+    <div
+      className="grid min-h-64 place-items-center rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_center,rgba(57,217,138,0.18),rgba(4,6,10,0.96)_68%)] p-6 text-center"
+      data-experience-tier="static"
+    >
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-green-300">
+          Adaptive organism · static lane
+        </p>
+        <p className="mt-3 text-sm leading-6 text-gray-300">
+          Province context stays live while motion-heavy 3D rendering is disabled for this preference or capability state.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function LivingOrganismSurface() {
   const {
     province,
@@ -87,6 +105,7 @@ export default function LivingOrganismSurface() {
     setProvince,
     detectLocation,
   } = useArenaLocality();
+  const prefersReducedMotion = useReducedMotion();
   const [feed, setFeed] = useState<OrganismFeed | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -205,11 +224,15 @@ export default function LivingOrganismSurface() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
           <div className="grid gap-4">
-            <LocalityScene
-              provinceSlug={provinceSlug}
-              weatherCode={weather?.weatherCode ?? null}
-              temperature={weather?.temperature ?? null}
-            />
+            {prefersReducedMotion !== false ? (
+              <StaticOrganismScene />
+            ) : (
+              <LocalityScene
+                provinceSlug={provinceSlug}
+                weatherCode={weather?.weatherCode ?? null}
+                temperature={weather?.temperature ?? null}
+              />
+            )}
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
