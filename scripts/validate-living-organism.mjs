@@ -22,6 +22,8 @@ const [
   editorialContract,
   organismFeed,
   organismSurface,
+  localityScene,
+  footballRuntime,
   domainAdapterClient,
   newsPage,
   nextConfig,
@@ -46,6 +48,8 @@ const [
   read('lib/organism/editorialContract.ts'),
   read('app/api/organism/feed/route.ts'),
   read('components/home/LivingOrganismSurface.tsx'),
+  read('components/organism/LocalityScene.tsx'),
+  read('lib/sports/football.js'),
   read('lib/kpgs/domainAdapterClient.ts'),
   read('app/news/page.tsx'),
   read('next.config.ts'),
@@ -162,7 +166,21 @@ assert.match(organismSurface, /data-testid="living-organism"/);
 assert.match(organismSurface, /data-testid="kpgs-adapter-state"/);
 assert.match(organismSurface, /data-province-selector/);
 assert.match(organismSurface, /Use my location/);
+assert.match(organismSurface, /\/api\/football\/featured/);
+assert.match(organismSurface, /data-match-pulse/);
+assert.match(organismSurface, /navigatorWithHints\.connection\?\.saveData/);
+assert.match(localityScene, /Verified match pulse/);
+assert.match(localityScene, /data-match-state/);
+assert.match(localityScene, /ambient-not-possession/);
+assert.match(localityScene, /livePulse/);
 assert.match(newsPage, /LivingOrganismSurface/);
+
+assert.doesNotMatch(footballRuntime, /Historic Rivalry Active/);
+assert.doesNotMatch(footballRuntime, /Home team has won 4 of the last 6 meetings/);
+assert.doesNotMatch(footballRuntime, /75% of recent encounters/);
+assert.match(footballRuntime, /status:\s*"unavailable"/);
+assert.match(footballRuntime, /winProbability:\s*null/);
+assert.match(footballRuntime, /lastMeetings:\s*\[\]/);
 
 assert.match(nextConfig, /geolocation=\(self\)/);
 assert.doesNotMatch(nextConfig, /geolocation=\(\)/);
@@ -184,7 +202,10 @@ assert.match(mobileConfig, /timezoneId:\s*'Africa\/Johannesburg'/);
 assert.match(mobileSpec, /height\)\.toBeGreaterThanOrEqual\(44\)/);
 assert.match(mobileSpec, /reducedMotion:\s*'reduce'/);
 assert.match(mobileSpec, /data-experience-tier/);
-assert.match(mobileSpec, /static/);
+assert.match(mobileSpec, /data-match-state/);
+assert.match(mobileSpec, /ambient-not-possession/);
+assert.match(mobileSpec, /Orlando Pirates/);
+assert.match(mobileSpec, /Kaizer Chiefs/);
 assert.match(mobileSpec, /Register Your Team/);
 
 console.log('Living organism proof: PASS');
