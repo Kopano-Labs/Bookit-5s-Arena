@@ -11,6 +11,7 @@ import {
   FaSatelliteDish,
   FaShieldAlt,
 } from 'react-icons/fa';
+import type { ArenaMatchPulse } from '@/components/organism/LocalityScene';
 import { useArenaLocality } from '@/hooks/useArenaLocality';
 import { SOUTH_AFRICA_PROVINCES } from '@/lib/organism/southAfrica';
 
@@ -62,6 +63,34 @@ type OrganismFeed = {
   };
 };
 
+type FeaturedMatch = {
+  id?: string | number;
+  league?: {
+    name?: string | null;
+    shortName?: string | null;
+  } | null;
+  home?: {
+    name?: string | null;
+  } | null;
+  away?: {
+    name?: string | null;
+  } | null;
+  score?: {
+    home?: number | null;
+    away?: number | null;
+  } | null;
+  status?: {
+    short?: string | null;
+    long?: string | null;
+    elapsed?: number | null;
+    state?: string | null;
+    isLive?: boolean;
+  } | null;
+  kickoffLabel?: string | null;
+  isLive?: boolean;
+  minute?: number | null;
+};
+
 function adapterLabel(status: AdapterStatus) {
   if (status === 'ready') return '.NET boundary ready';
   if (status === 'degraded') return '.NET boundary degraded';
@@ -78,11 +107,53 @@ function adapterClasses(status: AdapterStatus) {
   return 'border-amber-300/20 bg-amber-300/8 text-amber-200';
 }
 
-function StaticOrganismScene({ provinceLabel }: { provinceLabel: string }) {
+function toArenaMatchPulse(match: FeaturedMatch | null): ArenaMatchPulse | null {
+  if (!match?.id || !match.home?.name || !match.away?.name) return null;
+
+  return {
+    id: String(match.id),
+    league: match.league?.shortName || match.league?.name || null,
+    home: match.home.name,
+    away: match.away.name,
+    score: match.score
+      ? {
+          home: match.score.home ?? null,
+          away: match.score.away ?? null,
+        }
+      : null,
+    isLive: Boolean(match.isLive ?? match.status?.isLive),
+    minute: match.minute ?? match.status?.elapsed ?? null,
+    status: match.status?.long || match.status?.short || match.status?.state || null,
+    kickoffLabel: match.kickoffLabel || null,
+  };
+}
+
+function matchLine(matchPulse: ArenaMatchPulse | null) {
+  if (!matchPulse) return null;
+  const homeScore = matchPulse.score?.home;
+  const awayScore = matchPulse.score?.away;
+  const score = homeScore != null && awayScore != null ? `${homeScore} : ${awayScore}` : 'vs';
+  const state = matchPulse.isLive
+    ? matchPulse.minute != null
+      ? `LIVE · ${matchPulse.minute}′`
+      : 'LIVE'
+    : matchPulse.status || matchPulse.kickoffLabel || 'Verified fixture';
+  return `${matchPulse.home} ${score} ${matchPulse.away} · ${state}`;
+}
+
+function StaticOrganismScene({
+  provinceLabel,
+  matchPulse,
+}: {
+  provinceLabel: string;
+  matchPulse: ArenaMatchPulse | null;
+}) {
+  const pulseLine = matchLine(matchPulse);
   return (
     <div
       className="relative grid min-h-64 place-items-center overflow-hidden rounded-[2rem] border border-white/10 bg-[#050908] p-6 text-center"
       data-experience-tier="static"
+      data-match-state={matchPulse ? (matchPulse.isLive ? 'live' : 'available') : 'quiet'}
     >
       <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-[1.62/1] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/30 bg-green-950/35">
         <div className="absolute inset-y-0 left-1/2 border-l border-white/25" />
@@ -97,6 +168,11 @@ function StaticOrganismScene({ provinceLabel }: { provinceLabel: string }) {
         <p className="mt-3 text-sm leading-6 text-gray-300">
           Locality and football state remain available without forcing WebGL or continuous motion.
         </p>
+        {pulseLine ? (
+          <p className="mt-3 border-t border-white/10 pt-3 text-xs font-bold text-white">
+            {pulseLine}
+          </p>
+        ) : null}
       </div>
     </div>
   );
@@ -113,6 +189,7 @@ export default function LivingOrganismSurface() {
   } = useArenaLocality();
   const prefersReducedMotion = useReducedMotion();
   const [feed, setFeed] = useState<OrganismFeed | null>(null);
+  const [featuredMatches, setFeaturedMatches] = useState<FeaturedMatch[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -136,22 +213,70 @@ export default function LivingOrganismSurface() {
       }
     }
 
-    load();
+    void load();
     return () => {
       mounted = false;
       controller.abort();
     };
   }, [provinceSlug]);
 
+  useEffect(() => {
+    let mounted = true;
+    let activeController: AbortController | null = null;
+    const navigatorWithHints = navigator as Navigator & {
+      connection?: { saveData?: boolean };
+    };
+
+    async function loadFeaturedMatches() {
+      activeController?.abort();
+      const controller = new AbortController();
+      activeController = controller;
+      try {
+        const response = await fetch('/api/football/featured', {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+        if (!response.ok) throw new Error('featured-football-unavailable');
+        const payload = (await response.json()) as FeaturedMatch[];
+        if (mounted) setFeaturedMatches(Array.isArray(payload) ? payload : []);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        if (mounted) setFeaturedMatches([]);
+      }
+    }
+
+    void loadFeaturedMatches();
+
+    const refreshMs = 60_000;
+    const interval = navigatorWithHints.connection?.saveData
+      ? null
+      : window.setInterval(() => {
+          if (document.visibilityState === 'visible') void loadFeaturedMatches();
+        }, refreshMs);
+
+    return () => {
+      mounted = false;
+      activeController?.abort();
+      if (interval != null) window.clearInterval(interval);
+    };
+  }, []);
+
   const articles = useMemo(() => feed?.editorial?.articles || [], [feed]);
   const weather = feed?.weather || null;
   const adapterStatus = feed?.governance?.adapter?.status || 'contract-only';
+  const matchPulse = useMemo(() => {
+    const selected = featuredMatches.find((match) => Boolean(match.isLive ?? match.status?.isLive))
+      || featuredMatches[0]
+      || null;
+    return toArenaMatchPulse(selected);
+  }, [featuredMatches]);
 
   return (
     <section
       className="relative overflow-hidden border-y border-white/8 bg-[#040706] px-4 py-16 sm:px-6 lg:px-8"
       data-testid="living-organism"
       data-province={provinceSlug}
+      data-match-pulse={matchPulse ? (matchPulse.isLive ? 'live' : 'available') : 'quiet'}
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(57,217,138,0.12),transparent_38%),radial-gradient(circle_at_90%_80%,rgba(245,197,66,0.08),transparent_36%)]" />
 
@@ -177,7 +302,7 @@ export default function LivingOrganismSurface() {
               South Africa changes. <span className="text-yellow-400">The pitch reacts.</span>
             </h2>
             <p className="mt-5 max-w-3xl text-sm leading-7 text-gray-300 sm:text-base">
-              Province, weather and local football intelligence now enter the arena itself. The field is the interface: capable devices receive the spatial world, constrained devices keep the same governed state without paying the WebGL cost.
+              Province, weather, local football intelligence and verified match state enter the same adaptive world. A live provider pulse can raise the arena&apos;s energy, but never claims possession, position or a score the provider did not return.
             </p>
           </div>
 
@@ -231,7 +356,7 @@ export default function LivingOrganismSurface() {
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
           <div className="grid gap-4">
             {prefersReducedMotion !== false ? (
-              <StaticOrganismScene provinceLabel={province.label} />
+              <StaticOrganismScene provinceLabel={province.label} matchPulse={matchPulse} />
             ) : (
               <LocalityScene
                 provinceSlug={provinceSlug}
@@ -241,6 +366,7 @@ export default function LivingOrganismSurface() {
                 condition={weather?.condition ?? null}
                 footballReady={weather?.footballReady ?? false}
                 headline={articles[0]?.title ?? null}
+                matchPulse={matchPulse}
                 onProvinceSelect={setProvince}
               />
             )}
@@ -283,7 +409,7 @@ export default function LivingOrganismSurface() {
                   {province.label} football intelligence
                 </h3>
                 <p className="mt-2 text-xs leading-6 text-gray-500">
-                  The strongest locality match is projected into the arena scoreboard; the full governed feed remains here for reading and verification.
+                  The strongest locality match is projected beside any verified provider match pulse; the full governed feed remains here for reading and verification.
                 </p>
               </div>
               <Link
