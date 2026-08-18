@@ -7,6 +7,7 @@ const [
   home,
   about,
   blogIndex,
+  rulesPage,
   tournamentPage,
   tournamentStats,
   tournamentStandings,
@@ -29,6 +30,7 @@ const [
   read('app/page.jsx'),
   read('app/about/page.jsx'),
   read('app/blog/page.jsx'),
+  read('app/rules-of-the-game/page.jsx'),
   read('app/tournament/page.jsx'),
   read('app/tournament/stats/page.jsx'),
   read('app/tournament/standings/page.jsx'),
@@ -64,6 +66,12 @@ assert.doesNotMatch(about, /Join Tournament/);
 assert.match(about, /World Cup Archive/);
 assert.match(about, /South Africa Pulse/);
 assert.match(blogIndex, /redirect\('\/news\?organ=blog'\)/);
+
+assert.match(rulesPage, /Current venue governance/);
+assert.match(rulesPage, /World Cup 2026 policy archive/);
+assert.doesNotMatch(rulesPage, /Sign-ups open the day after/);
+assert.doesNotMatch(rulesPage, /choose your country at sign-up/i);
+assert.doesNotMatch(rulesPage, /Live tournament window/);
 
 assert.match(tournamentPage, /has concluded|Archived · concluded/i);
 assert.doesNotMatch(tournamentPage, /Register Your Team/i);
