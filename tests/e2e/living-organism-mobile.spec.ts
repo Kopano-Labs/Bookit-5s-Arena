@@ -93,17 +93,23 @@ test('province state drives weather and editorial surface without leaving the sh
   await expect(organism).toBeVisible();
   await expect(organism).toHaveAttribute('data-province', 'western-cape');
   await expect(page.getByTestId('current-province')).toHaveText('Western Cape');
-  await expect(page.getByText('Western Cape football pulse')).toBeVisible();
+  await expect(page.getByText('Western Cape football pulse')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId('kpgs-adapter-state')).toHaveAttribute(
     'data-adapter-status',
     'contract-only',
   );
 
+  const gautengResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/organism/feed?province=gauteng') &&
+      response.status() === 200,
+  );
   await page.locator('[data-province-selector="gauteng"]').click();
+  await gautengResponse;
 
   await expect(organism).toHaveAttribute('data-province', 'gauteng');
   await expect(page.getByTestId('current-province')).toHaveText('Gauteng');
-  await expect(page.getByText('Gauteng football pulse')).toBeVisible();
+  await expect(page.getByText('Gauteng football pulse')).toBeVisible({ timeout: 10_000 });
   await expect(page).toHaveURL(/\/news$/);
   await expectNoHorizontalOverflow(page);
 });
