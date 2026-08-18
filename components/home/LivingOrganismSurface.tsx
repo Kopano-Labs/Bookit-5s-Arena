@@ -9,6 +9,7 @@ import {
   FaMapMarkerAlt,
   FaNewspaper,
   FaSatelliteDish,
+  FaShieldAlt,
 } from 'react-icons/fa';
 import { useArenaLocality } from '@/hooks/useArenaLocality';
 import { SOUTH_AFRICA_PROVINCES } from '@/lib/organism/southAfrica';
@@ -26,6 +27,8 @@ type OrganismArticle = {
   publisher: string;
   localityScore: number;
 };
+
+type AdapterStatus = 'contract-only' | 'ready' | 'degraded';
 
 type OrganismFeed = {
   locality: {
@@ -48,7 +51,32 @@ type OrganismFeed = {
     status: 'live' | 'fallback';
     articles: OrganismArticle[];
   };
+  governance?: {
+    adapter: {
+      configured: boolean;
+      status: AdapterStatus;
+      origin: string | null;
+      checkedAt: string;
+    };
+    executionPolicy: string;
+  };
 };
+
+function adapterLabel(status: AdapterStatus) {
+  if (status === 'ready') return '.NET boundary ready';
+  if (status === 'degraded') return '.NET boundary degraded';
+  return '.NET boundary contract';
+}
+
+function adapterClasses(status: AdapterStatus) {
+  if (status === 'ready') {
+    return 'border-green-300/25 bg-green-300/10 text-green-200';
+  }
+  if (status === 'degraded') {
+    return 'border-red-300/20 bg-red-300/8 text-red-200';
+  }
+  return 'border-amber-300/20 bg-amber-300/8 text-amber-200';
+}
 
 export default function LivingOrganismSurface() {
   const {
@@ -92,9 +120,14 @@ export default function LivingOrganismSurface() {
 
   const articles = useMemo(() => feed?.editorial?.articles || [], [feed]);
   const weather = feed?.weather || null;
+  const adapterStatus = feed?.governance?.adapter?.status || 'contract-only';
 
   return (
-    <section className="relative overflow-hidden border-y border-white/8 bg-[#040706] px-4 py-16 sm:px-6 lg:px-8">
+    <section
+      className="relative overflow-hidden border-y border-white/8 bg-[#040706] px-4 py-16 sm:px-6 lg:px-8"
+      data-testid="living-organism"
+      data-province={provinceSlug}
+    >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(57,217,138,0.12),transparent_38%),radial-gradient(circle_at_90%_80%,rgba(245,197,66,0.08),transparent_36%)]" />
 
       <div className="relative mx-auto max-w-7xl">
@@ -107,6 +140,13 @@ export default function LivingOrganismSurface() {
               <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
                 {source.replaceAll('-', ' ')}
               </span>
+              <span
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] ${adapterClasses(adapterStatus)}`}
+                data-testid="kpgs-adapter-state"
+                data-adapter-status={adapterStatus}
+              >
+                <FaShieldAlt /> {adapterLabel(adapterStatus)}
+              </span>
             </div>
             <h2 className="max-w-4xl text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl lg:text-7xl">
               South Africa changes. <span className="text-yellow-400">Five&apos;s Arena reacts.</span>
@@ -117,12 +157,15 @@ export default function LivingOrganismSurface() {
           </div>
 
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 backdrop-blur-xl">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-4 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.22em] text-gray-500">
                   Current province context
                 </p>
-                <p className="mt-1 text-xl font-black uppercase text-white">
+                <p
+                  className="mt-1 text-xl font-black uppercase text-white"
+                  data-testid="current-province"
+                >
                   {province.label}
                 </p>
               </div>
@@ -130,7 +173,7 @@ export default function LivingOrganismSurface() {
                 type="button"
                 onClick={() => void detectLocation()}
                 disabled={detecting}
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-yellow-400/25 bg-yellow-400/8 px-4 text-[10px] font-black uppercase tracking-[0.14em] text-yellow-200 transition hover:bg-yellow-400/15 disabled:opacity-50"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-yellow-400/25 bg-yellow-400/8 px-4 text-[10px] font-black uppercase tracking-[0.14em] text-yellow-200 transition hover:bg-yellow-400/15 disabled:opacity-50 min-[420px]:w-auto"
               >
                 <FaCrosshairs /> {detecting ? 'Locating…' : 'Use my location'}
               </button>
@@ -138,12 +181,17 @@ export default function LivingOrganismSurface() {
           </div>
         </div>
 
-        <div className="mt-8 flex snap-x gap-2 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div
+          className="mt-8 flex snap-x gap-2 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-label="South African province context"
+        >
           {SOUTH_AFRICA_PROVINCES.map((item) => (
             <button
               key={item.slug}
               type="button"
               onClick={() => setProvince(item.slug)}
+              data-province-selector={item.slug}
+              aria-pressed={item.slug === provinceSlug}
               className={`min-h-11 shrink-0 snap-start rounded-full border px-4 text-[10px] font-black uppercase tracking-[0.14em] transition ${
                 item.slug === provinceSlug
                   ? 'border-yellow-300/50 bg-yellow-300/15 text-yellow-100'
