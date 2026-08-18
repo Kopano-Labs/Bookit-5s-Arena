@@ -13,7 +13,7 @@
     "typecheck:compare": "npm run typecheck && npm run typecheck:ts7",
     "validate:organism": "node scripts/validate-living-organism.mjs",
     "validate:apu-sync": "node scripts/validate-apu-progressive-sync.mjs",
-    "test:apu": "node --test tests/unit/apu-progressive-update.test.mjs",
+    "test:apu": "node --test tests/unit/apu-progressive-update.test.mjs tests/unit/kpgs-progressive-update.test.mjs",
     "test:e2e:organism": "playwright test --config=playwright.organism.config.ts",
     "build:css": "npx tailwindcss -i ./assets/styles/globals.css -o ./public/styles.css --minify",
     "diagnose:atlas": "node --env-file=.env.local scripts/diagnose-atlas-access.mjs",
