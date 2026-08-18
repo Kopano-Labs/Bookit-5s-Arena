@@ -3,16 +3,14 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import TournamentTeam from '@/models/TournamentTeam';
 import { WORLD_CUP_TEAMS } from '@/lib/worldCupTeams';
-import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from '@/lib/tournamentConfig';
+import {
+  TOURNAMENT_DATES,
+  TOURNAMENT_FORMAT,
+  getTournamentLifecycle,
+} from '@/lib/tournamentConfig';
 
 const TOURNAMENT_DEADLINE = new Date(TOURNAMENT_DATES.signupDeadlineISO);
-const TOURNAMENT_END = new Date('2026-05-31T23:59:59+02:00');
-
-function lifecycleState(now = new Date()) {
-  if (now < TOURNAMENT_DEADLINE) return 'registration';
-  if (now <= TOURNAMENT_END) return 'closed-live-window';
-  return 'archived';
-}
+const TOURNAMENT_END = new Date(TOURNAMENT_DATES.endISO);
 
 /* Historical read surface: team records remain queryable, registration does not. */
 export async function GET() {
@@ -23,7 +21,7 @@ export async function GET() {
     const availableTeams = WORLD_CUP_TEAMS.filter(
       (worldCupTeam) => !takenTeams.includes(`${worldCupTeam.name} (${worldCupTeam.player})`),
     );
-    const lifecycle = lifecycleState();
+    const lifecycle = getTournamentLifecycle();
 
     return NextResponse.json({
       lifecycle,
