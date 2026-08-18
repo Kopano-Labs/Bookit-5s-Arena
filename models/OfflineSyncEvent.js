@@ -10,6 +10,64 @@ const ApuReceiptSchema = new mongoose.Schema(
   { _id: false },
 );
 
+const ProgressiveUpdateSchema = new mongoose.Schema(
+  {
+    schema: { type: String, required: true, enum: ["kpgs.progressive-update.v1"] },
+    update_id: { type: String, required: true, trim: true },
+    node_id: { type: String, required: true, trim: true },
+    operation: { type: String, required: true, enum: ["CREATE", "READ", "UPDATE", "DELETE"] },
+    lane: { type: String, required: true, trim: true },
+    context_route: { type: String, required: true, trim: true },
+    protocol: { type: String, required: true, trim: true },
+    idempotency_key: { type: String, required: true, trim: true },
+    value: { type: mongoose.Schema.Types.Mixed, default: null },
+    apu_status: { type: String, required: true, enum: ["GREEN", "YELLOW", "RED", "UNSPECIFIED"] },
+    poc_validated: { type: Boolean, required: true },
+    foc_detected: { type: Boolean, required: true },
+    invariant_passed: { type: Boolean, required: true },
+    authority_effect: { type: String, required: true, enum: ["none"] },
+    state_class: {
+      type: String,
+      required: true,
+      enum: ["non_authoritative", "derived_projection", "pending_proposal"],
+    },
+    evidence_refs: { type: [String], default: [] },
+    correlation_id: { type: String, default: "" },
+    source: { type: String, default: "apu" },
+    expected_version: { type: Number, default: null, min: 0 },
+    boundary_marker: { type: String, required: true, enum: ["#NB"] },
+  },
+  { _id: false },
+);
+
+const SwfusStageReceiptSchema = new mongoose.Schema(
+  {
+    stage: { type: String, required: true, trim: true },
+    status: { type: String, required: true, trim: true },
+    reason: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
+const SwfusReceiptSchema = new mongoose.Schema(
+  {
+    schema: { type: String, required: true, enum: ["kpgs.swfus.receipt.v1"] },
+    update_id: { type: String, required: true, trim: true },
+    node_id: { type: String, required: true, trim: true },
+    operation: { type: String, required: true, enum: ["CREATE", "READ", "UPDATE", "DELETE"] },
+    disposition: { type: String, required: true, enum: ["APPLIED", "OBSERVED", "HELD", "REJECTED"] },
+    stages: { type: [SwfusStageReceiptSchema], default: [] },
+    synchronized: { type: Boolean, required: true },
+    canonical_authority_changed: { type: Boolean, required: true, default: false },
+    state: { type: mongoose.Schema.Types.Mixed, default: null },
+    evidence_refs: { type: [String], default: [] },
+    correlation_id: { type: String, default: "" },
+    boundary_marker: { type: String, required: true, enum: ["#NB"] },
+    replayed: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
 const ApuProgressiveUpdateSchema = new mongoose.Schema(
   {
     schema: {
@@ -39,6 +97,8 @@ const ApuProgressiveUpdateSchema = new mongoose.Schema(
       ],
     },
     receipts: { type: [ApuReceiptSchema], default: [] },
+    progressive_update: { type: ProgressiveUpdateSchema, default: null },
+    swfus_receipt: { type: SwfusReceiptSchema, default: null },
   },
   { _id: false },
 );
@@ -103,6 +163,8 @@ OfflineSyncEventSchema.index({ status: 1, updatedAt: -1 });
 OfflineSyncEventSchema.index({ user: 1, createdAt: -1 });
 OfflineSyncEventSchema.index({ "apu.update_id": 1 }, { sparse: true });
 OfflineSyncEventSchema.index({ "apu.stage": 1, createdAt: -1 }, { sparse: true });
+OfflineSyncEventSchema.index({ "apu.progressive_update.node_id": 1 }, { sparse: true });
+OfflineSyncEventSchema.index({ "apu.swfus_receipt.disposition": 1, createdAt: -1 }, { sparse: true });
 
 if (mongoose.models.OfflineSyncEvent) {
   try {
