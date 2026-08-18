@@ -156,7 +156,10 @@ assert.match(nextConfig, /destination:\s*["']\/news\?organ=news["']/);
 assert.match(nextConfig, /destination:\s*["']\/news\?organ=blog["']/);
 
 for (const width of [360, 390, 430]) {
-  assert.match(mobileConfig, new RegExp(`width:\s*${width}`));
+  assert.ok(
+    mobileConfig.includes(`width: ${width}`),
+    `mobile matrix must include ${width}px viewport`,
+  );
 }
 assert.match(mobileConfig, /hasTouch:\s*true/);
 assert.match(mobileConfig, /isMobile:\s*true/);
