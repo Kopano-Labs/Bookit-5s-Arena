@@ -5,24 +5,32 @@ on:
     paths:
       - 'app/api/v1/sync/**'
       - 'lib/offline/**'
+      - 'lib/governance/**'
       - 'models/OfflineSyncEvent.js'
+      - 'models/SwfusProjection.js'
       - 'scripts/validate-apu-progressive-sync.mjs'
       - 'tests/unit/apu-progressive-update.test.mjs'
+      - 'tests/unit/kpgs-progressive-update.test.mjs'
       - 'docs/apwa/APU_PROGRESSIVE_SYNC_CONTRACT.md'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/apu-progressive-sync-proof.yml'
   push:
     branches:
       - main
-      - feat/apu-progressive-sync-governance
+      - feat/kpgs-vnext-apu-crud-swfus
     paths:
       - 'app/api/v1/sync/**'
       - 'lib/offline/**'
+      - 'lib/governance/**'
       - 'models/OfflineSyncEvent.js'
+      - 'models/SwfusProjection.js'
       - 'scripts/validate-apu-progressive-sync.mjs'
       - 'tests/unit/apu-progressive-update.test.mjs'
+      - 'tests/unit/kpgs-progressive-update.test.mjs'
       - 'docs/apwa/APU_PROGRESSIVE_SYNC_CONTRACT.md'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/apu-progressive-sync-proof.yml'
   workflow_dispatch:
 
@@ -46,13 +54,13 @@ jobs:
           node-version: '22'
           cache: npm
 
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install exact dependencies
+        run: npm ci --no-audit --no-fund
 
-      - name: APU stage and CRUD unit proof
+      - name: APU + canonical progressive CRUD/SWFUS unit proof
         run: npm run test:apu
 
-      - name: APU → CRUD → SWFUS contract proof
+      - name: APU → #NB → CRUD → SWFUS contract proof
         run: npm run validate:apu-sync
 
       - name: Production compiler typecheck

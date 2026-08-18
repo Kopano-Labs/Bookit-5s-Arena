@@ -12,6 +12,17 @@ import {
   assertApuReceivableBySwfus,
   markApuSwfusSynced,
 } from "@/lib/offline/apuProgressiveUpdate";
+import {
+  SWFUS_DISPOSITIONS,
+  bindSwfusReceiptProof,
+  evaluateKpgsProgressiveUpdate,
+} from "@/lib/governance/kpgsProgressiveUpdate";
+import {
+  SwfusProjectionConflictError,
+  applySwfusProjection,
+  loadSwfusProjection,
+  rollbackSwfusProjection,
+} from "@/lib/governance/swfusProjectionStore";
 import OfflineSyncEvent from "@/models/OfflineSyncEvent";
 
 const VALID_EVENT_TYPES = new Set([
@@ -43,6 +54,27 @@ function stableJson(value) {
 
 function sha256(value) {
   return crypto.createHash("sha256").update(String(value)).digest("hex");
+}
+
+function stateDigest(projection) {
+  return projection === null ? null : sha256(stableJson(projection));
+}
+
+function finalizeSwfusReceipt(evaluation, at) {
+  const digest = stateDigest(evaluation.nextProjection);
+  const updateDigest = sha256(stableJson(evaluation.update));
+  const receiptId = `swfus_${sha256(
+    `swfus-vnext:${updateDigest}:${evaluation.receipt.disposition}:${digest || "none"}`,
+  ).slice(0, 24)}`;
+  const receipt = bindSwfusReceiptProof(evaluation.receipt, {
+    receiptId,
+    stateDigest: digest,
+    createdAt: at,
+  });
+  const distribution = evaluation.distribution
+    ? { ...evaluation.distribution, state_digest: digest }
+    : null;
+  return { receipt, distribution };
 }
 
 function normalizeBody(body) {
@@ -93,7 +125,31 @@ function replayPayload(existing, idempotencyKey, eventType) {
     eventType,
     status: existing?.status || "ACCEPTED",
     ...(existing?.apu ? { apu: existing.apu } : {}),
+    ...(existing?.swfusDistribution ? { swfusDistribution: existing.swfusDistribution } : {}),
   };
+}
+
+function bindLegacyProgressiveIdempotency(apu, idempotencyKey) {
+  const progressive = apu?.progressive_update;
+  if (!progressive || progressive.idempotency_key === idempotencyKey) return apu;
+
+  const legacyMarker = ":apu:";
+  const markerIndex = apu.update_id.indexOf(legacyMarker);
+  const legacyKey = markerIndex >= 0 ? apu.update_id.slice(markerIndex + legacyMarker.length) : null;
+  const isLegacyAdapter = progressive.source === "fivesarena-apu-legacy-adapter";
+
+  if (isLegacyAdapter && legacyKey === idempotencyKey) {
+    return {
+      ...apu,
+      progressive_update: {
+        ...progressive,
+        idempotency_key: idempotencyKey,
+        correlation_id: progressive.correlation_id || idempotencyKey,
+      },
+    };
+  }
+
+  return apu;
 }
 
 export async function GET() {
@@ -106,7 +162,11 @@ export async function GET() {
       schema: APU_SCHEMA,
       intakeStage: APU_STAGES.POC,
       acceptedStage: APU_STAGES.SYNCED,
-      semantics: "CRUD progressive-update synchronization; S4/S5 are not claimed by this endpoint.",
+      progressiveUpdateSchema: "kpgs.progressive-update.v1",
+      swfusReceiptSchema: "kpgs.swfus.receipt.v1",
+      boundaryMarker: "#NB",
+      semantics:
+        "Adaptive Progressive Update -> #NB -> bounded non-authoritative CRUD projection -> SWFUS distribution. Synchronization does not grant canonical authority.",
     },
     status: "ready",
   });
@@ -158,12 +218,20 @@ export async function POST(request) {
   if (body?.apu !== undefined && body?.apu !== null) {
     try {
       incomingApu = assertApuReceivableBySwfus(body.apu);
+      incomingApu = bindLegacyProgressiveIdempotency(incomingApu, idempotencyKey);
     } catch (error) {
       return badRequest(error?.message || "Invalid APU progressive update envelope.");
     }
+    if (incomingApu.progressive_update.idempotency_key !== idempotencyKey) {
+      return badRequest(
+        "progressive_update.idempotency_key must match X-Idempotency-Key at the SWFUS boundary.",
+      );
+    }
   }
 
-  const payloadHash = sha256(stableJson({ eventType, payload, ...(incomingApu ? { apu: incomingApu } : {}) }));
+  const payloadHash = sha256(
+    stableJson({ eventType, payload, ...(incomingApu ? { apu: incomingApu } : {}) }),
+  );
   const session = await getOptionalSession();
 
   try {
@@ -186,27 +254,97 @@ export async function POST(request) {
     }
 
     const acceptedAt = new Date().toISOString();
-    const syncedApu = incomingApu
-      ? markApuSwfusSynced(incomingApu, {
-          receiptId: `swfus:${sha256(`${idempotencyKey}:${payloadHash}`).slice(0, 48)}`,
-          at: acceptedAt,
-        })
-      : null;
+    let syncedApu = null;
+    let swfusDistribution = null;
+    let previousProjection = null;
+    let appliedUpdate = null;
 
-    const created = await OfflineSyncEvent.create({
-      idempotencyKey,
-      eventType,
-      payload,
-      payloadHash,
-      ...(syncedApu ? { apu: syncedApu } : {}),
-      status: "ACCEPTED",
-      source: syncedApu ? "fivesarena_apu_swfus" : "bookit_offline_queue",
-      user: session?.user?.id || null,
-      requestMeta: {
-        ipHash: sha256(ip),
-        userAgentHash: sha256(request.headers.get("user-agent") || ""),
-      },
-    });
+    if (incomingApu) {
+      const progressiveUpdate = incomingApu.progressive_update;
+      previousProjection = await loadSwfusProjection(progressiveUpdate.node_id);
+      const evaluation = evaluateKpgsProgressiveUpdate(progressiveUpdate, previousProjection);
+      const finalized = finalizeSwfusReceipt(evaluation, acceptedAt);
+
+      if (evaluation.receipt.disposition === SWFUS_DISPOSITIONS.HELD) {
+        return NextResponse.json(
+          {
+            ok: false,
+            status: "HELD",
+            error: "Progressive update held by KPGS vNext governance.",
+            swfusReceipt: finalized.receipt,
+          },
+          { status: 409 },
+        );
+      }
+      if (evaluation.receipt.disposition === SWFUS_DISPOSITIONS.REJECTED) {
+        return NextResponse.json(
+          {
+            ok: false,
+            status: "REJECTED",
+            error: "Progressive update rejected by KPGS vNext governance.",
+            swfusReceipt: finalized.receipt,
+          },
+          { status: 422 },
+        );
+      }
+      if (evaluation.receipt.disposition !== SWFUS_DISPOSITIONS.APPLIED) {
+        return NextResponse.json(
+          {
+            ok: true,
+            status: evaluation.receipt.disposition,
+            swfusReceipt: finalized.receipt,
+          },
+          { status: 200 },
+        );
+      }
+
+      try {
+        await applySwfusProjection({
+          update: evaluation.update,
+          previousProjection,
+          nextProjection: evaluation.nextProjection,
+          receiptId: finalized.receipt.receipt_id,
+        });
+        appliedUpdate = evaluation.update;
+        swfusDistribution = finalized.distribution;
+        syncedApu = markApuSwfusSynced(incomingApu, {
+          receiptId: finalized.receipt.receipt_id,
+          swfusReceipt: finalized.receipt,
+          at: acceptedAt,
+        });
+      } catch (error) {
+        if (appliedUpdate) {
+          await rollbackSwfusProjection({ update: appliedUpdate, previousProjection });
+          appliedUpdate = null;
+        }
+        throw error;
+      }
+    }
+
+    let created;
+    try {
+      created = await OfflineSyncEvent.create({
+        idempotencyKey,
+        eventType,
+        payload,
+        payloadHash,
+        ...(syncedApu ? { apu: syncedApu } : {}),
+        ...(swfusDistribution ? { swfusDistribution } : {}),
+        status: "ACCEPTED",
+        source: syncedApu ? "fivesarena_kpgs_vnext_swfus" : "bookit_offline_queue",
+        user: session?.user?.id || null,
+        requestMeta: {
+          ipHash: sha256(ip),
+          userAgentHash: sha256(request.headers.get("user-agent") || ""),
+        },
+      });
+    } catch (error) {
+      if (appliedUpdate) {
+        await rollbackSwfusProjection({ update: appliedUpdate, previousProjection });
+        appliedUpdate = null;
+      }
+      throw error;
+    }
 
     return NextResponse.json(
       {
@@ -216,10 +354,26 @@ export async function POST(request) {
         eventType,
         status: "ACCEPTED",
         ...(created.apu ? { apu: created.apu.toObject?.() || created.apu } : {}),
+        ...(created.swfusDistribution
+          ? { swfusDistribution: created.swfusDistribution }
+          : swfusDistribution
+            ? { swfusDistribution }
+            : {}),
       },
       { status: 202 },
     );
   } catch (error) {
+    if (error instanceof SwfusProjectionConflictError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          idempotencyKey,
+          status: "CONFLICT",
+        },
+        { status: 409 },
+      );
+    }
+
     if (error?.code === 11000) {
       try {
         const duplicate = await OfflineSyncEvent.findOne({ idempotencyKey }).lean();
