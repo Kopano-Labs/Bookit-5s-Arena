@@ -7,6 +7,7 @@ const [
   home,
   about,
   blogIndex,
+  footer,
   rulesPage,
   tournamentPage,
   tournamentStats,
@@ -30,6 +31,7 @@ const [
   read('app/page.jsx'),
   read('app/about/page.jsx'),
   read('app/blog/page.jsx'),
+  read('components/Footer.jsx'),
   read('app/rules-of-the-game/page.jsx'),
   read('app/tournament/page.jsx'),
   read('app/tournament/stats/page.jsx'),
@@ -66,6 +68,12 @@ assert.doesNotMatch(about, /Join Tournament/);
 assert.match(about, /World Cup Archive/);
 assert.match(about, /South Africa Pulse/);
 assert.match(blogIndex, /redirect\('\/news\?organ=blog'\)/);
+
+assert.match(footer, /South Africa Pulse/);
+assert.match(footer, /href:\s*["']\/news\?organ=blog["']/);
+assert.doesNotMatch(footer, /href:\s*["']https:\/\/blog\.fivesarena\.com["']/);
+assert.doesNotMatch(footer, /10:00\s*[–-]\s*22:00/);
+assert.match(footer, /live booking surface rather than a hard-coded footer timetable/);
 
 assert.match(rulesPage, /Current venue governance/);
 assert.match(rulesPage, /World Cup 2026 policy archive/);
