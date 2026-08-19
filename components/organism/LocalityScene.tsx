@@ -18,6 +18,21 @@ const PITCH_LENGTH = 6.8;
 const PITCH_WIDTH = 4.2;
 const LINE_Y = 0.025;
 
+export type ArenaMatchPulse = {
+  id: string;
+  league: string | null;
+  home: string;
+  away: string;
+  score: {
+    home: number | null;
+    away: number | null;
+  } | null;
+  isLive: boolean;
+  minute: number | null;
+  status: string | null;
+  kickoffLabel: string | null;
+};
+
 function detectProfile(): ExperienceProfile {
   if (typeof window === 'undefined') {
     return {
@@ -154,6 +169,7 @@ function Player({
   active,
   animate,
   lite,
+  livePulse,
 }: {
   position: readonly [number, number];
   team: 'home' | 'away';
@@ -161,12 +177,14 @@ function Player({
   active: boolean;
   animate: boolean;
   lite: boolean;
+  livePulse: boolean;
 }) {
   const group = useRef<Group>(null);
 
   useFrame((state) => {
     if (!group.current || !animate) return;
-    const phase = state.clock.elapsedTime * 0.75 + index * 0.63 + (team === 'away' ? 1.8 : 0);
+    const tempo = livePulse ? 1.05 : 0.75;
+    const phase = state.clock.elapsedTime * tempo + index * 0.63 + (team === 'away' ? 1.8 : 0);
     group.current.position.z = position[1] + Math.sin(phase) * (active ? 0.09 : 0.035);
     group.current.position.x = position[0] + Math.cos(phase * 0.7) * (active ? 0.055 : 0.02);
   });
@@ -181,7 +199,7 @@ function Player({
         <meshStandardMaterial
           color={body}
           emissive={glow}
-          emissiveIntensity={active ? 0.65 : 0.18}
+          emissiveIntensity={active ? (livePulse ? 0.9 : 0.65) : 0.18}
           roughness={0.55}
         />
       </mesh>
@@ -191,35 +209,46 @@ function Player({
       </mesh>
       {active ? (
         <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.17, 0.23, lite ? 18 : 28]} />
-          <meshBasicMaterial color={body} transparent opacity={0.65} />
+          <ringGeometry args={[0.17, livePulse ? 0.26 : 0.23, lite ? 18 : 28]} />
+          <meshBasicMaterial color={body} transparent opacity={livePulse ? 0.85 : 0.65} />
         </mesh>
       ) : null}
     </group>
   );
 }
 
-function Ball({ animate, ready, lite }: { animate: boolean; ready: boolean; lite: boolean }) {
+function Ball({
+  animate,
+  ready,
+  lite,
+  livePulse,
+}: {
+  animate: boolean;
+  ready: boolean;
+  lite: boolean;
+  livePulse: boolean;
+}) {
   const mesh = useRef<Mesh>(null);
 
   useFrame((state) => {
     if (!mesh.current || !animate || !ready) return;
-    const t = state.clock.elapsedTime * 0.55;
-    mesh.current.position.x = Math.sin(t) * 1.65;
-    mesh.current.position.z = Math.sin(t * 1.7) * 0.88;
-    mesh.current.rotation.x += 0.025;
-    mesh.current.rotation.z += 0.018;
+    const t = state.clock.elapsedTime * (livePulse ? 0.86 : 0.55);
+    const reach = livePulse ? 1.9 : 1.65;
+    mesh.current.position.x = Math.sin(t) * reach;
+    mesh.current.position.z = Math.sin(t * 1.7) * (livePulse ? 1.05 : 0.88);
+    mesh.current.rotation.x += livePulse ? 0.038 : 0.025;
+    mesh.current.rotation.z += livePulse ? 0.028 : 0.018;
   });
 
   return (
     <mesh ref={mesh} position={[0, 0.13, 0]} castShadow={!lite}>
       <sphereGeometry args={[0.12, lite ? 10 : 18, lite ? 8 : 14]} />
-      <meshStandardMaterial color="#f7f5e8" roughness={0.68} />
+      <meshStandardMaterial color="#f7f5e8" roughness={0.68} emissive={livePulse ? '#3a2b00' : '#000000'} emissiveIntensity={livePulse ? 0.22 : 0} />
     </mesh>
   );
 }
 
-function Floodlight({ x, z, lite }: { x: number; z: number; lite: boolean }) {
+function Floodlight({ x, z, lite, livePulse }: { x: number; z: number; lite: boolean; livePulse: boolean }) {
   return (
     <group position={[x, 0, z]}>
       <mesh position={[0, 1.35, 0]} castShadow={!lite}>
@@ -228,7 +257,11 @@ function Floodlight({ x, z, lite }: { x: number; z: number; lite: boolean }) {
       </mesh>
       <mesh position={[0, 2.72, 0]} rotation={[0, 0, x < 0 ? -0.15 : 0.15]}>
         <boxGeometry args={[0.45, 0.18, 0.12]} />
-        <meshStandardMaterial color="#e9f6ff" emissive="#b8dcff" emissiveIntensity={lite ? 0.4 : 1.2} />
+        <meshStandardMaterial
+          color="#e9f6ff"
+          emissive="#b8dcff"
+          emissiveIntensity={lite ? 0.4 : livePulse ? 1.75 : 1.2}
+        />
       </mesh>
     </group>
   );
@@ -303,6 +336,7 @@ function ArenaWorld({
   temperature,
   wind,
   footballReady,
+  livePulse,
   animate,
   lite,
   full,
@@ -313,6 +347,7 @@ function ArenaWorld({
   temperature: number | null;
   wind: number | null;
   footballReady: boolean;
+  livePulse: boolean;
   animate: boolean;
   lite: boolean;
   full: boolean;
@@ -326,26 +361,33 @@ function ArenaWorld({
 
   useFrame((state, delta) => {
     if (!root.current || !animate) return;
-    root.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.11) * (0.015 + windEnergy * 0.012);
-    root.current.position.y = Math.sin(state.clock.elapsedTime * 0.42) * 0.008;
+    const spatialTempo = livePulse ? 0.17 : 0.11;
+    root.current.rotation.y = Math.sin(state.clock.elapsedTime * spatialTempo) * (0.015 + windEnergy * 0.012);
+    root.current.position.y = Math.sin(state.clock.elapsedTime * (livePulse ? 0.62 : 0.42)) * 0.008;
     if (!footballReady) root.current.rotation.y *= Math.max(0, 1 - delta * 0.7);
   });
 
   return (
     <group ref={root}>
-      <ambientLight intensity={rainLike ? 0.55 : 0.78} />
-      <hemisphereLight args={['#d7ecff', '#132219', rainLike ? 0.55 : 0.8]} />
+      <ambientLight intensity={rainLike ? 0.55 : livePulse ? 0.9 : 0.78} />
+      <hemisphereLight args={['#d7ecff', '#132219', rainLike ? 0.55 : livePulse ? 0.95 : 0.8]} />
       <directionalLight
         position={[3.5, 6.5, 3]}
-        intensity={1.15 + heat * 0.65}
+        intensity={1.15 + heat * 0.65 + (livePulse ? 0.22 : 0)}
         castShadow={full}
       />
-      {full ? <pointLight position={[0, 4.2, 0]} intensity={footballReady ? 0.75 : 0.3} color="#ffe7a1" /> : null}
+      {full ? (
+        <pointLight
+          position={[0, 4.2, 0]}
+          intensity={livePulse ? 1.2 : footballReady ? 0.75 : 0.3}
+          color="#ffe7a1"
+        />
+      ) : null}
 
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[PITCH_LENGTH, PITCH_WIDTH, 1, 1]} />
         <meshStandardMaterial
-          color={rainLike ? '#174f34' : '#1f6a3c'}
+          color={rainLike ? '#174f34' : livePulse ? '#247847' : '#1f6a3c'}
           roughness={rainLike ? 0.72 : 0.92}
           metalness={rainLike ? 0.08 : 0.01}
         />
@@ -369,6 +411,7 @@ function ArenaWorld({
           active={index === activePlayer}
           animate={animate && footballReady}
           lite={lite}
+          livePulse={livePulse}
         />
       ))}
       {TEAM_B.map((position, index) => (
@@ -380,16 +423,17 @@ function ArenaWorld({
           active={index === (activePlayer + 2) % 5}
           animate={animate && footballReady}
           lite={lite}
+          livePulse={livePulse}
         />
       ))}
-      <Ball animate={animate} ready={footballReady} lite={lite} />
+      <Ball animate={animate} ready={footballReady} lite={lite} livePulse={livePulse} />
 
       {!lite ? (
         <>
-          <Floodlight x={-4.15} z={-2.65} lite={lite} />
-          <Floodlight x={4.15} z={-2.65} lite={lite} />
-          <Floodlight x={-4.15} z={2.65} lite={lite} />
-          <Floodlight x={4.15} z={2.65} lite={lite} />
+          <Floodlight x={-4.15} z={-2.65} lite={lite} livePulse={livePulse} />
+          <Floodlight x={4.15} z={-2.65} lite={lite} livePulse={livePulse} />
+          <Floodlight x={-4.15} z={2.65} lite={lite} livePulse={livePulse} />
+          <Floodlight x={4.15} z={2.65} lite={lite} livePulse={livePulse} />
         </>
       ) : null}
 
@@ -404,17 +448,45 @@ function ArenaWorld({
       ))}
 
       {full && footballReady ? (
-        <Sparkles count={28} scale={[8.8, 3.4, 6]} size={1.3} speed={0.18} opacity={0.22} color="#f5c542" />
+        <Sparkles
+          count={livePulse ? 46 : 28}
+          scale={[8.8, 3.4, 6]}
+          size={livePulse ? 1.65 : 1.3}
+          speed={livePulse ? 0.34 : 0.18}
+          opacity={livePulse ? 0.3 : 0.22}
+          color="#f5c542"
+        />
       ) : null}
     </group>
   );
 }
 
-function StaticArenaFallback({ provinceLabel }: { provinceLabel: string }) {
+function scoreLabel(matchPulse: ArenaMatchPulse) {
+  const home = matchPulse.score?.home;
+  const away = matchPulse.score?.away;
+  if (home == null || away == null) return 'vs';
+  return `${home} : ${away}`;
+}
+
+function matchStatusLabel(matchPulse: ArenaMatchPulse) {
+  if (matchPulse.isLive) {
+    return matchPulse.minute != null ? `LIVE · ${matchPulse.minute}′` : 'LIVE';
+  }
+  return matchPulse.status || matchPulse.kickoffLabel || 'Verified fixture';
+}
+
+function StaticArenaFallback({
+  provinceLabel,
+  matchPulse,
+}: {
+  provinceLabel: string;
+  matchPulse: ArenaMatchPulse | null;
+}) {
   return (
     <div
       className="relative grid min-h-64 place-items-center overflow-hidden rounded-[2rem] border border-white/10 bg-[#050908] p-6 text-center"
       data-experience-tier="static"
+      data-match-state={matchPulse ? (matchPulse.isLive ? 'live' : 'available') : 'quiet'}
     >
       <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-[1.62/1] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/30 bg-green-950/35">
         <div className="absolute inset-y-0 left-1/2 border-l border-white/25" />
@@ -429,6 +501,11 @@ function StaticArenaFallback({ provinceLabel }: { provinceLabel: string }) {
         <p className="mt-2 text-sm leading-6 text-gray-300">
           Locality and football state stay available without forcing WebGL or continuous motion.
         </p>
+        {matchPulse ? (
+          <p className="mt-3 border-t border-white/10 pt-3 text-xs font-bold text-white">
+            {matchPulse.home} <span className="text-yellow-300">{scoreLabel(matchPulse)}</span> {matchPulse.away} · {matchStatusLabel(matchPulse)}
+          </p>
+        ) : null}
       </div>
     </div>
   );
@@ -442,6 +519,7 @@ export default function LocalityScene({
   condition,
   footballReady,
   headline,
+  matchPulse,
   onProvinceSelect,
 }: {
   provinceSlug: string;
@@ -451,6 +529,7 @@ export default function LocalityScene({
   condition: string | null;
   footballReady: boolean;
   headline: string | null;
+  matchPulse: ArenaMatchPulse | null;
   onProvinceSelect?: (slug: string) => void;
 }) {
   const [profile, setProfile] = useState<ExperienceProfile>({
@@ -488,9 +567,10 @@ export default function LocalityScene({
   const selectProvince = onProvinceSelect
     ? (slug: ProvinceSlug) => onProvinceSelect(slug)
     : undefined;
+  const livePulse = Boolean(matchPulse?.isLive);
 
   if (!profile.runThreeJs) {
-    return <StaticArenaFallback provinceLabel={province.label} />;
+    return <StaticArenaFallback provinceLabel={province.label} matchPulse={matchPulse} />;
   }
 
   return (
@@ -498,6 +578,8 @@ export default function LocalityScene({
       className="relative min-h-[21rem] overflow-hidden rounded-[2rem] border border-white/10 bg-[#050908] shadow-[0_28px_90px_rgba(0,0,0,0.38)]"
       data-experience-tier={profile.tier}
       data-football-ready={footballReady ? 'true' : 'false'}
+      data-match-state={matchPulse ? (livePulse ? 'live' : 'available') : 'quiet'}
+      data-match-visualization="ambient-not-possession"
     >
       <Canvas
         dpr={[1, profile.maxDpr]}
@@ -511,6 +593,7 @@ export default function LocalityScene({
           temperature={temperature}
           wind={wind}
           footballReady={footballReady}
+          livePulse={livePulse}
           animate={animate}
           lite={lite}
           full={full}
@@ -546,10 +629,31 @@ export default function LocalityScene({
         </div>
       </div>
 
-      {headline ? (
-        <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-2xl border border-white/10 bg-black/72 px-3 py-2.5 backdrop-blur-md sm:inset-x-4 sm:bottom-4 sm:px-4">
-          <p className="text-[8px] font-black uppercase tracking-[0.2em] text-yellow-300">Local feed entering the arena</p>
-          <p className="mt-1 line-clamp-1 text-xs font-bold text-white sm:text-sm">{headline}</p>
+      {(matchPulse || headline) ? (
+        <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-2xl border border-white/10 bg-black/76 px-3 py-2.5 backdrop-blur-md sm:inset-x-4 sm:bottom-4 sm:px-4" data-testid="arena-match-pulse">
+          {matchPulse ? (
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className={`text-[8px] font-black uppercase tracking-[0.2em] ${livePulse ? 'text-red-300' : 'text-yellow-300'}`}>
+                  Verified match pulse · {matchStatusLabel(matchPulse)}
+                </p>
+                <p className="mt-1 truncate text-xs font-black text-white sm:text-sm">
+                  {matchPulse.home} <span className="text-yellow-300">{scoreLabel(matchPulse)}</span> {matchPulse.away}
+                </p>
+              </div>
+              {matchPulse.league ? (
+                <p className="hidden max-w-[32%] truncate text-right text-[9px] font-bold uppercase tracking-[0.14em] text-gray-400 sm:block">
+                  {matchPulse.league}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+          {headline ? (
+            <div className={matchPulse ? 'mt-2 border-t border-white/8 pt-2' : ''}>
+              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-green-300">Local feed entering the arena</p>
+              <p className="mt-1 line-clamp-1 text-[10px] font-bold text-gray-200 sm:text-xs">{headline}</p>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

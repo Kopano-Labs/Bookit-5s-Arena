@@ -59,6 +59,33 @@ function organismPayload(province = 'western-cape') {
   };
 }
 
+function featuredMatchPayload() {
+  return [
+    {
+      id: 'psl-live-proof-01',
+      league: {
+        id: '18031',
+        name: 'PSL (South Africa)',
+        shortName: 'PSL',
+        slug: 'psl',
+      },
+      home: { id: 'home-01', name: 'Orlando Pirates' },
+      away: { id: 'away-01', name: 'Kaizer Chiefs' },
+      score: { home: 1, away: 0 },
+      status: {
+        long: 'Second Half',
+        short: '2H',
+        elapsed: 63,
+        state: 'live',
+        isLive: true,
+      },
+      kickoffLabel: '7:30 pm',
+      isLive: true,
+      minute: 63,
+    },
+  ];
+}
+
 async function mockOrganismFeed(page: Page) {
   await page.route('**/api/organism/feed?province=*', async (route) => {
     const url = new URL(route.request().url());
@@ -67,6 +94,16 @@ async function mockOrganismFeed(page: Page) {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(organismPayload(province)),
+    });
+  });
+}
+
+async function mockFeaturedMatches(page: Page) {
+  await page.route('**/api/football/featured', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(featuredMatchPayload()),
     });
   });
 }
@@ -83,7 +120,7 @@ async function expectNoHorizontalOverflow(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await mockOrganismFeed(page);
+  await Promise.all([mockOrganismFeed(page), mockFeaturedMatches(page)]);
 });
 
 test('province state drives weather and editorial surface without leaving the shell', async ({ page }) => {
@@ -92,6 +129,7 @@ test('province state drives weather and editorial surface without leaving the sh
   const organism = page.getByTestId('living-organism');
   await expect(organism).toBeVisible();
   await expect(organism).toHaveAttribute('data-province', 'western-cape');
+  await expect(organism).toHaveAttribute('data-match-pulse', 'live');
   await expect(page.getByTestId('current-province')).toHaveText('Western Cape');
   await expect(page.getByRole('heading', { name: 'Western Cape football pulse' })).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId('kpgs-adapter-state')).toHaveAttribute(
@@ -99,10 +137,16 @@ test('province state drives weather and editorial surface without leaving the sh
     'contract-only',
   );
 
-  const arena = page.locator('[data-football-ready="true"]');
+  const arena = page.locator('[data-football-ready="true"][data-match-state="live"]');
   await expect(arena).toBeVisible({ timeout: 10_000 });
+  await expect(arena).toHaveAttribute('data-match-visualization', 'ambient-not-possession');
   await expect(arena).toContainText('Play ready');
   await expect(arena).toContainText('Western Cape football pulse');
+  await expect(arena).toContainText('Verified match pulse');
+  await expect(arena).toContainText('Orlando Pirates');
+  await expect(arena).toContainText('1 : 0');
+  await expect(arena).toContainText('Kaizer Chiefs');
+  await expect(arena).toContainText('63′');
 
   const gautengResponse = page.waitForResponse(
     (response) =>
@@ -113,9 +157,11 @@ test('province state drives weather and editorial surface without leaving the sh
   await gautengResponse;
 
   await expect(organism).toHaveAttribute('data-province', 'gauteng');
+  await expect(organism).toHaveAttribute('data-match-pulse', 'live');
   await expect(page.getByTestId('current-province')).toHaveText('Gauteng');
   await expect(page.getByRole('heading', { name: 'Gauteng football pulse' })).toBeVisible({ timeout: 10_000 });
   await expect(arena).toContainText('Gauteng football pulse');
+  await expect(arena).toContainText('Orlando Pirates');
   await expect(page).toHaveURL(/\/news$/);
   await expectNoHorizontalOverflow(page);
 });
@@ -142,7 +188,11 @@ test('reduced-motion users receive the static organism lane instead of forced Th
 
   const staticLane = page.locator('[data-experience-tier="static"]');
   await expect(staticLane).toBeVisible();
+  await expect(staticLane).toHaveAttribute('data-match-state', 'live');
   await expect(staticLane).toContainText('adaptive static arena');
+  await expect(staticLane).toContainText('Orlando Pirates');
+  await expect(staticLane).toContainText('1 : 0');
+  await expect(staticLane).toContainText('Kaizer Chiefs');
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 
