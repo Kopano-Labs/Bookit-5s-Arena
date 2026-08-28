@@ -1,7 +1,7 @@
 {
-  "name": "5s Arena World Cup",
+  "name": "Bookit 5s Arena",
   "short_name": "5s Arena",
-  "description": "Cape Town's most advanced 5-a-side football venue. Experience the World Cup 5s, real-time competition standings, and pro-tier floodlit courts at Milnerton. Book online from R400/hour.",
+  "description": "Cape Town 5-a-side football at Hellenic FC, Milnerton: court bookings, social football, events, competition reference surfaces, and venue information.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a1628",
@@ -72,4 +72,3 @@
     }
   ]
 }
-

@@ -30,7 +30,6 @@ export const metadata = {
   description:
     "Book 5-a-side football at Cape Town's premier arena. Floodlit courts at Hellenic FC, Milnerton. Online booking from R400/hr.",
   keywords: [
-    "World Cup 5s",
     "5-a-side football",
     "Cape Town",
     "Milnerton",
@@ -39,6 +38,7 @@ export const metadata = {
     "Hellenic Football Club",
     "Bookit 5's Arena",
     "Competition Hub",
+    "World Cup 5s archive",
   ],
   authors: [{ name: "Bookit 5's Arena" }],
   openGraph: {
@@ -46,9 +46,9 @@ export const metadata = {
     locale: "en_ZA",
     url: process.env.NEXTAUTH_URL || "https://fivesarena.com",
     siteName: "Bookit 5's Arena",
-    title: "Bookit 5's Arena | World Cup 5s Football Cape Town",
+    title: "Bookit 5's Arena | 5-a-Side Football Cape Town",
     description:
-      "Elite 5-a-side football in Milnerton, Cape Town. Live competition standings, floodlit courts, and integrated fan experiences. Join the World Cup 5s today.",
+      "Book floodlit 5-a-side courts in Milnerton, Cape Town, explore social football and events, and access archived competition reference surfaces.",
     images: [
       {
         url: "/icons/icon-512x512.png",
@@ -62,7 +62,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Bookit 5's Arena | Cape Town Football",
     description:
-      "Experience the World Cup 5s and real-time competition stats in Milnerton, Cape Town.",
+      "Book 5-a-side football in Milnerton, Cape Town, and follow current arena activity.",
   },
   robots: { index: true, follow: true },
 };

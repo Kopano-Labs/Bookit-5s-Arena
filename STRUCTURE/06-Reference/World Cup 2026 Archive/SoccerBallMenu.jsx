@@ -23,10 +23,10 @@ const MENU_ITEMS = [
   },
   {
     icon: FaTrophy,
-    label: '2026 Tournament Archive',
+    label: 'Register for Tournament',
     href: '/tournament',
     color: '#eab308',
-    desc: 'World Cup 5s · event window closed',
+    desc: 'World Cup 5s · 29–31 May 2026',
   },
 ];
 
@@ -149,10 +149,10 @@ export default function SoccerBallMenu() {
                   >
                     <Icon size={18} style={{ color: item.color }} />
                   </motion.div>
-                  <div className="min-w-0 text-left">
-                    <p className="text-white text-sm font-black uppercase tracking-widest">{item.label}</p>
-                    <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider">{item.desc}</p>
-                  </div>
+                    <div className="min-w-0 text-left">
+                      <p className="text-white text-sm font-black uppercase tracking-widest">{item.label}</p>
+                      <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider">{item.desc}</p>
+                    </div>
                 </motion.button>
               );
             })}

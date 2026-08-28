@@ -7,10 +7,10 @@ const SITE_URL = process.env.NEXTAUTH_URL || 'https://fivesarena.com';
 export async function GET() {
   const items = [
     {
-      title: '5s Arena World Cup Tournament — Registrations Open',
-      description: `Sign up for the 5s Arena World Cup — ${TOURNAMENT_FORMAT.groupCount} groups × ${TOURNAMENT_FORMAT.teamsPerGroup} teams; top ${TOURNAMENT_FORMAT.advancePerGroup} per group → ${TOURNAMENT_FORMAT.bracket[0]}. Live window ${TOURNAMENT_DATES.rangeRSS} at Hellenic Football Club, Milnerton. Registration closes ${TOURNAMENT_DATES.signupDeadline}.`,
+      title: '5s Arena World Cup 2026 — Event Archive',
+      description: `Archive notice for the 5s Arena World Cup: ${TOURNAMENT_FORMAT.groupCount} groups × ${TOURNAMENT_FORMAT.teamsPerGroup} teams; event window ${TOURNAMENT_DATES.rangeRSS} at Hellenic Football Club, Milnerton. Registration closed ${TOURNAMENT_DATES.signupDeadline}.`,
       link: `${SITE_URL}/tournament`,
-      pubDate: new Date('2026-01-01').toUTCString(),
+      pubDate: new Date('2026-06-01').toUTCString(),
     },
     {
       title: 'Book a 5-a-Side Court in Milnerton, Cape Town',
