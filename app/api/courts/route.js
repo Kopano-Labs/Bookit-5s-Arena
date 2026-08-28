@@ -3,8 +3,18 @@ import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/getSession';
 import { requireRole } from '@/lib/roles';
 import connectDB from '@/lib/mongodb';
-import { getFallbackCourts } from '@/lib/localData/courts';
 import Court from '@/models/Court';
+
+function publicCourtResponse(courts, status = 200, state = 'verified-source') {
+  const response = NextResponse.json(courts, { status });
+  response.headers.set('X-FivesArena-Data-State', state);
+  if (status === 200) {
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+  } else {
+    response.headers.set('Cache-Control', 'no-store');
+  }
+  return response;
+}
 
 // GET /api/courts — fetch all courts (public) or own courts (?mine=true)
 export async function GET(request) {
@@ -24,27 +34,19 @@ export async function GET(request) {
 
     await connectDB();
 
-    // .lean() returns plain JS objects — ~3× faster for read-only routes
     const courts = await Court.find(filter)
       .sort({ sortOrder: 1, createdAt: 1 })
       .lean();
 
-    if (!mine && courts.length === 0) {
-      return NextResponse.json(getFallbackCourts(), { status: 200 });
-    }
-
-    const res = NextResponse.json(courts, { status: 200 });
-
-    // Public court list changes rarely — cache 60s at edge, serve stale while revalidating
     if (!mine) {
-      res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+      return publicCourtResponse(courts, 200, courts.length > 0 ? 'verified-source' : 'database-empty');
     }
 
-    return res;
+    return NextResponse.json(courts, { status: 200 });
   } catch (error) {
     console.error('GET /api/courts error:', error);
     if (!mine) {
-      return NextResponse.json(getFallbackCourts(), { status: 200 });
+      return publicCourtResponse([], 503, 'unavailable');
     }
     return NextResponse.json({ error: 'Failed to fetch courts' }, { status: 500 });
   }

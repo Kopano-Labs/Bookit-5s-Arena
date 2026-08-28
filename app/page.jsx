@@ -5,6 +5,7 @@ import StatsBar         from '@/components/home/StatsBar';
 import WeatherWidget    from '@/components/home/WeatherWidget';
 import HomeLiveFixtures from '@/components/home/HomeLiveFixtures';
 import CourtsSection    from '@/components/home/CourtsSection';
+import CourtAvailabilityNotice from '@/components/home/CourtAvailabilityNotice';
 import AmenitiesStrip   from '@/components/home/AmenitiesStrip';
 import EventsSection    from '@/components/home/EventsSection';
 import HomeMediaHighlights from '@/components/home/HomeMediaHighlights';
@@ -17,7 +18,6 @@ import WelcomePopup     from '@/components/home/WelcomePopup';
 import BlackboxMarketMask from '@/components/marketing/BlackboxMarketMask';
 import { showBlackboxMarketMaskOnHome } from '@/lib/featureFlags';
 import connectDB        from '@/lib/mongodb';
-import { getFallbackCourts } from '@/lib/localData/courts';
 import { normalizeCourtImageFilename } from '@/lib/courtImage';
 import Court            from '@/models/Court';
 
@@ -28,57 +28,71 @@ const getCourts = async () => {
   try {
     await connectDB();
     const data = await Court.find().sort({ sortOrder: 1 }).lean();
+
     if (data.length === 0) {
-      return getFallbackCourts();
+      return { courts: [], source: 'unavailable' };
     }
-    return data.map((doc) => ({
-      ...doc,
-      image: normalizeCourtImageFilename(doc.image),
-      _id: doc._id?.toString?.() ?? String(doc._id),
-      owner:
-        doc.owner != null ? String(doc.owner) : '000000000000000000000001',
-      createdAt: doc.createdAt?.toISOString?.(),
-      updatedAt: doc.updatedAt?.toISOString?.(),
-    }));
+
+    return {
+      source: 'database',
+      courts: data.map((doc) => ({
+        ...doc,
+        image: normalizeCourtImageFilename(doc.image),
+        _id: doc._id?.toString?.() ?? String(doc._id),
+        owner:
+          doc.owner != null ? String(doc.owner) : '000000000000000000000001',
+        createdAt: doc.createdAt?.toISOString?.(),
+        updatedAt: doc.updatedAt?.toISOString?.(),
+      })),
+    };
   } catch (err) {
-    console.error('Failed to get courts:', err);
-    return getFallbackCourts();
+    console.error('Failed to get verified court inventory:', err);
+    return { courts: [], source: 'unavailable' };
   }
 };
 
 // ─── page component ───────────────────────────────────────────
 const HomePage = async () => {
-  const courts = await getCourts();
+  const courtResult = await getCourts();
+  const courts = courtResult.courts;
+  const courtFeedReady = courtResult.source === 'database' && courts.length > 0;
+  const numericPrices = courtFeedReady
+    ? courts
+        .map((court) => Number(court.price_per_hour))
+        .filter((price) => Number.isFinite(price) && price > 0)
+    : [];
+  const minPrice = numericPrices.length > 0 ? Math.min(...numericPrices) : null;
+
   const ecosystemRoutes = [
     {
       label: "KRRababalela",
       href: "https://krrababalela.com",
       note: "Chief portfolio",
-      status: "LIVE",
+      status: "LINKED",
     },
     {
       label: "Kopano Labs",
       href: "https://kopanolabs.com",
       note: "Studio lane",
-      status: "LIVE",
+      status: "LINKED",
     },
     {
       label: "KasiLink",
       href: "https://kasilink.com",
       note: "Township network",
-      status: "LIVE",
+      status: "LINKED",
     },
     {
       label: "5s Arena Blog",
       href: "https://blog.fivesarena.com",
       note: "Editorial surface",
-      status: "LIVE",
+      status: "LINKED",
     },
     {
       label: "Starfall Salvage",
       href: "https://starfallsalvage.kopanolabs.com",
       note: "Game lane",
-      status: "LIVE",
+      status: "LINKED",
     },
     {
       label: "Kopano Context",
@@ -99,17 +113,21 @@ const HomePage = async () => {
       <HomeLiveFixtures />
       <FixturesPromo />
 
-      {/* ══ STATS BAR — live counts from courts (no misleading zero flash) ══ */}
-      <StatsBar courtsCount={courts.length || 4} />
+      {/* ══ STATS BAR — values come from the booking source, never fallback seed data ══ */}
+      <StatsBar
+        courtsCount={courtFeedReady ? courts.length : null}
+        minPrice={minPrice}
+        courtFeedReady={courtFeedReady}
+      />
 
       {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}
       <WeatherWidget />
 
-      {/* ══ TOURNAMENT — showstopper World Cup section ══════════ */}
+      {/* ══ TOURNAMENT — archived World Cup section ═════════════ */}
       <TournamentSection />
 
-      {/* ══ COURTS — staggered scroll-reveal + hover glow ═══════ */}
-      <CourtsSection courts={courts} />
+      {/* ══ COURTS — only transactional inventory may render as bookable ═══════ */}
+      {courtFeedReady ? <CourtsSection courts={courts} /> : <CourtAvailabilityNotice />}
 
       {/* ══ AMENITIES — spring pop-in ════════════════════════════ */}
       <AmenitiesStrip />
@@ -117,13 +135,17 @@ const HomePage = async () => {
       {/* ══ EVENTS — staggered cards + coloured glows ════════════ */}
       <EventsSection />
 
-      {/* ══ ABOUT — slide in from sides ══════════════════════════ */}
-      <AboutSection courtsCount={courts.length || 4} />
+      {/* ══ ABOUT — venue reference + truth-qualified commercial stats ═══════ */}
+      <AboutSection
+        courtsCount={courtFeedReady ? courts.length : null}
+        minPrice={minPrice}
+        courtFeedReady={courtFeedReady}
+      />
 
       {/* ══ SOCIAL — staggered slide reveal ═════════════════════ */}
       <SocialSection />
 
-      {/* ══ TOURNAMENT SHOWCASE — live standings + SSE ══════════ */}
+      {/* ══ TOURNAMENT SHOWCASE — retired component currently returns null ════ */}
       <TournamentShowcase />
 
       {/* ══ MEDIA HIGHLIGHTS — cinematic global news feed ════════ */}
@@ -139,9 +161,10 @@ const HomePage = async () => {
               Five&apos;s Arena is one lane in a wider public graph
             </h2>
             <p className="mt-4 text-sm leading-7 text-gray-400">
-              The arena should route cleanly to the chief portfolio, studio, township work
-              network, editorial lane, and game layer. Kopano Context stays visible, but honestly
-              marked as reserved until the public runtime is owner-proven.
+              The arena links outward to the chief portfolio, studio, township work network,
+              editorial lane, and game layer. A LINKED badge records this page&apos;s configured
+              relationship only; it is not a runtime-health claim. Kopano Context remains marked
+              as reserved until its public runtime is owner-proven.
             </p>
           </div>
 
@@ -162,7 +185,7 @@ const HomePage = async () => {
                     className={`rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${
                       item.status === "RESERVED"
                         ? "bg-amber-500/15 text-amber-300"
-                        : "bg-yellow-600/15 text-green-300"
+                        : "bg-sky-500/10 text-sky-300"
                     }`}
                   >
                     {item.status}
@@ -179,10 +202,8 @@ const HomePage = async () => {
 
       {/* ══ CONTACT + FOOTER — animated cards ═══════════════════ */}
       <ContactSection />
-
     </div>
   );
 };
 
 export default HomePage;
-

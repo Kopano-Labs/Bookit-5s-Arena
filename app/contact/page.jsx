@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   FaPhone,
   FaWhatsapp,
   FaEnvelope,
   FaMapMarkerAlt,
   FaPaperPlane,
-  FaCheckCircle,
 } from "react-icons/fa";
 
+const CONTACT_EMAIL = "fivearena@gmail.com";
+
 export default function ContactPage() {
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -21,14 +20,15 @@ export default function ContactPage() {
     message: "",
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setLoading(false);
-    setSuccess(true);
-    setForm({ name: "", email: "", subject: "General Inquiry", message: "" });
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const subject = encodeURIComponent(`[5s Arena] ${form.subject}`);
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
+    );
+
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -60,12 +60,13 @@ export default function ContactPage() {
             transition={{ delay: 0.2 }}
             className="text-gray-400 text-lg max-w-2xl mx-auto"
           >
-            Have a question about our courts, tournaments, or leagues? Send us a message and we'll get back to you within 24 hours.
+            Use WhatsApp, phone or email for current court, rate, event and competition enquiries.
+            The form below opens an email draft on your device; it does not claim a message was sent
+            until your email provider actually sends it.
           </motion.p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-12">
-          {/* Info Side */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -91,23 +92,23 @@ export default function ContactPage() {
                 {
                   icon: FaEnvelope,
                   label: "Email",
-                  value: "fivearena@gmail.com",
-                  href: "mailto:fivearena@gmail.com",
+                  value: CONTACT_EMAIL,
+                  href: `mailto:${CONTACT_EMAIL}`,
                   color: "#3b82f6",
                 },
                 {
                   icon: FaMapMarkerAlt,
                   label: "Location",
-                  value: "Hellenic Football Club, Milnerton, CZ",
+                  value: "Hellenic Football Club, Milnerton, Cape Town, ZA",
                   href: "https://maps.google.com/?q=Hellenic+Football+Club+Milnerton",
                   color: "#ef4444",
                 },
-              ].map((item, i) => (
+              ].map((item) => (
                 <a
-                  key={i}
+                  key={item.label}
                   href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  target={item.href.startsWith("http") ? "_blank" : undefined}
+                  rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   className="flex items-start gap-4 p-4 rounded-2xl bg-gray-900 border border-gray-800 hover:border-gray-700 transition-all group"
                 >
                   <div
@@ -129,124 +130,98 @@ export default function ContactPage() {
             </div>
 
             <div className="p-6 rounded-3xl bg-linear-to-br from-green-900/20 to-gray-900 border border-green-500/20">
-              <h3 className="text-white font-bold mb-2">Operating Hours</h3>
-              <ul className="text-sm text-gray-400 space-y-2">
-                <li className="flex justify-between">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-white font-bold">Site-stated hours</h3>
+                <span className="rounded-full border border-amber-700/30 bg-amber-900/20 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-amber-300">
+                  Confirm availability
+                </span>
+              </div>
+              <ul className="text-sm text-gray-400 space-y-2 mt-4">
+                <li className="flex justify-between gap-4">
                   <span>Monday - Sunday</span>
-                  <span className="text-green-400">10:00 - 22:00</span>
+                  <span className="text-gray-200">10:00 - 22:00</span>
                 </li>
-                <li className="flex justify-between">
+                <li className="flex justify-between gap-4">
                   <span>Public Holidays</span>
-                  <span className="text-green-400">10:00 - 18:00</span>
+                  <span className="text-amber-300">Confirm directly</span>
                 </li>
               </ul>
+              <p className="mt-3 text-[10px] leading-5 text-gray-600">
+                These hours are reference information, not a real-time open/closed signal.
+              </p>
             </div>
           </motion.div>
 
-          {/* Form Side */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
             className="lg:col-span-3 bg-gray-900 border border-gray-800 rounded-3xl p-8"
           >
-            <AnimatePresence mode="wait">
-              {success ? (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-12"
+            <div className="mb-6 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 text-sm leading-6 text-blue-100">
+              This is an email-draft helper. Pressing the button opens your configured email client;
+              you remain the human-in-the-loop for the final send.
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-widest font-black ml-1">Name</label>
+                  <input
+                    required
+                    value={form.name}
+                    onChange={(event) => setForm({ ...form, name: event.target.value })}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:border-green-500 outline-none transition-all"
+                    placeholder="Your Name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-widest font-black ml-1">Email</label>
+                  <input
+                    required
+                    type="email"
+                    value={form.email}
+                    onChange={(event) => setForm({ ...form, email: event.target.value })}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:border-green-500 outline-none transition-all"
+                    placeholder="email@example.com"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 uppercase tracking-widest font-black ml-1">Subject</label>
+                <select
+                  value={form.subject}
+                  onChange={(event) => setForm({ ...form, subject: event.target.value })}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:border-green-500 outline-none transition-all"
                 >
-                  <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-green-900/40">
-                    <FaCheckCircle className="text-white text-3xl" />
-                  </div>
-                  <h2 className="text-2xl font-black uppercase tracking-widest mb-4">Message Sent!</h2>
-                  <p className="text-gray-400 mb-8 max-w-xs mx-auto">
-                    Thanks for reaching out! A member of our team will contact you shortly.
-                  </p>
-                  <button
-                    onClick={() => setSuccess(false)}
-                    className="px-8 py-3 rounded-xl bg-gray-800 text-white font-bold uppercase tracking-widest text-sm border border-gray-700 hover:bg-gray-700 transition-all"
-                  >
-                    Send Another Message
-                  </button>
-                </motion.div>
-              ) : (
-                <motion.form
-                  key="form"
-                  initial={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onSubmit={handleSubmit}
-                  className="space-y-6"
-                >
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] text-gray-500 uppercase tracking-widest font-black ml-1">Name</label>
-                      <input
-                        required
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:border-green-500 outline-none transition-all"
-                        placeholder="Your Name"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] text-gray-500 uppercase tracking-widest font-black ml-1">Email</label>
-                      <input
-                        required
-                        type="email"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:border-green-500 outline-none transition-all"
-                        placeholder="email@example.com"
-                      />
-                    </div>
-                  </div>
+                  <option>General Inquiry</option>
+                  <option>Court Availability</option>
+                  <option>Competition Information</option>
+                  <option>Events & Birthdays</option>
+                  <option>Booking Issues</option>
+                </select>
+              </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[10px] text-gray-500 uppercase tracking-widest font-black ml-1">Subject</label>
-                    <select
-                      value={form.subject}
-                      onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:border-green-500 outline-none transition-all"
-                    >
-                      <option>General Inquiry</option>
-                      <option>Tournament Registration</option>
-                      <option>League Information</option>
-                      <option>Events & Birthdays</option>
-                      <option>Booking Issues</option>
-                    </select>
-                  </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 uppercase tracking-widest font-black ml-1">Message</label>
+                <textarea
+                  required
+                  value={form.message}
+                  onChange={(event) => setForm({ ...form, message: event.target.value })}
+                  rows={6}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:border-green-500 outline-none transition-all resize-none"
+                  placeholder="Tell us how we can help..."
+                />
+              </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[10px] text-gray-500 uppercase tracking-widest font-black ml-1">Message</label>
-                    <textarea
-                      required
-                      value={form.message}
-                      onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      rows={5}
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white text-sm focus:border-green-500 outline-none transition-all resize-none"
-                      placeholder="Tell us how we can help..."
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-4 rounded-xl bg-green-600 hover:bg-green-500 text-white font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-green-900/40 flex items-center justify-center gap-3"
-                  >
-                    {loading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <FaPaperPlane size={14} /> Send Message
-                      </>
-                    )}
-                  </button>
-                </motion.form>
-              )}
-            </AnimatePresence>
+              <button
+                type="submit"
+                className="w-full py-4 rounded-xl bg-green-600 hover:bg-green-500 text-white font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-green-900/40 flex items-center justify-center gap-3"
+              >
+                <FaPaperPlane size={14} /> Open Email Draft
+              </button>
+            </form>
           </motion.div>
         </div>
       </div>
