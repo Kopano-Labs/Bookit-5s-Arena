@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import AuthProvider from "@/components/AuthProvider";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import TruthFooter from "@/components/TruthFooter";
 import ClientOnly from "@/components/ClientOnly";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { FeatureAccessProvider } from "@/hooks/useFeatureAccess";
@@ -28,7 +28,7 @@ export const metadata = {
     template: "%s | Bookit 5's Arena",
   },
   description:
-    "Book 5-a-side football at Cape Town's premier arena. Floodlit courts at Hellenic FC, Milnerton. Online booking from R400/hr.",
+    "Explore 5-a-side football at Hellenic FC, Milnerton, with source-qualified court booking, event enquiries, football fixtures and archived competition reference surfaces.",
   keywords: [
     "5-a-side football",
     "Cape Town",
@@ -48,7 +48,7 @@ export const metadata = {
     siteName: "Bookit 5's Arena",
     title: "Bookit 5's Arena | 5-a-Side Football Cape Town",
     description:
-      "Book floodlit 5-a-side courts in Milnerton, Cape Town, explore social football and events, and access archived competition reference surfaces.",
+      "Explore 5-a-side football in Milnerton, Cape Town, including source-qualified booking surfaces, event enquiries and archived competition reference.",
     images: [
       {
         url: "/icons/icon-512x512.png",
@@ -62,7 +62,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Bookit 5's Arena | Cape Town Football",
     description:
-      "Book 5-a-side football in Milnerton, Cape Town, and follow current arena activity.",
+      "Explore 5-a-side football in Milnerton, Cape Town, with current-source booking surfaces and archived competition reference.",
   },
   robots: { index: true, follow: true },
 };
@@ -122,7 +122,6 @@ const RootLayout = ({ children }) => {
             __html: `(function(){try{var t=localStorage.getItem('5s_theme');var ok=t==='dark'||t==='light'||t==='crazy'||t==='read';if(ok){document.documentElement.classList.add(t);}}catch(e){}})();`,
           }}
         />
-        {/* Plausible Analytics — Lightweight & Privacy-focused */}
         <script
           defer
           data-domain="fivesarena.com"
@@ -144,8 +143,7 @@ const RootLayout = ({ children }) => {
               <main>
                 <PageTransition>{children}</PageTransition>
               </main>
-              <Footer />
-              {/* Fixed floating elements */}
+              <TruthFooter />
               <ScrollToTop />
               <SoccerBallMenu />
               <BottomNavbar />

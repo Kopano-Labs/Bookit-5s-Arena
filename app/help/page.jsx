@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  FaQuestionCircle,
+  FaCalendarAlt,
   FaChevronDown,
   FaCreditCard,
-  FaCalendarAlt,
+  FaEnvelope,
+  FaPhone,
+  FaQuestionCircle,
   FaShieldAlt,
   FaTrophy,
   FaUsers,
-  FaPhone,
   FaWhatsapp,
-  FaEnvelope,
 } from "react-icons/fa";
 
 const FAQ_CATEGORIES = [
@@ -23,24 +22,20 @@ const FAQ_CATEGORIES = [
     color: "#22c55e",
     faqs: [
       {
-        q: "How do I book a court?",
-        a: "You can book online through our website — select your preferred court, date, and time slot. Payment can be made via Stripe (card) or cash on site for guest bookings.",
+        q: "How do I check current court availability?",
+        a: "Use the Courts section on the home page. Bookable inventory is shown only when the current booking source returns verified court records. If that source is unavailable, confirm the court, rate and slot directly with 5s Arena instead of relying on fallback data.",
       },
       {
-        q: "Can I book as a guest?",
-        a: "Yes! Guest bookings are available with cash-on-site payment only. However, signing up unlocks online payments, booking history, loyalty rewards, and more.",
+        q: "What are the current court rates?",
+        a: "Current rates are not hard-coded into this FAQ. Use the rate shown by the current booking inventory. If no source-backed rate is shown, confirm it on WhatsApp before booking or travelling.",
       },
       {
-        q: "What are the court rates?",
-        a: "Courts start from R400 per hour. Rates may vary for peak times, weekends, and special events. Check the booking page for live pricing.",
+        q: "Which payment methods are accepted?",
+        a: "Use only payment options presented by the current transactional booking flow or confirmed directly by a 5s Arena human. This FAQ does not independently certify card, cash, EFT, deposits or bank details.",
       },
       {
-        q: "Can I cancel a booking?",
-        a: "Cancellations are allowed up to 24 hours before your booking time. Cancellations within 24 hours are non-refundable.",
-      },
-      {
-        q: "Are refunds available?",
-        a: "Refunds for online payments are processed within 5-7 business days. Cash payments are non-refundable.",
+        q: "Can I cancel or get a refund?",
+        a: "Use My Bookings for any cancellation action currently available to your booking, then confirm the applicable cancellation/refund terms with 5s Arena. This FAQ does not promise a 24-hour rule, refund eligibility, or a processing timeline without a current policy receipt.",
       },
     ],
   },
@@ -50,47 +45,35 @@ const FAQ_CATEGORIES = [
     color: "#3b82f6",
     faqs: [
       {
-        q: "How do I book an event?",
-        a: "Contact us via WhatsApp, phone, or email. We will create a custom package based on your requirements.",
+        q: "How do I request an event?",
+        a: "Use the Events enquiry surface or contact the team directly. Submitting an enquiry is not a confirmed booking; the team must confirm the date, package scope, rate and payment instructions.",
       },
       {
-        q: "What events do you host?",
-        a: "Kids birthdays, corporate team-building, social tournaments, and private functions. All packages include court access, equipment, and dedicated staff.",
+        q: "Which event packages are available?",
+        a: "Package descriptions on the site are reference information. Confirm current inclusions, guest limits, catering, staffing, equipment and pricing directly before relying on them.",
       },
       {
-        q: "Is catering included?",
-        a: "Our bar and restaurant are available for all events. Custom catering can be arranged upon request for an additional fee.",
-      },
-      {
-        q: "How far in advance should I book?",
-        a: "We recommend booking at least 2 weeks in advance for events. Popular dates (weekends, school holidays) fill up fast!",
+        q: "How early should I enquire?",
+        a: "There is no guaranteed lead-time rule in this FAQ. Send the preferred date and requirements as early as practical, then wait for the team to confirm availability.",
       },
     ],
   },
   {
-    name: "Tournament",
+    name: "World Cup 2026 Archive",
     icon: FaTrophy,
     color: "#eab308",
     faqs: [
       {
-        q: "When does the tournament start?",
-        a: `The 5s Arena World Cup live window is ${TOURNAMENT_DATES.rangeLong}. Sign-ups close ${TOURNAMENT_DATES.signupDeadline}.`,
+        q: "Is World Cup 5s 2026 still open for registration?",
+        a: "No. The public event window ran 29–31 May 2026 and registration closed 22 May 2026. The /tournament route is now an archive, not a signup or payment flow.",
       },
       {
-        q: "How many players per team?",
-        a: "5 starting players, up to 3 reserves, and up to 3 support staff (water carriers, coaches, etc.).",
+        q: "Can I still use the old tournament payment reference or entry fee?",
+        a: "No current payment instruction is issued by the archive. Do not reuse historical World Cup entry-fee or EFT-reference instructions. Ask the team what current competition, if any, is open before paying anything.",
       },
       {
-        q: "How does the format work?",
-        a: `${TOURNAMENT_FORMAT.groupCount} groups of ${TOURNAMENT_FORMAT.teamsPerGroup} teams. ${TOURNAMENT_FORMAT.qualificationLegend}. Knockout: ${TOURNAMENT_FORMAT.bracket.join(" → ")} — one champion.`,
-      },
-      {
-        q: "Can I change my World Cup team?",
-        a: "Yes, through the manager interface — but only if your new choice hasn't been taken by another team.",
-      },
-      {
-        q: "What happens if I miss the deadline?",
-        a: "Your team will NOT be allowed to register. If you miss the deadline, your team is removed from the system entirely. No exceptions.",
+        q: "Where are the historical standings and fixtures?",
+        a: "Open the World Cup 2026 archive at /tournament and use its standings or fixtures reference links. Historical data must not be read as a current live-event state.",
       },
     ],
   },
@@ -100,39 +83,31 @@ const FAQ_CATEGORIES = [
     color: "#ef4444",
     faqs: [
       {
-        q: "Are slide tackles allowed?",
-        a: "NO. Slide tackles are strictly prohibited. Any slide tackle results in an immediate yellow card.",
+        q: "Where can I find the rules that apply?",
+        a: "Use the Rules/Terms surface for site-stated rules. If a rule affects safety, payment, cancellation, liability or a disputed booking, confirm it with the team rather than treating this FAQ as the final contractual source.",
       },
       {
-        q: "What about drugs and substances?",
-        a: "Zero tolerance. Any person found with illegal substances will be removed, police will be contacted, and they will be permanently banned.",
-      },
-      {
-        q: "What if equipment is damaged?",
-        a: "Any intentional damage to equipment results in full financial liability. You break it, you pay for it.",
-      },
-      {
-        q: "Is smoking allowed?",
-        a: "Smoking is allowed on the premises but NOT inside the clubhouse.",
+        q: "What should I do if a safety or conduct issue happens at the venue?",
+        a: "Contact venue staff immediately. For urgent support from 5s Arena, use WhatsApp or phone. Do not rely on the website alone for an active physical safety incident.",
       },
     ],
   },
   {
-    name: "Leagues",
+    name: "Competitions",
     icon: FaUsers,
     color: "#a855f7",
     faqs: [
       {
-        q: "When do leagues start?",
-        a: "Leagues are coming soon! Season 1 dates will be announced on our website and social media channels.",
+        q: "Which leagues or competitions are currently open?",
+        a: "The site does not assume an OPEN registration state without a current receipt. Use /leagues to request the current competition options, or confirm directly with the team.",
       },
       {
-        q: "How much does it cost?",
-        a: "Fees vary per league (R600-R800 per team per season). Payment is due before the first match.",
+        q: "What does a competition cost?",
+        a: "Current competition fees are not certified by this FAQ. Confirm the specific competition, date, format and fee before making any payment.",
       },
       {
-        q: "Can individuals join without a team?",
-        a: "Yes! Use our Find Players feature to connect with teams looking for additional members.",
+        q: "Can an individual join without a team?",
+        a: "Ask the team whether the current competition supports individual placement or player matching. A feature or route existing in the codebase is not proof that it is currently operational for a given competition.",
       },
     ],
   },
@@ -144,16 +119,15 @@ export default function HelpPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* Hero */}
-      <section className="py-20 text-center px-6">
+      <section className="px-6 py-20 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <FaQuestionCircle className="mx-auto text-green-400 mb-4" size={36} />
+          <FaQuestionCircle className="mx-auto mb-4 text-green-400" size={36} />
           <h1
-            className="font-black uppercase tracking-widest mb-3"
+            className="mb-3 font-black uppercase tracking-widest"
             style={{
               fontSize: "clamp(2rem, 5vw, 3.5rem)",
               fontFamily: "Impact, Arial Black, sans-serif",
@@ -161,89 +135,69 @@ export default function HelpPage() {
           >
             HELP & <span className="text-green-400">FAQ</span>
           </h1>
-          <p className="text-gray-400 max-w-lg mx-auto">
-            Got questions? We&apos;ve got answers. Browse by category or search
-            below.
+          <p className="mx-auto max-w-2xl text-gray-400">
+            Stable navigation can live here. Changing business facts—price, availability, payment,
+            refund, OPEN/LIVE status—must come from their current source or a human confirmation.
           </p>
         </motion.div>
       </section>
 
-      {/* Category Tabs */}
-      <section className="max-w-4xl mx-auto px-6 pb-6">
+      <section className="mx-auto max-w-4xl px-6 pb-6">
         <div className="flex flex-wrap justify-center gap-2">
-          {FAQ_CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
-            const isActive = openCategory === cat.name;
+          {FAQ_CATEGORIES.map((category) => {
+            const Icon = category.icon;
+            const isActive = openCategory === category.name;
             return (
-              <motion.button
-                key={cat.name}
+              <button
+                key={category.name}
                 onClick={() => {
-                  setOpenCategory(cat.name);
+                  setOpenCategory(category.name);
                   setOpenFaq(null);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest cursor-pointer border transition-all ${
+                className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-widest transition ${
                   isActive
                     ? "text-white"
-                    : "text-gray-500 border-gray-800 hover:border-gray-700 hover:text-gray-400"
-                } shadow-sm hover:shadow-lg hover:shadow-green-400/20 focus:ring-2 focus:ring-green-400/40`}
+                    : "border-gray-800 text-gray-500 hover:border-gray-700 hover:text-gray-300"
+                }`}
                 style={
                   isActive
                     ? {
-                        borderColor: cat.color,
-                        background: `${cat.color}15`,
-                        color: cat.color,
+                        borderColor: category.color,
+                        background: `${category.color}15`,
+                        color: category.color,
                       }
                     : {}
                 }
-                whileHover={{
-                  scale: 1.08,
-                  rotate: 1,
-                  boxShadow: "0 0 16px 2px #22c55e33",
-                }}
-                whileTap={{ scale: 0.96, rotate: -1 }}
               >
-                <Icon size={12} /> {cat.name}
-              </motion.button>
+                <Icon size={12} /> {category.name}
+              </button>
             );
           })}
         </div>
       </section>
 
-      {/* FAQs */}
-      <section className="max-w-3xl mx-auto px-6 pb-16">
+      <section className="mx-auto max-w-3xl px-6 pb-16">
         <AnimatePresence mode="wait">
-          {FAQ_CATEGORIES.filter((c) => c.name === openCategory).map((cat) => (
+          {FAQ_CATEGORIES.filter((category) => category.name === openCategory).map((category) => (
             <motion.div
-              key={cat.name}
+              key={category.name}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="space-y-2"
             >
-              {cat.faqs.map((faq, _i) => {
-                const isOpen = openFaq === `${cat.name}-${_i}`;
+              {category.faqs.map((faq, index) => {
+                const key = `${category.name}-${index}`;
+                const isOpen = openFaq === key;
                 return (
-                  <motion.div
-                    key={_i}
-                    className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: _i * 0.05 }}
-                  >
+                  <div key={key} className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50">
                     <button
-                      onClick={() =>
-                        setOpenFaq(isOpen ? null : `${cat.name}-${_i}`)
-                      }
-                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-800/30 transition-colors duration-300 hover:scale-[1.01] active:scale-95 group"
+                      onClick={() => setOpenFaq(isOpen ? null : key)}
+                      className="flex w-full items-center justify-between px-5 py-4 text-left transition hover:bg-gray-800/30"
                     >
-                      <span className="text-sm font-bold text-gray-200">
-                        {faq.q}
-                      </span>
-                      <motion.span
-                        animate={{ rotate: isOpen ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <FaChevronDown size={12} style={{ color: cat.color }} />
+                      <span className="text-sm font-bold text-gray-200">{faq.q}</span>
+                      <motion.span animate={{ rotate: isOpen ? 180 : 0 }}>
+                        <FaChevronDown size={12} style={{ color: category.color }} />
                       </motion.span>
                     </button>
                     <AnimatePresence>
@@ -252,16 +206,13 @@ export default function HelpPage() {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.25 }}
                           className="overflow-hidden"
                         >
-                          <p className="px-5 pb-4 text-sm text-gray-400 leading-relaxed">
-                            {faq.a}
-                          </p>
+                          <p className="px-5 pb-4 text-sm leading-7 text-gray-400">{faq.a}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </motion.div>
+                  </div>
                 );
               })}
             </motion.div>
@@ -269,47 +220,37 @@ export default function HelpPage() {
         </AnimatePresence>
       </section>
 
-      {/* Still need help? */}
-      <section className="max-w-3xl mx-auto px-6 pb-20">
-        <motion.div
-          className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <FaPhone className="mx-auto text-green-400 mb-4" size={24} />
-          <h3
-            className="font-black uppercase tracking-widest text-xl mb-2"
-            style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
-          >
-            Still Need <span className="text-green-400">Help</span>?
-          </h3>
-          <p className="text-gray-400 text-sm mb-6">
-            Our team is here to help. Get in touch any way you prefer.
+      <section className="mx-auto max-w-3xl px-6 pb-20">
+        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-8 text-center">
+          <FaPhone className="mx-auto mb-4 text-green-400" size={24} />
+          <h2 className="text-xl font-black uppercase tracking-widest">Need a current answer?</h2>
+          <p className="mt-3 text-sm leading-6 text-gray-400">
+            Use a human confirmation for changing business state. No response-time guarantee is
+            implied by these contact routes.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href="https://wa.me/27637820245"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-600/20 border border-green-600/40 text-green-400 text-sm font-bold"
+              className="flex items-center gap-2 rounded-xl border border-green-600/40 bg-green-600/20 px-5 py-2.5 text-sm font-bold text-green-400"
             >
               <FaWhatsapp /> WhatsApp
             </a>
             <a
               href="tel:+27637820245"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600/20 border border-blue-600/40 text-blue-400 text-sm font-bold"
+              className="flex items-center gap-2 rounded-xl border border-blue-600/40 bg-blue-600/20 px-5 py-2.5 text-sm font-bold text-blue-400"
             >
               <FaPhone /> 063 782 0245
             </a>
             <a
               href="mailto:fivearena@gmail.com"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600/20 border border-purple-600/40 text-purple-400 text-sm font-bold"
+              className="flex items-center gap-2 rounded-xl border border-purple-600/40 bg-purple-600/20 px-5 py-2.5 text-sm font-bold text-purple-400"
             >
-              <FaEnvelope /> Email Us
+              <FaEnvelope /> Email
             </a>
           </div>
-        </motion.div>
+        </div>
       </section>
     </div>
   );

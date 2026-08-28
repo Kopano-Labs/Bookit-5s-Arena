@@ -13,14 +13,14 @@ export async function GET() {
       pubDate: new Date('2026-06-01').toUTCString(),
     },
     {
-      title: 'Book a 5-a-Side Court in Milnerton, Cape Town',
-      description: 'Book floodlit FIFA-standard synthetic turf courts from R400/hour. Online booking with instant confirmation.',
+      title: '5-a-Side Courts in Milnerton, Cape Town',
+      description: 'Review the current online court inventory, rates and booking availability on 5s Arena. If the booking source is unavailable, the site will ask you to confirm directly with the venue instead of showing fallback availability.',
       link: `${SITE_URL}/#courts`,
       pubDate: new Date('2025-12-01').toUTCString(),
     },
     {
       title: 'Events at 5s Arena — Birthdays, Corporate & Tournaments',
-      description: 'Host your next event at 5s Arena. Kids birthday parties, premium corporate team building, and social tournaments.',
+      description: 'Explore event and service information for 5s Arena, including social football and venue enquiries.',
       link: `${SITE_URL}/events-and-services`,
       pubDate: new Date('2025-11-01').toUTCString(),
     },

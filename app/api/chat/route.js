@@ -1,52 +1,44 @@
 export const dynamic = 'force-dynamic';
 // app/api/chat/route.js
-// AI Chatbot — Fallback chain:
-//   1. Groq (free, fast — Llama 3.3 70B via groq.com, GROQ_API_KEY)
-//   2. Anthropic Claude (ANTHROPIC_API_KEY)
-//   3. Rule-based local engine (lib/supportAI.js — always works, no key needed)
+// AI Chatbot fallback chain:
+//   1. Groq
+//   2. Anthropic
+//   3. Rule-based local engine
 
 import { answerSupportQuestion } from '@/lib/supportAI';
 import { verifyBotRequest } from '@/lib/security/botid';
 import { logBraintrustEvent } from '@/lib/integrations/braintrust';
+import { rateLimit } from '@/lib/rateLimit';
 
-const SYSTEM_PROMPT = `You are the friendly AI assistant for 5s Arena, a 5-a-side football venue in Cape Town, South Africa.
+const SYSTEM_PROMPT = `You are the support assistant for 5s Arena, a 5-a-side football service associated with Hellenic Football Club in Milnerton, Cape Town.
 
-About 5s Arena:
-- Full name: 5s Arena at Hellenic Football Club
-- Location: Pringle Rd, Milnerton, Cape Town 7441, South Africa
-- Courts: Multiple floodlit, all-weather synthetic grass pitches
-- Hours: 10:00 AM – 10:00 PM daily (every day)
-- Pricing: From R400/hour (varies by court and time slot)
-- Amenities: Bar & Restaurant, Sound System, Secure Parking, Floodlit courts, All-weather synthetic turf
-- Events we host: Birthday parties, Tournaments (5v5 World Cup), Social Leagues, Corporate team-building events, Holiday football clinics for kids
-- Contact: WhatsApp 063 782 0245 (Mashoto), Email: fivearena@mail.com
-- Social media: Facebook (Fives Arena), Instagram @fivesarena, TikTok @fivesarena
+SOURCE GOVERNANCE — this is mandatory:
+- Never turn configured, cached, fallback, historical, or site-stated information into VERIFIED-LIVE or TRANSACTIONAL state without a current authoritative receipt.
+- Prices, court availability, slot availability, payment methods, payment references, refund/cancellation terms, opening-now status, event-package scope, prizes, jobs, and current competition registration are changing business facts. Do not guess them.
+- For current court inventory/rates, direct users to the Courts section. If the booking source is unavailable, tell them to confirm with a 5s Arena human.
+- The site-stated reference hours are 10:00–22:00, but that is not a real-time OPEN/CLOSED signal. Tell users to confirm current availability before travelling when it matters.
+- The World Cup 5s 2026 event window ran 29–31 May 2026 and registration closed 22 May 2026. /tournament is an archive. Never say registrations are open, never quote the historical entry fee as a current fee, and never issue/reuse a World Cup payment reference.
+- Fixture data can come from a current network response or a saved/cached snapshot. A snapshot must not be described as LIVE. Tell users to rely on the source-state label shown by the fixture UI.
+- Event requests are enquiries until a human confirms date, package scope, price, and payment instructions.
+- Contact: WhatsApp +27 63 782 0245; email fivearena@gmail.com.
+- Location listed by the site: Hellenic Football Club, Pringle Rd, Milnerton, Cape Town 7441, South Africa.
 
-Our Brand New Features (Direct users to these URLs):
-- Tournament Features: Live Fixtures & Standings (/fixtures), Knockout Brackets (/tournament/bracket), and a Manager Dashboard for Squad lineups and AI Co-Coach (/tournament/manager).
-- Hub & Content: The 5s Arena Tech Blog (/blog). The API documentation (/docs/api) and past Case Studies (/case-studies).
-- Community & Careers: We have a Job Board to apply for Referee or Bartender roles (/jobs). Check out our Partner Affiliates (/partners).
+COMMUNICATION:
+- Keep answers concise and helpful.
+- State the evidence class when relevant: current booking source, site-stated reference, saved snapshot, archive, or human confirmation required.
+- If you cannot validate a changing business fact, say that clearly and direct the user to WhatsApp +27 63 782 0245 rather than inventing an answer.
+- Navigational URLs can be mentioned as routes, but the existence of a route is not proof that a feature, job, league, payment rail, or live event is currently active.`;
 
-Your role:
-- Answer questions about the venue concisely, warmly, and enthusiastically (football emojis welcome!)
-- If they ask about Leauges, Tournaments, or Jobs, proudly point them to the new features above!
-- Keep answers short — 1–3 sentences max unless detail is genuinely needed
-- If unsure about specific details (exact packages, availability), direct them to WhatsApp: 063 782 0245
-- Never make up pricing, policies or availability not stated above
-- Speak as if you love football and love this venue`;
-
-// ── Shared message builder ─────────────────────────────────────────────────
 function buildMessages(history, message) {
   return [
-    ...(Array.isArray(history) ? history : []).slice(-8).map((m) => ({
-      role: m.role === 'user' ? 'user' : 'assistant',
-      content: String(m.content),
+    ...(Array.isArray(history) ? history : []).slice(-8).map((item) => ({
+      role: item.role === 'user' ? 'user' : 'assistant',
+      content: String(item.content),
     })),
     { role: 'user', content: message },
   ];
 }
 
-// ── Provider 1: Groq (free, fast — OpenAI-compatible) ─────────────────────
 async function tryGroq(messages) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return null;
@@ -58,9 +50,9 @@ async function tryGroq(messages) {
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile', // Best Groq free model
+      model: 'llama-3.3-70b-versatile',
       max_tokens: 400,
-      temperature: 0.7,
+      temperature: 0.3,
       messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
     }),
   });
@@ -74,7 +66,6 @@ async function tryGroq(messages) {
   return data?.choices?.[0]?.message?.content ?? null;
 }
 
-// ── Provider 2: Anthropic Claude ──────────────────────────────────────────
 async function tryClaude(messages) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
@@ -103,15 +94,11 @@ async function tryClaude(messages) {
   return data?.content?.[0]?.text ?? null;
 }
 
-// ── Provider 3: Rule-based local engine ───────────────────────────────────
 function tryRuleBased(message) {
   const result = answerSupportQuestion(message);
   return result.answer;
 }
 
-import { rateLimit } from '@/lib/rateLimit';
-
-// ── Route handler ─────────────────────────────────────────────────────────
 export async function POST(request) {
   const botVerification = await verifyBotRequest();
   if (botVerification.isBot) {
@@ -143,7 +130,6 @@ export async function POST(request) {
 
     const messages = buildMessages(history, message);
 
-    // Try providers in order of preference
     let reply = await tryGroq(messages);
     let provider = 'groq';
 
@@ -163,7 +149,7 @@ export async function POST(request) {
 
     void logBraintrustEvent({
       input: {
-        route: "/api/chat",
+        route: '/api/chat',
         provider,
         message,
       },
@@ -171,8 +157,9 @@ export async function POST(request) {
         reply,
       },
       metadata: {
-        category: "support-chat",
+        category: 'support-chat',
         provider,
+        governance: 'source-qualified-business-claims',
       },
       scores: {
         response_length: reply.length,
@@ -180,8 +167,8 @@ export async function POST(request) {
     });
 
     return Response.json({ reply, provider });
-  } catch (err) {
-    console.error('Chat API error:', err);
+  } catch (error) {
+    console.error('Chat API error:', error);
     return Response.json({ error: 'Something went wrong.' }, { status: 500 });
   }
 }
