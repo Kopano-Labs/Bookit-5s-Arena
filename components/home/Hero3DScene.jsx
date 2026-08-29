@@ -14,6 +14,11 @@ function SoccerBall() {
   useFrame((state) => {
     if (!groupRef.current) return;
 
+    // Responsive scaling based on viewport width (Mobile auto-fit)
+    const isMobile = state.viewport.width < 6.5;
+    const baseScale = isMobile ? 1.35 : 2.1;
+    groupRef.current.scale.lerp(new THREE.Vector3(baseScale, baseScale, baseScale), 0.08);
+
     // Smooth Cursor Parallax Tracking (Elastic Lerping)
     const targetX = state.pointer.y * 0.45;
     const targetY = state.pointer.x * 0.45;
@@ -43,7 +48,7 @@ function SoccerBall() {
     <group ref={groupRef}>
       <Float speed={2.5} rotationIntensity={0.2} floatIntensity={0.6}>
         {/* 1. Core Sphere (Ultra-glossy space metallic core) */}
-        <mesh ref={innerRef} scale={2.1}>
+        <mesh ref={innerRef}>
           <sphereGeometry args={[1, 64, 64]} />
           <meshStandardMaterial
             color="#090d16"
@@ -54,7 +59,7 @@ function SoccerBall() {
         </mesh>
 
         {/* 2. Holographic Geodesic Soccer Pattern Shell (Glowing seams) */}
-        <mesh ref={outerRef} scale={2.13}>
+        <mesh ref={outerRef} scale={1.015}>
           <icosahedronGeometry args={[1, 3]} /> {/* High poly geodesic pattern matches soccer seams */}
           <meshStandardMaterial
             color="#22c55e"

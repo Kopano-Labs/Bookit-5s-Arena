@@ -3,7 +3,8 @@ import HeroSection      from '@/components/home/HeroSection';
 import FixturesPromo    from '@/components/home/FixturesPromo';
 import StatsBar         from '@/components/home/StatsBar';
 import LivingOrganismSurface from '@/components/home/LivingOrganismSurface';
-import TournamentArchiveSection from '@/components/home/TournamentArchiveSection';
+import PitchStadiumScene from '@/components/3d/PitchStadiumScene';
+import TacticalBoard    from '@/components/tactics/TacticalBoard';
 import HomeLiveFixtures from '@/components/home/HomeLiveFixtures';
 import CourtsSection    from '@/components/home/CourtsSection';
 import AmenitiesStrip   from '@/components/home/AmenitiesStrip';
@@ -66,11 +67,10 @@ const HomePage = async () => {
       status: "LIVE",
     },
     {
-      label: "5s Arena News",
-      href: "/news",
-      note: "Blog + news organs rendered in the arena shell",
+      label: "5s Arena Blog",
+      href: "https://blog.fivesarena.com",
+      note: "Editorial surface",
       status: "LIVE",
-      internal: true,
     },
     {
       label: "Starfall Salvage",
@@ -98,11 +98,18 @@ const HomePage = async () => {
 
       <StatsBar courtsCount={courts.length || 4} />
 
+      {/* Interactive 3D Stadium Map: Hellenic FC 4-Pitch Layout */}
+      <section id="pitches" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <PitchStadiumScene />
+      </section>
+
+      {/* 5v5 Tactical Lineup & Match Card Builder */}
+      <section id="tactics" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <TacticalBoard />
+      </section>
+
       {/* One province context now drives weather, editorial relevance and adaptive Three.js. */}
       <LivingOrganismSurface />
-
-      {/* World Cup 2026 is historical evidence, not an active registration surface. */}
-      <TournamentArchiveSection />
 
       <CourtsSection courts={courts} />
       <AmenitiesStrip />
