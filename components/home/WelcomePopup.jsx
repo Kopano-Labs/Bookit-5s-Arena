@@ -13,7 +13,7 @@ export default function WelcomePopup() {
   useEffect(() => {
     const hidden = localStorage.getItem(WELCOME_POPUP_STORAGE_KEY);
     if (!hidden) {
-      const timer = setTimeout(() => setIsVisible(true), 3000);
+      const timer = setTimeout(() => setIsVisible(true), 6000);
       return () => clearTimeout(timer);
     }
   }, []);

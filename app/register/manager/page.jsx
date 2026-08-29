@@ -125,14 +125,14 @@ export default function ManagerRegisterPage() {
             MANAGE YOUR <span className="text-purple-500">LEGACY</span>
           </h1>
           <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-            As a 5s Arena Manager, you gain control over squad rosters, team rewards, and tournament registrations. Lead your team to glory in the 2026 World Cup.
+            As a 5s Arena Manager, you gain control over squad rosters, team rewards, and tournament registrations. Lead your team to glory in the 5s Arena Leagues.
           </p>
 
           <div className="space-y-4">
              {[
                { icon: <FaTrophy />, title: 'Squad Control', desc: 'Manage players and team logos.' },
                { icon: <FaStar />, title: 'Exclusive Rewards', desc: 'Earn staff-only loyalty points.' },
-               { icon: <FaGlobe />, title: 'WC Eligibility', desc: 'Direct entry for verified managers.' }
+               { icon: <FaGlobe />, title: 'League Eligibility', desc: 'Direct entry for verified squads.' }
              ].map((f, i) => (
                <motion.div key={i} className="flex gap-4 p-4 rounded-2xl bg-gray-900/40 border border-gray-800/50" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i*0.1 }}>
                  <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 flex-shrink-0 border border-purple-500/20">

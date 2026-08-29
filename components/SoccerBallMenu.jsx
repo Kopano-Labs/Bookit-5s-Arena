@@ -23,10 +23,10 @@ const MENU_ITEMS = [
   },
   {
     icon: FaTrophy,
-    label: 'Register for Tournament',
+    label: 'Arena Tournaments',
     href: '/tournament',
     color: '#eab308',
-    desc: 'World Cup 5s · 29–31 May 2026',
+    desc: '5s Arena Leagues & Archive',
   },
 ];
 

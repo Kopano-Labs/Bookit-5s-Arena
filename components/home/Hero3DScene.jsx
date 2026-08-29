@@ -15,9 +15,14 @@ function SoccerBall() {
     if (!groupRef.current) return;
 
     // Responsive scaling based on viewport width (Mobile auto-fit)
-    const isMobile = state.viewport.width < 6.5;
-    const baseScale = isMobile ? 1.35 : 2.1;
+    const isSmallMobile = state.viewport.width < 4.8;
+    const isMobile = state.viewport.width < 7.0;
+    const baseScale = isSmallMobile ? 0.95 : isMobile ? 1.25 : 2.1;
     groupRef.current.scale.lerp(new THREE.Vector3(baseScale, baseScale, baseScale), 0.08);
+
+    // Responsive Y-offset to prevent overlapping hero action buttons on mobile
+    const targetPosY = isSmallMobile ? -0.35 : isMobile ? -0.2 : 0.0;
+    groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, targetPosY, 0.08);
 
     // Smooth Cursor Parallax Tracking (Elastic Lerping)
     const targetX = state.pointer.y * 0.45;
