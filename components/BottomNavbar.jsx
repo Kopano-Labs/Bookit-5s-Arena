@@ -19,20 +19,15 @@ import {
   FaBookOpen,
   FaKey,
   FaNewspaper,
+  FaGamepad,
 } from "react-icons/fa";
 
 /* ─── Nav items per role (4-tier) ───────────────────── */
 const USER_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
   { href: "/#courts", icon: FaFutbol, label: "Book", color: "#22c55e" },
-  {
-    href: "/bookings",
-    icon: FaCalendarAlt,
-    label: "Bookings",
-    color: "#a855f7",
-  },
   { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
-  { href: "/leagues", icon: FaTrophy, label: "Leagues", color: "#eab308" },
+  { href: "/play", icon: FaGamepad, label: "Play", color: "#eab308" },
   { href: "/news", icon: FaNewspaper, label: "Pulse", color: "#39d98a" },
 ];
 
@@ -40,9 +35,8 @@ const GUEST_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
   { href: "/#courts", icon: FaFutbol, label: "Book", color: "#22c55e" },
   { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
-  { href: "/leagues", icon: FaTrophy, label: "Leagues", color: "#eab308" },
+  { href: "/play", icon: FaGamepad, label: "Play", color: "#eab308" },
   { href: "/news", icon: FaNewspaper, label: "Pulse", color: "#39d98a" },
-  { href: "/about", icon: FaBookOpen, label: "About", color: "#22c55e" },
 ];
 
 const MANAGER_ITEMS = [

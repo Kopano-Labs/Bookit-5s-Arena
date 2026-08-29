@@ -145,9 +145,11 @@ const RootLayout = ({ children }) => {
                 <PageTransition>{children}</PageTransition>
               </main>
               <Footer />
-              {/* Fixed floating elements */}
-              <ScrollToTop />
-              <SoccerBallMenu />
+              {/* Desktop-only secondary floaters — Enforcing One Persistent Control on Mobile */}
+              <div className="hidden md:block">
+                <ScrollToTop />
+                <SoccerBallMenu />
+              </div>
               <BottomNavbar />
               <NewsletterPopup />
               <CookieBanner />

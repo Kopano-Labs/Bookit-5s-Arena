@@ -36,10 +36,10 @@ const KIT_COLORS = [
 ];
 
 export default function TacticalBoard() {
-  const [teamName, setTeamName] = useState("Cape Town All-Stars");
+  const [teamName, setTeamName] = useState("My 5s Squad (Template)");
   const [selectedFormation, setSelectedFormation] = useState(FORMATIONS[0]);
   const [selectedKit, setSelectedKit] = useState(KIT_COLORS[0]);
-  const [players, setPlayers] = useState(["Sipho (GK)", "Tshepo (CB)", "Robyn (LM)", "Kagiso (RM)", "Lebo (ST)"]);
+  const [players, setPlayers] = useState(["Player 1 (GK)", "Player 2 (DEF)", "Player 3 (LM)", "Player 4 (RM)", "Player 5 (FWD)"]);
   const boardRef = useRef();
 
   const handlePlayerChange = (index, value) => {
@@ -59,12 +59,12 @@ export default function TacticalBoard() {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-800 pb-6">
         <div>
           <span className="rounded-full border border-yellow-500/30 bg-yellow-500/10 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-yellow-400">
-            Tactics Lab
+            Tactics Lab (Template)
           </span>
           <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
-            5v5 Team Lineup Builder
+            5v5 Tactical Lineup Builder
           </h2>
-          <p className="text-xs text-gray-400">Build your 5-a-side starting team and export match cards to WhatsApp</p>
+          <p className="text-xs text-gray-400">Customise your starting 5 formation and export match cards to WhatsApp</p>
         </div>
 
         <button
