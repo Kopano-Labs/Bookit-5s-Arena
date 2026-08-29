@@ -160,6 +160,27 @@ const SearchModal = () => {
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
             />
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <FaSearch size={12} />
+        <span className="hidden md:inline">Search…</span>
+        <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-700 text-gray-500 text-[10px] font-mono ml-2">
+          ⌘K
+        </kbd>
+      </motion.button>
+
+      {/* Modal overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+            />
             <motion.div
               className="fixed top-[15%] left-1/2 -translate-x-1/2 w-[90vw] max-w-lg bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl z-[9999] overflow-hidden"
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -178,7 +199,12 @@ const SearchModal = () => {
                   placeholder="Search pages…"
                   className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-gray-500"
                 />
-                <button onClick={() => setIsOpen(false)} className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center text-gray-500 hover:text-gray-300">
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-lg bg-gray-800/80 px-2 py-1 text-xs font-bold text-gray-400 hover:bg-gray-700 hover:text-white"
+                  aria-label="Close search"
+                >
+                  <span className="hidden sm:inline mr-1 text-[10px] uppercase">Close</span>
                   <FaTimes size={12} />
                 </button>
               </div>
@@ -217,10 +243,16 @@ const SearchModal = () => {
                 )}
               </div>
 
-              {/* Footer */}
-              <div className="border-t border-gray-800 px-4 py-2 flex items-center justify-between text-gray-600 text-[10px]">
-                <span>Navigate with ↑↓ · Open with ↵</span>
-                <span>ESC to close</span>
+              {/* Footer — Desktop keyboard hints, Mobile touch close button */}
+              <div className="border-t border-gray-800 px-4 py-2 flex items-center justify-between text-gray-400 text-[10px]">
+                <span className="hidden sm:inline text-gray-500">Navigate with ↑↓ · Open with ↵</span>
+                <span className="hidden sm:inline text-gray-500">ESC to close</span>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="sm:hidden w-full py-1.5 text-center font-bold uppercase tracking-wider text-green-400 hover:text-green-300"
+                >
+                  ✕ Close Search
+                </button>
               </div>
             </motion.div>
           </>

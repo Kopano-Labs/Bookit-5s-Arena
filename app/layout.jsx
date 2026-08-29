@@ -40,7 +40,18 @@ export const metadata = {
     "Bookit 5's Arena",
     "Competition Hub",
   ],
-  authors: [{ name: "Bookit 5's Arena" }],
+  authors: [
+    { name: "Kholofelo Robyn Rababalela", url: "https://krrababalela.com" },
+    { name: "Bookit 5's Arena", url: "https://fivesarena.com" },
+  ],
+  creator: "Kholofelo Robyn Rababalela",
+  publisher: "Kopano Labs",
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": "/api/rss",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_ZA",

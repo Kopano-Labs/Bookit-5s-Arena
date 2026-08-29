@@ -141,6 +141,19 @@ function matchLine(matchPulse: ArenaMatchPulse | null) {
   return `${matchPulse.home} ${score} ${matchPulse.away} · ${state}`;
 }
 
+function decodeHtmlEntities(text?: string | null): string {
+  if (!text) return '';
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#039;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ');
+}
+
 function StaticOrganismScene({
   provinceLabel,
   matchPulse,
@@ -445,11 +458,11 @@ export default function LivingOrganismSurface() {
                       ) : null}
                     </div>
                     <h4 className="mt-2 text-sm font-black leading-5 text-white sm:text-base">
-                      {article.title}
+                      {decodeHtmlEntities(article.title)}
                     </h4>
                     {article.summary ? (
                       <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-400">
-                        {article.summary}
+                        {decodeHtmlEntities(article.summary)}
                       </p>
                     ) : null}
                   </motion.article>
