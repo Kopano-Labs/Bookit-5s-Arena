@@ -160,27 +160,6 @@ const SearchModal = () => {
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
             />
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <FaSearch size={12} />
-        <span className="hidden md:inline">Search…</span>
-        <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-700 text-gray-500 text-[10px] font-mono ml-2">
-          ⌘K
-        </kbd>
-      </motion.button>
-
-      {/* Modal overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-            />
             <motion.div
               className="fixed top-[15%] left-1/2 -translate-x-1/2 w-[90vw] max-w-lg bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl z-[9999] overflow-hidden"
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
