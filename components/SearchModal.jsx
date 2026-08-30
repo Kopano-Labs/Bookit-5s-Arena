@@ -1,42 +1,46 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { 
-  FaSearch, FaFutbol, FaTrophy, FaGavel,
-  FaStar, FaUser, FaChartBar, FaTimes, FaNewspaper,
-  FaBolt, FaPaintBrush, FaPlus, FaUsers
+import {
+  FaBolt,
+  FaChartBar,
+  FaFutbol,
+  FaGavel,
+  FaNewspaper,
+  FaPaintBrush,
+  FaPlus,
+  FaSearch,
+  FaStar,
+  FaTimes,
+  FaTrophy,
+  FaUser,
+  FaUsers,
 } from 'react-icons/fa';
 
 const PAGES = [
-  // Public (Guests & Everyone)
-  { name: 'Book a Court', href: '/#courts', icon: FaFutbol, category: 'Booking', auth: 'public' },
+  { name: 'Courts & Booking', href: '/#courts', icon: FaFutbol, category: 'Booking', auth: 'public' },
   { name: 'Events & Services', href: '/events-and-services', icon: FaBolt, category: 'Booking', auth: 'public' },
-  { name: 'Register for Tournament', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
-  { name: 'Fixtures & Live Scores', href: '/fixtures', icon: FaFutbol, category: 'Competition', auth: 'public' },
+  { name: 'World Cup 2026 Archive', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
+  { name: 'Fixtures & Match Center', href: '/fixtures', icon: FaFutbol, category: 'Competition', auth: 'public' },
   { name: 'Competitions', href: '/leagues', icon: FaTrophy, category: 'Competition', auth: 'public' },
   { name: 'Rules of the Game', href: '/rules-of-the-game', icon: FaGavel, category: 'Info', auth: 'public' },
-
-  // Authenticated Users (User)
+  { name: 'Football Playground', href: '/play', icon: FaFutbol, category: 'Info', auth: 'public' },
   { name: 'Rewards', href: '/rewards', icon: FaStar, category: 'Account', auth: 'user' },
   { name: 'My Bookings', href: '/bookings', icon: FaBolt, category: 'Account', auth: 'user' },
   { name: 'Profile Settings', href: '/profile', icon: FaUser, category: 'Account', auth: 'user' },
   { name: 'Arena Creator', href: '/creator', icon: FaPaintBrush, category: 'Info', auth: 'user' },
-
-  // Managers
   { name: 'Squad Management', href: '/manager/squad', icon: FaUsers, category: 'Staff', auth: 'manager' },
   { name: 'Manager Rewards', href: '/rewards', icon: FaStar, category: 'Staff', auth: 'manager' },
-
-  // Admins Only
   { name: 'Admin Dashboard', href: '/admin/dashboard', icon: FaChartBar, category: 'Admin', auth: 'admin' },
   { name: 'Add Event', href: '/events/add', icon: FaPlus, category: 'Admin', auth: 'admin' },
   { name: 'Add Newsletter', href: '/admin/newsletter', icon: FaNewspaper, category: 'Admin', auth: 'admin' },
   { name: 'Rights Management', href: '/admin/rights', icon: FaUser, category: 'Admin', auth: 'admin' },
 ];
 
-const SearchModal = () => {
+export default function SearchModal() {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -46,59 +50,52 @@ const SearchModal = () => {
   const pathname = usePathname();
 
   const userRole = session?.user?.activeRole || session?.user?.role;
-  const isAuthenticated = !!session;
+  const isAuthenticated = Boolean(session);
   const isAdmin = userRole === 'admin';
   const isManager = userRole === 'manager';
+  const normalizedQuery = query.trim().toLowerCase();
 
-  // Filter based on authentication role and query
-  const filtered = PAGES.filter((p) => {
-    // 1. Strict Role-Based Filtering
-    if (p.auth === 'admin' && !isAdmin) return false;
-    if (p.auth === 'manager' && !isManager && !isAdmin) return false;
-    
-    // Explicit Guest Safety: If guest, ONLY show public items.
-    // If not public and not authenticated, hide it.
-    if (!isAuthenticated && p.auth !== 'public') return false;
-
-    // 2. Query matching
-    return (
-      p.name.toLowerCase().includes(query.toLowerCase()) ||
-      p.category.toLowerCase().includes(query.toLowerCase())
-    );
+  const results = PAGES.filter((page) => {
+    if (page.auth === 'admin' && !isAdmin) return false;
+    if (page.auth === 'manager' && !isManager && !isAdmin) return false;
+    if (!isAuthenticated && page.auth !== 'public') return false;
+    if (!normalizedQuery) return true;
+    return page.name.toLowerCase().includes(normalizedQuery) || page.category.toLowerCase().includes(normalizedQuery);
   });
 
-  const flatResults = filtered;
+  const navigate = useCallback((href) => {
+    setIsOpen(false);
+    if (href.startsWith('/#')) window.location.href = href;
+    else router.push(href);
+  }, [router]);
 
-  const handleKeyDown = useCallback((e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-      e.preventDefault();
-      setIsOpen((prev) => !prev);
+  const handleKeyDown = useCallback((event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      setIsOpen((value) => !value);
       return;
     }
-    if (!isOpen) {
-      if (e.key === 'Escape') setIsOpen(false);
-      return;
-    }
-    if (e.key === 'Escape') {
+    if (!isOpen) return;
+    if (event.key === 'Escape') {
       setIsOpen(false);
       return;
     }
-    if (!flatResults.length) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setHighlightedIndex((prev) => (prev + 1) % flatResults.length);
+    if (!results.length) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setHighlightedIndex((value) => (value + 1) % results.length);
       return;
     }
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setHighlightedIndex((prev) => (prev - 1 + flatResults.length) % flatResults.length);
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setHighlightedIndex((value) => (value - 1 + results.length) % results.length);
       return;
     }
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      navigate(flatResults[highlightedIndex].href);
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      navigate(results[Math.min(highlightedIndex, results.length - 1)].href);
     }
-  }, [flatResults, highlightedIndex, isOpen]);
+  }, [highlightedIndex, isOpen, navigate, results]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -106,11 +103,11 @@ const SearchModal = () => {
   }, [handleKeyDown]);
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-      setQuery('');
-      setHighlightedIndex(0);
-    }
+    if (!isOpen) return undefined;
+    const timer = window.setTimeout(() => inputRef.current?.focus(), 80);
+    setQuery('');
+    setHighlightedIndex(0);
+    return () => window.clearTimeout(timer);
   }, [isOpen]);
 
   useEffect(() => {
@@ -121,95 +118,85 @@ const SearchModal = () => {
     setHighlightedIndex(0);
   }, [query]);
 
-  const navigate = (href) => {
-    setIsOpen(false);
-    if (href.startsWith('/#')) {
-      // eslint-disable-next-line react-hooks/immutability
-      window.location.href = href;
-    } else {
-      router.push(href);
-    }
-  };
-
-  const categories = [...new Set(filtered.map((p) => p.category))];
+  const categories = [...new Set(results.map((page) => page.category))];
 
   return (
     <>
-      {/* Trigger button */}
       <motion.button
+        type="button"
         onClick={() => setIsOpen(true)}
-        className="flex min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800/60 px-2.5 py-1.5 text-sm text-gray-400 transition-all hover:border-green-500/40 hover:text-gray-300"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-gray-700 bg-gray-800/60 px-3 text-sm text-gray-400 transition hover:border-green-500/40 hover:text-white"
+        aria-label="Open site search"
       >
         <FaSearch size={12} />
         <span className="hidden md:inline">Search…</span>
-        <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-700 text-gray-500 text-[10px] font-mono ml-2">
-          ⌘K
-        </kbd>
+        <kbd className="hidden rounded bg-gray-700 px-1.5 py-0.5 font-mono text-[10px] text-gray-500 md:inline">⌘K</kbd>
       </motion.button>
 
-      {/* Modal overlay */}
       <AnimatePresence>
         {isOpen && (
           <>
-            <motion.div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+            <motion.button
+              type="button"
+              aria-label="Close search"
+              className="fixed inset-0 z-[9998] cursor-default bg-black/65 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              className="fixed top-[15%] left-1/2 -translate-x-1/2 w-[90vw] max-w-lg bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl z-[9999] overflow-hidden"
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Site search"
+              className="fixed left-1/2 top-[10%] z-[9999] w-[94vw] max-w-lg -translate-x-1/2 overflow-hidden rounded-2xl border border-gray-700 bg-gray-950 shadow-2xl sm:top-[15%]"
+              initial={{ opacity: 0, y: -18, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              exit={{ opacity: 0, y: -18, scale: 0.96 }}
             >
-              {/* Search input */}
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800">
-                <FaSearch className="text-green-400 flex-shrink-0" size={14} />
+              <div className="flex items-center gap-3 border-b border-gray-800 px-4 py-3">
+                <FaSearch className="shrink-0 text-green-400" size={14} />
                 <input
                   ref={inputRef}
-                  type="text"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search pages…"
-                  className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-gray-500"
+                  className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-gray-600"
                 />
-                <button onClick={() => setIsOpen(false)} className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center text-gray-500 hover:text-gray-300">
-                  <FaTimes size={12} />
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-gray-800 bg-gray-900 text-gray-400 hover:text-white"
+                  aria-label="Close search"
+                >
+                  <FaTimes size={13} />
                 </button>
               </div>
 
-              {/* Results */}
-              <div className="max-h-80 overflow-y-auto p-2">
-                {filtered.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-8">No pages found for &ldquo;{query}&rdquo;</p>
+              <div className="max-h-[65vh] overflow-y-auto p-2 sm:max-h-96">
+                {results.length === 0 ? (
+                  <p className="py-10 text-center text-sm text-gray-500">No matching pages.</p>
                 ) : (
-                  categories.map((cat) => (
-                    <div key={cat} className="mb-2">
-                      <p className="text-green-500 text-[10px] uppercase tracking-widest font-bold px-3 py-1">{cat}</p>
-                      {filtered.filter((p) => p.category === cat).map((page) => {
+                  categories.map((category) => (
+                    <div key={category} className="mb-2">
+                      <p className="px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-green-500">{category}</p>
+                      {results.filter((page) => page.category === category).map((page) => {
                         const Icon = page.icon;
-                        const pageIndex = flatResults.findIndex((item) => item.href === page.href);
-                        const isHighlighted = pageIndex === highlightedIndex;
+                        const index = results.findIndex((item) => item.href === page.href && item.name === page.name);
+                        const active = index === highlightedIndex;
                         return (
-                          <motion.button
-                            key={page.href}
+                          <button
+                            key={`${page.category}-${page.name}`}
+                            type="button"
+                            onMouseEnter={() => setHighlightedIndex(index)}
                             onClick={() => navigate(page.href)}
-                            onMouseEnter={() => setHighlightedIndex(pageIndex)}
-                            className={`flex min-h-[44px] w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
-                              isHighlighted
-                                ? 'bg-green-600/10 text-white'
-                                : 'text-gray-300 hover:bg-green-600/10 hover:text-white'
-                            }`}
-                            whileHover={{ x: 3 }}
+                            className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition ${active ? 'bg-green-600/10 text-white' : 'text-gray-300 hover:bg-gray-900 hover:text-white'}`}
                           >
-                            <Icon size={14} className="text-green-400 flex-shrink-0" />
-                            <span className="text-sm">{page.name}</span>
-                          </motion.button>
+                            <Icon className="shrink-0 text-green-400" size={14} />
+                            {page.name}
+                          </button>
                         );
                       })}
                     </div>
@@ -217,10 +204,9 @@ const SearchModal = () => {
                 )}
               </div>
 
-              {/* Footer */}
-              <div className="border-t border-gray-800 px-4 py-2 flex items-center justify-between text-gray-600 text-[10px]">
-                <span>Navigate with ↑↓ · Open with ↵</span>
-                <span>ESC to close</span>
+              <div className="flex items-center justify-between border-t border-gray-800 px-4 py-2 text-[10px] uppercase tracking-widest text-gray-600">
+                <span>↑↓ navigate · ↵ open</span>
+                <span>Esc closes</span>
               </div>
             </motion.div>
           </>
@@ -228,6 +214,4 @@ const SearchModal = () => {
       </AnimatePresence>
     </>
   );
-};
-
-export default SearchModal;
+}
