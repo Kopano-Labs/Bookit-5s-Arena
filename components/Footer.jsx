@@ -46,7 +46,6 @@ const GUEST_QUICK_LINKS = [
   { label: "South Africa Pulse", href: "/news" },
   { label: "Fixtures", href: "/fixtures" },
   { label: "Leagues", href: "/leagues" },
-  { label: "World Cup 2026 Archive", href: "/tournament" },
   { label: "Rules of the Game", href: "/rules-of-the-game" },
 ];
 
@@ -74,11 +73,6 @@ const ORGANISM_LINKS = [
     label: "Blog Organ",
     href: "/news?organ=blog",
     note: "Editorial organ rendered inside this shell",
-  },
-  {
-    label: "World Cup 2026",
-    href: "/tournament",
-    note: "Evidence-first historical archive",
   },
   {
     label: "APWA Proof",

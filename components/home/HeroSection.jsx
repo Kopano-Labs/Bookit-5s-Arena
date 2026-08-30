@@ -114,13 +114,7 @@ export default function HeroSection() {
           </motion.p>
 
           <motion.div variants={item} className="mb-8 flex flex-wrap justify-center gap-2 md:justify-start">
-            <Link
-              href="/tournament"
-              className="inline-flex min-h-10 items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-amber-200 shadow-[0_0_24px_rgba(251,191,36,0.15)] transition hover:border-amber-300/60 hover:bg-amber-500/20"
-            >
-              <FaTrophy className="text-amber-300" size={13} aria-hidden />
-              World Cup 2026 · Archive
-            </Link>
+
             <Link
               href="/news"
               className="inline-flex min-h-10 items-center rounded-full border border-green-400/20 bg-green-400/8 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-green-200 transition hover:border-green-300/40 hover:bg-green-300/12"

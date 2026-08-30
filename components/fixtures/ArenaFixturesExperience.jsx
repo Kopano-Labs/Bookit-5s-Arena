@@ -205,7 +205,6 @@ function FilterBar({ statusFilter, setStatusFilter, competitionFilter, setCompet
         className="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-gray-900 text-gray-400 border border-gray-800 cursor-pointer"
       >
         <option value="all">All Competitions</option>
-        <option value="tournament">World Cup Tournament</option>
         {leagues.map((l) => (
           <option key={l._id} value={l._id}>
             {l.name}
