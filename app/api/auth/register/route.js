@@ -7,6 +7,8 @@ import { getRecaptchaEnv } from '@/lib/config/env';
 import { verifyBotRequest } from '@/lib/security/botid';
 
 // POST /api/auth/register
+// Public self-registration is intentionally user-only. Elevated roles must be
+// granted through authenticated administrative role-management flows.
 export async function POST(request) {
   try {
     const botVerification = await verifyBotRequest();
@@ -20,7 +22,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
     }
 
-    const { name, email, password, recaptchaToken, role: requestedRole } = await request.json();
+    const { name, email, password, recaptchaToken } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -29,12 +31,6 @@ export async function POST(request) {
       );
     }
 
-    // Role whitelisting — SAFETY: Never allow 'admin' registration
-    const baseRole = ['user', 'manager'].includes(requestedRole) ? requestedRole : 'user';
-    // Build roles array — manager registration includes 'user' + 'manager'
-    const roles = baseRole === 'manager' ? ['user', 'manager'] : ['user'];
-
-    // Validate types to prevent NoSQL injection
     if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
       return NextResponse.json(
         { error: 'Invalid input types' },
@@ -42,7 +38,6 @@ export async function POST(request) {
       );
     }
 
-    // Validate name length
     if (name.trim().length < 2 || name.trim().length > 100) {
       return NextResponse.json(
         { error: 'Name must be between 2 and 100 characters' },
@@ -50,7 +45,6 @@ export async function POST(request) {
       );
     }
 
-    // Validate email format
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
         { error: 'Please enter a valid email address' },
@@ -58,9 +52,6 @@ export async function POST(request) {
       );
     }
 
-    // ── Verify Google reCAPTCHA token (server-side) ──────────────
-    // Optional: if token provided, verify it. If not (ad-blocker), allow registration
-    // since we have rate-limiting + security notice as fallback protection.
     if (recaptchaToken && recaptchaSecretKey) {
       try {
         const recaptchaRes = await fetch(
@@ -77,7 +68,6 @@ export async function POST(request) {
         }
       } catch (err) {
         console.warn('reCAPTCHA verify failed (network):', err.message);
-        // Allow registration to proceed — rate-limiting protects against abuse
       }
     }
 
@@ -90,7 +80,8 @@ export async function POST(request) {
 
     await connectDB();
 
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return NextResponse.json(
         { error: 'An account with this email already exists' },
@@ -98,13 +89,12 @@ export async function POST(request) {
       );
     }
 
-    // Whitelisted fields — prevent mass-assignment
     const user = await User.create({
       name: name.trim(),
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       password,
-      roles, // Multi-role array
-      newsletterOptIn: true
+      roles: ['user'],
+      newsletterOptIn: false,
     });
 
     return NextResponse.json(

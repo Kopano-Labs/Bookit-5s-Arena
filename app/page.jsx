@@ -15,6 +15,8 @@ import TournamentSection from '@/components/home/TournamentSection';
 import TournamentShowcase from '@/components/home/TournamentShowcase';
 import ContactSection   from '@/components/home/ContactSection';
 import WelcomePopup     from '@/components/home/WelcomePopup';
+import PitchStadiumScene from '@/components/3d/PitchStadiumScene';
+import TacticalBoard from '@/components/tactics/TacticalBoard';
 import BlackboxMarketMask from '@/components/marketing/BlackboxMarketMask';
 import { showBlackboxMarketMaskOnHome } from '@/lib/featureFlags';
 import connectDB        from '@/lib/mongodb';
@@ -119,6 +121,16 @@ const HomePage = async () => {
         minPrice={minPrice}
         courtFeedReady={courtFeedReady}
       />
+
+      {/* ══ 3D CONCEPT — explicitly not a physical/live venue map ═════ */}
+      <section id="pitches" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <PitchStadiumScene />
+      </section>
+
+      {/* ══ TACTICS LAB — planning sandbox, not match/booking state ═════ */}
+      <section id="tactics" className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+        <TacticalBoard />
+      </section>
 
       {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}
       <WeatherWidget />
