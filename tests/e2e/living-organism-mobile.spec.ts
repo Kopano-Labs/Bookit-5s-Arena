@@ -1,0 +1,207 @@
+import { expect, test, type Page } from '@playwright/test';
+
+function organismPayload(province = 'western-cape') {
+  const labels: Record<string, string> = {
+    'western-cape': 'Western Cape',
+    gauteng: 'Gauteng',
+    limpopo: 'Limpopo',
+  };
+
+  return {
+    schema: 'fivesarena.organism.feed.v1',
+    canonicalSurface: 'https://fivesarena.com',
+    locality: {
+      country: 'South Africa',
+      province: labels[province] || 'Western Cape',
+      provinceSlug: province,
+      weatherLabel: province === 'gauteng' ? 'Johannesburg' : 'Cape Town',
+      source: 'user-governed-context',
+    },
+    weather: {
+      temperature: province === 'gauteng' ? 22 : 17,
+      feelsLike: province === 'gauteng' ? 22 : 16,
+      weatherCode: 1,
+      condition: 'Mainly Clear',
+      emoji: '🌤️',
+      wind: 12,
+      humidity: 58,
+      footballReady: true,
+      fetchedAt: '2026-08-18T05:20:00.000Z',
+    },
+    editorial: {
+      status: 'fallback',
+      articles: [
+        {
+          title: `${labels[province] || 'Western Cape'} football pulse`,
+          summary: 'Locality-bound South African football intelligence.',
+          publisher: 'South Africa football feed',
+          localityScore: 2,
+        },
+      ],
+    },
+    governance: {
+      adapter: {
+        configured: false,
+        status: 'contract-only',
+        origin: null,
+        health: null,
+        version: null,
+        checkedAt: '2026-08-18T05:20:00.000Z',
+      },
+      executionPolicy: 'domain-runtime-direct-with-canonical-adapter-not-promoted',
+    },
+    organs: {
+      blog: 'https://blog.fivesarena.com',
+      news: 'https://news.fivesarena.com',
+      policy: 'render-inside-fivesarena-shell',
+    },
+    fetchedAt: '2026-08-18T05:20:00.000Z',
+  };
+}
+
+function featuredMatchPayload() {
+  return [
+    {
+      id: 'psl-live-proof-01',
+      league: {
+        id: '18031',
+        name: 'PSL (South Africa)',
+        shortName: 'PSL',
+        slug: 'psl',
+      },
+      home: { id: 'home-01', name: 'Orlando Pirates' },
+      away: { id: 'away-01', name: 'Kaizer Chiefs' },
+      score: { home: 1, away: 0 },
+      status: {
+        long: 'Second Half',
+        short: '2H',
+        elapsed: 63,
+        state: 'live',
+        isLive: true,
+      },
+      kickoffLabel: '7:30 pm',
+      isLive: true,
+      minute: 63,
+    },
+  ];
+}
+
+async function mockOrganismFeed(page: Page) {
+  await page.route('**/api/organism/feed?province=*', async (route) => {
+    const url = new URL(route.request().url());
+    const province = url.searchParams.get('province') || 'western-cape';
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(organismPayload(province)),
+    });
+  });
+}
+
+async function mockFeaturedMatches(page: Page) {
+  await page.route('**/api/football/featured', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(featuredMatchPayload()),
+    });
+  });
+}
+
+async function expectNoHorizontalOverflow(page: Page) {
+  const overflow = await page.evaluate(() => ({
+    viewport: window.innerWidth,
+    body: document.body.scrollWidth,
+    document: document.documentElement.scrollWidth,
+  }));
+
+  expect(overflow.body).toBeLessThanOrEqual(overflow.viewport + 1);
+  expect(overflow.document).toBeLessThanOrEqual(overflow.viewport + 1);
+}
+
+test.beforeEach(async ({ page }) => {
+  await Promise.all([mockOrganismFeed(page), mockFeaturedMatches(page)]);
+});
+
+test('province state drives weather and editorial surface without leaving the shell', async ({ page }) => {
+  await page.goto('/news');
+
+  const organism = page.getByTestId('living-organism');
+  await expect(organism).toBeVisible();
+  await expect(organism).toHaveAttribute('data-province', 'western-cape');
+  await expect(organism).toHaveAttribute('data-match-pulse', 'live');
+  await expect(page.getByTestId('current-province')).toHaveText('Western Cape');
+  await expect(page.getByRole('heading', { name: 'Western Cape football pulse' })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByTestId('kpgs-adapter-state')).toHaveAttribute(
+    'data-adapter-status',
+    'contract-only',
+  );
+
+  const arena = page.locator('[data-football-ready="true"][data-match-state="live"]');
+  await expect(arena).toBeVisible({ timeout: 10_000 });
+  await expect(arena).toHaveAttribute('data-match-visualization', 'ambient-not-possession');
+  await expect(arena).toContainText('Play ready');
+  await expect(arena).toContainText('Western Cape football pulse');
+  await expect(arena).toContainText('Verified match pulse');
+  await expect(arena).toContainText('Orlando Pirates');
+  await expect(arena).toContainText('1 : 0');
+  await expect(arena).toContainText('Kaizer Chiefs');
+  await expect(arena).toContainText('63′');
+
+  const gautengResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/organism/feed?province=gauteng') &&
+      response.status() === 200,
+  );
+  await page.locator('[data-province-selector="gauteng"]').click();
+  await gautengResponse;
+
+  await expect(organism).toHaveAttribute('data-province', 'gauteng');
+  await expect(organism).toHaveAttribute('data-match-pulse', 'live');
+  await expect(page.getByTestId('current-province')).toHaveText('Gauteng');
+  await expect(page.getByRole('heading', { name: 'Gauteng football pulse' })).toBeVisible({ timeout: 10_000 });
+  await expect(arena).toContainText('Gauteng football pulse');
+  await expect(arena).toContainText('Orlando Pirates');
+  await expect(page).toHaveURL(/\/news$/);
+  await expectNoHorizontalOverflow(page);
+});
+
+test('province controls retain mobile touch targets and horizontal scroll stays bounded', async ({ page }) => {
+  await page.goto('/news');
+
+  const selectors = page.locator('[data-province-selector]');
+  await expect(selectors).toHaveCount(9);
+
+  const count = await selectors.count();
+  for (let index = 0; index < count; index += 1) {
+    const box = await selectors.nth(index).boundingBox();
+    expect(box, `province selector ${index} should have a bounding box`).not.toBeNull();
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+
+  await expectNoHorizontalOverflow(page);
+});
+
+test('reduced-motion users receive the static organism lane instead of forced Three.js motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/news');
+
+  const staticLane = page.locator('[data-experience-tier="static"]');
+  await expect(staticLane).toBeVisible();
+  await expect(staticLane).toHaveAttribute('data-match-state', 'live');
+  await expect(staticLane).toContainText('adaptive static arena');
+  await expect(staticLane).toContainText('Orlando Pirates');
+  await expect(staticLane).toContainText('1 : 0');
+  await expect(staticLane).toContainText('Kaizer Chiefs');
+  await expect(page.locator('canvas')).toHaveCount(0);
+});
+
+test('World Cup 2026 is an archive on mobile, never a registration funnel', async ({ page }) => {
+  await page.goto('/tournament');
+
+  await expect(page.getByText(/Archived · concluded 31 May 2026/i)).toBeVisible();
+  await expect(page.getByRole('heading', { name: /5s Arena World Cup/i })).toBeVisible();
+  await expect(page.getByText(/Register Your Team/i)).toHaveCount(0);
+  await expect(page.getByText(/Proof of Payment/i)).toHaveCount(0);
+  await expectNoHorizontalOverflow(page);
+});

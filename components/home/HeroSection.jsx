@@ -5,9 +5,7 @@ import { Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { FaFutbol, FaWhatsapp, FaTrophy } from "react-icons/fa";
-import { TOURNAMENT_DATES } from "@/lib/tournamentConfig";
 
-/* ── Lazy-load 3D scene (heavy Three.js bundle) ── */
 const Hero3DScene = dynamic(() => import("@/components/home/Hero3DScene"), {
   ssr: false,
   loading: () => null,
@@ -46,14 +44,12 @@ const item = {
 export default function HeroSection() {
   return (
     <section className="relative z-0 flex min-h-screen items-center justify-center overflow-hidden px-0 pt-20 pb-20 sm:pt-24 sm:pb-24">
-      {/* ── 3D Three.js Scene (background layer) ── */}
       <Suspense fallback={null}>
         <Hero3DErrorBoundary>
           <Hero3DScene />
         </Hero3DErrorBoundary>
       </Suspense>
 
-      {/* ── Gradient underlay for 3D scene ── */}
       <div
         className="absolute inset-0 z-[-1]"
         style={{
@@ -61,11 +57,7 @@ export default function HeroSection() {
             "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(74,222,128,0.06) 0%, transparent 70%), linear-gradient(180deg, #04060a 0%, #080d14 50%, #04060a 100%)",
         }}
       />
-
-      {/* Particle dot grid overlay */}
       <div className="absolute inset-0 hero-particles read:opacity-30" />
-
-      {/* Bottom gradient fade */}
       <div
         className="absolute inset-0"
         style={{
@@ -118,17 +110,16 @@ export default function HeroSection() {
             variants={item}
             className="mb-6 max-w-xl text-base leading-relaxed text-gray-200 sm:text-xl"
           >
-            Cape Town&apos;s premier 5-a-side football experience. Book a court,
-            gather your squad, and play the beautiful game under the lights.
+            Book a court, follow South African football, and let the arena adapt to your province, device, and network state without leaving the Five&apos;s Arena experience.
           </motion.p>
 
-          <motion.div variants={item} className="mb-8 flex justify-center md:justify-start">
+          <motion.div variants={item} className="mb-8 flex flex-wrap justify-center gap-2 md:justify-start">
+
             <Link
-              href="/tournament"
-              className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-amber-200 shadow-[0_0_24px_rgba(251,191,36,0.15)] transition hover:border-amber-300/60 hover:bg-amber-500/20"
+              href="/news"
+              className="inline-flex min-h-10 items-center rounded-full border border-green-400/20 bg-green-400/8 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-green-200 transition hover:border-green-300/40 hover:bg-green-300/12"
             >
-              <FaTrophy className="text-amber-300" size={14} aria-hidden />
-              World Cup 5s · {TOURNAMENT_DATES.rangeShort}
+              South Africa pulse
             </Link>
           </motion.div>
 
@@ -142,11 +133,7 @@ export default function HeroSection() {
             >
               <motion.span
                 animate={{ rotate: [0, 20, -20, 0] }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               >
                 <FaFutbol size={16} />
               </motion.span>
@@ -169,10 +156,7 @@ export default function HeroSection() {
           </motion.div>
         </div>
 
-        <motion.div
-          variants={item}
-          className="hidden justify-self-end md:block"
-        >
+        <motion.div variants={item} className="hidden justify-self-end md:block">
           <div className="rounded-[32px] border border-white/12 bg-black/20 p-5 backdrop-blur-sm shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
             <div className="w-[min(34vw,390px)] rounded-[26px] border border-white/10 bg-black/10 p-5 text-left">
               <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-green-300">
@@ -185,35 +169,26 @@ export default function HeroSection() {
                 Floodlit 5-A-Side
               </p>
               <p className="mt-3 max-w-sm text-sm leading-relaxed text-gray-200">
-                Premium synthetic turf, quick bookings, fixtures, and competition play from the heart of Milnerton.
+                Premium synthetic turf, quick bookings, live fixtures, locality-aware football intelligence, and resilient mobile continuity from Milnerton.
               </p>
             </div>
           </div>
         </motion.div>
 
-        {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-10 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 opacity-50 sm:flex"
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.5 }}
           transition={{ delay: 2, duration: 1 }}
         >
-          <span className="text-white text-[10px] uppercase tracking-[0.3em]">
-            Scroll
-          </span>
+          <span className="text-white text-[10px] uppercase tracking-[0.3em]">Scroll</span>
           <motion.div
             className="w-px h-10 bg-yellow-600 origin-top"
             animate={{ scaleY: [0, 1, 0] }}
-            transition={{
-              duration: 1.4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2,
-            }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           />
         </motion.div>
       </motion.div>
     </section>
   );
 }
-

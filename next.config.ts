@@ -3,7 +3,7 @@ import { withBotId } from "botid/next/config";
 
 const nextConfig: NextConfig = {
   compress: true,
-  // Skip type-checking & linting during CI build for speed (run these locally)
+  // Type errors are gated explicitly in CI before the production build.
   typescript: { ignoreBuildErrors: true },
   env: {
     NEXT_PUBLIC_RECAPTCHA_SITE_KEY:
@@ -11,11 +11,8 @@ const nextConfig: NextConfig = {
       process.env.RECAPTCHA_SITE_KEY ||
       "",
   },
-  // Prevent webpack from bundling native/binary packages
   serverExternalPackages: ["bcryptjs", "mongoose", "mongodb"],
 
-  // Turbopack removed from config — production build uses stable webpack.
-  // For local dev with Turbopack: run `next dev --turbopack`
   allowedDevOrigins: ["192.168.101.106", "*.local", "localhost"],
 
   images: {
@@ -38,6 +35,21 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        has: [{ type: "host", value: "news.fivesarena.com" }],
+        destination: "/news?organ=news",
+      },
+      {
+        source: "/",
+        has: [{ type: "host", value: "blog.fivesarena.com" }],
+        destination: "/news?organ=blog",
+      },
+    ];
+  },
+
   async headers() {
     const isDev = process.env.NODE_ENV !== "production";
     const headersArr = [
@@ -53,7 +65,7 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(), payment=(self)",
+            value: "camera=(), microphone=(), geolocation=(self), payment=(self)",
           },
           {
             key: "Strict-Transport-Security",
@@ -75,11 +87,6 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Note: Do NOT set custom Cache-Control headers here.
-      // Next.js 16 + Turbopack owns all caching. Custom Cache-Control
-      // headers cause the production build optimizer to hang indefinitely.
-      // Vercel/Next.js automatically handles caching for static assets,
-      // images, and service workers.
     ];
     return headersArr;
   },

@@ -1,0 +1,481 @@
+'use client';
+
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  FaCrosshairs,
+  FaMapMarkerAlt,
+  FaNewspaper,
+  FaSatelliteDish,
+  FaShieldAlt,
+} from 'react-icons/fa';
+import type { ArenaMatchPulse } from '@/components/organism/LocalityScene';
+import { useArenaLocality } from '@/hooks/useArenaLocality';
+import { SOUTH_AFRICA_PROVINCES } from '@/lib/organism/southAfrica';
+
+const LocalityScene = dynamic(() => import('@/components/organism/LocalityScene'), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-64 animate-pulse rounded-[2rem] border border-white/10 bg-white/5" />
+  ),
+});
+
+type OrganismArticle = {
+  title: string;
+  summary: string;
+  publisher: string;
+  localityScore: number;
+};
+
+type AdapterStatus = 'contract-only' | 'ready' | 'degraded';
+
+type OrganismFeed = {
+  locality: {
+    province: string;
+    provinceSlug: string;
+    weatherLabel: string;
+  };
+  weather: null | {
+    temperature: number;
+    feelsLike: number;
+    weatherCode: number;
+    condition: string;
+    emoji: string;
+    wind: number;
+    humidity: number;
+    footballReady: boolean;
+    fetchedAt: string;
+  };
+  editorial: {
+    status: 'live' | 'fallback';
+    articles: OrganismArticle[];
+  };
+  governance?: {
+    adapter: {
+      configured: boolean;
+      status: AdapterStatus;
+      origin: string | null;
+      checkedAt: string;
+    };
+    executionPolicy: string;
+  };
+};
+
+type FeaturedMatch = {
+  id?: string | number;
+  league?: {
+    name?: string | null;
+    shortName?: string | null;
+  } | null;
+  home?: {
+    name?: string | null;
+  } | null;
+  away?: {
+    name?: string | null;
+  } | null;
+  score?: {
+    home?: number | null;
+    away?: number | null;
+  } | null;
+  status?: {
+    short?: string | null;
+    long?: string | null;
+    elapsed?: number | null;
+    state?: string | null;
+    isLive?: boolean;
+  } | null;
+  kickoffLabel?: string | null;
+  isLive?: boolean;
+  minute?: number | null;
+};
+
+function adapterLabel(status: AdapterStatus) {
+  if (status === 'ready') return '.NET boundary ready';
+  if (status === 'degraded') return '.NET boundary degraded';
+  return '.NET boundary contract';
+}
+
+function adapterClasses(status: AdapterStatus) {
+  if (status === 'ready') {
+    return 'border-green-300/25 bg-green-300/10 text-green-200';
+  }
+  if (status === 'degraded') {
+    return 'border-red-300/20 bg-red-300/8 text-red-200';
+  }
+  return 'border-amber-300/20 bg-amber-300/8 text-amber-200';
+}
+
+function toArenaMatchPulse(match: FeaturedMatch | null): ArenaMatchPulse | null {
+  if (!match?.id || !match.home?.name || !match.away?.name) return null;
+
+  return {
+    id: String(match.id),
+    league: match.league?.shortName || match.league?.name || null,
+    home: match.home.name,
+    away: match.away.name,
+    score: match.score
+      ? {
+          home: match.score.home ?? null,
+          away: match.score.away ?? null,
+        }
+      : null,
+    isLive: Boolean(match.isLive ?? match.status?.isLive),
+    minute: match.minute ?? match.status?.elapsed ?? null,
+    status: match.status?.long || match.status?.short || match.status?.state || null,
+    kickoffLabel: match.kickoffLabel || null,
+  };
+}
+
+function matchLine(matchPulse: ArenaMatchPulse | null) {
+  if (!matchPulse) return null;
+  const homeScore = matchPulse.score?.home;
+  const awayScore = matchPulse.score?.away;
+  const score = homeScore != null && awayScore != null ? `${homeScore} : ${awayScore}` : 'vs';
+  const state = matchPulse.isLive
+    ? matchPulse.minute != null
+      ? `LIVE · ${matchPulse.minute}′`
+      : 'LIVE'
+    : matchPulse.status || matchPulse.kickoffLabel || 'Verified fixture';
+  return `${matchPulse.home} ${score} ${matchPulse.away} · ${state}`;
+}
+
+function decodeHtmlEntities(text?: string | null): string {
+  if (!text) return '';
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#039;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ');
+}
+
+function StaticOrganismScene({
+  provinceLabel,
+  matchPulse,
+}: {
+  provinceLabel: string;
+  matchPulse: ArenaMatchPulse | null;
+}) {
+  const pulseLine = matchLine(matchPulse);
+  return (
+    <div
+      className="relative grid min-h-64 place-items-center overflow-hidden rounded-[2rem] border border-white/10 bg-[#050908] p-6 text-center"
+      data-experience-tier="static"
+      data-match-state={matchPulse ? (matchPulse.isLive ? 'live' : 'available') : 'quiet'}
+    >
+      <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-[1.62/1] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/30 bg-green-950/35">
+        <div className="absolute inset-y-0 left-1/2 border-l border-white/25" />
+        <div className="absolute left-1/2 top-1/2 aspect-square h-[30%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/25" />
+        <div className="absolute inset-y-[24%] left-0 w-[18%] border-y border-r border-white/20" />
+        <div className="absolute inset-y-[24%] right-0 w-[18%] border-y border-l border-white/20" />
+      </div>
+      <div className="relative z-10 max-w-sm rounded-2xl border border-white/10 bg-black/70 p-4 backdrop-blur">
+        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-green-300">
+          {provinceLabel} · adaptive static arena
+        </p>
+        <p className="mt-3 text-sm leading-6 text-gray-300">
+          Locality and football state remain available without forcing WebGL or continuous motion.
+        </p>
+        {pulseLine ? (
+          <p className="mt-3 border-t border-white/10 pt-3 text-xs font-bold text-white">
+            {pulseLine}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export default function LivingOrganismSurface() {
+  const {
+    province,
+    provinceSlug,
+    source,
+    detecting,
+    setProvince,
+    detectLocation,
+  } = useArenaLocality();
+  const prefersReducedMotion = useReducedMotion();
+  const [feed, setFeed] = useState<OrganismFeed | null>(null);
+  const [featuredMatches, setFeaturedMatches] = useState<FeaturedMatch[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
+
+    async function load() {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `/api/organism/feed?province=${encodeURIComponent(provinceSlug)}`,
+          { signal: controller.signal, cache: 'no-store' },
+        );
+        if (!response.ok) throw new Error('organism-feed-unavailable');
+        const payload = (await response.json()) as OrganismFeed;
+        if (mounted) setFeed(payload);
+      } catch {
+        if (mounted) setFeed(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    void load();
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, [provinceSlug]);
+
+  useEffect(() => {
+    let mounted = true;
+    let activeController: AbortController | null = null;
+    const navigatorWithHints = navigator as Navigator & {
+      connection?: { saveData?: boolean };
+    };
+
+    async function loadFeaturedMatches() {
+      activeController?.abort();
+      const controller = new AbortController();
+      activeController = controller;
+      try {
+        const response = await fetch('/api/football/featured', {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+        if (!response.ok) throw new Error('featured-football-unavailable');
+        const payload = (await response.json()) as FeaturedMatch[];
+        if (mounted) setFeaturedMatches(Array.isArray(payload) ? payload : []);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        if (mounted) setFeaturedMatches([]);
+      }
+    }
+
+    void loadFeaturedMatches();
+
+    const refreshMs = 60_000;
+    const interval = navigatorWithHints.connection?.saveData
+      ? null
+      : window.setInterval(() => {
+          if (document.visibilityState === 'visible') void loadFeaturedMatches();
+        }, refreshMs);
+
+    return () => {
+      mounted = false;
+      activeController?.abort();
+      if (interval != null) window.clearInterval(interval);
+    };
+  }, []);
+
+  const articles = useMemo(() => feed?.editorial?.articles || [], [feed]);
+  const weather = feed?.weather || null;
+  const adapterStatus = feed?.governance?.adapter?.status || 'contract-only';
+  const matchPulse = useMemo(() => {
+    const selected = featuredMatches.find((match) => Boolean(match.isLive ?? match.status?.isLive))
+      || featuredMatches[0]
+      || null;
+    return toArenaMatchPulse(selected);
+  }, [featuredMatches]);
+
+  return (
+    <section
+      className="relative overflow-hidden border-y border-white/8 bg-[#040706] px-4 py-16 sm:px-6 lg:px-8"
+      data-testid="living-organism"
+      data-province={provinceSlug}
+      data-match-pulse={matchPulse ? (matchPulse.isLive ? 'live' : 'available') : 'quiet'}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(57,217,138,0.12),transparent_38%),radial-gradient(circle_at_90%_80%,rgba(245,197,66,0.08),transparent_36%)]" />
+
+      <div className="relative mx-auto max-w-7xl">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:items-end">
+          <div>
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full border border-green-400/20 bg-green-400/8 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-green-300">
+                <FaSatelliteDish /> Living Arena
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
+                {source.replaceAll('-', ' ')}
+              </span>
+              <span
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] ${adapterClasses(adapterStatus)}`}
+                data-testid="kpgs-adapter-state"
+                data-adapter-status={adapterStatus}
+              >
+                <FaShieldAlt /> {adapterLabel(adapterStatus)}
+              </span>
+            </div>
+            <h2 className="max-w-4xl text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl lg:text-7xl">
+              South Africa changes. <span className="text-yellow-400">The pitch reacts.</span>
+            </h2>
+            <p className="mt-5 max-w-3xl text-sm leading-7 text-gray-300 sm:text-base">
+              Province, weather, local football intelligence and verified match state enter the same adaptive world. A live provider pulse can raise the arena&apos;s energy, but never claims possession, position or a score the provider did not return.
+            </p>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 backdrop-blur-xl">
+            <div className="flex flex-col gap-4 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-gray-500">
+                  Current province context
+                </p>
+                <p
+                  className="mt-1 text-xl font-black uppercase text-white"
+                  data-testid="current-province"
+                >
+                  {province.label}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void detectLocation()}
+                disabled={detecting}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-yellow-400/25 bg-yellow-400/8 px-4 text-[10px] font-black uppercase tracking-[0.14em] text-yellow-200 transition hover:bg-yellow-400/15 disabled:opacity-50 min-[420px]:w-auto"
+              >
+                <FaCrosshairs /> {detecting ? 'Locating…' : 'Use my location'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="mt-8 flex snap-x gap-2 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-label="South African province context"
+        >
+          {SOUTH_AFRICA_PROVINCES.map((item) => (
+            <button
+              key={item.slug}
+              type="button"
+              onClick={() => setProvince(item.slug)}
+              data-province-selector={item.slug}
+              aria-pressed={item.slug === provinceSlug}
+              className={`min-h-11 shrink-0 snap-start rounded-full border px-4 text-[10px] font-black uppercase tracking-[0.14em] transition ${
+                item.slug === provinceSlug
+                  ? 'border-yellow-300/50 bg-yellow-300/15 text-yellow-100'
+                  : 'border-white/10 bg-white/[0.035] text-gray-400 hover:border-white/20 hover:text-white'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+          <div className="grid gap-4">
+            {prefersReducedMotion !== false ? (
+              <StaticOrganismScene provinceLabel={province.label} matchPulse={matchPulse} />
+            ) : (
+              <LocalityScene
+                provinceSlug={provinceSlug}
+                weatherCode={weather?.weatherCode ?? null}
+                temperature={weather?.temperature ?? null}
+                wind={weather?.wind ?? null}
+                condition={weather?.condition ?? null}
+                footballReady={weather?.footballReady ?? false}
+                headline={articles[0]?.title ?? null}
+                matchPulse={matchPulse}
+                onProvinceSelect={setProvince}
+              />
+            )}
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Weather</p>
+                <p className="mt-2 text-2xl font-black text-white">
+                  {loading ? '—' : weather ? `${weather.emoji} ${weather.temperature}°` : 'N/A'}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Condition</p>
+                <p className="mt-2 text-sm font-black uppercase text-white">
+                  {weather?.condition || 'Checking'}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Wind</p>
+                <p className="mt-2 text-xl font-black text-white">
+                  {weather ? `${weather.wind} km/h` : '—'}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Football state</p>
+                <p className={`mt-2 text-sm font-black uppercase ${weather?.footballReady ? 'text-green-300' : 'text-amber-300'}`}>
+                  {weather ? (weather.footballReady ? 'Ready' : 'Watch conditions') : 'Checking'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-green-300">
+                  <FaNewspaper /> Local editorial membrane
+                </p>
+                <h3 className="mt-2 text-2xl font-black uppercase text-white sm:text-3xl">
+                  {province.label} football intelligence
+                </h3>
+                <p className="mt-2 text-xs leading-6 text-gray-500">
+                  The strongest locality match is projected beside any verified provider match pulse; the full governed feed remains here for reading and verification.
+                </p>
+              </div>
+              <Link
+                href="/news"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-4 text-[10px] font-black uppercase tracking-[0.16em] text-white transition hover:border-green-300/30 hover:bg-green-300/8"
+              >
+                <FaMapMarkerAlt /> Open local feed
+              </Link>
+            </div>
+
+            <div className="mt-6 grid gap-3">
+              {loading ? (
+                [0, 1, 2].map((item) => (
+                  <div key={item} className="h-24 animate-pulse rounded-2xl bg-white/5" />
+                ))
+              ) : articles.length ? (
+                articles.slice(0, 4).map((article, index) => (
+                  <motion.article
+                    key={`${article.title}-${index}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.06 }}
+                    className="rounded-2xl border border-white/8 bg-black/25 p-4"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[9px] font-black uppercase tracking-[0.16em] text-gray-500">
+                        {article.publisher}
+                      </span>
+                      {article.localityScore > 0 ? (
+                        <span className="rounded-full bg-green-300/10 px-2 py-1 text-[8px] font-black uppercase tracking-widest text-green-300">
+                          locality match
+                        </span>
+                      ) : null}
+                    </div>
+                    <h4 className="mt-2 text-sm font-black leading-5 text-white sm:text-base">
+                      {decodeHtmlEntities(article.title)}
+                    </h4>
+                    {article.summary ? (
+                      <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-400">
+                        {decodeHtmlEntities(article.summary)}
+                      </p>
+                    ) : null}
+                  </motion.article>
+                ))
+              ) : (
+                <div className="rounded-2xl border border-dashed border-white/10 p-6 text-sm leading-6 text-gray-400">
+                  No current editorial items passed the locality membrane. The weather and province state remain active rather than filling the surface with stale demo copy.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

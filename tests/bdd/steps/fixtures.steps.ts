@@ -48,7 +48,7 @@ async function enableRecoveryShield(world: BddWorld) {
 // --- Given -------------------------------------------------------------------
 
 Given("the user opens the Fixtures page on a mobile viewport", async function (this: BddWorld) {
-  world.stubState.mode = "default";
+  this.stubState.mode = "default";
   await openFixtures(this);
 });
 
@@ -168,7 +168,7 @@ Given("the user selects a future season that is not published yet", async functi
   const page = this.page!;
   const seasonSelect = page.locator("select").first();
   if (await seasonSelect.isVisible()) {
-    await seasonSelect.selectOption({ label: /2026-27/i });
+    await seasonSelect.selectOption({ label: "2026-27" });
   } else {
     await page.getByText(/2026-27/i).first().click();
   }
