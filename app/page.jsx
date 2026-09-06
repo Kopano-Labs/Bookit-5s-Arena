@@ -1,29 +1,30 @@
 // Server Component — keeps ISR data fetching; passes data to client components for animations
-import HeroSection      from '@/components/home/HeroSection';
-import FixturesPromo    from '@/components/home/FixturesPromo';
-import StatsBar         from '@/components/home/StatsBar';
-import WeatherWidget    from '@/components/home/WeatherWidget';
+import HeroSection from '@/components/home/HeroSection';
+import FixturesPromo from '@/components/home/FixturesPromo';
+import StatsBar from '@/components/home/StatsBar';
+import WeatherWidget from '@/components/home/WeatherWidget';
+import LivingOrganismSurface from '@/components/home/LivingOrganismSurface';
+import PitchStadiumScene from '@/components/3d/PitchStadiumScene';
+import TacticalBoard from '@/components/tactics/TacticalBoard';
 import HomeLiveFixtures from '@/components/home/HomeLiveFixtures';
-import CourtsSection    from '@/components/home/CourtsSection';
+import CourtsSection from '@/components/home/CourtsSection';
 import CourtAvailabilityNotice from '@/components/home/CourtAvailabilityNotice';
-import AmenitiesStrip   from '@/components/home/AmenitiesStrip';
-import EventsSection    from '@/components/home/EventsSection';
+import AmenitiesStrip from '@/components/home/AmenitiesStrip';
+import EventsSection from '@/components/home/EventsSection';
 import HomeMediaHighlights from '@/components/home/HomeMediaHighlights';
-import AboutSection     from '@/components/home/AboutSection';
-import SocialSection    from '@/components/home/SocialSection';
-import TournamentSection from '@/components/home/TournamentSection';
-import TournamentShowcase from '@/components/home/TournamentShowcase';
-import ContactSection   from '@/components/home/ContactSection';
-import WelcomePopup     from '@/components/home/WelcomePopup';
+import AboutSection from '@/components/home/AboutSection';
+import SocialSection from '@/components/home/SocialSection';
+import TournamentArchiveSection from '@/components/home/TournamentArchiveSection';
+import ContactSection from '@/components/home/ContactSection';
+import WelcomePopup from '@/components/home/WelcomePopup';
 import BlackboxMarketMask from '@/components/marketing/BlackboxMarketMask';
 import { showBlackboxMarketMaskOnHome } from '@/lib/featureFlags';
-import connectDB        from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import { normalizeCourtImageFilename } from '@/lib/courtImage';
-import Court            from '@/models/Court';
+import Court from '@/models/Court';
 
 export const revalidate = 60; // ISR — revalidate every 60 seconds
 
-// ─── server-side fetch ────────────────────────────────────────
 const getCourts = async () => {
   try {
     await connectDB();
@@ -39,8 +40,7 @@ const getCourts = async () => {
         ...doc,
         image: normalizeCourtImageFilename(doc.image),
         _id: doc._id?.toString?.() ?? String(doc._id),
-        owner:
-          doc.owner != null ? String(doc.owner) : '000000000000000000000001',
+        owner: doc.owner != null ? String(doc.owner) : '000000000000000000000001',
         createdAt: doc.createdAt?.toISOString?.(),
         updatedAt: doc.updatedAt?.toISOString?.(),
       })),
@@ -51,7 +51,6 @@ const getCourts = async () => {
   }
 };
 
-// ─── page component ───────────────────────────────────────────
 const HomePage = async () => {
   const courtResult = await getCourts();
   const courts = courtResult.courts;
@@ -65,40 +64,40 @@ const HomePage = async () => {
 
   const ecosystemRoutes = [
     {
-      label: "KRRababalela",
-      href: "https://krrababalela.com",
-      note: "Chief portfolio",
-      status: "LINKED",
+      label: 'KRRababalela',
+      href: 'https://krrababalela.com',
+      note: 'Chief portfolio',
+      status: 'LINKED',
     },
     {
-      label: "Kopano Labs",
-      href: "https://kopanolabs.com",
-      note: "Studio lane",
-      status: "LINKED",
+      label: 'Kopano Labs',
+      href: 'https://kopanolabs.com',
+      note: 'Studio lane',
+      status: 'LINKED',
     },
     {
-      label: "KasiLink",
-      href: "https://kasilink.com",
-      note: "Township network",
-      status: "LINKED",
+      label: 'KasiLink',
+      href: 'https://kasilink.com',
+      note: 'Township network',
+      status: 'LINKED',
     },
     {
-      label: "5s Arena Blog",
-      href: "https://blog.fivesarena.com",
-      note: "Editorial surface",
-      status: "LINKED",
+      label: '5s Arena Blog',
+      href: 'https://blog.fivesarena.com',
+      note: 'Editorial surface',
+      status: 'LINKED',
     },
     {
-      label: "Starfall Salvage",
-      href: "https://starfallsalvage.kopanolabs.com",
-      note: "Game lane",
-      status: "LINKED",
+      label: 'Starfall Salvage',
+      href: 'https://starfallsalvage.kopanolabs.com',
+      note: 'Game lane',
+      status: 'LINKED',
     },
     {
-      label: "Kopano Context",
-      href: "https://context.kopanolabs.com",
-      note: "Reserved domain",
-      status: "RESERVED",
+      label: 'Kopano Context',
+      href: 'https://context.kopanolabs.com',
+      note: 'Reserved domain',
+      status: 'RESERVED',
     },
   ];
 
@@ -107,48 +106,50 @@ const HomePage = async () => {
       <WelcomePopup />
       {showBlackboxMarketMaskOnHome() ? <BlackboxMarketMask /> : null}
 
-      {/* ══ HERO — animated entrance + particle background ══════ */}
       <HeroSection />
 
       <HomeLiveFixtures />
       <FixturesPromo />
 
-      {/* ══ STATS BAR — values come from the booking source, never fallback seed data ══ */}
+      {/* Values come from the booking source; unavailable data stays explicit. */}
       <StatsBar
         courtsCount={courtFeedReady ? courts.length : null}
         minPrice={minPrice}
         courtFeedReady={courtFeedReady}
       />
 
-      {/* ══ WEATHER — live Cape Town weather via Open-Meteo ═════ */}
       <WeatherWidget />
 
-      {/* ══ TOURNAMENT — archived World Cup section ═════════════ */}
-      <TournamentSection />
+      {/* Interactive 3D Stadium Map: Hellenic FC 4-Pitch Layout */}
+      <section id="pitches" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <PitchStadiumScene />
+      </section>
 
-      {/* ══ COURTS — only transactional inventory may render as bookable ═══════ */}
+      {/* 5v5 Tactical Lineup & Match Card Builder */}
+      <section id="tactics" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <TacticalBoard />
+      </section>
+
+      {/* Province context drives weather, editorial relevance and adaptive Three.js. */}
+      <LivingOrganismSurface />
+
+      {/* Archived competition reference; it never presents expired actions as current. */}
+      <TournamentArchiveSection />
+
+      {/* Only verified transactional inventory may render as bookable. */}
       {courtFeedReady ? <CourtsSection courts={courts} /> : <CourtAvailabilityNotice />}
 
-      {/* ══ AMENITIES — spring pop-in ════════════════════════════ */}
       <AmenitiesStrip />
-
-      {/* ══ EVENTS — staggered cards + coloured glows ════════════ */}
       <EventsSection />
 
-      {/* ══ ABOUT — venue reference + truth-qualified commercial stats ═══════ */}
       <AboutSection
         courtsCount={courtFeedReady ? courts.length : null}
         minPrice={minPrice}
         courtFeedReady={courtFeedReady}
       />
 
-      {/* ══ SOCIAL — staggered slide reveal ═════════════════════ */}
       <SocialSection />
 
-      {/* ══ TOURNAMENT SHOWCASE — retired component currently returns null ════ */}
-      <TournamentShowcase />
-
-      {/* ══ MEDIA HIGHLIGHTS — cinematic global news feed ════════ */}
       <HomeMediaHighlights />
 
       <section className="px-4 py-12 sm:px-6 lg:px-8">
@@ -183,9 +184,9 @@ const HomePage = async () => {
                   </p>
                   <span
                     className={`rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${
-                      item.status === "RESERVED"
-                        ? "bg-amber-500/15 text-amber-300"
-                        : "bg-sky-500/10 text-sky-300"
+                      item.status === 'RESERVED'
+                        ? 'bg-amber-500/15 text-amber-300'
+                        : 'bg-sky-500/10 text-sky-300'
                     }`}
                   >
                     {item.status}
@@ -200,7 +201,6 @@ const HomePage = async () => {
         </div>
       </section>
 
-      {/* ══ CONTACT + FOOTER — animated cards ═══════════════════ */}
       <ContactSection />
     </div>
   );

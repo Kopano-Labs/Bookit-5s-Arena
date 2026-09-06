@@ -76,13 +76,13 @@ export default function NewsletterPopup() {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
-            {/* Close */}
+            {/* Close Button — 44x44 mobile friendly */}
             <button
               onClick={dismiss}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors cursor-pointer"
-              aria-label="Close"
+              className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-gray-800/80 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700 transition-colors cursor-pointer shadow-md"
+              aria-label="Close newsletter signup"
             >
-              <FaTimes size={16} />
+              <FaTimes size={15} />
             </button>
 
             {status === "success" ? (
@@ -154,9 +154,16 @@ export default function NewsletterPopup() {
                       Something went wrong. Try again.
                     </p>
                   )}
+                  <button
+                    type="button"
+                    onClick={dismiss}
+                    className="w-full py-1.5 text-center text-xs text-gray-500 hover:text-gray-300 transition-colors uppercase tracking-wider font-bold"
+                  >
+                    No thanks, continue browsing
+                  </button>
                 </form>
 
-                <div className="flex items-center justify-between mt-4">
+                <div className="flex items-center justify-between mt-3">
                   <p className="text-gray-600 text-[10px]">
                     Unsubscribe anytime. We respect your inbox.
                   </p>

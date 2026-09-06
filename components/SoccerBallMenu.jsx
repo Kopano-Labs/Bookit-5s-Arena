@@ -23,10 +23,10 @@ const MENU_ITEMS = [
   },
   {
     icon: FaTrophy,
-    label: '2026 Tournament Archive',
+    label: 'Arena Tournaments & Archive',
     href: '/tournament',
     color: '#eab308',
-    desc: 'World Cup 5s · event window closed',
+    desc: '5s Arena leagues · historical archive',
   },
 ];
 

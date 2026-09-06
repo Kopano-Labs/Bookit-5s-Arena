@@ -59,13 +59,13 @@ function CourtCard({ court, index }) {
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.15) 0%, transparent 50%)' }} />
 
               {/* Live pulse dot */}
-              <div className="absolute top-4 right-4 flex items-center gap-1.5">
+              <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 backdrop-blur-md border border-white/10">
                 <motion.div
-                  className="w-2 h-2 rounded-full bg-yellow-500"
+                  className="w-2 h-2 rounded-full bg-green-400"
                   animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <span className="text-[9px] uppercase tracking-wider text-yellow-500 font-bold">Available</span>
+                <span className="text-[9px] uppercase tracking-wider text-green-400 font-bold">View Slots</span>
               </div>
             </>
           ) : (
@@ -108,10 +108,11 @@ function CourtCard({ court, index }) {
           {/* Price + CTA */}
           <div className="flex items-center justify-between">
             <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-500 block">From</span>
               <span className="text-3xl font-black text-yellow-500" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 R{court.price_per_hour}
               </span>
-              <span className="text-gray-500 text-sm"> /hour</span>
+              <span className="text-gray-500 text-xs font-bold uppercase"> /hr</span>
             </div>
             <Link
               href={`/courts/${court._id}`}

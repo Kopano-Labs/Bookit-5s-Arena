@@ -1,0 +1,70 @@
+name: Living Organism Proof
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'hooks/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'tests/e2e/living-organism-mobile.spec.ts'
+      - 'playwright.organism.config.ts'
+      - 'package.json'
+      - 'scripts/validate-living-organism.mjs'
+      - '.github/workflows/living-organism-proof.yml'
+  push:
+    branches:
+      - feat/fivesarena-living-organism
+
+permissions:
+  contents: read
+
+jobs:
+  organism-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Living organism contract
+        run: npm run validate:organism
+
+      - name: Production compiler typecheck
+        run: npm run typecheck
+
+      - name: TypeScript 7 compatibility
+        run: npm run typecheck:ts7
+
+      - name: APWA architecture proof
+        run: npx tsx scripts/validate-apwa-proof.ts
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install constrained mobile browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Mobile locality switching proof
+        if: always()
+        run: npx playwright test --config=playwright.organism.config.ts --grep "province state drives weather and editorial surface without leaving the shell" --reporter=line
+
+      - name: Mobile touch and overflow proof
+        if: always()
+        run: npx playwright test --config=playwright.organism.config.ts --grep "province controls retain mobile touch targets and horizontal scroll stays bounded" --reporter=line
+
+      - name: Mobile reduced-motion proof
+        if: always()
+        run: npx playwright test --config=playwright.organism.config.ts --grep "reduced-motion users receive the static organism lane instead of forced Three.js motion" --reporter=line
+
+      - name: Mobile World Cup archive proof
+        if: always()
+        run: npx playwright test --config=playwright.organism.config.ts --grep "World Cup 2026 is an archive on mobile, never a registration funnel" --reporter=line

@@ -178,7 +178,12 @@ const SearchModal = () => {
                   placeholder="Search pages…"
                   className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-gray-500"
                 />
-                <button onClick={() => setIsOpen(false)} className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center text-gray-500 hover:text-gray-300">
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-lg bg-gray-800/80 px-2 py-1 text-xs font-bold text-gray-400 hover:bg-gray-700 hover:text-white"
+                  aria-label="Close search"
+                >
+                  <span className="hidden sm:inline mr-1 text-[10px] uppercase">Close</span>
                   <FaTimes size={12} />
                 </button>
               </div>
@@ -217,10 +222,16 @@ const SearchModal = () => {
                 )}
               </div>
 
-              {/* Footer */}
-              <div className="border-t border-gray-800 px-4 py-2 flex items-center justify-between text-gray-600 text-[10px]">
-                <span>Navigate with ↑↓ · Open with ↵</span>
-                <span>ESC to close</span>
+              {/* Footer — Desktop keyboard hints, Mobile touch close button */}
+              <div className="border-t border-gray-800 px-4 py-2 flex items-center justify-between text-gray-400 text-[10px]">
+                <span className="hidden sm:inline text-gray-500">Navigate with ↑↓ · Open with ↵</span>
+                <span className="hidden sm:inline text-gray-500">ESC to close</span>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="sm:hidden w-full py-1.5 text-center font-bold uppercase tracking-wider text-green-400 hover:text-green-300"
+                >
+                  ✕ Close Search
+                </button>
               </div>
             </motion.div>
           </>

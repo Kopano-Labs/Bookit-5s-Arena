@@ -1,256 +1,125 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
+  FaArchive,
+  FaArrowLeft,
+  FaCalendarCheck,
+  FaChartBar,
+  FaFutbol,
+  FaShieldAlt,
   FaTrophy,
   FaUsers,
-  FaFutbol,
-  FaCalendarAlt,
-  FaChartBar,
-  FaArrowRight,
-  FaChevronDown,
-} from "react-icons/fa";
-import Link from "next/link";
-import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from "@/lib/tournamentConfig";
+} from 'react-icons/fa';
+import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from '@/lib/tournamentConfig';
 
-const STAT_CARDS = [
-  {
-    label: "Teams Registered",
-    icon: FaUsers,
-    color: "#22c55e",
-    key: "registeredCount",
-  },
-  { label: "Total Slots", icon: FaTrophy, color: "#eab308", key: "totalSlots" },
-  {
-    label: "Groups",
-    icon: FaChartBar,
-    color: "#3b82f6",
-    value: TOURNAMENT_FORMAT.groupCount,
-  },
-  {
-    label: "Teams per Group",
-    icon: FaFutbol,
-    color: "#a855f7",
-    value: TOURNAMENT_FORMAT.teamsPerGroup,
-  },
-];
-
-export default function TournamentStatsPage() {
+export default function TournamentStatsArchivePage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/tournament")
-      .then((r) => r.json())
-      .then((d) => {
-        setData(d);
-        setLoading(false);
+    let mounted = true;
+    fetch('/api/tournament', { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (mounted) setData(payload);
       })
-      .catch(() => setLoading(false));
+      .catch(() => undefined)
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const deadline = data?.deadline ? new Date(data.deadline) : null;
-  const now = new Date();
-  const daysUntilDeadline = deadline
-    ? Math.max(0, Math.ceil((deadline - now) / (1000 * 60 * 60 * 24)))
-    : null;
+  const registeredCount = loading ? '—' : data?.registeredCount ?? 'Unavailable';
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Hero */}
-      <section className="py-20 text-center px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+    <main className="min-h-screen bg-[#040609] px-4 pb-20 pt-28 text-white sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl">
+        <Link
+          href="/tournament"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 text-[10px] font-black uppercase tracking-[0.16em] text-gray-300 transition hover:text-white"
         >
-          <FaChartBar className="mx-auto text-green-400 mb-4" size={36} />
-          <h1
-            className="font-black uppercase tracking-widest mb-3"
-            style={{
-              fontSize: "clamp(2rem, 5vw, 3.5rem)",
-              fontFamily: "Impact, Arial Black, sans-serif",
-            }}
-          >
-            TOURNAMENT <span className="text-green-400">STATS</span>
+          <FaArrowLeft /> World Cup archive
+        </Link>
+
+        <section className="mt-8 rounded-[2.5rem] border border-green-300/15 bg-black/35 p-6 sm:p-8 lg:p-12">
+          <div className="inline-flex items-center gap-2 rounded-full border border-green-300/20 bg-green-300/8 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-green-200">
+            <FaArchive /> Historical statistics
+          </div>
+          <h1 className="mt-5 text-5xl font-black uppercase leading-[0.9] sm:text-7xl">
+            World Cup 2026 <span className="text-green-300">archive data</span>
           </h1>
-          <p className="text-gray-400 max-w-lg mx-auto">
-            Live registration stats and tournament information for the 5s Arena
-            World Cup 2026.
+          <p className="mt-5 max-w-3xl text-sm leading-7 text-gray-300 sm:text-base">
+            The competition ran {TOURNAMENT_DATES.rangeShort}. This page now reports stored historical configuration and registration records only; countdowns and registration CTAs are retired.
           </p>
-        </motion.div>
-      </section>
-
-      {/* Stats Grid */}
-      <section className="max-w-4xl mx-auto px-6 pb-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {STAT_CARDS.map((card, i) => {
-            const Icon = card.icon;
-            const value = card.value || (data ? data[card.key] : "—");
-            return (
-              <motion.div
-                key={card.label}
-                className="bg-gray-900/80 border border-gray-800 rounded-2xl p-5 text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Icon
-                  size={20}
-                  style={{ color: card.color }}
-                  className="mx-auto mb-2"
-                />
-                <p
-                  className="text-3xl font-black mb-1"
-                  style={{
-                    fontFamily: "Impact, Arial Black, sans-serif",
-                    color: card.color,
-                  }}
-                >
-                  {loading ? "..." : value}
-                </p>
-                <p className="text-gray-500 text-[10px] uppercase tracking-widest font-bold">
-                  {card.label}
-                </p>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Deadline Countdown */}
-      {daysUntilDeadline !== null && (
-        <section className="max-w-4xl mx-auto px-6 pb-12">
-          <motion.div
-            className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <FaCalendarAlt className="mx-auto text-yellow-400 mb-3" size={24} />
-            <h3
-              className="font-black uppercase tracking-widest text-xl mb-2"
-              style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
-            >
-              Registration {data?.isOpen ? "Closes In" : "Closed"}
-            </h3>
-            {data?.isOpen ? (
-              <>
-                <p
-                  className="text-5xl font-black text-green-400 mb-2"
-                  style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
-                >
-                  {daysUntilDeadline}{" "}
-                  <span className="text-xl text-gray-500">DAYS</span>
-                </p>
-                <p className="text-gray-500 text-sm">
-                  Deadline:{" "}
-                  {deadline?.toLocaleDateString("en-ZA", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              </>
-            ) : (
-              <p className="text-red-400 text-lg font-bold">
-                Registration has closed. Good luck to all teams!
-              </p>
-            )}
-          </motion.div>
         </section>
-      )}
 
-      {/* Capacity Bar */}
-      <section className="max-w-4xl mx-auto px-6 pb-12">
-        <motion.div
-          className="bg-gray-900 border border-gray-800 rounded-2xl p-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-        >
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-              Tournament Capacity
-            </span>
-            <span className="text-xs font-bold text-green-400">
-              {loading ? "..." : `${data?.registeredCount || 0}/48 teams`}
-            </span>
+        <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 text-center">
+            <FaUsers className="mx-auto text-green-300" />
+            <p className="mt-3 text-3xl font-black text-white">{registeredCount}</p>
+            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-gray-500">
+              Stored registrations
+            </p>
           </div>
-          <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full rounded-full"
-              style={{ background: "linear-gradient(90deg, #22c55e, #16a34a)" }}
-              initial={{ width: 0 }}
-              animate={{
-                width: loading
-                  ? "0%"
-                  : `${((data?.registeredCount || 0) / TOURNAMENT_FORMAT.totalTeams) * 100}%`,
-              }}
-              transition={{ duration: 1, delay: 0.8 }}
-            />
+          <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 text-center">
+            <FaTrophy className="mx-auto text-amber-300" />
+            <p className="mt-3 text-3xl font-black text-white">{TOURNAMENT_FORMAT.totalTeams}</p>
+            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-gray-500">
+              Planned slots
+            </p>
           </div>
-        </motion.div>
-      </section>
+          <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 text-center">
+            <FaChartBar className="mx-auto text-blue-300" />
+            <p className="mt-3 text-3xl font-black text-white">{TOURNAMENT_FORMAT.groupCount}</p>
+            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-gray-500">
+              Groups
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 text-center">
+            <FaFutbol className="mx-auto text-purple-300" />
+            <p className="mt-3 text-3xl font-black text-white">{TOURNAMENT_FORMAT.teamsPerGroup}</p>
+            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-gray-500">
+              Teams per group
+            </p>
+          </div>
+        </section>
 
-      {/* Tournament Format Info */}
-      <section className="max-w-4xl mx-auto px-6 pb-12">
-        <motion.div
-          className="bg-gray-900 border border-gray-800 rounded-2xl p-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          <h3 className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">
-            Tournament Format
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-400">
+        <section className="mt-6 rounded-[2rem] border border-white/8 bg-white/[0.03] p-6 sm:p-8">
+          <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+            <FaCalendarCheck /> Historical format
+          </p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {[
-              [
-                "Format",
-                `${TOURNAMENT_FORMAT.groupCount} groups × ${TOURNAMENT_FORMAT.teamsPerGroup} teams (${TOURNAMENT_FORMAT.totalTeams} nations)`,
-              ],
-              [
-                "Group Stage",
-                `Round-robin (${TOURNAMENT_FORMAT.groupMatchPerGroup} matches per group)`,
-              ],
-              ["Advancement", TOURNAMENT_FORMAT.qualificationLegend],
-              [
-                "Knockout",
-                `${TOURNAMENT_FORMAT.bracket.join(" → ")} — one winner`,
-              ],
-              ["Match Duration", "20 minutes per match"],
-              ["Dates", TOURNAMENT_DATES.rangeLong],
-              ["Venue", "Hellenic Football Club, Milnerton"],
-              ["Total Matches", TOURNAMENT_FORMAT.totalMatchSummary],
+              ['Event window', TOURNAMENT_DATES.rangeLong],
+              ['Registration deadline', TOURNAMENT_DATES.signupDeadline],
+              ['Venue', 'Hellenic Football Club, Milnerton'],
+              ['Group model', `${TOURNAMENT_FORMAT.groupCount} groups × ${TOURNAMENT_FORMAT.teamsPerGroup} teams`],
+              ['Advancement', TOURNAMENT_FORMAT.qualificationLegend],
+              ['Planned bracket', TOURNAMENT_FORMAT.bracket.join(' → ')],
             ].map(([label, value]) => (
-              <div key={label} className="flex items-start gap-2">
-                <FaFutbol size={10} className="text-green-500 mt-1 shrink-0" />
-                <div>
-                  <span className="text-white font-bold">{label}: </span>
-                  <span>{value}</span>
-                </div>
+              <div key={label} className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-600">{label}</p>
+                <p className="mt-2 text-sm font-bold leading-6 text-gray-200">{value}</p>
               </div>
             ))}
           </div>
-        </motion.div>
-      </section>
+        </section>
 
-      {/* CTA */}
-      <section className="max-w-4xl mx-auto px-6 pb-20 text-center">
-        <Link href="/tournament">
-          <motion.button
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-green-600 text-white font-black uppercase tracking-widest text-sm cursor-pointer"
-            style={{ boxShadow: "0 0 25px rgba(34,197,94,0.4)" }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <FaTrophy size={16} /> Register Your Team <FaArrowRight size={12} />
-          </motion.button>
-        </Link>
-      </section>
-    </div>
+        <section className="mt-6 rounded-[2rem] border border-amber-300/12 bg-amber-300/[0.025] p-6">
+          <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-amber-200">
+            <FaShieldAlt /> Evidence boundary
+          </p>
+          <p className="mt-3 text-sm leading-7 text-gray-400">
+            Planned capacity and format are configuration evidence. They are not proof that every planned match occurred, nor proof of results, attendance, prizes or a champion.
+          </p>
+        </section>
+      </div>
+    </main>
   );
 }
