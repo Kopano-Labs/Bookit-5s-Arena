@@ -1,102 +1,73 @@
 ---
 title: Now
 created: 2026-04-09
-updated: 2026-04-10
-author: Codex
+updated: 2026-09-09
+author: Cursor (stateless renter)
 tags:
   - home
   - current-state
-  - status
-  - demo
+  - epoch
+  - fivesarena
+  - kpgsthree
 priority: critical
 status: active
 ---
 
 # Now
 
-> Canonical one-note snapshot for where Orch stands right now.
+> Canonical one-note snapshot for where FivesArena stands right now.
 > If you only open one note, open this one first.
 
-## Current Phase
+## Current Phase — 2026-09-09
 
-- Delivery mode: `demo hardening`
-- Stable foundation: Phases 1 through 5 are complete.
-- Active buildout: Phase 6, Phase 7, Phase 8, and Phase 9 are active in parallel.
-- Practical truth: the demo-ready path right now is the Orch surface, not the full end-to-end KasiLink marketplace story.
+- **Epoch:** public-surface transition underway (`epoch/fivesarena-relaunch`)
+- **Authority:** `RobynAwesome/Introduction-to-MCP` Issue #158
+- **Public root `/`:** parked on-domain relaunch page (indexable `200`), not Hellenic booking UI
+- **Experiment 001:** `lib/experiments/KPGSTHREE.ts` — EXPERIMENTAL / POC — visual thesis `single venue → platform network`
+- **Do not merge / do not deploy** until Kholofelo Robyn Rababalela inspects the PR
 
-## Operating Constitution As Of 2026-04-10
+## Historical correction (locked)
 
-- Lead Developer: `Codex`
-- DEV_1: `Germini (Google AI)`
-- DEV_2: `Nother`
-- DEV_3: `Meither`
-- DEV_4: `Cicero`
-- These are the standing devs for multi-dev sessions. No new ad-hoc spawn roles are the default vault model.
-- Lead may rotate between `Codex`, `Claude`, or `Codex + Claude`.
-- Lead target is `60% management / 40% coding`.
-- Every task starts with a dev-progress check, a live diff check, and a [comms-log](../04-Updates/comms-log.md) check.
-- All current sessions count as `pre-sessions` and training data for Orch.
-- Token-saving mode is mandatory outside Plan Mode and outside Lead-only sessions with Master.
-- If truth is not present in the vault or official sources, ask Master instead of guessing.
+The **5% transaction fee model was for other B2B / B2O / NPO prospects — NOT Hellenic.**
 
-## Current Reality As Of 2026-04-09
+## Preserve
 
-| Area | State | Truth |
-|------|-------|-------|
-| Orch API + GUI | PASS | `tests/test_labs_api.py` passes, `npm run build` in `orch/gui` passes, compile checks pass, and `/api/labs/microsoft-readiness` returns live status. |
-| Orch-only demo route | PASS | Public and admin rehearsal paths were locked and passed on `2026-04-09`. |
-| Microsoft readiness | PARTIAL | Local tooling is installed and the live readiness endpoint works, but only `2/6` required checks and `1/3` optional checks are ready. |
-| Full KasiLink story | PARTIAL | Wider buyer story still depends on external auth, data, and integration blockers. |
-| Vault organization | IN PROGRESS | Schematics is the canonical Obsidian layer; root docs are now being indexed instead of moved casually. |
-| Training corpus | ACTIVE | Human, AI, session, hallucination, and Orch progression notes are being consolidated into one second-brain system. |
+- Repository, database, provenance, SEO/Search Console evidence, deployment history
+- Hellenic POC evidence archived in code paths (not destroyed)
+- Domain equity on `https://fivesarena.com/`
 
-## Demo Day Position
+## Canonical outbound identity
 
-- Demo hub: [Microsoft Demo Day!](../Microsoft%20Demo%20Day!/index.md)
-- Safe live route: [Orch Demo Script - 2026-04-09](../Microsoft%20Demo%20Day!/Orch%20Demo%20Script%20-%202026-04-09.md)
-- Countdown and ownership: [Demo Countdown - April 8-15, 2026](../Microsoft%20Demo%20Day!/Demo%20Countdown%20-%20April%208-15,%202026.md)
-- UI verification detail: [Orch Demo Task List - 2026-04-08](../Microsoft%20Demo%20Day!/Orch%20Demo%20Task%20List%20-%202026-04-08.md)
-- Owner checklist: [Owner Must Handle - Microsoft Demo Day](../Microsoft%20Demo%20Day!/Owner%20Must%20Handle%20-%20Microsoft%20Demo%20Day.md)
-- Phase and capability truth: [Project Status](../04-Updates/Project%20Status.md)
+- https://KopanoLabs.com
+- https://KRRababalela.com
+- https://www.linkedin.com/in/kholofelorobynrababalela/
 
-## Biggest Open Blockers
+## Verified discovery metrics (public-safe)
 
-- valid Clerk keys for the wider authenticated rehearsal
-- `whatsapp_bridge_configured: true` (Simulation mode live, API ready)
-- All foundational business pages are DEPLOYED.
-- Critical production bugs have been RESOLVED.
-- Azure sign-in is still incomplete in the local demo shell
-- Azure OpenAI, App Insights, and hosting env/resource values are still missing
-- reward/referral is documentation-only in this workspace and is `NO-GO` for the live demo script until code exists
-- product polish: copy tightening, youth-fit research summary, and reconnecting the Orch-only route to the bigger KasiLink story
+- August 2026: 5.71K impressions / 149 Google clicks
+- June 2026 baseline: 2.57K impressions / 90 clicks
+- IONOS assessment: optimisation rated excellent
+- Do **not** claim bookings, revenue, or conversion without receipts
 
-## New Control Systems
+## Inventory receipt
 
-- [Schematics Root Index](../index.md)
-- [07-Sessions By Day](../07-Sessions%20By%20Day/index.md)
-- [08-IDEAS AT BIRTH](../08-IDEAS%20AT%20BIRTH/index.md)
-- [09-KOPANO CONTEXT PROGRESSION](../09-ORCH%20PROGRESSION/index.md)
-- [10-SESSION IMPROVEMENTS](../10-SESSION%20IMPROVEMENTS/index.md)
-- [11-AI HALLUCINATION - CRITICAL](../11-AI%20HALLUCINATION%20-%20CRITICAL/index.md)
-- [12-PLAN MODE SESSIONS](../12-PLAN%20MODE%20SESSIONS/index.md)
-- [KC Train Logs](../05-Training/Orch%20Train%20Logs/index.md)
+See [EPOCH_FIVESARENA_RELAUNCH_INVENTORY_2026-09-09.md](../04-Updates/EPOCH_FIVESARENA_RELAUNCH_INVENTORY_2026-09-09.md)
 
-## Open These In Order
+## Next admissible action
 
-1. [Project Status](../04-Updates/Project%20Status.md)
-2. [Microsoft Demo Day!](../Microsoft%20Demo%20Day!/index.md)
-3. [Owner Must Handle - Microsoft Demo Day](../Microsoft%20Demo%20Day!/Owner%20Must%20Handle%20-%20Microsoft%20Demo%20Day.md)
-4. [Open Issues](../06-Reference/Open%20Issues.md)
-5. [07-Sessions By Day](../07-Sessions%20By%20Day/index.md)
-6. [10-SESSION IMPROVEMENTS](../10-SESSION%20IMPROVEMENTS/index.md)
-7. [11-AI HALLUCINATION - CRITICAL](../11-AI%20HALLUCINATION%20-%20CRITICAL/index.md)
-8. [12-PLAN MODE SESSIONS](../12-PLAN%20MODE%20SESSIONS/index.md)
-9. [Training Index](../05-Training/index.md)
-10. [Repo Documents Index](../06-Reference/Repo%20Documents%20Index.md)
+Owner inspection of the single relaunch PR. No production merge/deploy without explicit approval.
 
-## Repo Structure Rule
+---
 
-- Keep app/runtime documents at repo root when tests, README, or scripts already refer to them.
-- Use Schematics to consolidate, index, and explain those docs inside Obsidian.
-- File movement is not organization unless note homes, backlinks, references, and current-state summaries are updated with it.
-- Every folder in `Schematics` should explain itself through `index.md`.
+## Prior snapshot (stale — April 2026 Orch/demo notes)
+
+The April Orch / Microsoft Demo Day material below is **historical vault context only** and does **not** describe the September 2026 FivesArena epoch.
+
+<details>
+<summary>Archived April 2026 Orch snapshot</summary>
+
+- Delivery mode was `demo hardening` for Orch surfaces.
+- Standing multi-dev constitution and Microsoft Demo Day routes lived under STRUCTURE Microsoft Demo Day notes.
+- Those blockers (Clerk keys, Azure sign-in, etc.) are not the active FivesArena epoch gate.
+
+</details>

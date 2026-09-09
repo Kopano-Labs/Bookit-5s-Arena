@@ -24,25 +24,23 @@ const SITE_URL =
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Bookit 5's Arena | 5-a-Side Football Cape Town",
-    template: "%s | Bookit 5's Arena",
+    default: "FivesArena | Evolving 5-a-Side Platform",
+    template: "%s | FivesArena",
   },
   description:
-    "Explore 5-a-side football at Hellenic FC, Milnerton, with source-qualified court booking, event enquiries, football fixtures and archived competition reference surfaces.",
+    "FivesArena is evolving. The venue proved the need. The platform is becoming something bigger. Experiment 001 — KPGSTHREE on fivesarena.com.",
   keywords: [
+    "FivesArena",
     "5-a-side football",
     "Cape Town",
-    "Milnerton",
-    "court booking",
-    "football tournament",
-    "Hellenic Football Club",
+    "platform network",
+    "Kopano Labs",
+    "KPGSTHREE",
     "Bookit 5's Arena",
-    "Competition Hub",
-    "World Cup 5s archive",
   ],
   authors: [
-    { name: "Kholofelo Robyn Rababalela", url: "https://krrababalela.com" },
-    { name: "Bookit 5's Arena", url: "https://fivesarena.com" },
+    { name: "Kholofelo Robyn Rababalela", url: "https://KRRababalela.com" },
+    { name: "FivesArena", url: "https://fivesarena.com" },
   ],
   creator: "Kholofelo Robyn Rababalela",
   publisher: "Kopano Labs",
@@ -56,24 +54,24 @@ export const metadata = {
     type: "website",
     locale: "en_ZA",
     url: process.env.NEXTAUTH_URL || "https://fivesarena.com",
-    siteName: "Bookit 5's Arena",
-    title: "Bookit 5's Arena | 5-a-Side Football Cape Town",
+    siteName: "FivesArena",
+    title: "FivesArena is evolving",
     description:
-      "Explore 5-a-side football in Milnerton, Cape Town, including source-qualified booking surfaces, event enquiries and archived competition reference.",
+      "The venue proved the need. The platform is becoming something bigger. Experiment 001 — KPGSTHREE.",
     images: [
       {
         url: "/icons/icon-512x512.png",
         width: 512,
         height: 512,
-        alt: "Bookit 5's Arena",
+        alt: "FivesArena",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bookit 5's Arena | Cape Town Football",
+    title: "FivesArena is evolving",
     description:
-      "Explore 5-a-side football in Milnerton, Cape Town, with current-source booking surfaces and archived competition reference.",
+      "The venue proved the need. The platform is becoming something bigger. Experiment 001 — KPGSTHREE.",
   },
   robots: { index: true, follow: true },
 };

@@ -307,7 +307,7 @@ const SOCIAL_LINKS = [
   {
     label: "LinkedIn",
     icon: FaLinkedin,
-    url: "https://www.linkedin.com/in/kholofelo-robyn-rababalela-7a26273b6/",
+    url: "https://www.linkedin.com/in/kholofelorobynrababalela/",
     color: "#0a66c2",
   },
   {

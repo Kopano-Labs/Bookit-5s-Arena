@@ -51,6 +51,8 @@ const NavIcon = ({ children }) => (
 );
 
 import { useTheme } from "@/context/ThemeContext";
+import { isEpochRelaunchRoot } from "@/lib/featureFlags";
+import { CANONICAL_OUTBOUND_LINKS } from "@/lib/experiments/KPGSTHREE";
 
 const ThemeGlyph = ({ theme }) => {
   if (theme === "light") {
@@ -83,6 +85,12 @@ const ThemeGlyph = ({ theme }) => {
     </span>
   );
 };
+
+const EPOCH_GUEST_NAV = [
+  { href: CANONICAL_OUTBOUND_LINKS.kopanoLabs, emoji: "🧪", label: "Kopano Labs", external: true },
+  { href: CANONICAL_OUTBOUND_LINKS.krrababalela, emoji: "👤", label: "KRRababalela", external: true },
+  { href: CANONICAL_OUTBOUND_LINKS.linkedIn, emoji: "💼", label: "LinkedIn", external: true },
+];
 
 const GUEST_NAV = [
   { href: "/#courts",             emoji: "⚽",  label: "Book" },
@@ -179,13 +187,17 @@ const HeaderInner = () => {
         ? "register"
         : "login";
 
+  const epochRoot = isEpochRelaunchRoot(pathname);
+
   /* 5-tier enforcement: strictly match role to nav set */
-  const navLinks =
-    isAdmin         ? ADMIN_NAV_PRIMARY :
-    isManager       ? MANAGER_NAV :
-    isSecurityGuard ? SECURITY_NAV :
-    session         ? USER_NAV :
-                      GUEST_NAV;
+  /* Epoch parked root: no Hellenic booking CTAs on the public landing chrome. */
+  const navLinks = epochRoot
+    ? EPOCH_GUEST_NAV
+    : isAdmin         ? ADMIN_NAV_PRIMARY :
+      isManager       ? MANAGER_NAV :
+      isSecurityGuard ? SECURITY_NAV :
+      session         ? USER_NAV :
+                        GUEST_NAV;
 
   const navClass = (href) => {
     const active = isActive(pathname, href);
@@ -306,6 +318,19 @@ const HeaderInner = () => {
             {/* Search Hub */}
             {!hideDesktopSearch && <SearchModal />}
             {navLinks.map((tab) => (
+              tab.external ? (
+                <a
+                  key={tab.href}
+                  href={tab.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={navClass(tab.href)}
+                  data-epoch-cta={tab.label}
+                >
+                  {tab.emoji && <span className="text-sm">{tab.emoji}</span>}
+                  {tab.label}
+                </a>
+              ) : (
               <Link
                 key={tab.href}
                 href={tab.href}
@@ -316,6 +341,7 @@ const HeaderInner = () => {
                 {tab.icon && <NavIcon>{tab.icon}</NavIcon>}
                 {tab.label}
               </Link>
+              )
             ))}
 
             {/* Admin "More" dropdown */}
@@ -653,6 +679,23 @@ const HeaderInner = () => {
                     </>
                   ) : (
                     navLinks.map((tab) => (
+                      tab.external ? (
+                        <a
+                          key={tab.href}
+                          href={tab.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setMobileOpen(false)}
+                          data-epoch-cta={tab.label}
+                          className={`${mobileClass(tab.href)} w-full justify-between border border-gray-800 bg-gray-900/80 text-gray-300 hover:border-gray-700 hover:bg-gray-900`}
+                        >
+                          <span className="flex items-center gap-2">
+                            {tab.emoji && <span className="text-base">{tab.emoji}</span>}
+                            {tab.label}
+                          </span>
+                          <FaChevronRight size={12} className="text-gray-500" />
+                        </a>
+                      ) : (
                       <Link
                         key={tab.href}
                         href={tab.href}
@@ -670,6 +713,7 @@ const HeaderInner = () => {
                         </span>
                         <FaChevronRight size={12} className="text-gray-500" />
                       </Link>
+                      )
                     ))
                   )}
                 </div>
