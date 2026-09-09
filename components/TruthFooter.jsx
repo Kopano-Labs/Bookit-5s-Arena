@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   FaFacebook,
   FaInstagram,
@@ -7,6 +10,8 @@ import {
   FaTiktok,
   FaWhatsapp,
 } from "react-icons/fa";
+import { isEpochRelaunchRoot } from "@/lib/featureFlags";
+import { CANONICAL_OUTBOUND_LINKS } from "@/lib/experiments/KPGSTHREE";
 
 const ECOSYSTEM_LINKS = [
   { label: "KRRababalela", href: "https://krrababalela.com", note: "Chief portfolio", state: "LINKED" },
@@ -24,7 +29,71 @@ const SOCIALS = [
   { label: "WhatsApp", href: "https://wa.me/27637820245", icon: FaWhatsapp },
 ];
 
+const EPOCH_CTAS = [
+  { label: "Kopano Labs", href: CANONICAL_OUTBOUND_LINKS.kopanoLabs, note: "Studio & platform" },
+  { label: "KRRababalela", href: CANONICAL_OUTBOUND_LINKS.krrababalela, note: "Founder portfolio" },
+  { label: "LinkedIn", href: CANONICAL_OUTBOUND_LINKS.linkedIn, note: "Professional contact" },
+];
+
+function EpochTruthFooter() {
+  return (
+    <footer
+      data-testid="epoch-truth-footer"
+      className="border-t border-gray-800 bg-gray-950 pb-24 text-white"
+    >
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="max-w-3xl">
+          <p className="text-xl font-black uppercase tracking-wider">
+            5S <span className="text-yellow-500">ARENA</span>
+          </p>
+          <p className="mt-4 text-sm leading-7 text-gray-400">
+            FivesArena is evolving. The venue proved the need. The platform is becoming something
+            bigger. This domain remains indexable while product, database, SEO history, and evidence
+            are preserved.
+          </p>
+        </div>
+
+        <nav
+          aria-label="Epoch canonical links"
+          className="mt-8 grid gap-3 sm:grid-cols-3"
+          data-testid="epoch-footer-ctas"
+        >
+          {EPOCH_CTAS.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-2xl border border-gray-800 bg-black/20 p-4 transition hover:border-emerald-700/40"
+            >
+              <span className="text-xs font-black uppercase tracking-wide text-gray-200">
+                {item.label}
+              </span>
+              <p className="mt-2 text-[10px] uppercase tracking-widest text-gray-600">{item.note}</p>
+              <p className="mt-3 break-all text-[11px] text-emerald-400/80">{item.href}</p>
+            </a>
+          ))}
+        </nav>
+
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-gray-800 pt-6 text-[10px] uppercase tracking-widest text-gray-700">
+          <span>© {new Date().getFullYear()} FivesArena · Kopano Labs</span>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/security" className="hover:text-gray-400">Security</Link>
+            <Link href="/privacy" className="hover:text-gray-400">Privacy</Link>
+            <Link href="/api/rss" className="hover:text-gray-400">RSS</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export default function TruthFooter() {
+  const pathname = usePathname();
+  if (isEpochRelaunchRoot(pathname)) {
+    return <EpochTruthFooter />;
+  }
+
   return (
     <footer className="border-t border-gray-800 bg-gray-950 pb-24 text-white">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
@@ -34,9 +103,8 @@ export default function TruthFooter() {
               5S <span className="text-yellow-500">ARENA</span>
             </p>
             <p className="mt-4 text-sm leading-7 text-gray-500">
-              5-a-side football at Hellenic Football Club, Milnerton. Current court inventory,
-              rates and slot availability are presented as transactional only when the booking
-              source returns them.
+              5-a-side football platform surface. Current court inventory, rates and slot
+              availability are presented as transactional only when the booking source returns them.
             </p>
             <div className="mt-5 flex gap-2">
               {SOCIALS.map(({ label, href, icon: Icon }) => (
@@ -82,7 +150,7 @@ export default function TruthFooter() {
               </a>
               <div className="flex items-start gap-3">
                 <FaMapMarkerAlt className="mt-1 shrink-0 text-yellow-500" size={12} />
-                <span>Pringle Rd, Milnerton, Cape Town, 7441</span>
+                <span>Cape Town, South Africa</span>
               </div>
               <a href="mailto:fivearena@gmail.com" className="block hover:text-white">
                 fivearena@gmail.com

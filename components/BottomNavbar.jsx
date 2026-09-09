@@ -20,9 +20,21 @@ import {
   FaKey,
   FaNewspaper,
   FaGamepad,
+  FaFlask,
+  FaLinkedin,
+  FaUser,
 } from "react-icons/fa";
+import { isEpochRelaunchRoot } from "@/lib/featureFlags";
+import { CANONICAL_OUTBOUND_LINKS } from "@/lib/experiments/KPGSTHREE";
 
 /* ─── Nav items per role (4-tier) ───────────────────── */
+const EPOCH_ITEMS = [
+  { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
+  { href: CANONICAL_OUTBOUND_LINKS.kopanoLabs, icon: FaFlask, label: "Labs", color: "#34d399", external: true },
+  { href: CANONICAL_OUTBOUND_LINKS.krrababalela, icon: FaUser, label: "KRR", color: "#f5c542", external: true },
+  { href: CANONICAL_OUTBOUND_LINKS.linkedIn, icon: FaLinkedin, label: "In", color: "#60a5fa", external: true },
+];
+
 const USER_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
   { href: "/#courts", icon: FaFutbol, label: "Book", color: "#22c55e" },
@@ -109,8 +121,9 @@ export default function BottomNavbar() {
   const closeTimer = useRef(null);
 
   const role = session?.user?.activeRole || session?.user?.role;
-  const items =
-    role === "admin"
+  const items = isEpochRelaunchRoot(pathname)
+    ? EPOCH_ITEMS
+    : role === "admin"
       ? ADMIN_ITEMS
       : role === "manager"
         ? MANAGER_ITEMS
@@ -192,6 +205,36 @@ export default function BottomNavbar() {
               const Icon = item.icon;
               const scale = getScale(i);
               const active = isActive(item.href);
+              const className =
+                "flex min-h-[44px] min-w-[64px] flex-col items-center justify-center rounded-lg px-2 py-2 transition-all";
+              const style = {
+                color: active ? item.color : "#fff",
+                transform: `scale(${scale})`,
+              };
+              const body = (
+                <>
+                  <Icon size={24} />
+                  <span className="mt-0.5 text-sm font-bold tracking-widest uppercase">
+                    {item.label}
+                  </span>
+                </>
+              );
+              if (item.external) {
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onMouseEnter={() => setHoveredIndex(i)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    className={className}
+                    style={style}
+                  >
+                    {body}
+                  </a>
+                );
+              }
               return (
                 <Link
                   key={item.href}
@@ -199,16 +242,10 @@ export default function BottomNavbar() {
                   prefetch={false}
                   onMouseEnter={() => setHoveredIndex(i)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  className="flex min-h-[44px] min-w-[64px] flex-col items-center justify-center rounded-lg px-2 py-2 transition-all"
-                  style={{
-                    color: active ? item.color : "#fff",
-                    transform: `scale(${scale})`,
-                  }}
+                  className={className}
+                  style={style}
                 >
-                  <Icon size={24} />
-                  <span className="mt-0.5 text-sm font-bold tracking-widest uppercase">
-                    {item.label}
-                  </span>
+                  {body}
                 </Link>
               );
             })}
