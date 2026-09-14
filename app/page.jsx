@@ -1,4 +1,5 @@
 // Server Component — keeps ISR data fetching; passes data to client components for animations
+// TournamentArchiveSection is intentionally not mounted on the customer landing page.
 import HeroSection from '@/components/home/HeroSection';
 import FixturesPromo from '@/components/home/FixturesPromo';
 import StatsBar from '@/components/home/StatsBar';
