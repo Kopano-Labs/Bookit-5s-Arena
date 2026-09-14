@@ -3,9 +3,8 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { getProviders, signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
-import { FaGoogle, FaLock, FaSignInAlt, FaTrophy, FaUserPlus } from "react-icons/fa";
+import { FaGoogle, FaLock, FaSignInAlt, FaUserPlus } from "react-icons/fa";
 
 function AuthPageInner() {
   const { status } = useSession();
@@ -154,39 +153,21 @@ function AuthPageInner() {
 
   return (
     <main className="min-h-screen bg-gray-950 px-4 py-14 text-white sm:px-6">
-      <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2 lg:items-center">
-        <section className="rounded-[2rem] border border-gray-800 bg-gradient-to-br from-gray-900 via-gray-950 to-black p-7 sm:p-9">
+      <div className="mx-auto grid max-w-xl gap-8">
+        <section className="rounded-[2rem] border border-gray-800 bg-gray-900/80 p-6 shadow-2xl backdrop-blur sm:p-8">
+          <div className="mb-7">
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-green-400">
             Account access
           </p>
-          <h1 className="mt-4 text-4xl font-black uppercase leading-none tracking-tight sm:text-6xl">
-            Sign in to the arena, not an expired campaign.
+          <h1 className="mt-3 text-3xl font-black uppercase leading-none tracking-tight sm:text-5xl">
+            Sign in to 5s Arena.
           </h1>
-          <p className="mt-5 text-sm leading-7 text-gray-400 sm:text-base">
-            Account access is for current 5s Arena features such as booking history and role-based
-            tools. Authentication does not imply that a court, league, event, price, or competition
-            is currently available; those states must be confirmed by their own source.
+          <p className="mt-4 text-sm leading-7 text-gray-400 sm:text-base">
+            Manage bookings, profile details and arena tools from one account. New players can
+            create an account here, then confirm courts or events directly with the venue.
           </p>
-
-          <div className="mt-7 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5">
-            <div className="flex items-center gap-3 text-yellow-300">
-              <FaTrophy />
-              <p className="text-xs font-black uppercase tracking-widest">World Cup 5s 2026</p>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-gray-400">
-              The 29–31 May 2026 tournament is historical. Registration closed 22 May 2026; this
-              login page no longer advertises entry fees, prize claims, or team signup as current.
-            </p>
-            <Link
-              href="/tournament"
-              className="mt-4 inline-flex text-xs font-black uppercase tracking-widest text-yellow-300 hover:text-yellow-200"
-            >
-              Open tournament archive →
-            </Link>
           </div>
-        </section>
 
-        <section className="rounded-[2rem] border border-gray-800 bg-gray-900/80 p-6 shadow-2xl backdrop-blur sm:p-8">
           <div className="mb-7 flex rounded-xl border border-gray-800 bg-gray-950 p-1">
             {[
               { key: "login", label: "Sign In", icon: FaSignInAlt },

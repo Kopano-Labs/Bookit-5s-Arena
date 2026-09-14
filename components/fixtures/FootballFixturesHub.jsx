@@ -180,6 +180,21 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
   const [newsLoading, setNewsLoading] = useState(false);
   const [error, setError] = useState("");
   const [vaultMeta, setVaultMeta] = useState(null);
+  const matchGroups = matchesPayload?.groups || [];
+  const matchRows = matchesPayload?.matches || [];
+  const hasMatches = matchGroups.some((group) => group.matches?.length > 0);
+  const hasLiveMatches = matchRows.some((match) => match?.isLive || match?.status?.state === "live");
+  const providerStatus = matchesPayload?.provider?.status || "empty";
+  const providerName = matchesPayload?.provider?.name || "fixture feed";
+  const statusBadge = hasLiveMatches
+    ? { label: "Live Matches", tone: "border-green-500/20 bg-green-500/10 text-green-400", dot: "bg-green-500" }
+    : hasMatches
+      ? {
+          label: providerStatus === "fallback" ? "Schedule Window" : "Fixtures Ready",
+          tone: "border-green-500/20 bg-green-500/10 text-green-400",
+          dot: "bg-green-500",
+        }
+      : { label: "Window Empty", tone: "border-amber-500/20 bg-amber-500/10 text-amber-300", dot: "bg-amber-400" };
 
   useEffect(() => {
     let cancelled = false;
@@ -347,16 +362,16 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
                 className="px-6 py-4 border-b flex items-center justify-between"
                 style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.05)" }}
               >
-                  <h2 className="text-sm font-black uppercase tracking-widest text-white">Active Match Window</h2>
-                  <div className="flex items-center gap-2 text-[10px] font-bold text-green-400 uppercase tracking-widest bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                      Live Hub Active
+                  <h2 className="text-sm font-black uppercase tracking-widest text-white">Match Window</h2>
+                  <div className={`flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${statusBadge.tone}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${statusBadge.dot} ${hasLiveMatches ? "animate-pulse" : ""}`} />
+                      {statusBadge.label}
                   </div>
               </div>
               
-              {matchesPayload?.groups?.length ? (
+              {hasMatches ? (
                 <div className="divide-y divide-white/5">
-                  {matchesPayload.groups.map((group) => (
+                  {matchGroups.map((group) => (
                     <div key={group.dateKey}>
                       <div
                         className="px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-green-400/60 sm:px-6"
@@ -386,7 +401,13 @@ export default function FootballFixturesHub({ slug = "premier-league" }) {
               ) : (
                 <div className="py-20 text-center">
                   <FaTrophy className="mx-auto text-zinc-700 mb-4" size={48} />
-                  <p className="text-zinc-500 text-sm font-black uppercase tracking-widest">No fixtures found for this window</p>
+                  <p className="text-zinc-500 text-sm font-black uppercase tracking-widest">
+                    {matchesPayload?.emptyState || "No fixtures found for this window"}
+                  </p>
+                  <p className="mx-auto mt-3 max-w-md text-xs leading-6 text-zinc-600">
+                    {providerName} returned no matches for this league window. Try another competition
+                    or check back when the provider publishes the next batch.
+                  </p>
                 </div>
               )}
             </motion.div>

@@ -4,9 +4,85 @@ import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, MeshDistortMaterial, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
+import { useTheme } from "@/context/ThemeContext";
+
+const SCENE_PALETTES = {
+  dark: {
+    fog: "#04060a",
+    core: "#090d16",
+    shell: "#22c55e",
+    emissive: "#15803d",
+    ringA: "#4ade80",
+    ringB: "#3b82f6",
+    floor: "#03070c",
+    gridPrimary: "#15803d",
+    gridSecondary: "#082f49",
+    sparkle: "#3b82f6",
+    hemiGround: "#04060a",
+  },
+  crazy: {
+    fog: "#0d0520",
+    core: "#12051f",
+    shell: "#c084fc",
+    emissive: "#7e22ce",
+    ringA: "#d946ef",
+    ringB: "#f0abfc",
+    floor: "#080312",
+    gridPrimary: "#7e22ce",
+    gridSecondary: "#581c87",
+    sparkle: "#c084fc",
+    hemiGround: "#0d0520",
+  },
+  light: {
+    fog: "#f8fafc",
+    core: "#e5e7eb",
+    shell: "#16a34a",
+    emissive: "#15803d",
+    ringA: "#22c55e",
+    ringB: "#2563eb",
+    floor: "#dbeafe",
+    gridPrimary: "#16a34a",
+    gridSecondary: "#93c5fd",
+    sparkle: "#2563eb",
+    hemiGround: "#e2e8f0",
+  },
+  read: {
+    fog: "#faf7f2",
+    core: "#e7dfd3",
+    shell: "#15803d",
+    emissive: "#166534",
+    ringA: "#16a34a",
+    ringB: "#a16207",
+    floor: "#efe8dc",
+    gridPrimary: "#15803d",
+    gridSecondary: "#d6cfc3",
+    sparkle: "#a16207",
+    hemiGround: "#efe8dc",
+  },
+};
+
+function useRenderProfile() {
+  return useMemo(() => {
+    if (typeof navigator === "undefined") {
+      return { dpr: [1, 1.5], antialias: true, particles: 900, sparkles: 90, powerPreference: "high-performance" };
+    }
+
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const lowPower =
+      Boolean(connection?.saveData) ||
+      (typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4) ||
+      (typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4);
+
+    if (lowPower) {
+      return { dpr: [1, 1.25], antialias: false, particles: 360, sparkles: 36, powerPreference: "low-power" };
+    }
+
+    return { dpr: [1, 1.5], antialias: true, particles: 760, sparkles: 72, powerPreference: "high-performance" };
+  }, []);
+}
 
 /* ── Premium Holographic Soccer Ball with Cursor Tracking ── */
-function SoccerBall() {
+function SoccerBall({ palette }) {
   const groupRef = useRef();
   const innerRef = useRef();
   const outerRef = useRef();
@@ -56,7 +132,7 @@ function SoccerBall() {
         <mesh ref={innerRef}>
           <sphereGeometry args={[1, 64, 64]} />
           <meshStandardMaterial
-            color="#090d16"
+            color={palette.core}
             roughness={0.08}
             metalness={0.98}
             envMapIntensity={1.5}
@@ -67,8 +143,8 @@ function SoccerBall() {
         <mesh ref={outerRef} scale={1.015}>
           <icosahedronGeometry args={[1, 3]} /> {/* High poly geodesic pattern matches soccer seams */}
           <meshStandardMaterial
-            color="#22c55e"
-            emissive="#15803d"
+            color={palette.shell}
+            emissive={palette.emissive}
             emissiveIntensity={1.2}
             roughness={0.1}
             metalness={0.9}
@@ -81,10 +157,10 @@ function SoccerBall() {
         {/* 3. Glowing Emerald Gyro Ring A (Horizontal) */}
         <mesh scale={2.6} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[1, 0.01, 16, 100]} />
-          <meshBasicMaterial 
-            color="#4ade80" 
-            transparent 
-            opacity={0.35} 
+          <meshBasicMaterial
+            color={palette.ringA}
+            transparent
+            opacity={0.35}
             blending={THREE.AdditiveBlending}
           />
         </mesh>
@@ -92,10 +168,10 @@ function SoccerBall() {
         {/* 4. Glowing Blue Gyro Ring B (Vertical) */}
         <mesh scale={2.6} rotation={[0, Math.PI / 2, 0]}>
           <torusGeometry args={[1, 0.01, 16, 100]} />
-          <meshBasicMaterial 
-            color="#3b82f6" 
-            transparent 
-            opacity={0.25} 
+          <meshBasicMaterial
+            color={palette.ringB}
+            transparent
+            opacity={0.25}
             blending={THREE.AdditiveBlending}
           />
         </mesh>
@@ -105,19 +181,17 @@ function SoccerBall() {
 }
 
 /* ── GPU-Accelerated Particle Embers (120 FPS / Zero CPU Overhead) ── */
-function GPUParticles({ count = 1000 }) {
+function GPUParticles({ count = 1000, color = "#4ade80" }) {
   const pointsRef = useRef();
 
-  const [positions, speeds] = useMemo(() => {
+  const [positions] = useMemo(() => {
     const pos = new Float32Array(count * 3);
-    const spd = new Float32Array(count);
     for (let i = 0; i < count; i++) {
       pos[i * 3] = (Math.random() - 0.5) * 16;      // X
       pos[i * 3 + 1] = (Math.random() - 0.5) * 16;  // Y
       pos[i * 3 + 2] = (Math.random() - 0.5) * 12;  // Z
-      spd[i] = Math.random() * 0.15 + 0.05;
     }
-    return [pos, spd];
+    return [pos];
   }, [count]);
 
   useFrame((state) => {
@@ -142,7 +216,7 @@ function GPUParticles({ count = 1000 }) {
         />
       </bufferGeometry>
       <pointsMaterial
-        color="#4ade80"
+        color={color}
         size={0.065}
         sizeAttenuation
         transparent
@@ -155,7 +229,7 @@ function GPUParticles({ count = 1000 }) {
 }
 
 /* ── Cinematic Volumetric Light Rays ── */
-function LightRays() {
+function LightRays({ color = "#22c55e" }) {
   const ref = useRef();
   
   useFrame((state) => {
@@ -180,7 +254,7 @@ function LightRays() {
         >
           <planeGeometry args={[0.1, 15]} />
           <meshBasicMaterial
-            color="#22c55e"
+            color={color}
             transparent
             opacity={0.03}
             side={THREE.DoubleSide}
@@ -193,14 +267,14 @@ function LightRays() {
 }
 
 /* ── Glowing Tech Grid Ground ── */
-function GroundPlane() {
+function GroundPlane({ palette }) {
   return (
     <group position={[0, -3.2, 0]}>
       {/* Glossy dark floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[50, 50]} />
         <meshStandardMaterial
-          color="#03070c"
+          color={palette.floor}
           roughness={0.15}
           metalness={0.9}
           transparent
@@ -208,58 +282,62 @@ function GroundPlane() {
         />
       </mesh>
       {/* High-tech emerald grid overlay */}
-      <gridHelper args={[50, 50, "#15803d", "#082f49"]} position={[0, 0.01, 0]} />
+      <gridHelper args={[50, 50, palette.gridPrimary, palette.gridSecondary]} position={[0, 0.01, 0]} />
     </group>
   );
 }
 
 /* ── Main 3D Scene Export ── */
 export default function Hero3DScene() {
+  const { theme } = useTheme();
+  const palette = SCENE_PALETTES[theme] || SCENE_PALETTES.dark;
+  const renderProfile = useRenderProfile();
+
   return (
     <div className="absolute inset-0 z-0" style={{ pointerEvents: "none" }}>
       <Canvas
         camera={{ position: [0, 0.4, 5.8], fov: 45 }}
-        dpr={[1, 2]} // High precision display support
+        dpr={renderProfile.dpr}
         gl={{
-          antialias: true,
+          antialias: renderProfile.antialias,
           alpha: true,
-          powerPreference: "high-performance",
+          powerPreference: renderProfile.powerPreference,
           toneMapping: THREE.ACESFilmicToneMapping,
         }}
         style={{ background: "transparent" }}
       >
-        <fog attach="fog" args={["#04060a", 6, 20]} />
+        <fog attach="fog" args={[palette.fog, 6, 20]} />
         
         <ambientLight intensity={0.3} />
-        <hemisphereLight args={["#ffffff", "#04060a", 0.4]} />
+        <hemisphereLight args={["#ffffff", palette.hemiGround, 0.4]} />
 
         {/* Cinematic Lighting System */}
         {/* Core Emerald spotlight */}
         <directionalLight
           position={[-6, 10, 6]}
           intensity={1.5}
-          color="#22c55e"
+          color={palette.shell}
         />
 
         {/* Ambient fill blue light */}
-        <pointLight position={[6, 4, 4]} intensity={0.9} color="#2563eb" />
+        <pointLight position={[6, 4, 4]} intensity={0.9} color={palette.ringB} />
 
         {/* Under-ball uplight for massive sci-fi elevation feel */}
-        <pointLight position={[0, -2.8, 1]} intensity={1.8} color="#10b981" />
+        <pointLight position={[0, -2.8, 1]} intensity={1.8} color={palette.emissive} />
         
         {/* Scene Objects */}
-        <SoccerBall />
-        <GPUParticles count={1200} />
-        <LightRays />
-        <GroundPlane />
+        <SoccerBall palette={palette} />
+        <GPUParticles count={renderProfile.particles} color={palette.ringA} />
+        <LightRays color={palette.shell} />
+        <GroundPlane palette={palette} />
         
         {/* Floating dust sparkles */}
         <Sparkles
-          count={120}
+          count={renderProfile.sparkles}
           scale={8}
           size={2.5}
           speed={0.5}
-          color="#3b82f6"
+          color={palette.sparkle}
           opacity={0.35}
         />
       </Canvas>
