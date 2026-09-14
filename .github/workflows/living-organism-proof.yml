@@ -12,6 +12,7 @@ on:
       - 'playwright.organism.config.ts'
       - 'package.json'
       - 'scripts/validate-living-organism.mjs'
+      - 'scripts/validate-public-surface.mjs'
       - '.github/workflows/living-organism-proof.yml'
   push:
     branches:
@@ -37,6 +38,9 @@ jobs:
 
       - name: Living organism contract
         run: npm run validate:organism
+
+      - name: Public customer surface gate
+        run: node scripts/validate-public-surface.mjs
 
       - name: Production compiler typecheck
         run: npm run typecheck
