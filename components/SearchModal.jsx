@@ -14,7 +14,7 @@ const PAGES = [
   // Public (Guests & Everyone)
   { name: 'Book a Court', href: '/#courts', icon: FaFutbol, category: 'Booking', auth: 'public' },
   { name: 'Events & Services', href: '/events-and-services', icon: FaBolt, category: 'Booking', auth: 'public' },
-  { name: 'Register for Tournament', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
+  { name: 'World Cup 2026 Archive', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
   { name: 'Fixtures & Live Scores', href: '/fixtures', icon: FaFutbol, category: 'Competition', auth: 'public' },
   { name: 'Competitions', href: '/leagues', icon: FaTrophy, category: 'Competition', auth: 'public' },
   { name: 'Rules of the Game', href: '/rules-of-the-game', icon: FaGavel, category: 'Info', auth: 'public' },

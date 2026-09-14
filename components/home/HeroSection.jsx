@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { FaFutbol, FaWhatsapp, FaTrophy } from "react-icons/fa";
+import { FaFutbol, FaWhatsapp } from "react-icons/fa";
+import { useTheme } from "@/context/ThemeContext";
 
 const Hero3DScene = dynamic(() => import("@/components/home/Hero3DScene"), {
   ssr: false,
@@ -41,9 +42,70 @@ const item = {
   },
 };
 
+const HERO_BACKDROPS = {
+  dark: {
+    sky:
+      "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(74,222,128,0.06) 0%, transparent 70%), linear-gradient(180deg, #04060a 0%, #080d14 50%, #04060a 100%)",
+    floor:
+      "linear-gradient(to top, rgba(4,6,10,1) 0%, rgba(4,6,10,0.8) 20%, transparent 50%)",
+    accent: "#eab308",
+    accentHover: "#ca8a04",
+    accentSoft: "rgba(34,197,94,0.08)",
+    accentBorder: "rgba(74,222,128,0.22)",
+    accentText: "#bbf7d0",
+    glow: "rgba(34,197,94,0.4)",
+  },
+  crazy: {
+    sky:
+      "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(168,85,247,0.16) 0%, transparent 70%), linear-gradient(180deg, #0d0520 0%, #160830 52%, #080312 100%)",
+    floor:
+      "linear-gradient(to top, rgba(8,3,18,1) 0%, rgba(22,8,48,0.84) 20%, transparent 50%)",
+    accent: "#a855f7",
+    accentHover: "#9333ea",
+    accentSoft: "rgba(168,85,247,0.12)",
+    accentBorder: "rgba(216,180,254,0.3)",
+    accentText: "#e9d5ff",
+    glow: "rgba(168,85,247,0.42)",
+  },
+  light: {
+    sky:
+      "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(22,163,74,0.08) 0%, transparent 70%), linear-gradient(180deg, #f8fafc 0%, #dbeafe 52%, #f8fafc 100%)",
+    floor:
+      "linear-gradient(to top, rgba(248,250,252,0.98) 0%, rgba(248,250,252,0.82) 20%, transparent 50%)",
+    accent: "#15803d",
+    accentHover: "#166534",
+    accentSoft: "rgba(22,163,74,0.1)",
+    accentBorder: "rgba(22,163,74,0.28)",
+    accentText: "#166534",
+    glow: "rgba(22,163,74,0.22)",
+  },
+  read: {
+    sky:
+      "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(161,98,7,0.07) 0%, transparent 70%), linear-gradient(180deg, #faf7f2 0%, #efe8dc 52%, #faf7f2 100%)",
+    floor:
+      "linear-gradient(to top, rgba(250,247,242,0.98) 0%, rgba(250,247,242,0.84) 20%, transparent 50%)",
+    accent: "#166534",
+    accentHover: "#14532d",
+    accentSoft: "rgba(22,101,52,0.08)",
+    accentBorder: "rgba(22,101,52,0.24)",
+    accentText: "#14532d",
+    glow: "rgba(22,101,52,0.18)",
+  },
+};
+
 export default function HeroSection() {
+  const { theme } = useTheme();
+  const backdrop = HERO_BACKDROPS[theme] || HERO_BACKDROPS.dark;
+
   return (
-    <section className="relative z-0 flex min-h-screen items-center justify-center overflow-hidden px-0 pt-20 pb-20 sm:pt-24 sm:pb-24">
+    <section
+      className="relative z-0 flex min-h-screen items-center justify-center overflow-hidden px-0 pt-20 pb-20 sm:pt-24 sm:pb-24"
+      style={{
+        "--hero-accent": backdrop.accent,
+        "--hero-accent-hover": backdrop.accentHover,
+        "--hero-glow": backdrop.glow,
+      }}
+    >
       <Suspense fallback={null}>
         <Hero3DErrorBoundary>
           <Hero3DScene />
@@ -53,16 +115,14 @@ export default function HeroSection() {
       <div
         className="absolute inset-0 z-[-1]"
         style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(74,222,128,0.06) 0%, transparent 70%), linear-gradient(180deg, #04060a 0%, #080d14 50%, #04060a 100%)",
+          background: backdrop.sky,
         }}
       />
       <div className="absolute inset-0 hero-particles read:opacity-30" />
       <div
         className="absolute inset-0"
         style={{
-          background:
-            "linear-gradient(to top, rgba(4,6,10,1) 0%, rgba(4,6,10,0.8) 20%, transparent 50%)",
+          background: backdrop.floor,
         }}
       />
 
@@ -75,7 +135,7 @@ export default function HeroSection() {
         <div className="mx-auto w-full max-w-xl md:mx-0 md:max-w-2xl">
           <motion.p
             variants={item}
-            className="mb-4 text-[8px] font-bold uppercase leading-relaxed tracking-[0.18em] text-yellow-500 sm:text-sm sm:tracking-[0.35em]"
+            className="mb-4 text-[8px] font-bold uppercase leading-relaxed tracking-[0.18em] text-[var(--hero-accent)] sm:text-sm sm:tracking-[0.35em]"
             style={{ textWrap: "balance" }}
           >
             Milnerton · Cape Town · Hellenic Football Club
@@ -93,7 +153,7 @@ export default function HeroSection() {
           >
             <span className="block text-white/95">Welcome to</span>
             <motion.span
-              className="mt-2 block text-yellow-500"
+              className="mt-2 block text-[var(--hero-accent)]"
               initial={{ opacity: 0, x: -28 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{
@@ -117,7 +177,12 @@ export default function HeroSection() {
 
             <Link
               href="/news"
-              className="inline-flex min-h-10 items-center rounded-full border border-green-400/20 bg-green-400/8 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-green-200 transition hover:border-green-300/40 hover:bg-green-300/12"
+              className="inline-flex min-h-10 items-center rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest transition"
+              style={{
+                background: backdrop.accentSoft,
+                borderColor: backdrop.accentBorder,
+                color: backdrop.accentText,
+              }}
             >
               South Africa pulse
             </Link>
@@ -129,7 +194,8 @@ export default function HeroSection() {
           >
             <Link
               href="/#courts"
-              className="w-full sm:w-auto px-8 py-4 bg-yellow-700 text-white rounded-xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(34,197,94,0.4)] hover:bg-yellow-600 hover:scale-105 active:scale-95 transition-all text-center"
+              className="w-full sm:w-auto px-8 py-4 bg-[var(--hero-accent)] text-white rounded-xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2 hover:bg-[var(--hero-accent-hover)] hover:scale-105 active:scale-95 transition-all text-center"
+              style={{ boxShadow: "0 4px 20px var(--hero-glow)" }}
             >
               <motion.span
                 animate={{ rotate: [0, 20, -20, 0] }}
@@ -159,7 +225,10 @@ export default function HeroSection() {
         <motion.div variants={item} className="hidden justify-self-end md:block">
           <div className="rounded-[32px] border border-white/12 bg-black/20 p-5 backdrop-blur-sm shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
             <div className="w-[min(34vw,390px)] rounded-[26px] border border-white/10 bg-black/10 p-5 text-left">
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-green-300">
+              <p
+                className="text-[10px] font-bold uppercase tracking-[0.28em]"
+                style={{ color: backdrop.accentText }}
+              >
                 Open Daily
               </p>
               <p
@@ -183,7 +252,7 @@ export default function HeroSection() {
         >
           <span className="text-white text-[10px] uppercase tracking-[0.3em]">Scroll</span>
           <motion.div
-            className="w-px h-10 bg-yellow-600 origin-top"
+            className="w-px h-10 origin-top bg-[var(--hero-accent)]"
             animate={{ scaleY: [0, 1, 0] }}
             transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           />
