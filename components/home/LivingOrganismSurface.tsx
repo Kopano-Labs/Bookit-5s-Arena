@@ -9,7 +9,6 @@ import {
   FaMapMarkerAlt,
   FaNewspaper,
   FaSatelliteDish,
-  FaShieldAlt,
 } from 'react-icons/fa';
 import type { ArenaMatchPulse } from '@/components/organism/LocalityScene';
 import { useArenaLocality } from '@/hooks/useArenaLocality';
@@ -91,22 +90,6 @@ type FeaturedMatch = {
   minute?: number | null;
 };
 
-function adapterLabel(status: AdapterStatus) {
-  if (status === 'ready') return '.NET boundary ready';
-  if (status === 'degraded') return '.NET boundary degraded';
-  return '.NET boundary contract';
-}
-
-function adapterClasses(status: AdapterStatus) {
-  if (status === 'ready') {
-    return 'border-green-300/25 bg-green-300/10 text-green-200';
-  }
-  if (status === 'degraded') {
-    return 'border-red-300/20 bg-red-300/8 text-red-200';
-  }
-  return 'border-amber-300/20 bg-amber-300/8 text-amber-200';
-}
-
 function toArenaMatchPulse(match: FeaturedMatch | null): ArenaMatchPulse | null {
   if (!match?.id || !match.home?.name || !match.away?.name) return null;
 
@@ -137,7 +120,7 @@ function matchLine(matchPulse: ArenaMatchPulse | null) {
     ? matchPulse.minute != null
       ? `LIVE · ${matchPulse.minute}′`
       : 'LIVE'
-    : matchPulse.status || matchPulse.kickoffLabel || 'Verified fixture';
+    : matchPulse.status || matchPulse.kickoffLabel || 'Fixture update';
   return `${matchPulse.home} ${score} ${matchPulse.away} · ${state}`;
 }
 
@@ -179,7 +162,7 @@ function StaticOrganismScene({
           {provinceLabel} · adaptive static arena
         </p>
         <p className="mt-3 text-sm leading-6 text-gray-300">
-          Locality and football state remain available without forcing WebGL or continuous motion.
+          A lightweight matchday view keeps your province and current football updates readable on slower devices.
         </p>
         {pulseLine ? (
           <p className="mt-3 border-t border-white/10 pt-3 text-xs font-bold text-white">
@@ -195,7 +178,6 @@ export default function LivingOrganismSurface() {
   const {
     province,
     provinceSlug,
-    source,
     detecting,
     setProvince,
     detectLocation,
@@ -298,24 +280,25 @@ export default function LivingOrganismSurface() {
           <div>
             <div className="mb-4 flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center gap-2 rounded-full border border-green-400/20 bg-green-400/8 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-green-300">
-                <FaSatelliteDish /> Living Arena
+                <FaSatelliteDish /> South Africa pulse
               </span>
               <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">
-                {source.replaceAll('-', ' ')}
+                {province.label}
               </span>
               <span
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] ${adapterClasses(adapterStatus)}`}
+                className="sr-only"
                 data-testid="kpgs-adapter-state"
                 data-adapter-status={adapterStatus}
+                aria-hidden="true"
               >
-                <FaShieldAlt /> {adapterLabel(adapterStatus)}
+                system state
               </span>
             </div>
             <h2 className="max-w-4xl text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl lg:text-7xl">
               South Africa changes. <span className="text-yellow-400">The pitch reacts.</span>
             </h2>
             <p className="mt-5 max-w-3xl text-sm leading-7 text-gray-300 sm:text-base">
-              Province, weather, local football intelligence and verified match state enter the same adaptive world. A live provider pulse can raise the arena&apos;s energy, but never claims possession, position or a score the provider did not return.
+              Pick your province to see local weather, football headlines and current match updates in one place.
             </p>
           </div>
 
@@ -323,7 +306,7 @@ export default function LivingOrganismSurface() {
             <div className="flex flex-col gap-4 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.22em] text-gray-500">
-                  Current province context
+                  Current province
                 </p>
                 <p
                   className="mt-1 text-xl font-black uppercase text-white"
@@ -416,20 +399,20 @@ export default function LivingOrganismSurface() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-green-300">
-                  <FaNewspaper /> Local editorial membrane
+                  <FaNewspaper /> Local football
                 </p>
                 <h3 className="mt-2 text-2xl font-black uppercase text-white sm:text-3xl">
-                  {province.label} football intelligence
+                  {province.label} football pulse
                 </h3>
                 <p className="mt-2 text-xs leading-6 text-gray-500">
-                  The strongest locality match is projected beside any verified provider match pulse; the full governed feed remains here for reading and verification.
+                  Fresh football headlines for your province, with current match updates when available.
                 </p>
               </div>
               <Link
                 href="/news"
                 className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-4 text-[10px] font-black uppercase tracking-[0.16em] text-white transition hover:border-green-300/30 hover:bg-green-300/8"
               >
-                <FaMapMarkerAlt /> Open local feed
+                <FaMapMarkerAlt /> More local news
               </Link>
             </div>
 
@@ -453,7 +436,7 @@ export default function LivingOrganismSurface() {
                       </span>
                       {article.localityScore > 0 ? (
                         <span className="rounded-full bg-green-300/10 px-2 py-1 text-[8px] font-black uppercase tracking-widest text-green-300">
-                          locality match
+                          local match
                         </span>
                       ) : null}
                     </div>
@@ -469,7 +452,7 @@ export default function LivingOrganismSurface() {
                 ))
               ) : (
                 <div className="rounded-2xl border border-dashed border-white/10 p-6 text-sm leading-6 text-gray-400">
-                  No current editorial items passed the locality membrane. The weather and province state remain active rather than filling the surface with stale demo copy.
+                  No fresh local football headlines are available right now. Weather and province tools are still available above.
                 </div>
               )}
             </div>
