@@ -31,6 +31,11 @@ const BookingSchema = new mongoose.Schema(
       min: [1, 'Minimum booking is 1 hour'],
       max: [3, 'Maximum booking is 3 hours'],
     },
+    slotClaimId: {
+      type: String,
+      default: null,
+      select: false,
+    },
     total_price: {
       type: Number,
       required: true,
@@ -66,9 +71,6 @@ const BookingSchema = new mongoose.Schema(
 );
 
 // ── Indexes ─────────────────────────────────────────────────────────────────
-// Prevent double bookings: same court, same date, same start_time
-BookingSchema.index({ court: 1, date: 1, start_time: 1 }, { unique: true });
-
 // Fast lookup of all bookings for a user (GET /api/bookings sorts by date asc)
 BookingSchema.index({ user: 1, date: 1 });
 

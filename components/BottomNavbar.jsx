@@ -25,7 +25,7 @@ import {
 /* ─── Nav items per role (4-tier) ───────────────────── */
 const USER_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
-  { href: "/#courts", icon: FaFutbol, label: "Book", color: "#22c55e" },
+  { href: "/book", icon: FaFutbol, label: "Book", color: "#22c55e" },
   { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
   { href: "/play", icon: FaGamepad, label: "Play", color: "#eab308" },
   { href: "/news", icon: FaNewspaper, label: "Pulse", color: "#39d98a" },
@@ -33,7 +33,7 @@ const USER_ITEMS = [
 
 const GUEST_ITEMS = [
   { href: "/", icon: FaHome, label: "Home", color: "#22c55e" },
-  { href: "/#courts", icon: FaFutbol, label: "Book", color: "#22c55e" },
+  { href: "/book", icon: FaFutbol, label: "Book", color: "#22c55e" },
   { href: "/fixtures", icon: FaListAlt, label: "Fixtures", color: "#f97316" },
   { href: "/play", icon: FaGamepad, label: "Play", color: "#eab308" },
   { href: "/news", icon: FaNewspaper, label: "Pulse", color: "#39d98a" },
@@ -168,6 +168,8 @@ export default function BottomNavbar() {
   };
 
   useEffect(() => {
+    // Route changes are external navigation events; clear transient menu state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
     setHoveredIndex(null);
   }, [pathname]);

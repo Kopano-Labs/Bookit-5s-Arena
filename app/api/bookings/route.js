@@ -10,6 +10,13 @@ import { sendBookingWATip } from '@/lib/integrations/whatsapp';
 import { rateLimit } from '@/lib/rateLimit';
 import { verifyBotRequest } from '@/lib/security/botid';
 import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
+import { isElapsedStartTimeForDate, isPastBookingDate, isValidBookingDateValue } from '@/lib/bookingDates';
+import {
+  attachBookingSlotClaim,
+  BookingSlotConflictError,
+  claimBookingSlots,
+  releaseBookingSlotClaim,
+} from '@/lib/bookingSlotClaims';
 
 // GET /api/bookings — get all bookings for the logged-in user
 export async function GET() {
@@ -37,6 +44,8 @@ export async function GET() {
 
 // POST /api/bookings — create a new booking
 export async function POST(request) {
+  let slotClaimId = null;
+  let bookingCreated = false;
   try {
     const botVerification = await verifyBotRequest();
     if (botVerification.isBot) {
@@ -69,15 +78,11 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid court ID' }, { status: 400 });
     }
 
-    // Validate date format (YYYY-MM-DD)
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+    if (!isValidBookingDateValue(date)) {
       return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const bookingDate = new Date(date);
-    if (bookingDate < today) {
+    if (isPastBookingDate(date)) {
       return NextResponse.json({ error: 'Bookings cannot be in the past.' }, { status: 400 });
     }
 
@@ -109,6 +114,9 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+    if (isElapsedStartTimeForDate(date, toMinutes(start_time))) {
+      return NextResponse.json({ error: 'That start time has already passed in South Africa. Choose a later slot.' }, { status: 400 });
+    }
 
     const newStart = toMinutes(start_time);
     const newEnd = newStart + duration * 60;
@@ -120,27 +128,8 @@ export async function POST(request) {
       );
     }
 
-    // Check for overlapping bookings on the same court and date
-    const sameDayBookings = await Booking.find({
-      court: courtId,
-      date,
-      status: { $ne: 'cancelled' },
-    }).select('start_time duration');
-
-    const hasOverlap = sameDayBookings.some((b) => {
-      const existStart = toMinutes(b.start_time);
-      const existEnd = existStart + b.duration * 60;
-      return newStart < existEnd && newEnd > existStart;
-    });
-
-    if (hasOverlap) {
-      return NextResponse.json(
-        { error: 'This court is already booked during that time. Please choose a different slot.' },
-        { status: 409 }
-      );
-    }
-
     const total_price = court.price_per_hour * duration;
+    slotClaimId = await claimBookingSlots({ courtId, date, startTime: start_time, duration });
 
     const booking = await Booking.create({
       court: courtId,
@@ -151,7 +140,14 @@ export async function POST(request) {
       total_price,
       status: 'pending',
       paymentStatus: payAtVenue ? 'reserved' : 'unpaid',
+      slotClaimId,
     });
+    bookingCreated = true;
+    try {
+      await attachBookingSlotClaim(slotClaimId, booking._id);
+    } catch (claimError) {
+      console.error('Booking saved but slot claim could not be attached:', claimError);
+    }
 
     // Send confirmation email (non-blocking)
     try {
@@ -203,9 +199,26 @@ export async function POST(request) {
         }
     }
 
-    return NextResponse.json(booking, { status: 201 });
+    return NextResponse.json({
+      _id: String(booking._id),
+      courtId: String(court._id),
+      courtName: court.name,
+      date: booking.date,
+      start_time: booking.start_time,
+      duration: booking.duration,
+      total_price: booking.total_price,
+      status: booking.status,
+      paymentStatus: booking.paymentStatus,
+    }, { status: 201 });
   } catch (error) {
     console.error('POST /api/bookings error:', error);
+    if (slotClaimId && !bookingCreated) await releaseBookingSlotClaim(slotClaimId).catch(() => {});
+    if (error instanceof BookingSlotConflictError || error?.code === 'BOOKING_SLOT_CONFLICT' || error?.code === 11000) {
+      return NextResponse.json(
+        { error: 'This court was just booked for that start time. Refresh availability and choose another slot.' },
+        { status: 409 }
+      );
+    }
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
   }
 }

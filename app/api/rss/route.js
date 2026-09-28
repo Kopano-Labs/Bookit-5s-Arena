@@ -15,7 +15,7 @@ export async function GET() {
     {
       title: '5-a-Side Courts in Milnerton, Cape Town',
       description: 'Review the current online court inventory, rates and booking availability on 5s Arena. If the booking source is unavailable, the site will ask you to confirm directly with the venue instead of showing fallback availability.',
-      link: `${SITE_URL}/#courts`,
+      link: `${SITE_URL}/book`,
       pubDate: new Date('2025-12-01').toUTCString(),
     },
     {

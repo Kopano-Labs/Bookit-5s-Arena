@@ -41,7 +41,7 @@ const CourtPage = async ({ params }) => {
           <p className="mt-4 text-sm leading-6 text-gray-400">
             This URL does not resolve to a court in the current booking inventory. Seed data is not used for booking records.
           </p>
-          <Link href="/#courts" className="mt-5 inline-block text-green-400 hover:text-green-300 text-sm">
+          <Link href="/book" className="mt-5 inline-block text-green-400 hover:text-green-300 text-sm">
             ← Back to Courts
           </Link>
         </div>

@@ -6,6 +6,13 @@ import Court from '@/models/Court';
 import { rateLimit } from '@/lib/rateLimit';
 import { verifyBotRequest } from '@/lib/security/botid';
 import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
+import { isElapsedStartTimeForDate, isPastBookingDate, isValidBookingDateValue } from '@/lib/bookingDates';
+import {
+  attachBookingSlotClaim,
+  BookingSlotConflictError,
+  claimBookingSlots,
+  releaseBookingSlotClaim,
+} from '@/lib/bookingSlotClaims';
 
 const toMinutes = (t) => {
   const [h, m] = t.split(':').map(Number);
@@ -14,6 +21,8 @@ const toMinutes = (t) => {
 
 // POST /api/bookings/guest — reserve without login (pay at venue)
 export async function POST(request) {
+  let slotClaimId = null;
+  let bookingCreated = false;
   try {
     const botVerification = await verifyBotRequest();
     if (botVerification.isBot) {
@@ -39,16 +48,17 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid court ID.' }, { status: 400 });
     }
 
-    // Validate date format (YYYY-MM-DD)
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+    if (!isValidBookingDateValue(date)) {
       return NextResponse.json({ error: 'Invalid date format.' }, { status: 400 });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const bookingDate = new Date(date);
-    if (bookingDate < today) {
+    if (isPastBookingDate(date)) {
       return NextResponse.json({ error: 'Bookings cannot be in the past.' }, { status: 400 });
+    }
+
+    // Validate duration is an integer in allowed range
+    if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
+      return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours.' }, { status: 400 });
     }
 
     if (!isAllowedBookingStartTime(start_time, duration)) {
@@ -57,10 +67,11 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-
-    // Validate duration is an integer in allowed range
-    if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
-      return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours.' }, { status: 400 });
+    if (isElapsedStartTimeForDate(date, toMinutes(start_time))) {
+      return NextResponse.json(
+        { error: 'That start time has already passed in South Africa. Choose a later slot.' },
+        { status: 400 },
+      );
     }
 
     // Validate guest name length
@@ -69,11 +80,12 @@ export async function POST(request) {
     }
 
     // Basic email validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
+    const normalizedEmail = typeof guestEmail === 'string' ? guestEmail.trim() : '';
+    if (normalizedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
     }
     // Basic phone validation (South African: 10 digits or +27...)
-    if (!/^(\+27|0)[0-9]{9}$/.test(guestPhone.replace(/\s/g, ''))) {
+    if (typeof guestPhone !== 'string' || !/^(\+27|0)[0-9]{9}$/.test(guestPhone.replace(/\s/g, ''))) {
       return NextResponse.json({ error: 'Please enter a valid South African phone number.' }, { status: 400 });
     }
 
@@ -91,24 +103,14 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Bookings must start at 10:00 and end by 22:00.' }, { status: 400 });
     }
 
-    // Overlap check
-    const sameDayBookings = await Booking.find({ court: courtId, date, status: { $ne: 'cancelled' } }).select('start_time duration');
-    const hasOverlap = sameDayBookings.some((b) => {
-      const existStart = toMinutes(b.start_time);
-      const existEnd = existStart + b.duration * 60;
-      return newStart < existEnd && newEnd > existStart;
-    });
-    if (hasOverlap) {
-      return NextResponse.json({ error: 'This court is already booked during that time. Please choose a different slot.' }, { status: 409 });
-    }
-
     const total_price = court.price_per_hour * duration;
+    slotClaimId = await claimBookingSlots({ courtId, date, startTime: start_time, duration });
 
     // Build booking — omit `user` so Mongoose uses schema default (null)
     const booking = await Booking.create({
       court: courtId,
       guestName: guestName.trim(),
-      guestEmail: guestEmail.trim().toLowerCase(),
+      guestEmail: normalizedEmail.toLowerCase(),
       guestPhone: guestPhone.trim(),
       date,
       start_time,
@@ -116,14 +118,39 @@ export async function POST(request) {
       total_price,
       status: 'pending',
       paymentStatus: 'reserved',
+      slotClaimId,
     });
+    bookingCreated = true;
+    try {
+      await attachBookingSlotClaim(slotClaimId, booking._id);
+    } catch (claimError) {
+      console.error('Guest booking saved but slot claim could not be attached:', claimError);
+    }
 
-    return NextResponse.json(booking, { status: 201 });
+    return NextResponse.json({
+      _id: String(booking._id),
+      courtId: String(court._id),
+      courtName: court.name,
+      date: booking.date,
+      start_time: booking.start_time,
+      duration: booking.duration,
+      total_price: booking.total_price,
+      status: booking.status,
+      paymentStatus: booking.paymentStatus,
+    }, { status: 201 });
   } catch (error) {
     console.error('POST /api/bookings/guest error:', error);
+    if (slotClaimId && !bookingCreated) await releaseBookingSlotClaim(slotClaimId).catch(() => {});
+
+    if (error instanceof BookingSlotConflictError || error?.code === 'BOOKING_SLOT_CONFLICT' || error?.code === 11000) {
+      return NextResponse.json(
+        { error: 'This court was just booked for that start time. Refresh availability and choose another slot.' },
+        { status: 409 }
+      );
+    }
 
     // Provide a cleaner user-facing message
-    if (error.name === 'ValidationError') {
+    if (error?.name === 'ValidationError') {
       return NextResponse.json(
         { error: `Reservation could not be processed. Please try again or contact us via WhatsApp.` },
         { status: 400 }

@@ -10,7 +10,7 @@ const MENU_ITEMS = [
   {
     icon: FaFutbol,
     label: 'Book a Court',
-    href: '/#courts',
+    href: '/book',
     color: '#22c55e',
     desc: 'Reserve your pitch',
   },
@@ -67,6 +67,8 @@ export default function SoccerBallMenu() {
   }, []);
 
   useEffect(() => {
+    // Route changes are external navigation events; clear transient menu state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
     setHoveredIndex(null);
   }, [pathname]);

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { FaFilter, FaTimes, FaFutbol, FaCalendarAlt } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { bookingRequest } from '@/lib/bookingRequest';
 import InfoTooltip from '@/components/InfoTooltip';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 
@@ -25,11 +26,17 @@ const AdminBookings = () => {
   const canView = useFeatureAccess('admin.bookings.view');
   const [activeTab, setActiveTab] = useState('courts');
 
+  const [operationError, setOperationError] = useState('');
+  const [courtError, setCourtError] = useState('');
+  const [eventError, setEventError] = useState('');
+
   // Courts state
   const [bookings, setBookings] = useState([]);
   const [loadingCourts, setLoadingCourts] = useState(true);
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [courtFilter, setCourtFilter] = useState('');
+  const [courtOptions, setCourtOptions] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [updating, setUpdating] = useState(null);
 
@@ -47,12 +54,25 @@ const AdminBookings = () => {
     const params = new URLSearchParams();
     if (fromDate) params.set('from', fromDate);
     if (toDate) params.set('to', toDate);
+    if (courtFilter) params.set('court', courtFilter);
     if (statusFilter) params.set('status', statusFilter);
     setLoadingCourts(true);
-    fetch(`/api/admin/bookings?${params.toString()}`)
-      .then((res) => res.json())
-      .then((data) => { setBookings(Array.isArray(data) ? data : []); setLoadingCourts(false); });
-  }, [fromDate, toDate, statusFilter]);
+    setCourtError('');
+    return bookingRequest(`/api/admin/bookings?${params.toString()}`)
+      .then((data) => {
+        if (!Array.isArray(data)) throw new Error('Unexpected booking response. Please refresh.');
+        setBookings(data);
+      })
+      .catch((error) => setCourtError(error.message))
+      .finally(() => setLoadingCourts(false));
+  }, [fromDate, toDate, courtFilter, statusFilter]);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    bookingRequest('/api/courts')
+      .then((data) => setCourtOptions(Array.isArray(data) ? data : []))
+      .catch(() => setCourtOptions([]));
+  }, [status]);
 
   // Fetch event bookings
   const fetchEvents = useCallback(() => {
@@ -62,60 +82,50 @@ const AdminBookings = () => {
     if (evStatusFilter) params.set('status', evStatusFilter);
     if (evTypeFilter) params.set('type', evTypeFilter);
     setLoadingEvents(true);
-    fetch(`/api/admin/events?${params.toString()}`)
-      .then((res) => res.json())
-      .then((data) => { setEvents(Array.isArray(data) ? data : []); setLoadingEvents(false); });
+    setEventError('');
+    return bookingRequest(`/api/admin/events?${params.toString()}`)
+      .then((data) => {
+        if (!Array.isArray(data)) throw new Error('Unexpected event response. Please refresh.');
+        setEvents(data);
+      })
+      .catch((error) => setEventError(error.message))
+      .finally(() => setLoadingEvents(false));
   }, [evFromDate, evToDate, evStatusFilter, evTypeFilter]);
 
   useEffect(() => {
     if (status === 'unauthenticated') { router.push('/login'); return; }
     if (status === 'authenticated' && session.user.activeRole !== 'admin') { router.push('/'); return; }
     if (status === 'authenticated') {
+      // Auth state changes are the external trigger for the initial data load.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchBookings();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchEvents();
     }
   }, [status, session, router, fetchBookings, fetchEvents]);
 
-  const handleStatusChange = async (bookingId, newStatus) => {
-    setUpdating(bookingId);
-    await fetch(`/api/admin/bookings/${bookingId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus }),
-    });
-    setBookings((prev) =>
-      prev.map((b) => (b._id === bookingId ? { ...b, status: newStatus } : b))
-    );
-    setUpdating(null);
+  const updateRecord = async (url, payload, setBusy, id, refresh) => {
+    setBusy(id);
+    setOperationError('');
+    try {
+      await bookingRequest(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      await refresh();
+    } catch (error) {
+      setOperationError(error.message || 'Connection interrupted. Refresh to check whether the change was saved.');
+    } finally {
+      setBusy(null);
+    }
   };
 
-  const handleMarkPaid = async (bookingId) => {
-    setUpdating(bookingId);
-    await fetch(`/api/admin/bookings/${bookingId}/payment`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentStatus: 'paid' }),
-    });
-    setBookings((prev) =>
-      prev.map((b) => (b._id === bookingId ? { ...b, paymentStatus: 'paid' } : b))
-    );
-    setUpdating(null);
-  };
-
-  const handleEventStatusChange = async (eventId, newStatus) => {
-    setUpdatingEvent(eventId);
-    await fetch(`/api/admin/events/${eventId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus }),
-    });
-    setEvents((prev) =>
-      prev.map((e) => (e._id === eventId ? { ...e, status: newStatus } : e))
-    );
-    setUpdatingEvent(null);
-  };
+  const handleStatusChange = (id, status) =>
+    updateRecord('/api/admin/bookings/' + id, { status }, setUpdating, id, fetchBookings);
+  const handleMarkPaid = (id) =>
+    updateRecord('/api/admin/bookings/' + id + '/payment', { paymentStatus: 'paid' }, setUpdating, id, fetchBookings);
+  const handleEventStatusChange = (id, status) =>
+    updateRecord('/api/admin/events/' + id, { status }, setUpdatingEvent, id, fetchEvents);
 
   const inputClass = 'bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all';
 
@@ -157,6 +167,7 @@ const AdminBookings = () => {
           </span>
         </motion.div>
 
+        {operationError && <p role="alert" className="rounded-xl border border-red-800 bg-red-950 p-4 text-red-200">{operationError}</p>}
         {/* Tabs */}
         <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1 w-fit">
           {TABS.map((tab) => {
@@ -193,6 +204,15 @@ const AdminBookings = () => {
               {/* Court Filters */}
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-wrap gap-4 items-end shadow-lg">
                 <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">Court</label>
+                  <select value={courtFilter} onChange={(e) => setCourtFilter(e.target.value)} className={inputClass}>
+                    <option value="">All courts</option>
+                    {courtOptions.map((court) => (
+                      <option key={court._id || court.id} value={court._id || court.id}>{court.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
                   <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
                     From{' '}
                     <InfoTooltip text="Filter bookings from this date onwards. Leave empty to show all past bookings." size={12} />
@@ -226,7 +246,7 @@ const AdminBookings = () => {
                   <FaFilter size={11} /> Apply
                 </button>
                 <button
-                  onClick={() => { setFromDate(''); setToDate(''); setStatusFilter(''); }}
+                  onClick={() => { setFromDate(''); setToDate(''); setCourtFilter(''); setStatusFilter(''); }}
                   className="flex items-center gap-2 px-5 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-white hover:border-gray-600 transition-all"
                 >
                   <FaTimes size={11} /> Clear
@@ -237,6 +257,8 @@ const AdminBookings = () => {
               <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
                 {loadingCourts ? (
                   <p className="text-center py-16 text-green-400 animate-pulse">Loading bookings...</p>
+                ) : courtError ? (
+                  <p role="alert" className="p-6 text-red-300">{courtError} Use Apply to retry.</p>
                 ) : bookings.length === 0 ? (
                   <p className="text-center py-16 text-gray-600">No court bookings found.</p>
                 ) : (
@@ -252,8 +274,8 @@ const AdminBookings = () => {
                           <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Total</th>
                           <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Status</th>
                           <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
-                            Cash Payment{' '}
-                            <InfoTooltip text="All bookings are pay-at-venue (cash). Use 'Mark Paid' once the player has paid at the venue." size={12} />
+                            Payment status{' '}
+                            <InfoTooltip text="Bookit shows the recorded payment state. Use 'Mark Paid' after the venue confirms payment." size={12} />
                           </th>
                           <th className="px-5 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
                             Update{' '}
@@ -265,8 +287,9 @@ const AdminBookings = () => {
                         {bookings.map((b) => (
                           <tr key={b._id} className="border-b border-gray-800 last:border-0 hover:bg-gray-800/40 transition-colors">
                             <td className="px-5 py-4">
-                              <p className="font-semibold text-white">{b.user?.name ?? 'Unknown'}</p>
-                              <p className="text-xs text-gray-500 mt-0.5">{b.user?.email}</p>
+                              <p className="font-semibold text-white">{b.user?.name || b.guestName || 'Guest'}</p>
+                              {(b.user?.email || b.guestEmail) && <p className="text-xs text-gray-500 mt-0.5">{b.user?.email || b.guestEmail}</p>}
+                              {b.guestPhone && <p className="text-xs text-gray-500 mt-0.5">{b.guestPhone}</p>}
                             </td>
                             <td className="px-5 py-4 text-gray-300 font-medium">{b.court?.name ?? 'Unknown'}</td>
                             <td className="px-5 py-4 text-gray-400">{b.date}</td>
@@ -291,7 +314,7 @@ const AdminBookings = () => {
                                       ? 'bg-blue-900/40 text-blue-400 border border-blue-800/60'
                                       : 'bg-amber-900/40 text-amber-400 border border-amber-800/60'
                                   }`}>
-                                    {b.paymentStatus === 'paid' ? 'Cash Received' : b.paymentStatus === 'refunded' ? 'Refunded' : 'Awaiting Cash'}
+                                    {b.paymentStatus === 'paid' ? 'Paid' : b.paymentStatus === 'refunded' ? 'Refunded' : b.paymentStatus === 'reserved' ? 'Pay at venue' : 'Unpaid'}
                                   </span>
                                 </div>
                                 {b.paymentStatus !== 'paid' && b.paymentStatus !== 'refunded' && b.status !== 'cancelled' && (
@@ -396,6 +419,8 @@ const AdminBookings = () => {
               <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
                 {loadingEvents ? (
                   <p className="text-center py-16 text-green-400 animate-pulse">Loading event bookings...</p>
+                ) : eventError ? (
+                  <p role="alert" className="p-6 text-red-300">{eventError} Use Apply to retry.</p>
                 ) : events.length === 0 ? (
                   <p className="text-center py-16 text-gray-600">No event bookings found.</p>
                 ) : (
