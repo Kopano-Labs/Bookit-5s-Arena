@@ -42,7 +42,7 @@ const SOCIALS = [
 ];
 
 const GUEST_QUICK_LINKS = [
-  { label: "Book a Court", href: "/#courts" },
+  { label: "Book a Court", href: "/book" },
   { label: "South Africa Pulse", href: "/news" },
   { label: "Fixtures", href: "/fixtures" },
   { label: "Leagues", href: "/leagues" },
@@ -51,7 +51,7 @@ const GUEST_QUICK_LINKS = [
 
 const AUTH_QUICK_LINKS = [
   { label: "My Bookings", href: "/bookings" },
-  { label: "Book a Court", href: "/#courts" },
+  { label: "Book a Court", href: "/book" },
   { label: "South Africa Pulse", href: "/news" },
   { label: "Fixtures", href: "/fixtures" },
   { label: "Events & Services", href: "/events-and-services" },

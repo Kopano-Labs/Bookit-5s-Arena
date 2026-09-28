@@ -193,7 +193,7 @@ export default function HeroSection() {
             className="mx-auto flex w-full flex-col items-center justify-center gap-4 sm:flex-row md:mx-0 md:justify-start"
           >
             <Link
-              href="/#courts"
+              href="/book"
               className="w-full sm:w-auto px-8 py-4 bg-[var(--hero-accent)] text-white rounded-xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2 hover:bg-[var(--hero-accent-hover)] hover:scale-105 active:scale-95 transition-all text-center"
               style={{ boxShadow: "0 4px 20px var(--hero-glow)" }}
             >

@@ -198,7 +198,7 @@ export default function PlayPage() {
         {/* Bottom Actions */}
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
-            href="/#courts"
+            href="/book"
             className="flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-green-600/20 transition hover:bg-green-500"
           >
             <FaFutbol /> Book Real Pitch at Hellenic FC

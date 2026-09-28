@@ -12,7 +12,7 @@ import {
 
 const PAGES = [
   // Public (Guests & Everyone)
-  { name: 'Book a Court', href: '/#courts', icon: FaFutbol, category: 'Booking', auth: 'public' },
+  { name: 'Book a Court', href: '/book', icon: FaFutbol, category: 'Booking', auth: 'public' },
   { name: 'Events & Services', href: '/events-and-services', icon: FaBolt, category: 'Booking', auth: 'public' },
   { name: 'World Cup 2026 Archive', href: '/tournament', icon: FaTrophy, category: 'Competition', auth: 'public' },
   { name: 'Fixtures & Live Scores', href: '/fixtures', icon: FaFutbol, category: 'Competition', auth: 'public' },
@@ -69,10 +69,27 @@ const SearchModal = () => {
 
   const flatResults = filtered;
 
+  const navigate = useCallback((href) => {
+    setIsOpen(false);
+    if (href.startsWith('/#')) {
+      window.location.href = href;
+    } else {
+      router.push(href);
+    }
+  }, [router]);
+
+  const openSearch = useCallback(() => {
+    setQuery('');
+    setHighlightedIndex(0);
+    setIsOpen(true);
+    window.setTimeout(() => inputRef.current?.focus(), 100);
+  }, []);
+
   const handleKeyDown = useCallback((e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
-      setIsOpen((prev) => !prev);
+      if (isOpen) setIsOpen(false);
+      else openSearch();
       return;
     }
     if (!isOpen) {
@@ -98,7 +115,7 @@ const SearchModal = () => {
       e.preventDefault();
       navigate(flatResults[highlightedIndex].href);
     }
-  }, [flatResults, highlightedIndex, isOpen]);
+  }, [flatResults, highlightedIndex, isOpen, navigate, openSearch]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -106,30 +123,10 @@ const SearchModal = () => {
   }, [handleKeyDown]);
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-      setQuery('');
-      setHighlightedIndex(0);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
+    // Navigation changes the route externally; close this transient surface.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
   }, [pathname]);
-
-  useEffect(() => {
-    setHighlightedIndex(0);
-  }, [query]);
-
-  const navigate = (href) => {
-    setIsOpen(false);
-    if (href.startsWith('/#')) {
-      // eslint-disable-next-line react-hooks/immutability
-      window.location.href = href;
-    } else {
-      router.push(href);
-    }
-  };
 
   const categories = [...new Set(filtered.map((p) => p.category))];
 
@@ -137,7 +134,7 @@ const SearchModal = () => {
     <>
       {/* Trigger button */}
       <motion.button
-        onClick={() => setIsOpen(true)}
+        onClick={openSearch}
         className="flex min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800/60 px-2.5 py-1.5 text-sm text-gray-400 transition-all hover:border-green-500/40 hover:text-gray-300"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -174,7 +171,10 @@ const SearchModal = () => {
                   ref={inputRef}
                   type="text"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setHighlightedIndex(0);
+                  }}
                   placeholder="Search pages…"
                   className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-gray-500"
                 />

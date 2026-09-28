@@ -85,7 +85,7 @@ const ThemeGlyph = ({ theme }) => {
 };
 
 const GUEST_NAV = [
-  { href: "/#courts",             emoji: "⚽",  label: "Book" },
+  { href: "/book",                emoji: "⚽",  label: "Book" },
   { href: "/fixtures",            emoji: "📅",  label: "Fixtures" },
   { href: "/leagues",             emoji: "🏆",  label: "Leagues" },
   { href: "/events-and-services", emoji: "🔥",  label: "Events" },
@@ -93,7 +93,7 @@ const GUEST_NAV = [
 ];
 
 const USER_NAV = [
-  { href: "/#courts",   emoji: "⚽",  label: "Book" },
+  { href: "/book",      emoji: "⚽",  label: "Book" },
   { href: "/bookings",  emoji: "📅",  label: "Bookings" },
   { href: "/leagues",   emoji: "🏆",  label: "Leagues" },
   { href: "/fixtures",  emoji: "📡",  label: "Fixtures" },

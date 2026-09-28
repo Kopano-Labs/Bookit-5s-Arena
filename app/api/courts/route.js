@@ -4,6 +4,7 @@ import { getAuthSession } from '@/lib/getSession';
 import { requireRole } from '@/lib/roles';
 import connectDB from '@/lib/mongodb';
 import Court from '@/models/Court';
+import { parseCourtCreatePayload } from '@/lib/courtInput';
 
 function publicCourtResponse(courts, status = 200, state = 'verified-source') {
   const response = NextResponse.json(courts, { status });
@@ -65,23 +66,12 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { name, description, pricePerHour, images, amenities, openTime, closeTime } = body;
-
-    if (!name || !pricePerHour) {
-      return NextResponse.json({ error: 'Name and price are required' }, { status: 400 });
-    }
+    const parsed = parseCourtCreatePayload(await request.json());
+    if (parsed.error) return NextResponse.json({ error: parsed.error }, { status: 400 });
 
     await connectDB();
-
     const court = await Court.create({
-      name,
-      description: description || '',
-      pricePerHour: Number(pricePerHour),
-      images: images || [],
-      amenities: amenities || [],
-      openTime: openTime || '10:00',
-      closeTime: closeTime || '22:00',
+      ...parsed.value,
       owner: session.user.id,
     });
 

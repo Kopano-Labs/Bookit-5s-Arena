@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -13,13 +13,25 @@ import {
 import InfoTooltip from './InfoTooltip';
 import {
   formatBookingTimeLabel,
-  getAllowedStartTimes,
   normalizeDuration,
 } from '@/lib/bookingSlots';
+import { getTodayInBookingTimeZone } from '@/lib/bookingDates';
 import {
   deriveOfflineIdempotencyKey,
   enqueueOfflineEvent,
 } from '@/lib/offline/kopanoOfflineQueue';
+
+function slotOptionsForDuration(slots, duration) {
+  const safeDuration = Number(duration);
+  if (!Array.isArray(slots)) return [];
+
+  return slots
+    .filter((slot) => Array.isArray(slot.availableDurations) && slot.availableDurations.includes(safeDuration))
+    .map((slot) => ({
+      value: slot.start_time,
+      label: formatBookingTimeLabel(slot.start_time),
+    }));
+}
 
 const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const { data: session } = useSession();
@@ -31,29 +43,105 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
   const [error, setError] = useState('');
   const [reserveLoading, setReserveLoading] = useState(false);
   const [reserved, setReserved] = useState(false);
-  const [showGuestForm, setShowGuestForm] = useState(false);
+  const [showGuestForm, setShowGuestForm] = useState(true);
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [guestReserveLoading, setGuestReserveLoading] = useState(false);
   const [reservationMode, setReservationMode] = useState('reserved');
+  const [bookingReference, setBookingReference] = useState('');
+  const [reservationDetails, setReservationDetails] = useState(null);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [availabilityState, setAvailabilityState] = useState('idle');
+  const [availabilityError, setAvailabilityError] = useState('');
 
-  const totalPrice = pricePerHour * Number(duration);
-  const slotOptions = getAllowedStartTimes(duration);
+  const hourlyPrice = Number(pricePerHour) || 0;
+  const totalPrice = hourlyPrice * Number(duration);
+  const today = getTodayInBookingTimeZone();
+  const slotOptions = useMemo(
+    () => slotOptionsForDuration(availableSlots, duration),
+    [availableSlots, duration],
+  );
+  const selectedStartTime = slotOptions.some((option) => option.value === startTime)
+    ? startTime
+    : '';
+  const hasVerifiedSlot = Boolean(
+    date &&
+    selectedStartTime &&
+    availabilityState === 'ready',
+  );
+  const reserveDisabled = reserveLoading || !hasVerifiedSlot;
+  const guestReserveDisabled = guestReserveLoading || !hasVerifiedSlot;
+
+  useEffect(() => {
+    if (!date) return undefined;
+
+    const controller = new AbortController();
+
+    const loadAvailability = async () => {
+      try {
+        const params = new URLSearchParams({ date, courtId });
+        const response = await fetch(`/api/availability?${params.toString()}`, {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(data?.error || 'Could not load live availability for this court.');
+        }
+
+        const courtAvailability = Array.isArray(data?.courts) ? data.courts[0] : null;
+        const nextSlots = Array.isArray(courtAvailability?.slots) ? courtAvailability.slots : [];
+        setAvailableSlots(nextSlots);
+        setAvailabilityState(nextSlots.length > 0 ? 'ready' : 'empty');
+      } catch (fetchError) {
+        if (fetchError?.name === 'AbortError') return;
+        setAvailableSlots([]);
+        setAvailabilityState('error');
+        setAvailabilityError(fetchError?.message || 'Could not load live availability for this court.');
+      }
+    };
+
+    loadAvailability();
+    return () => controller.abort();
+  }, [courtId, date]);
+
+  const handleDateChange = (event) => {
+    const nextDate = event.target.value;
+    setDate(nextDate);
+    setStartTime('');
+    setAvailableSlots([]);
+    setAvailabilityError('');
+    setAvailabilityState(nextDate ? 'loading' : 'idle');
+    setError('');
+  };
 
   const handleDurationChange = (nextDuration) => {
     const safeDuration = String(normalizeDuration(nextDuration));
     setDuration(safeDuration);
 
-    const nextOptions = getAllowedStartTimes(safeDuration);
+    const nextOptions = slotOptionsForDuration(availableSlots, safeDuration);
     if (!nextOptions.some((option) => option.value === startTime)) {
-      setStartTime(nextOptions[0]?.value || '');
+      setStartTime('');
     }
   };
 
   const validateForm = () => {
     if (!date || !startTime || !duration) {
       setError('Please fill in all fields.');
+      return false;
+    }
+    if (availabilityState === 'loading') {
+      setError('Please wait for live availability to finish loading.');
+      return false;
+    }
+    if (availabilityState === 'error') {
+      setError('Live availability could not be verified. Refresh the date before reserving.');
+      return false;
+    }
+    if (!slotOptions.some((option) => option.value === startTime)) {
+      setError('That slot is no longer available for this duration. Please choose another time.');
       return false;
     }
     return true;
@@ -124,6 +212,8 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
     });
 
     setReservationMode('queued');
+    setBookingReference('');
+    setReservationDetails(null);
     setReserved(true);
   };
 
@@ -146,12 +236,18 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Failed to reserve. Please try again.'); return; }
       setReservationMode('reserved');
+      setBookingReference(data?._id ? String(data._id).slice(-8).toUpperCase() : '');
+      setReservationDetails(data);
       setReserved(true);
-    } catch {
-      try {
-        await queueOfflineBookingIntent('user');
-      } catch (queueError) {
-        setError(queueError?.message || 'Unable to save this booking request offline.');
+    } catch (reserveError) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        try {
+          await queueOfflineBookingIntent('user');
+        } catch (queueError) {
+          setError(queueError?.message || 'Unable to save this booking request offline.');
+        }
+      } else {
+        setError(reserveError?.message || 'We could not confirm if the server received this booking. Refresh availability before trying again.');
       }
     } finally {
       setReserveLoading(false);
@@ -191,12 +287,18 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Failed to reserve. Please try again.'); return; }
       setReservationMode('reserved');
+      setBookingReference(data?._id ? String(data._id).slice(-8).toUpperCase() : '');
+      setReservationDetails(data);
       setReserved(true);
-    } catch {
-      try {
-        await queueOfflineBookingIntent('guest');
-      } catch (queueError) {
-        setError(queueError?.message || 'Unable to save this guest request offline.');
+    } catch (reserveError) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        try {
+          await queueOfflineBookingIntent('guest');
+        } catch (queueError) {
+          setError(queueError?.message || 'Unable to save this guest request offline.');
+        }
+      } else {
+        setError(reserveError?.message || 'We could not confirm if the server received this booking. Refresh availability before trying again.');
       }
     } finally {
       setGuestReserveLoading(false);
@@ -225,18 +327,30 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
             <FaCheckCircle className="text-3xl text-yellow-500" />
           </motion.div>
           <h2 className="text-xl font-black uppercase tracking-widest text-white" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-            {reservationMode === 'queued' ? 'Request Queued' : 'Court Reserved!'}
+            {reservationMode === 'queued' ? 'Request Queued' : 'Reservation Received'}
           </h2>
-          <p className="text-yellow-500 text-sm mt-1 font-semibold">
-            {courtName} · {date} at {formatBookingTimeLabel(startTime)} · {duration}h
+          <p className="mt-2 text-sm font-semibold text-white" role="status">
+            {reservationMode === 'queued'
+              ? 'Bookit has not received this request yet.'
+              : reservationDetails?.status === 'confirmed'
+                ? 'Confirmed by the organiser.'
+                : 'Pending organiser confirmation.'}
           </p>
+          <p className="text-yellow-500 text-sm mt-1 font-semibold">
+            {(reservationDetails?.courtName || courtName)} · {(reservationDetails?.date || date)} at {formatBookingTimeLabel(reservationDetails?.start_time || startTime)} · {(reservationDetails?.duration || duration)}h
+          </p>
+          {bookingReference && (
+            <p className="mt-2 text-[11px] font-black uppercase tracking-widest text-green-300">
+              Reference {bookingReference}
+            </p>
+          )}
         </div>
 
         <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 mb-5">
           <div className="flex items-center gap-3 mb-2">
             <FaMoneyBillWave className="text-yellow-500 flex-shrink-0" size={16} />
             <p className="text-white text-sm font-bold">
-              {reservationMode === 'queued' ? 'Offline Request Saved' : `Pay at Venue — R${totalPrice}`}
+              {reservationMode === 'queued' ? 'Offline Request Saved' : `Reservation amount — R${Number(reservationDetails?.total_price ?? totalPrice)}`}
             </p>
           </div>
           <p className="text-gray-400 text-xs leading-relaxed">
@@ -244,7 +358,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
               ? 'This device saved your booking request for sync when the connection returns. No court slot is held until the request syncs and staff confirm availability.'
               : (
                 <>
-                  Your slot is reserved. Please arrive at the venue and pay <strong className="text-white">R{totalPrice} cash</strong> on the day. Your booking will be confirmed once payment is received by our staff.
+                  Bookit recorded a <strong className="text-white">{reservationDetails?.status || 'pending'}</strong> reservation for <strong className="text-white">R{Number(reservationDetails?.total_price ?? totalPrice)}</strong>. Payment is <strong className="text-white">{reservationDetails?.paymentStatus || 'not recorded'}</strong>. The organiser can confirm the reservation and update payment in Bookit.
                 </>
               )}
           </p>
@@ -276,7 +390,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
           <FaMapMarkerAlt className="text-yellow-600 flex-shrink-0" />
           Bookit 5s Arena · Pringle Rd, Milnerton, Cape Town
         </div>
-        {reservationMode !== 'queued' && (
+        {session && reservationMode !== 'queued' && (
           <Link href="/bookings" className="mt-4 block text-center text-xs text-yellow-500 hover:text-green-300 transition-colors">
             View My Bookings
           </Link>
@@ -295,9 +409,70 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
       <div className="mb-5 p-3 bg-green-900/20 border border-green-800/40 rounded-xl flex items-start gap-3">
         <FaMoneyBillWave className="text-yellow-500 flex-shrink-0 mt-0.5" size={14} />
         <p className="text-green-300 text-xs font-semibold leading-relaxed">
-          All court bookings are <strong>pay at venue (cash)</strong>. Reserve your slot online, then pay our staff on arrival.
+          Pick a date to load verified slots from Bookit. Court reservations are <strong>pay at venue</strong>.
         </p>
       </div>
+
+      <div className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="date" className={labelClass}><FaCalendarAlt className="inline mr-1.5 mb-0.5" />Date</label>
+            <input type="date" id="date" value={date} onChange={handleDateChange} min={today} className={inputClass} required />
+          </div>
+          <div>
+            <label htmlFor="start_time" className={labelClass}><FaClock className="inline mr-1.5 mb-0.5" />Start Time <InfoTooltip text="Courts are open 10:00 AM – 10:00 PM. Slots that already passed today are hidden." position="top" /></label>
+            <select id="start_time" value={selectedStartTime} onChange={(e) => setStartTime(e.target.value)} className={inputClass} disabled={!date || availabilityState === 'loading' || slotOptions.length === 0} required>
+              {!date && <option value="">Select a date first</option>}
+              {date && availabilityState === 'loading' && <option value="">Checking live slots...</option>}
+              {date && availabilityState !== 'loading' && slotOptions.length === 0 && <option value="">No verified slots for this duration</option>}
+              {date && availabilityState !== 'loading' && slotOptions.length > 0 && <option value="">Select an hourly slot</option>}
+              {slotOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="duration" className={labelClass}>Duration <InfoTooltip text="Minimum 1 hour, maximum 3 hours per booking." position="top" /></label>
+            <select id="duration" value={duration} onChange={(e) => handleDurationChange(e.target.value)} className={inputClass} required>
+              <option value="1">1 hour</option>
+              <option value="2">2 hours</option>
+              <option value="3">3 hours</option>
+            </select>
+          </div>
+        </div>
+
+        {date && selectedStartTime && (
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-green-900/20 border border-green-800/40 rounded-xl text-sm text-green-300">
+            <span className="font-bold text-white">Total: R{totalPrice}</span>
+            <span className="text-yellow-600 ml-2">({formatBookingTimeLabel(selectedStartTime)} · {duration} hr × R{hourlyPrice}/hr) — pay at venue</span>
+          </motion.div>
+        )}
+
+        {date && availabilityState === 'loading' && (
+          <p className="text-xs font-semibold uppercase tracking-widest text-yellow-500">
+            Checking live availability...
+          </p>
+        )}
+
+        {date && availabilityState === 'empty' && (
+          <p className="rounded-xl border border-yellow-800/40 bg-yellow-950/20 p-3 text-xs font-semibold text-yellow-200">
+            No verified slots are open for {courtName} on this date. Try another date or contact the venue for special arrangements.
+          </p>
+        )}
+
+        {date && availabilityState === 'ready' && slotOptions.length === 0 && (
+          <p className="rounded-xl border border-yellow-800/40 bg-yellow-950/20 p-3 text-xs font-semibold text-yellow-200">
+            {courtName} has live availability on this date, but not for a {duration}-hour booking. Try a shorter duration or another start time.
+          </p>
+        )}
+
+        {availabilityState === 'error' && (
+          <p className="rounded-xl border border-red-800 bg-red-950 p-3 text-xs font-semibold text-red-300">
+            {availabilityError || 'Live availability could not be verified.'}
+          </p>
+        )}
 
       {!session && (
         <motion.div
@@ -333,7 +508,7 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                 onClick={() => setShowGuestForm((v) => !v)}
                 className="bg-gray-900 px-3 flex items-center gap-1 text-gray-500 hover:text-yellow-500 text-xs uppercase tracking-widest transition-colors"
               >
-                <FaUser size={9} /> or reserve as guest (pay cash on arrival)
+                <FaUser size={9} /> {showGuestForm ? 'hide guest details' : 'reserve as guest (pay at venue)'}
               </button>
             </div>
           </div>
@@ -350,13 +525,16 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                 <div className="bg-gray-800/60 border border-yellow-800/40 rounded-xl p-4 space-y-3">
                   <p className="text-green-300 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                     <FaMapMarkerAlt className="text-yellow-500" /> Guest Reservation — Pay at Venue
-                    <InfoTooltip text="No account needed! We'll hold your court slot. Pay cash when you arrive at the venue." position="right" />
+                    <InfoTooltip text="No account needed. The selected slot is held only after Bookit accepts the reservation." position="right" />
                   </p>
-                  <p className="text-gray-500 text-xs">Fill in your details to hold this slot. Pay R{totalPrice} cash when you arrive.</p>
+                  <p className="text-gray-500 text-xs">Choose a verified slot, then enter your details. Pay R{totalPrice} at the venue.</p>
 
                   <div className="space-y-2.5">
                     <input
                       type="text"
+                      aria-label="Full name"
+                      autoComplete="name"
+                      maxLength={100}
                       placeholder="Full Name *"
                       value={guestName}
                       onChange={(e) => setGuestName(e.target.value)}
@@ -364,6 +542,9 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                     />
                     <input
                       type="email"
+                      aria-label="Email address"
+                      autoComplete="email"
+                      maxLength={254}
                       placeholder="Email Address *"
                       value={guestEmail}
                       onChange={(e) => setGuestEmail(e.target.value)}
@@ -371,6 +552,8 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                     />
                     <input
                       type="tel"
+                      aria-label="South African phone number"
+                      autoComplete="tel"
                       placeholder="Phone Number * (e.g. 0821234567)"
                       value={guestPhone}
                       onChange={(e) => setGuestPhone(e.target.value)}
@@ -378,23 +561,19 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
                     />
                   </div>
 
-                  {error && (
-                    <p className="text-red-400 text-xs">{error}</p>
-                  )}
-
                   <motion.button
                     type="button"
                     onClick={handleGuestReserve}
-                    disabled={guestReserveLoading}
+                    disabled={guestReserveDisabled}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                     className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white uppercase tracking-widest transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     style={{ background: 'linear-gradient(135deg, var(--btn-from) 0%, var(--btn-to) 100%)' }}
                   >
                     {guestReserveLoading ? (
-                      <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Reserving...</>
+                      <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Sending reservation...</>
                     ) : (
-                      <><FaMoneyBillWave size={13} /> Reserve — Pay R{totalPrice} at Venue</>
+                      <><FaMoneyBillWave size={13} /> Request Reservation · Pay R{totalPrice} at Venue</>
                     )}
                   </motion.button>
                 </div>
@@ -404,60 +583,26 @@ const BookingForm = ({ courtId, courtName, pricePerHour }) => {
         </motion.div>
       )}
 
-      {error && !showGuestForm && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-5 p-3 bg-red-950 border border-red-800 rounded-xl text-red-400 text-sm">
+      {error && (
+        <motion.div role="alert" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-5 p-3 bg-red-950 border border-red-800 rounded-xl text-red-300 text-sm">
           {error}
         </motion.div>
       )}
-
-      <div className="space-y-5">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="date" className={labelClass}><FaCalendarAlt className="inline mr-1.5 mb-0.5" />Date</label>
-            <input type="date" id="date" value={date} onChange={(e) => setDate(e.target.value)} min={new Date().toISOString().split('T')[0]} className={inputClass} required />
-          </div>
-          <div>
-            <label htmlFor="start_time" className={labelClass}><FaClock className="inline mr-1.5 mb-0.5" />Start Time <InfoTooltip text="Courts are open 10:00 AM – 10:00 PM. Book at least 1 day in advance." position="top" /></label>
-            <select id="start_time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className={inputClass} required>
-              <option value="">Select an hourly slot</option>
-              {slotOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="duration" className={labelClass}>Duration <InfoTooltip text="Minimum 1 hour, maximum 3 hours per booking." position="top" /></label>
-            <select id="duration" value={duration} onChange={(e) => handleDurationChange(e.target.value)} className={inputClass} required>
-              <option value="1">1 hour</option>
-              <option value="2">2 hours</option>
-              <option value="3">3 hours</option>
-            </select>
-          </div>
-        </div>
-
-        {date && startTime && (
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-green-900/20 border border-green-800/40 rounded-xl text-sm text-green-300">
-            <span className="font-bold text-white">Total: R{totalPrice}</span>
-            <span className="text-yellow-600 ml-2">({formatBookingTimeLabel(startTime)} · {duration} hr × R{pricePerHour}/hr) — pay cash at venue</span>
-          </motion.div>
-        )}
 
         {session ? (
           <motion.button
             type="button"
             onClick={handleReserve}
-            disabled={reserveLoading}
+            disabled={reserveDisabled}
             whileHover={{ scale: 1.02, boxShadow: '0 0 35px rgba(34,197,94,0.5)' }}
             whileTap={{ scale: 0.97 }}
             className="w-full py-3.5 px-4 rounded-xl text-sm font-black text-white uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             style={{ background: 'linear-gradient(135deg, var(--btn-from) 0%, var(--btn-to) 100%)', boxShadow: '0 0 25px var(--glow)' }}
           >
             {reserveLoading ? (
-              <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Reserving...</>
+              <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Sending reservation...</>
             ) : (
-              <><FaMoneyBillWave size={14} /> Reserve Court — Pay R{totalPrice} at Venue</>
+              <><FaMoneyBillWave size={14} /> Request Reservation · Pay R{totalPrice} at Venue</>
             )}
           </motion.button>
         ) : (
