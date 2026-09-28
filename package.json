@@ -43,7 +43,7 @@
     "leaflet": "^1.9.4",
     "mongodb": "^7.1.1",
     "mongoose": "^9.3.3",
-    "next": "^15.5.18",
+    "next": "^15.5.25",
     "next-auth": "^4.24.15",
     "nodemailer": "^6.9.16",
     "react": "19.2.4",
