@@ -93,6 +93,7 @@ export default function BookCourtClient({ courts = [] }) {
         <div>
           {selectedCourt && (
             <BookingForm
+              key={selectedCourt._id}
               courtId={selectedCourt._id}
               courtName={selectedCourt.name}
               pricePerHour={selectedCourt.price_per_hour}
