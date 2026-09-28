@@ -131,7 +131,7 @@ test('province state drives weather and editorial surface without leaving the sh
   await expect(organism).toHaveAttribute('data-province', 'western-cape');
   await expect(organism).toHaveAttribute('data-match-pulse', 'live');
   await expect(page.getByTestId('current-province')).toHaveText('Western Cape');
-  await expect(page.getByRole('heading', { name: 'Western Cape football pulse' })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: 'Western Cape football pulse', level: 3 })).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId('kpgs-adapter-state')).toHaveAttribute(
     'data-adapter-status',
     'contract-only',
@@ -159,7 +159,7 @@ test('province state drives weather and editorial surface without leaving the sh
   await expect(organism).toHaveAttribute('data-province', 'gauteng');
   await expect(organism).toHaveAttribute('data-match-pulse', 'live');
   await expect(page.getByTestId('current-province')).toHaveText('Gauteng');
-  await expect(page.getByRole('heading', { name: 'Gauteng football pulse' })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: 'Gauteng football pulse', level: 3 })).toBeVisible({ timeout: 10_000 });
   await expect(arena).toContainText('Gauteng football pulse');
   await expect(arena).toContainText('Orlando Pirates');
   await expect(page).toHaveURL(/\/news$/);
@@ -196,11 +196,23 @@ test('reduced-motion users receive the static organism lane instead of forced Th
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 
-test('World Cup 2026 is an archive on mobile, never a registration funnel', async ({ page }) => {
+test('competition copy gives mobile visitors clear team and court options', async ({ page }) => {
   await page.goto('/tournament');
 
-  await expect(page.getByText(/Archived · concluded 31 May 2026/i)).toBeVisible();
-  await expect(page.getByRole('heading', { name: /5s Arena World Cup/i })).toBeVisible();
+  await expect(page.getByText(/Competition information/i)).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Competitions at Five's Arena/i })).toBeVisible();
+  await expect(
+    page.getByText(/Competition dates and team entry details are not currently published/i),
+  ).toBeVisible();
+  await expect(page.getByText(/No dates published/i)).toBeVisible();
+  await expect(page.getByText(/Ask about venue and format/i)).toBeVisible();
+  await expect(page.getByText(/Ask about team options/i)).toBeVisible();
+  await expect(page.getByText(/Choose a court and book a time for your next game/i)).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: /Choose a court and book a time for your next game/i }),
+  ).toHaveAttribute('href', '/#courts');
+  await expect(page.getByRole('link', { name: /Contact the Arena/i })).toHaveAttribute('href', '/contact');
+  await expect(page.getByText(/Truth boundary/i)).toHaveCount(0);
   await expect(page.getByText(/Register Your Team/i)).toHaveCount(0);
   await expect(page.getByText(/Proof of Payment/i)).toHaveCount(0);
   await expectNoHorizontalOverflow(page);

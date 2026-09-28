@@ -1,44 +1,39 @@
 import Link from 'next/link';
 import {
-  FaArchive,
   FaArrowLeft,
   FaCalendarCheck,
-  FaChartBar,
   FaMapMarkerAlt,
-  FaShieldAlt,
-  FaTrophy,
   FaUsers,
 } from 'react-icons/fa';
-import { TOURNAMENT_DATES, TOURNAMENT_FORMAT } from '@/lib/tournamentConfig';
 
 export const metadata = {
-  title: 'World Cup 5s 2026 Archive | Five’s Arena',
+  title: 'Competitions at Five’s Arena',
   description:
-    'Historical archive for the inaugural Five’s Arena World Cup 5s held at Hellenic Football Club in Milnerton from 29–31 May 2026.',
+    'Ask about team events or book a court at Five’s Arena. Competition dates and team entry details are not currently published.',
 };
 
-const archiveLinks = [
+const competitionLinks = [
   {
-    href: '/tournament/stats',
-    title: 'Historical statistics',
-    note: 'Inspect recorded tournament statistics and evidence where data exists.',
-    icon: FaChartBar,
+    href: '/events-and-services',
+    title: 'Plan a team event',
+    note: 'Ask about a private match, team day or local competition format.',
+    icon: FaUsers,
   },
   {
-    href: '/tournament/bracket',
-    title: 'Competition bracket',
-    note: 'Review the knockout structure as an archived competition surface.',
-    icon: FaTrophy,
+    href: '/#courts',
+    title: 'Book a court',
+    note: 'Choose a court and book a time for your next game.',
+    icon: FaCalendarCheck,
   },
   {
-    href: '/rules-of-the-game',
-    title: 'Rules archive',
-    note: 'Preserve the rules that governed the 2026 competition.',
-    icon: FaShieldAlt,
+    href: '/fixtures',
+    title: 'Follow fixtures',
+    note: 'See current match information when fixtures are available.',
+    icon: FaMapMarkerAlt,
   },
 ];
 
-export default function TournamentArchivePage() {
+export default function CompetitionsPage() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#040609] text-white">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(245,197,66,0.12),transparent_38%),radial-gradient(circle_at_12%_80%,rgba(57,217,138,0.08),transparent_35%)]" />
@@ -53,15 +48,16 @@ export default function TournamentArchivePage() {
 
         <section className="mt-8 rounded-[2.5rem] border border-amber-300/15 bg-black/35 p-6 shadow-2xl backdrop-blur-sm sm:p-8 lg:p-12">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/20 bg-amber-300/8 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-amber-200">
-            <FaArchive /> Archived · concluded 31 May 2026
+            <FaCalendarCheck /> Competition information
           </div>
 
           <h1 className="mt-6 max-w-5xl text-5xl font-black uppercase leading-[0.88] tracking-tight sm:text-7xl lg:text-8xl">
-            5s Arena World Cup <span className="text-amber-300">2026</span>
+            Competitions at <span className="text-amber-300">Five&apos;s Arena</span>
           </h1>
 
           <p className="mt-6 max-w-3xl text-sm leading-7 text-gray-300 sm:text-base">
-            This competition is no longer accepting registrations or payments. The inaugural event window ran {TOURNAMENT_DATES.rangeShort} at Hellenic Football Club in Milnerton. This route now preserves the competition as evidence instead of presenting expired actions as current.
+            Competition dates and team entry details are not currently published.
+            Ask about current team options or book a court for your next game.
           </p>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -70,7 +66,7 @@ export default function TournamentArchivePage() {
                 <FaCalendarCheck /> Event window
               </p>
               <p className="mt-3 text-sm font-black uppercase text-white">
-                {TOURNAMENT_DATES.rangeShort}
+                No dates published
               </p>
             </div>
             <div className="rounded-2xl border border-white/8 bg-white/[0.035] p-5">
@@ -78,7 +74,7 @@ export default function TournamentArchivePage() {
                 <FaMapMarkerAlt /> Venue
               </p>
               <p className="mt-3 text-sm font-black uppercase text-white">
-                Hellenic FC · Milnerton
+                Ask about venue and format
               </p>
             </div>
             <div className="rounded-2xl border border-white/8 bg-white/[0.035] p-5">
@@ -86,22 +82,22 @@ export default function TournamentArchivePage() {
                 <FaUsers /> Field
               </p>
               <p className="mt-3 text-sm font-black uppercase text-white">
-                {TOURNAMENT_FORMAT.totalTeams}-team format
+                5-a-side football
               </p>
             </div>
             <div className="rounded-2xl border border-white/8 bg-white/[0.035] p-5">
               <p className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-gray-500">
-                <FaShieldAlt /> Registration state
+                <FaUsers /> Team entry
               </p>
               <p className="mt-3 text-sm font-black uppercase text-amber-200">
-                Closed · {TOURNAMENT_DATES.signupDeadline}
+                Ask about team options
               </p>
             </div>
           </div>
         </section>
 
         <section className="mt-8 grid gap-4 lg:grid-cols-3">
-          {archiveLinks.map((item) => {
+          {competitionLinks.map((item) => {
             const Icon = item.icon;
             return (
               <Link
@@ -119,7 +115,7 @@ export default function TournamentArchivePage() {
                   {item.note}
                 </p>
                 <p className="mt-5 text-[10px] font-black uppercase tracking-[0.16em] text-amber-200 transition group-hover:translate-x-1">
-                  Open archive →
+                  Explore →
                 </p>
               </Link>
             );
@@ -128,14 +124,20 @@ export default function TournamentArchivePage() {
 
         <section className="mt-8 rounded-[2rem] border border-green-300/10 bg-green-300/[0.025] p-6 sm:p-8">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-green-300">
-            Truth boundary
+            Team football
           </p>
           <h2 className="mt-3 text-2xl font-black uppercase text-white">
-            Historical claims require receipts.
+            Looking for a team event?
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-gray-400">
-            Results, champions, attendance, prizes and performance claims are surfaced only when the underlying tournament records provide evidence. Missing evidence remains missing instead of being reconstructed from promotional copy.
+            Ask our team about a private match, team day or local competition.
           </p>
+          <Link
+            href="/contact"
+            className="mt-5 inline-flex min-h-11 items-center rounded-xl border border-green-300/20 bg-green-300/10 px-4 text-xs font-black uppercase tracking-[0.16em] text-green-200 transition hover:bg-green-300/15 hover:text-white"
+          >
+            Contact the Arena
+          </Link>
         </section>
       </div>
     </main>

@@ -85,7 +85,16 @@ assert.doesNotMatch(rulesPage, /Sign-ups open the day after/);
 assert.doesNotMatch(rulesPage, /choose your country at sign-up/i);
 assert.doesNotMatch(rulesPage, /Live tournament window/);
 
-assert.match(tournamentPage, /has concluded|Archived · concluded/i);
+assert.match(tournamentPage, /Competition information/);
+assert.match(tournamentPage, /Competition dates and team entry details are not currently published/);
+assert.match(tournamentPage, /No dates published/);
+assert.match(tournamentPage, /Ask about venue and format/);
+assert.match(tournamentPage, /Ask about team options/);
+assert.match(tournamentPage, /Choose a court and book a time for your next game/);
+assert.match(tournamentPage, /href="\/contact"/);
+assert.doesNotMatch(tournamentPage, /next competition is being prepared/i);
+assert.doesNotMatch(tournamentPage, /Truth boundary/);
+assert.doesNotMatch(tournamentPage, /has concluded|Archived · concluded|World Cup 5s/i);
 assert.doesNotMatch(tournamentPage, /Register Your Team/i);
 assert.doesNotMatch(tournamentPage, /Proof of Payment/i);
 assert.match(tournamentStats, /Historical statistics/);
@@ -206,6 +215,7 @@ assert.match(mobileSpec, /data-match-state/);
 assert.match(mobileSpec, /ambient-not-possession/);
 assert.match(mobileSpec, /Orlando Pirates/);
 assert.match(mobileSpec, /Kaizer Chiefs/);
-assert.match(mobileSpec, /Register Your Team/);
+assert.match(mobileSpec, /No dates published/);
+assert.match(mobileSpec, /Truth boundary/);
 
 console.log('Living organism proof: PASS');
