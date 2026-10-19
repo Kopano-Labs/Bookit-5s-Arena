@@ -389,7 +389,7 @@ export default function CourtsSection({ courts = [] }) {
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
         >
-          <Link href="/bookings">
+          <Link href="/book">
             <motion.span
               className="inline-flex items-center gap-3 text-white font-bold px-10 py-4 rounded-xl uppercase tracking-wide text-sm"
               style={{
@@ -402,7 +402,7 @@ export default function CourtsSection({ courts = [] }) {
               animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
               transition={{ duration: 4, repeat: Infinity }}
             >
-              <FaFutbol /> View All Courts <FaArrowRight size={12} />
+              <FaFutbol /> Book a Court <FaArrowRight size={12} />
             </motion.span>
           </Link>
         </motion.div>
@@ -410,4 +410,5 @@ export default function CourtsSection({ courts = [] }) {
     </section>
   );
 }
+
 

@@ -8,14 +8,20 @@ export default function CourtAvailabilityNotice() {
           Book a court
         </p>
         <h2 className="mt-3 text-3xl font-black uppercase tracking-tight sm:text-5xl">
-          Check today&apos;s court and time directly with 5s Arena.
+          Choose a court and time in our online booking calendar.
         </h2>
         <p className="mt-5 max-w-3xl text-sm leading-7 text-gray-300 sm:text-base">
-          Online slots are not available on this page right now. WhatsApp or call us for the
-          current court, rate and time slot before travelling.
+          Booking is completed through our current Setmore calendar. Check the court, available
+          times, duration, price and booking terms there before confirming.
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
+          <Link
+            href="/book"
+            className="rounded-xl bg-yellow-500 px-5 py-3 text-xs font-black uppercase tracking-widest text-gray-950 transition hover:bg-yellow-400"
+          >
+            Choose a court and time
+          </Link>
           <a
             href="https://wa.me/27637820245"
             target="_blank"
@@ -41,3 +47,4 @@ export default function CourtAvailabilityNotice() {
     </section>
   );
 }
+
