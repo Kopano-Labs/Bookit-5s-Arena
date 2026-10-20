@@ -80,7 +80,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https: http:",
               "font-src 'self' https://fonts.gstatic.com https://assets.vercel.com",
               "connect-src 'self' https://api.open-meteo.com https://maps.googleapis.com https://*.google-analytics.com https://api.anthropic.com https://api.groq.com https://plausible.io https://vitals.vercel-insights.com https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://vercel.live https://*.vercel.live https://raw.githack.com https://raw.githubusercontent.com",
-              "frame-src 'self' https://www.youtube.com https://www.dailymotion.com https://player.vimeo.com https://www.fifa.com https://uefa.tv https://maps.google.com https://www.google.com https://maps.googleapis.com https://www.recaptcha.net https://vercel.live https://*.vercel.live",
+              "frame-src 'self' https://fivesarena.setmore.com https://www.youtube.com https://www.dailymotion.com https://player.vimeo.com https://www.fifa.com https://uefa.tv https://maps.google.com https://www.google.com https://maps.googleapis.com https://www.recaptcha.net https://vercel.live https://*.vercel.live",
               "object-src 'none'",
               "base-uri 'self'",
             ].join("; "),
