@@ -4,7 +4,7 @@ export const metadata = {
     "Choose a Five's Arena court and book directly in the Setmore calendar embedded on this page.",
 };
 
-const SETMORE_BOOKING_URL = 'https://fivesarena.setmore.com/';
+const SETMORE_BOOKING_URL = 'https://fivesarena.setmore.com/book';
 
 export default function BookPage() {
   return (
