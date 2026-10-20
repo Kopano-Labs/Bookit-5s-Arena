@@ -19,7 +19,7 @@ Status: draft for scope gut-check, 20 October 2026. This is the execution contra
 
 - [ ] **1. Recover the current system and requested technical capabilities**
   Spec ref: `spec.md > 1. Context and evidence`
-  What to build: Update the bounded context/evidence record from current instructions, deployment, issues, old repair candidates and receipts; preserve the original checkout. Inventory the intended coding-agent clients, verify the active REA connection, and recover relevant KPGS contracts/tasks. Retain prior setup approvals; show any materially new setup plan before executing it.
+  What to build: Update the bounded context/evidence record from current instructions, deployment, issues, old repair candidates and receipts; preserve the original checkout. Specifically compare recovered communications merge `1be66ae` / branch `73b7ce1` against current main before rebuilding existing work; see communication-gap-audit.md. Inventory the intended coding-agent clients, verify the active REA connection, and recover relevant KPGS contracts/tasks. Retain prior setup approvals; show any materially new setup plan before executing it.
   Acceptance: R01/R02/R15. Verified source/deployed identities and evidence populations; no hotel-scope drift, stale parked-homepage override or unsupported REA/KPGS activation. Tools absent versus installed versus actively connected are distinct.
   Verify: Read `AGENTS.md`, current-state notes and referenced receipts; capture `git status --short --branch`, remotes, live PR/head and Vercel alias/SHA. Record a relevant connected REA call's evidence or the exact connection gap. Document the KPGS contract locator and bounded task, or hold only that integration if undefined.
 
@@ -55,14 +55,14 @@ Status: draft for scope gut-check, 20 October 2026. This is the execution contra
 
 - [ ] **7. Complete customer-to-venue communication and booking management**
   Spec ref: `spec.md > 7. Confirmation, customer management and payments`
-  What to build: Customer confirmation/reference/next steps and secure guest/account retrieval, cancel and reschedule; venue booking alert with actionable details and access to the same record. Send change/cancel updates to both sides through verified configured channels. Track delivery/retries and surface failures without duplicate reservations. Apply the actual payment policy; implement sandbox payment consistency only if online payment is required.
-  Acceptance: R09/R10/R12. The customer knows whether the booking saved and how to manage it; the client/venue actually receives the booking and can act. Each message matches the persisted reference/status/total. Email/WhatsApp/SMS is not promised unless configured and evidenced. Sent, delivered and read are not conflated. Notification failure does not lose or duplicate the booking.
-  Verify: Allowlist sandbox customer and venue recipients; capture both inbox/provider delivery evidence and matching references after create/reschedule/cancel. Force delivery failure and retry; prove one stored booking. Open secure management links in a fresh browser and reject cross-customer access. If applicable, test payment success/failure/replay/late-event/refund in sandbox only.
+  What to build: Recover useful earlier dispatcher/receipt work and connect it to current native guest/account saves. Add the missing account-welcome event for credentials and first social signup, with Bookit profile/history/manage/book links. Complete customer booking confirmation/reference/next steps and secure guest/account retrieval, cancel and reschedule; venue booking alert with actionable details and access to the same record. Send change/cancel updates to both sides through verified configured channels. Track delivery/retries and surface failures without duplicate reservations. Correct recovered venue-recipient defaults and truthful pending/amount-due wording. Apply the actual payment policy; implement sandbox payment consistency only if online payment is required.
+  Acceptance: R09/R10/R12/R16. Welcome arrives once per created native account and its on-domain links work. The customer knows whether a booking saved and how to manage it; the client/venue actually receives the booking and can act. Each booking message matches the persisted reference/status/total. Email/WhatsApp/SMS is not promised unless configured and evidenced. Sent, delivered and read are not conflated; simulations never pass as delivery. Notification failure does not lose or duplicate the booking. Guest account linkage requires verified identity.
+  Verify: Allowlist sandbox customer and venue recipients. Create credentials/social accounts, verify one welcome each, sign in again and prove no duplicate welcome; open profile/history/book links. Capture both customer and venue inbox/provider evidence and matching references after booking create/reschedule/cancel. Force delivery failure and retry; prove one stored booking. Open secure guest/account management in a fresh browser and reject cross-customer access. If applicable, test payment success/failure/replay/late-event/refund in sandbox only.
 
 - [ ] **8. Make the existing dashboard useful for daily venue operations**
   Spec ref: `spec.md > 8. Operator dashboard and retained data`
   What to build: Wire operator booking/customer history, search/filter/status/contact details and supported manual block/closure/cancel/reschedule/payment actions to the same native store. Preserve necessary data so the business can operate and learn from bookings.
-  Acceptance: R07/R09/R11. Public booking immediately appears in the venue dashboard; staff can find the reference/customer, distinguish pending/reserved/confirmed/paid/cancelled, and operate under correct permissions. A manual block or lifecycle change changes customer availability. Pageviews are not reported as booking counts.
+  Acceptance: R07/R09/R11/R16. Public booking immediately appears in the venue dashboard; staff can find the reference/customer, distinguish pending/reserved/confirmed/paid/cancelled, and operate under correct permissions. Customer profile/contact changes persist and native account history is usable, with secure guest access/linkage. A manual block or lifecycle change changes customer availability. Pageviews are not reported as booking counts.
   Verify: In a fresh operator session, find the browser-created sandbox booking and inspect its permitted fields/history; make a block or lifecycle change and read public availability again. Confirm unauthorized sessions cannot view/manage records. Reconnect and verify the records persist.
 
 - [ ] **9. Fix recovery, privacy, accessibility, mobile behavior and relevant CI**
@@ -91,7 +91,7 @@ Status: draft for scope gut-check, 20 October 2026. This is the execution contra
 
 ## Requirement coverage
 
-R01: 1/12; R02: 1/12; R03: 2/12; R04: 2/6/11; R05: 2/6/10; R06: 4/6/11; R07: 3/6/8/10; R08: 4/5/10; R09: 7/8/10/11; R10: 4/5/7/10; R11: 3/8/10; R12: 3/5/6/7/9; R13: 2/9; R14: 9/10/11; R15: 1/12.
+R01: 1/12; R02: 1/12; R03: 2/12; R04: 2/6/11; R05: 2/6/10; R06: 4/6/11; R07: 3/6/8/10; R08: 4/5/10; R09: 7/8/10/11; R10: 4/5/7/10; R11: 3/8/10; R12: 3/5/6/7/9; R13: 2/9; R14: 9/10/11; R15: 1/12; R16: 7/8/10/12.
 
 ## Completion discipline
 

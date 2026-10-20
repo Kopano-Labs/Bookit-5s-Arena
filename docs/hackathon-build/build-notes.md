@@ -39,3 +39,11 @@ Recover the canonical production database/owner and historical data destination;
 ### Review / next step
 
 Deepening rounds: 0 (owner handed planning off). Required two planning answers received and incorporated. Completeness gut-check remains pending; do not present the whole checklist as owner-accepted yet. Next command: `$build-project`, starting with package 1 and continuing independently wherever prerequisites permit. Preserve the agreed prelaunch working-flow review.
+
+## 20 October 2026 — supplied account-welcome email and recovered communications history
+
+The owner supplied Setmore account-welcome evidence and stated these capabilities had already been built in Fives. Source recovery confirms existing Bookit profile/history features and an earlier communications implementation at merge 1be66ae (30 August) / remote branch 73b7ce1. It includes post-save guest/customer/business dispatch and durable revision-keyed receipts, but is absent from both inspected current main histories. Live production still maps to Kopano-Labs main 85e6e2b. This is an integration/lineage gap, not evidence that the owner imagined or never built the work.
+
+The current credentials/social signup paths lack welcome dispatch; current guest create lacks notification dispatch; signed-in create attempts customer communication but lacks the recovered customer/business receipt fan-out. Vercel production email-variable names are present (metadata only), so provider credentials cannot simply be called missing. Current source also has simulated WhatsApp success and misleading confirmed/Amount Paid copy. The recovered business email default differs from the owner-supplied venue address and must be corrected/verified before reuse.
+
+Added R16 and expanded packages 1, 7 and 8; detailed findings, exact sources, evidence limitations and recovery cautions are in communication-gap-audit.md. No real message/account/booking was submitted, no production data changed, and no delivery claim was made. User's personal email/screenshot are not copied into versioned documents.
