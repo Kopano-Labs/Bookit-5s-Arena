@@ -19,10 +19,11 @@
       "provider": "sandbox-smtp"
     }
   ],
-  "screen": "reservation-saved.png",
+  "screen": null,
   "limits": [
     "Synthetic reservation only; no production data",
     "Provider sent status is local SMTP acceptance, not external delivery/read",
-    "Mobile confirmation captured; complete desktop and accessibility review still pending"
-  ]
+    "Browser confirmation observed at mobile viewport; accepted screenshot export, complete desktop and accessibility review still pending"
+  ],
+  "captureStatus": "Rejected: screenshot export produced blank PNG despite the visible confirmation and matching AX state"
 }
