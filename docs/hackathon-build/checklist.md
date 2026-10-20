@@ -1,6 +1,6 @@
 # Bookit / FivesArena build checklist
 
-Status: draft for scope gut-check, 20 October 2026. This is the execution contract for `$build-project`, adapted from the requested skill to an existing client product. Supporting requirements are in prd.md; architecture/verification boundaries are in spec.md.
+Status: prepared repair plan, 20 October 2026; owner working-flow review remains before launch. This is the execution contract for `$build-project`, adapted from the requested skill to an existing client product. Supporting requirements are in prd.md; architecture/verification boundaries are in spec.md. The requested spreadsheet is [Bookit-Repair-Project-Tracker.xlsx](Bookit-Repair-Project-Tracker.xlsx): 24 slices mapped to these 12 packages. Release dependencies, current evidence and staged checks are in [deploy-checklist.md](deploy-checklist.md). Task dates are unassigned; no launch date is promised.
 
 ## Build preferences
 
@@ -87,7 +87,7 @@ Status: draft for scope gut-check, 20 October 2026. This is the execution contra
   Spec ref: `spec.md > 12. Delivery and consistency`
   What to build: Deliver concise customer/venue walkthroughs, before/after visuals, evidence-based findings/journey map and technical receipts. Record source populations, issue disposition, reused/new work, relevant REA/KPGS evidence, outstanding access gaps, ownership and next executable scope. Adapt the skill's final Devpost handoff to this actual client delivery; no Devpost submission is requested.
   Acceptance: R01/R02/R03/R15. The owner/client can see what changed, use the booking/dashboard flow, understand both communication paths and identify genuine remaining gaps. Source, tested, preview, merged, deployed and production/human-verified states are distinct. No invented CCP acceptance, PKA admission, runtime activation or conversion outcome.
-  Verify: Reapply CCP against this scope/PRD/checklist and actual receipts. Review each R01–R15 acceptance against evidence. Read back saved handoff files and any separately authorized issue/Drive delivery. Mark checklist boxes only for fully evidenced packages; identify the exact next action/owner for every incomplete one.
+  Verify: Reapply CCP against this scope/PRD/checklist and actual receipts. Review each R01–R16 acceptance against evidence. Read back saved handoff files and any separately authorized issue/Drive delivery. Mark checklist boxes only for fully evidenced packages; identify the exact next action/owner for every incomplete one.
 
 ## Requirement coverage
 
