@@ -5,6 +5,7 @@ import User from '@/models/User';
 import { rateLimit } from '@/lib/rateLimit';
 import { getRecaptchaEnv } from '@/lib/config/env';
 import { verifyBotRequest } from '@/lib/security/botid';
+import { notifyNewAccount } from '@/lib/messaging/accountWelcome';
 
 // POST /api/auth/register
 export async function POST(request) {
@@ -107,6 +108,7 @@ export async function POST(request) {
       newsletterOptIn: true
     });
 
+    await notifyNewAccount(user);
     return NextResponse.json(
       { message: 'Account created successfully', userId: user._id },
       { status: 201 }

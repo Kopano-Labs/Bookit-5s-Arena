@@ -102,16 +102,20 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
           <img src={court.image} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent" />
           <div className="absolute bottom-5 left-6">
-            <p className="text-xs font-black uppercase tracking-widest text-green-300">Saved to Bookit</p>
-          <h2 className="mt-1 text-3xl font-black uppercase">Booking saved</h2>
+            <h2 className="mt-1 text-3xl font-black uppercase">Reservation saved</h2>
           </div>
         </div>
         <div className="grid gap-3 p-6 text-sm sm:grid-cols-4">
           <p><span className="block text-xs uppercase text-gray-500">Court</span>{court.name}</p>
           <p><span className="block text-xs uppercase text-gray-500">Date</span>{date}</p>
           <p><span className="block text-xs uppercase text-gray-500">Kick-off</span>{formatTime(time)} · {duration}h</p>
-          <p><span className="block text-xs uppercase text-gray-500">Due at venue</span>R{total}</p>
+          <p><span className="block text-xs uppercase text-gray-500">Due at venue</span>R{booking.total_price}</p>
           <p className="text-xs text-gray-400 sm:col-span-4">Reference {String(booking._id || '').slice(-8).toUpperCase()} · Pay at the venue.</p>
+          <p role="status" className="text-xs text-gray-300 sm:col-span-4">
+            {booking.communicationReceipts?.some(receipt => receipt.recipientType === 'user' && receipt.status === 'sent')
+              ? 'Check your email for your reservation details.'
+              : 'Your reservation is saved. Email confirmation is pending.'}
+          </p>
         </div>
       </section>
     );

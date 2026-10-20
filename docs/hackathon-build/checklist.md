@@ -17,6 +17,8 @@ Status: prepared repair plan, 20 October 2026; owner working-flow review remains
 
 ## Checklist
 
+Execution update, 21 October: packages 3/7/8/9/10 now have a verified first slice. Native guest HTTP and actual browser submissions persist in an isolated MongoDB, customer and venue local SMTP inboxes receive matching references, account welcomes dispatch once in tested paths, and storage survives DB/app restart. See sandbox-communications-receipt.json, sandbox-browser-receipt.json and build-notes.md. This does not close any whole package: authoritative inventory, atomic booking retries/overlaps, secure guest lifecycle, external delivery, full visual review and production cutover remain open. The spreadsheet remains the explicitly dated 20 October planning snapshot.
+
 - [ ] **1. Recover the current system and requested technical capabilities**
   Spec ref: `spec.md > 1. Context and evidence`
   What to build: Update the bounded context/evidence record from current instructions, deployment, issues, old repair candidates and receipts; preserve the original checkout. Specifically compare recovered communications merge `1be66ae` / branch `73b7ce1` against current main before rebuilding existing work; see communication-gap-audit.md. Inventory the intended coding-agent clients, verify the active REA connection, and recover relevant KPGS contracts/tasks. Retain prior setup approvals; show any materially new setup plan before executing it.

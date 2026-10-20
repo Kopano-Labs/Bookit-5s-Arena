@@ -4,12 +4,10 @@ import { getAuthSession } from '@/lib/getSession';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Court from '@/models/Court';
-import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
-import { sendResendConfirmation, isResendBookingConfirmationConfigured } from '@/lib/messaging/bookingResendConfirmation';
-import { sendBookingWATip } from '@/lib/integrations/whatsapp';
 import { rateLimit } from '@/lib/rateLimit';
 import { verifyBotRequest } from '@/lib/security/botid';
 import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
+import { notifySavedBooking } from '@/lib/bookings/dispatchBookingCommunications';
 
 // GET /api/bookings — get all bookings for the logged-in user
 export async function GET() {
@@ -153,57 +151,10 @@ export async function POST(request) {
       paymentStatus: payAtVenue ? 'reserved' : 'unpaid',
     });
 
-    // Send confirmation email (non-blocking)
-    try {
-      let emailSent = false;
-      if (isResendBookingConfirmationConfigured()) {
-        const resendResponse = await sendResendConfirmation({
-          id: booking._id.toString(),
-          date,
-          time: start_time,
-          court: court.name,
-          amount: total_price,
-          type: 'confirmation'
-        }, session.user.email);
-        
-        if (resendResponse.success) {
-          emailSent = true;
-        } else {
-          console.warn('Resend confirmation failed, falling back to Nodemailer:', resendResponse.error);
-        }
-      }
-
-      if (!emailSent) {
-        await sendBookingConfirmation({
-          to: session.user.email,
-          name: session.user.name,
-          courtName: court.name,
-          date,
-          start_time,
-          duration,
-          total_price,
-        });
-      }
-    } catch (emailError) {
-      console.error('Failed to send confirmation email:', emailError);
-    }
-
-    // Phase 4: Send WhatsApp Notification (Non-blocking)
-    if (session.user.phone) {
-        try {
-            await sendBookingWATip({
-              to: session.user.phone,
-              name: session.user.name,
-              courtName: court.name,
-              date,
-              time: start_time
-            });
-        } catch (waError) {
-            console.error('Failed to send WhatsApp notification:', waError);
-        }
-    }
-
-    return NextResponse.json(booking, { status: 201 });
+    const communicationReceipts = await notifySavedBooking({ booking, court,
+      customerName: session.user.name, customerEmail: session.user.email,
+      customerPhone: session.user.phone });
+    return NextResponse.json({ ...booking.toObject(), communicationReceipts }, { status: 201 });
   } catch (error) {
     console.error('POST /api/bookings error:', error);
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });

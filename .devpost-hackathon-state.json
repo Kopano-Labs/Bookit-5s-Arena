@@ -3,13 +3,14 @@
   "project": "Bookit / FivesArena",
   "hackathon": null,
   "learning": {
-    "current_step": "checklist",
+    "current_step": "build",
     "completed_steps": [
-      "spec"
+      "spec",
+      "checklist"
     ],
     "checklist_file": "docs/hackathon-build/checklist.md"
   },
-  "document_status": "repair tracker and deployment checklist prepared; working visual-flow review required before launch",
+  "document_status": "build underway; native sandbox persistence and email receipts verified; full lifecycle and prelaunch visual review pending",
   "build_mode": "autonomous",
   "verification": "working visual flow review before launch",
   "next_command": "build-project"

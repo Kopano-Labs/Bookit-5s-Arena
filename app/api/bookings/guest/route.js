@@ -6,6 +6,7 @@ import Court from '@/models/Court';
 import { rateLimit } from '@/lib/rateLimit';
 import { verifyBotRequest } from '@/lib/security/botid';
 import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
+import { notifySavedBooking } from '@/lib/bookings/dispatchBookingCommunications';
 
 const toMinutes = (t) => {
   const [h, m] = t.split(':').map(Number);
@@ -118,7 +119,10 @@ export async function POST(request) {
       paymentStatus: 'reserved',
     });
 
-    return NextResponse.json(booking, { status: 201 });
+    const communicationReceipts = await notifySavedBooking({ booking, court,
+      customerName: booking.guestName, customerEmail: booking.guestEmail,
+      customerPhone: booking.guestPhone });
+    return NextResponse.json({ ...booking.toObject(), communicationReceipts }, { status: 201 });
   } catch (error) {
     console.error('POST /api/bookings/guest error:', error);
 

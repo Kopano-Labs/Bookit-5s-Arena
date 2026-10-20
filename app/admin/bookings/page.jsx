@@ -265,8 +265,10 @@ const AdminBookings = () => {
                         {bookings.map((b) => (
                           <tr key={b._id} className="border-b border-gray-800 last:border-0 hover:bg-gray-800/40 transition-colors">
                             <td className="px-5 py-4">
-                              <p className="font-semibold text-white">{b.user?.name ?? 'Unknown'}</p>
-                              <p className="text-xs text-gray-500 mt-0.5">{b.user?.email}</p>
+                              <p className="font-semibold text-white">{b.user?.name || b.guestName || 'Guest'}</p>
+                              <p className="text-xs text-gray-500 mt-0.5">{b.user?.email || b.guestEmail}</p>
+                              {b.guestPhone ? <p className="text-xs text-gray-400">{b.guestPhone}</p> : null}
+                              <p className="mt-1 font-mono text-xs text-gray-500">{b._id}</p>
                             </td>
                             <td className="px-5 py-4 text-gray-300 font-medium">{b.court?.name ?? 'Unknown'}</td>
                             <td className="px-5 py-4 text-gray-400">{b.date}</td>
