@@ -72,7 +72,7 @@ jobs:
       - name: Upload APU proof receipt
         if: always()
         continue-on-error: true
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: fivesarena-apu-proof-${{ github.sha }}
           path: .kpgs/receipts/apu-progressive-sync.json

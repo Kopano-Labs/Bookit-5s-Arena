@@ -45,6 +45,7 @@ const BookingSchema = new mongoose.Schema(
       enum: ['unpaid', 'paid', 'refunded', 'reserved'],
       default: 'unpaid',
     },
+    communicationRevision: { type: Number, default: 1, min: 1 },
     stripeSessionId: {
       type: String,
       default: null,

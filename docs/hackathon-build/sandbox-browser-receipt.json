@@ -1,0 +1,29 @@
+{
+  "observedAt": "2026-10-20T23:39:13.842Z",
+  "environment": "isolated loopback MongoDB and SMTP",
+  "browser": "Codex in-app browser",
+  "bookingReference": "6ad7fb6f8e00a01a47dbc86b",
+  "displayedReference": "47DBC86B",
+  "date": "2030-01-15",
+  "start_time": "18:00",
+  "total_price": 400,
+  "notificationReceipts": [
+    {
+      "recipientType": "user",
+      "status": "sent",
+      "provider": "sandbox-smtp"
+    },
+    {
+      "recipientType": "business",
+      "status": "sent",
+      "provider": "sandbox-smtp"
+    }
+  ],
+  "screen": null,
+  "limits": [
+    "Synthetic reservation only; no production data",
+    "Provider sent status is local SMTP acceptance, not external delivery/read",
+    "Browser confirmation observed at mobile viewport; accepted screenshot export, complete desktop and accessibility review still pending"
+  ],
+  "captureStatus": "Rejected: screenshot export produced blank PNG despite the visible confirmation and matching AX state"
+}
