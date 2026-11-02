@@ -32,7 +32,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.0",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/sandbox": "^1.9.3",
+    "@vercel/sandbox": "^3.9.1",
     "bcryptjs": "^3.0.3",
     "botid": "^1.5.11",
     "dotenv": "^17.3.1",
