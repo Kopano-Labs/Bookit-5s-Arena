@@ -7,7 +7,10 @@ import Court from '@/models/Court';
 import { rateLimit } from '@/lib/rateLimit';
 import { verifyBotRequest } from '@/lib/security/botid';
 import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
+import { bookingResponse } from '@/lib/bookings/bookingResponse';
+import { isValidBookingDateValue, isPastBookingDate, isElapsedStartTimeForDate } from '@/lib/bookingDates';
 import { notifySavedBooking } from '@/lib/bookings/dispatchBookingCommunications';
+import { createReservationWithClaims, readIdempotencyKey, reservationReplayIdentity, findReservationReplay, reservationError } from '@/lib/bookings/reservationOwnership';
 
 // GET /api/bookings — get all bookings for the logged-in user
 export async function GET() {
@@ -68,14 +71,11 @@ export async function POST(request) {
     }
 
     // Validate date format (YYYY-MM-DD)
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+    if (!isValidBookingDateValue(date)) {
       return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const bookingDate = new Date(date);
-    if (bookingDate < today) {
+    if (isPastBookingDate(date)) {
       return NextResponse.json({ error: 'Bookings cannot be in the past.' }, { status: 400 });
     }
 
@@ -91,6 +91,10 @@ export async function POST(request) {
     if (!court) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
     }
+    const { idempotencyKey, idempotencyFingerprint } = reservationReplayIdentity(
+      readIdempotencyKey(request), 'user:' + session.user.id, [courtId, date, start_time, duration, Boolean(payAtVenue)]);
+    const existing = await findReservationReplay(idempotencyKey, idempotencyFingerprint);
+    if (existing) return NextResponse.json(bookingResponse(existing, { replay: true }), { status: 200 });
 
     // Validate time window
     const toMinutes = (t) => {
@@ -110,6 +114,7 @@ export async function POST(request) {
 
     const newStart = toMinutes(start_time);
     const newEnd = newStart + duration * 60;
+    if (isElapsedStartTimeForDate(date, newStart)) return NextResponse.json({ error: 'This start time has passed.' }, { status: 400 });
 
     if (newStart < OPEN_MINUTES || newEnd > CLOSE_MINUTES) {
       return NextResponse.json(
@@ -118,45 +123,26 @@ export async function POST(request) {
       );
     }
 
-    // Check for overlapping bookings on the same court and date
-    const sameDayBookings = await Booking.find({
-      court: courtId,
-      date,
-      status: { $ne: 'cancelled' },
-    }).select('start_time duration');
-
-    const hasOverlap = sameDayBookings.some((b) => {
-      const existStart = toMinutes(b.start_time);
-      const existEnd = existStart + b.duration * 60;
-      return newStart < existEnd && newEnd > existStart;
-    });
-
-    if (hasOverlap) {
-      return NextResponse.json(
-        { error: 'This court is already booked during that time. Please choose a different slot.' },
-        { status: 409 }
-      );
-    }
-
     const total_price = court.price_per_hour * duration;
 
-    const booking = await Booking.create({
-      court: courtId,
-      user: session.user.id,
-      date,
-      start_time,
-      duration,
-      total_price,
-      status: 'pending',
-      paymentStatus: payAtVenue ? 'reserved' : 'unpaid',
+    const { booking, replayed } = await createReservationWithClaims({
+      court, date, start_time, duration, idempotencyKey, idempotencyFingerprint,
+      bookingFields: { user: session.user.id, total_price, status: 'pending', paymentStatus: payAtVenue ? 'reserved' : 'unpaid' },
     });
+
+    if (replayed) return NextResponse.json(bookingResponse(booking, { replay: true }), { status: 200 });
 
     const communicationReceipts = await notifySavedBooking({ booking, court,
       customerName: session.user.name, customerEmail: session.user.email,
       customerPhone: session.user.phone });
-    return NextResponse.json({ ...booking.toObject(), communicationReceipts }, { status: 201 });
+    return NextResponse.json({ ...bookingResponse(booking), communicationReceipts }, { status: 201 });
   } catch (error) {
+    const handled = reservationError(error);
+    if (handled) return NextResponse.json({ error: handled.error }, { status: handled.status });
     console.error('POST /api/bookings error:', error);
+    if (error?.code === 'BOOKING_SLOT_TAKEN') {
+      return NextResponse.json({ error: 'This court is already booked during that time. Please choose a different slot.' }, { status: 409 });
+    }
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
   }
 }

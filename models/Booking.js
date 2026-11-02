@@ -46,6 +46,14 @@ const BookingSchema = new mongoose.Schema(
       default: 'unpaid',
     },
     communicationRevision: { type: Number, default: 1, min: 1 },
+    // Client retries use an opaque key; it is never derived from customer data.
+    idempotencyKey: { type: String, default: undefined, trim: true, select: false },
+    idempotencyFingerprint: { type: String, default: undefined, select: false },
+    // Guest management tokens are hashed before persistence and may be revoked.
+    guestManagementTokenHash: { type: String, default: null, select: false },
+    guestManagementTokenExpiresAt: { type: Date, default: null },
+    guestManagementTokenRevokedAt: { type: Date, default: null },
+    guestManagementPermissions: { type: [String], enum: ['read', 'reschedule', 'cancel'], default: ['read', 'reschedule', 'cancel'] },
     stripeSessionId: {
       type: String,
       default: null,
@@ -67,8 +75,8 @@ const BookingSchema = new mongoose.Schema(
 );
 
 // ── Indexes ─────────────────────────────────────────────────────────────────
-// Prevent double bookings: same court, same date, same start_time
-BookingSchema.index({ court: 1, date: 1, start_time: 1 }, { unique: true });
+// Interval occupancy is enforced by BookingSlotClaim. The historical exact-start
+// index must be migrated separately before cancelled slots can be reused.
 
 // Fast lookup of all bookings for a user (GET /api/bookings sorts by date asc)
 BookingSchema.index({ user: 1, date: 1 });
@@ -78,6 +86,7 @@ BookingSchema.index({ court: 1, date: 1, status: 1 });
 
 // Admin dashboard — newest bookings first
 BookingSchema.index({ createdAt: -1 });
+BookingSchema.index({ idempotencyKey: 1 }, { unique: true, sparse: true, name: 'booking_idempotency_key' });
 
 // Paystack reference lookup (only documents with a non-empty ref participate)
 BookingSchema.index(

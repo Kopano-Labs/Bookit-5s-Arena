@@ -10,7 +10,7 @@ export default function CourtAvailabilityNotice() {
           <p className="text-xs font-black uppercase tracking-[0.2em] text-yellow-300">Five&apos;s Arena · Milnerton</p>
           <h2 className="mt-2 text-4xl font-black uppercase tracking-tight sm:text-6xl">Pick. Play. Book.</h2>
           <Link href="/book" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-yellow-300 px-6 text-sm font-black uppercase tracking-wide text-gray-950 transition hover:bg-yellow-200">
-            Book a pitch <span aria-hidden="true" className="ml-3 text-lg">→</span>
+            Book a court <span aria-hidden="true" className="ml-3 text-lg">→</span>
           </Link>
         </div>
       </div>

@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const localDate = () => {
-  const date = new Date();
-  const offset = date.getTimezoneOffset() * 60_000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Johannesburg' }).format(new Date());
 };
 
 const formatTime = (value) => {
@@ -26,6 +24,7 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [booking, setBooking] = useState(null);
+  const idempotencyAttempt = useRef(null);
 
   const court = useMemo(() => courts.find((item) => item.id === courtId), [courts, courtId]);
   const total = Number(court?.price || 0) * duration;
@@ -66,18 +65,23 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
     if (!court || !date || !time) return setError('Choose a court, date and time first.');
     setSaving(true);
     try {
+      const bookingInput = {
+        courtId,
+        date,
+        start_time: time,
+        duration,
+        guestName: details.name,
+        guestEmail: details.email,
+        guestPhone: details.phone,
+      };
+      const signature = JSON.stringify(bookingInput);
+      if (idempotencyAttempt.current?.signature !== signature) {
+        idempotencyAttempt.current = { signature, key: crypto.randomUUID() };
+      }
       const response = await fetch('/api/bookings/guest', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          courtId,
-          date,
-          start_time: time,
-          duration,
-          guestName: details.name,
-          guestEmail: details.email,
-          guestPhone: details.phone,
-        }),
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyAttempt.current.key },
+        body: JSON.stringify(bookingInput),
       });
       const result = await response.json();
       if (!response.ok) {

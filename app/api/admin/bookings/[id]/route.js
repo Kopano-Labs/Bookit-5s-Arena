@@ -4,6 +4,11 @@ export const dynamic = 'force-dynamic';
         import { requireRole } from '@/lib/roles';
         import dbConnect from '@/lib/mongodb';
         import Booking from '@/models/Booking';
+        import '@/models/Court';
+        import { bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
+        import { dispatchBookingCommunications } from '@/lib/bookings/dispatchBookingCommunications';
+        import { updateReservation, reservationError } from '@/lib/bookings/reservationOwnership';
+        import { bookingResponse } from '@/lib/bookings/bookingResponse';
 
             export async function PATCH(request, { params }) {
                     try {
@@ -27,15 +32,24 @@ export const dynamic = 'force-dynamic';
                         return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
                         }
 
-                        const booking = await Booking.findByIdAndUpdate(
-                        id,
-                        { status },
-                        { new: true }
-                        );
+                        const scope = await bookingScopeForAdmin(session);
+                        let booking = await Booking.findOne({ _id: id, ...scope }).populate('court');
 
                         if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
-                        return NextResponse.json(booking);
+                        const result = await updateReservation({ booking, changes: { status }, revokeGuestToken: status === 'cancelled' });
+                        booking = result.booking;
+                        const changed = result.changed;
+                        const communicationReceipts = changed ? await dispatchBookingCommunications({
+                          booking, court: booking.court,
+                          customerName: booking.guestName || 'Bookit player',
+                          customerEmail: booking.guestEmail,
+                          customerPhone: booking.guestPhone,
+                          purpose: 'reservation_notice',
+                        }) : [];
+                        return NextResponse.json({ ...bookingResponse(booking), communicationReceipts });
                     } catch (error) {
+                const handled = reservationError(error);
+                if (handled) return NextResponse.json({ error: handled.error }, { status: handled.status });
                 console.error('Update booking error:', error);
                 return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
             }

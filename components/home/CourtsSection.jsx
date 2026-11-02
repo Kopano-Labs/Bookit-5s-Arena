@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { FaFutbol, FaArrowRight, FaChevronLeft, FaChevronRight, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
 import { normalizeAvailabilityLabel } from '@/lib/bookingSlots';
 import { courtImageFallbackUrl, courtImageUrl, normalizeCourtImageFilename } from '@/lib/courtImage';
+import BookingFallback from '@/components/booking/BookingFallback';
 
 // ─── Court Card ──────────────────────────────────────────────────────────────
 
 function CourtCard({ court, index }) {
+  const bookingHref = court.bookingHref || `/book?courtId=${encodeURIComponent(String(court._id))}`;
   const imageSrc = courtImageUrl(court.image);
   const imageFallback = courtImageFallbackUrl(normalizeCourtImageFilename(court.image));
 
@@ -25,7 +27,6 @@ function CourtCard({ court, index }) {
       }}
     >
       <div
-        onClick={() => window.location.href = `/courts/${court._id}`}
         className="group block relative overflow-hidden rounded-2xl border border-gray-700/50 backdrop-blur-sm cursor-pointer
           transition-all duration-500
           hover:border-yellow-600/60
@@ -65,7 +66,7 @@ function CourtCard({ court, index }) {
                   animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <span className="text-[9px] uppercase tracking-wider text-green-400 font-bold">View Slots</span>
+                <span className="text-[9px] uppercase tracking-wider text-green-400 font-bold">{court.galleryOnly ? 'Explore court' : 'Check times'}</span>
               </div>
             </>
           ) : (
@@ -100,22 +101,22 @@ function CourtCard({ court, index }) {
                 <FaMapMarkerAlt className="text-yellow-600/70" size={10} /> Milnerton
               </span>
             )}
-            <span className="flex items-center gap-1">
+            {!court.galleryOnly ? <span className="flex items-center gap-1">
               <FaClock className="text-yellow-600/70" size={10} /> {normalizeAvailabilityLabel(court.availability)}
-            </span>
+            </span> : null}
           </div>
 
           {/* Price + CTA */}
           <div className="flex items-center justify-between">
-            <div>
+            {!court.galleryOnly ? <div>
               <span className="text-xs font-bold uppercase tracking-wider text-gray-500 block">From</span>
               <span className="text-3xl font-black text-yellow-500" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 R{court.price_per_hour}
               </span>
               <span className="text-gray-500 text-xs font-bold uppercase"> /hr</span>
-            </div>
+            </div> : <span className="text-xs text-gray-400">Choose a date for current times and prices.</span>}
             <Link
-              href={`/courts/${court._id}`}
+              href={bookingHref}
               onClick={(e) => e.stopPropagation()}
             >
               <motion.span
@@ -127,7 +128,7 @@ function CourtCard({ court, index }) {
                   boxShadow: '0 0 20px var(--glow), 0 4px 15px rgba(0,0,0,0.3)',
                 }}
               >
-                BOOK NOW <FaArrowRight size={10} />
+                {court.galleryOnly ? 'CHECK BOOKING' : 'BOOK NOW'} <FaArrowRight size={10} />
               </motion.span>
             </Link>
           </div>
@@ -308,6 +309,7 @@ export default function CourtsSection({ courts = [] }) {
           <p className="text-gray-400 max-w-md mx-auto text-sm leading-relaxed">
             All courts are floodlit, all-weather synthetic turf pitches at Hellenic Football Club, Milnerton.
           </p>
+          <BookingFallback />
         </motion.div>
 
         {courts.length === 0 ? (
