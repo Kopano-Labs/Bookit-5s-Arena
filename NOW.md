@@ -1,3 +1,17 @@
+# Bookit correction handoff — 3 November 2026
+
+Owner rejected the current candidate preview: gallery photo cards looked bookable even though `/api/courts` returned an empty inventory and `/book` could not proceed. The preview was misleading. Do not present deployment-ready metadata as a completed booking path.
+
+Current local source is the recovery checkpoint `373065f48b083ace004fde34064d99a4219a6ba5` plus an uncommitted correction to the courts gallery, homepage inventory summary, empty `/book` page, single booking-help disclosure, a read-only inventory inspection script, and this handoff. It removes synthetic photo IDs and fake booking links; live court records alone carry the book-now action and their actual stored address. The empty `/book` state no longer duplicates the photo gallery.
+
+Local verification on 3 November: 14 focused unit tests, TypeScript, targeted ESLint and production build pass. The production build reports its expected missing MongoDB configuration diagnostic at homepage generation. Local production-server HTTP returned 200 for `/` and `/book`; it showed the four original court photo names, no booking links inside the gallery, no “CHECK BOOKING” text, and one Setmore fallback per page. `/book` showed “Booking is temporarily unavailable” because this local process had no MongoDB URI. This verifies the corrected presentation only.
+
+The prior deployed preview still showed empty court inventory, so no customer booking or operator receipt exists. The latest source is not yet published or deployed in this checkpoint. Publish only through the already authorized draft PR #55. Then inspect the exact fresh preview URL/commit and compare runtime behavior. Do not claim a native journey pass without real intended court records, an idempotent customer reservation, an authenticated operator retrieval with matching fields, and evidence of both customer and venue delivery. No production cutover, live inventory write, sample seed, or external customer message.
+
+Read-only inventory preflight: `node scripts/inspect-bookit-inventory.mjs`. It uses only the explicitly provided process environment URI, issues reads only, prints no credentials/raw owner ID/guest booking data, and refuses to connect if none is configured. Do not run it on an unverified production target.
+
+---
+
 # Native Bookit recovery — 2 November 2026
 
 Owner direction: finish the native Bookit system rebuilt after Setmore, preserving the native redesign and arena operations backend. This candidate restores the later October repair checkpoint onto PR #51's published base, rather than starting another booking UI.

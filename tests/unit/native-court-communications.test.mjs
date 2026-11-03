@@ -10,7 +10,8 @@ test('empty inventory retains the four original photos without fake bookable IDs
   assert.equal(new Set(venueCourtPhotos.map(card => card.image)).size, 4);
   for (const card of cards) {
     assert.equal(card.galleryOnly, true); assert.equal(card.price_per_hour, undefined);
-    assert.equal(card.availability, undefined); assert.equal(card.bookingHref, '/book');
+    assert.equal(card.availability, undefined); assert.equal(card._id, undefined);
+    assert.equal(card.bookingHref, undefined);
   }
 });
 

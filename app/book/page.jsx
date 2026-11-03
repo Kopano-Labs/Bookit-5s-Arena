@@ -3,8 +3,6 @@ import connectDB from '@/lib/mongodb';
 import Court from '@/models/Court';
 import { courtImageUrl, normalizeCourtImageFilename } from '@/lib/courtImage';
 import BookingFallback from '@/components/booking/BookingFallback';
-import CourtsSection from '@/components/home/CourtsSection';
-import { courtShowcase } from '@/lib/venueCourtPhotos';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,12 +54,11 @@ export default async function BookPage({ searchParams }) {
         ) : (
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 text-center sm:p-14">
             <p className="text-5xl" aria-hidden="true">⚽</p>
-            <h2 className="mt-4 text-xl font-black uppercase">{available ? 'Courts are not online yet' : 'Booking is temporarily unavailable'}</h2>
-            <p className="mt-2 text-sm text-gray-400">Use our backup calendar or contact the arena while online times are unavailable.</p>
+            <h2 className="mt-4 text-xl font-black uppercase">{available ? 'Online booking is not available yet' : 'Booking is temporarily unavailable'}</h2>
+            <p className="mt-2 text-sm text-gray-400">No live court inventory is available for booking here right now.</p>
           </div>
         )}
         <BookingFallback />
-        {!courts.length ? <CourtsSection courts={courtShowcase()} /> : null}
       </section>
     </main>
   );
