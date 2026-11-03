@@ -11,8 +11,9 @@ The owner rejected a preview where four court photographs were given identical b
 - The current repair source is draft PR #55, branch `forge/native-bookit-recovery-20261102`, based on that native branch. This recovery consolidates the relevant saved October checkpoint; it is not proof that it matches the owner’s current Windows worktree.
 - The 2 November Vercel email’s deployment was Dependabot commit `26f55c2`, not the native repair. The repaired candidate deployment previously inspected was `dpl_Bya8eQAMHpYrfCRbRb1ggUepaWHC`.
 - In the preview that was inspected, `/api/courts` returned HTTP 200 and an empty list with `database-empty`. `/book` displayed “Courts are not online yet”. No reservation or operator-side saved booking was produced.
-- The local source now available here is the previously published Codex recovery checkpoint at `373065f48b083ace004fde34064d99a4219a6ba5`, plus the correction in this document. It does not establish that this is the exact contents of the owner's Windows worktree.
+- The corrected source was published to draft PR #55 at `91c50703a9f6e0891be034878b165fa46814fe02`; this recovers the native Codex booking branch but does not establish that it matches the owner's current Windows worktree.
 - Four local image assets are presentation-only. No confirmed mapping from those photographs to current Mongo court IDs, rates, operating hours, ownership, or current offline reservations has been recovered. Existing historical data is not authority to seed or mutate live inventory.
+- Google Contacts search found no saved Five's Arena contact. The public Arena page lists WhatsApp `063 782 0245` and `fivearena@gmail.com` ([booking/contact page](https://www.fivesarena.com/book)); no message was sent.
 
 ## Correction in this candidate
 
@@ -26,7 +27,17 @@ The owner rejected a preview where four court photographs were given identical b
 
 Local verification on 3 November 2026: 14 focused unit tests pass, `npm run typecheck` passes, targeted ESLint passes, and `npm run build` completes. Build logs retain the expected missing MongoDB configuration diagnostic during homepage generation. A local production-server HTTP smoke returned 200 for `/` and `/book`; the homepage rendered the four original court photo names twice (responsive desktop/mobile copies), zero booking links inside the court gallery, no “CHECK BOOKING” text, one Setmore link, and an unavailable court feed. `/book` rendered no repeated gallery, one booking-help disclosure and one Setmore link; without a configured local database URI it rendered “Booking is temporarily unavailable”. This is local presentation evidence only. The local server had no MongoDB URI, so this does not establish current Vercel behavior, inventory, booking persistence, operator retrieval, or message delivery.
 
-A deployed preview HTTP response is runtime evidence only for the pages and APIs actually exercised. Neither local rendering nor deployment metadata proves a successful customer-to-operator booking journey.
+## Deployed preview receipt — commit `91c5070`
+
+Vercel deployment `dpl_GDEUvfTXJsceRd7jsskH5opajmUz` reached `READY` for commit `91c50703a9f6e0891be034878b165fa46814fe02`. Its exact returned alias is `https://bookit-5s-arena-git-forge-native-c6ebd3-robynawesomes-projects.vercel.app`.
+
+- `GET /`: HTTP 200. Four original court photo names render; the visible court section is `OUR COURTS`; there are no `CHECK BOOKING` claims or `/book?courtId=` links from those gallery photos. The inventory summary renders `UNAVAILABLE` / `NOT VERIFIED`. One collapsed booking-help disclosure contains one Setmore anchor.
+- `GET /book`: HTTP 200. It says “Online booking is not available yet”, shows no repeated court gallery, and contains one booking-help disclosure with one Setmore anchor.
+- `GET /api/courts`: HTTP 200, body `[]`, header `X-FivesArena-Data-State: database-empty`.
+- `GET /api/availability?date=2026-11-04`: HTTP 200, empty `courts` array. `GET /api/availability?date=2026-02-31`: HTTP 400.
+- Unauthenticated `GET /api/admin/bookings`: HTTP 401. No authenticated operator retrieval was possible without an actual booking reference and session.
+
+The smallest customer-to-operator journey stops before submission: no real court ID is present to select. No booking POST, saved reservation, overlap/idempotency runtime check, operator retrieval, or customer/venue delivery was attempted or claimed. The new preview verifies that the misleading UI is corrected; it does not unblock native booking.
 
 Acceptance requires all of the following receipts against the intended preview and verified isolated data target:
 
