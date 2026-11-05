@@ -17,7 +17,7 @@ export async function GET() {
   try {
     const session = await getAuthSession();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
     }
 
@@ -52,7 +52,7 @@ export async function POST(request) {
 
     const session = await getAuthSession();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'You must be logged in to book a court' }, { status: 401 });
     }
 

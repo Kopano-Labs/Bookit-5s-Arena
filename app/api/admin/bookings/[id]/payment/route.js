@@ -1,20 +1,18 @@
 export const dynamic = 'force-dynamic';
 import { getAuthSession } from '@/lib/getSession';
-import { requireRole } from '@/lib/roles';
 import dbConnect from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import { updateReservation, reservationError } from '@/lib/bookings/reservationOwnership';
 import { bookingResponse } from '@/lib/bookings/bookingResponse';
 import '@/models/Court';
-import { bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
-import { dispatchBookingCommunications } from '@/lib/bookings/dispatchBookingCommunications';
+import { bookingAdminAccessError, bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
+import { notifySavedBooking } from '@/lib/bookings/dispatchBookingCommunications';
 
 export async function PATCH(request, { params }) {
   try {
   const session = await getAuthSession();
-  if (!requireRole(session, 'admin')) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const accessError = await bookingAdminAccessError(session, 'payment');
+  if (accessError) return accessError;
   await dbConnect();
   const { paymentStatus } = await request.json();
 
@@ -37,7 +35,7 @@ export async function PATCH(request, { params }) {
   const result = await updateReservation({ booking, changes: { paymentStatus } });
   booking = result.booking;
   const changed = result.changed;
-  const communicationReceipts = changed ? await dispatchBookingCommunications({
+  const communicationReceipts = changed ? await notifySavedBooking({
     booking, court: booking.court, customerName: booking.guestName || 'Bookit player',
     customerEmail: booking.guestEmail, customerPhone: booking.guestPhone, purpose: 'payment_receipt',
   }) : [];

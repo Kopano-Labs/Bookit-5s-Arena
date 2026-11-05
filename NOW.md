@@ -1,3 +1,9 @@
+# Bookit native integration — 5 November 2026
+
+Continue draft PR #55 and issue #42. This slice connects signed-in players to their account booking path, enforces the existing court booking grants on operator APIs, and repairs the invalid MongoDB index that blocked saves in the isolated replica set. See [build notes](docs/hackathon-build/build-notes.md) for the local browser, API, storage and SMTP evidence.
+
+Release hold remains. Confirm the intended deployment database, the four real court records and their ownership, venue role assignments, legacy indexes, and the active Setmore calendar before any native cutover. Keep local receipts, preview checks, and production evidence separate.
+
 # Bookit correction handoff — 3 November 2026
 
 Owner rejected the current candidate preview: gallery photo cards looked bookable even though `/api/courts` returned an empty inventory and `/book` could not proceed. The preview was misleading. Do not present deployment-ready metadata as a completed booking path.

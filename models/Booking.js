@@ -101,7 +101,7 @@ BookingSchema.index(
 
 BookingSchema.index(
   { paystackLastEventId: 1 },
-  { sparse: true, partialFilterExpression: { paystackLastEventId: { $gt: '' } } },
+  { partialFilterExpression: { paystackLastEventId: { $gt: '' } } },
 );
 
 // In dev, hot-reload can leave a stale model in mongoose.models with the old schema.

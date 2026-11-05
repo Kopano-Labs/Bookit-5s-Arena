@@ -1,20 +1,19 @@
 export const dynamic = 'force-dynamic';
         import { NextResponse } from 'next/server';
         import { getAuthSession } from '@/lib/getSession';
-        import { requireRole } from '@/lib/roles';
         import dbConnect from '@/lib/mongodb';
         import Booking from '@/models/Booking';
         import '@/models/Court';
-        import { bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
-        import { dispatchBookingCommunications } from '@/lib/bookings/dispatchBookingCommunications';
+        import { bookingAdminAccessError, bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
+        import { notifySavedBooking } from '@/lib/bookings/dispatchBookingCommunications';
         import { updateReservation, reservationError } from '@/lib/bookings/reservationOwnership';
         import { bookingResponse } from '@/lib/bookings/bookingResponse';
 
             export async function PATCH(request, { params }) {
                     try {
                         const session = await getAuthSession();
-                        if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
-                        if (!requireRole(session, 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+                        const accessError = await bookingAdminAccessError(session, 'edit');
+                        if (accessError) return accessError;
 
                         await dbConnect();
 
@@ -39,7 +38,7 @@ export const dynamic = 'force-dynamic';
                         const result = await updateReservation({ booking, changes: { status }, revokeGuestToken: status === 'cancelled' });
                         booking = result.booking;
                         const changed = result.changed;
-                        const communicationReceipts = changed ? await dispatchBookingCommunications({
+                        const communicationReceipts = changed ? await notifySavedBooking({
                           booking, court: booking.court,
                           customerName: booking.guestName || 'Bookit player',
                           customerEmail: booking.guestEmail,

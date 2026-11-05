@@ -1,5 +1,15 @@
 # Bookit build notes
 
+## 5 November 2026 — native booking and operator rights
+
+Continued the existing native recovery draft from `8c82abcd`. The signed-in booking form now uses the account reservation route and links the saved reservation to personal history. Guests still use the guest route. The court booking APIs enforce the existing view, edit and payment grants alongside the draft's court ownership scope. Manage Bookings reports load errors and uses the saved server response for changes. Post-save communication errors do not convert a committed status or payment change into an apparent failed write.
+
+A disposable MongoDB replica set reproduced a reservation failure before the insert. `Booking.init()` rejected the Paystack event index because it used both sparse and partial options. Keeping the partial filter fixed initialization and preserved the non-empty event-ID predicate. No production index was changed or inspected in this run.
+
+Validation ran the real Next routes, Chromium, a disposable loopback MongoDB replica set and isolated SMTP capture. It covered a signed-in customer reserving through `/book`, independent database and operator readback, account history, analytics and cash totals, guest and venue receipts, access denials, retries, overlap, concurrent edits, cancellation and attempted reactivation. Chromium used a fixture session and bypassed Vercel's hosted BotID challenge locally. No inbox delivery, hosted booking or real court inventory is established by these checks.
+
+Release remains on hold until the target database and real court records are identified, operator assignments and historical indexes are verified, and the active Setmore calendar is reconciled. The analytics readback shows that native saves feed the existing analytics route; its broader scope and permissions still need review against the venue's operating roles.
+
 ## 20 October 2026 — checklist recovery
 
 Requested deliverable: consolidate all of the owner's requirements, including those stated in frustration, into the explicitly invoked build-checklist format. Continue the existing Bookit operation; this planning turn does not execute a production migration, send notifications or submit a booking.

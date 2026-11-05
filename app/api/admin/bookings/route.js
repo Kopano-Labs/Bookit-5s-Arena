@@ -1,18 +1,17 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/getSession';
-import { requireRole } from '@/lib/roles';
 import dbConnect from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import '@/models/Court';
 import '@/models/User';
-import { bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
+import { bookingAdminAccessError, bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
 
 export async function GET(request) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
-    if (!requireRole(session, 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const accessError = await bookingAdminAccessError(session, 'view');
+    if (accessError) return accessError;
 
     await dbConnect();
 

@@ -1,16 +1,15 @@
 export const dynamic = 'force-dynamic';
 import { getAuthSession } from '@/lib/getSession';
-import { requireRole } from '@/lib/roles';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import BookingDelivery from '@/models/BookingDelivery';
-import { bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
+import { bookingAdminAccessError, bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
 
 export async function GET(request, { params }) {
   try {
     const session = await getAuthSession();
-    if (!session) return Response.json({ error: 'Authentication required' }, { status: 401 });
-    if (!requireRole(session, 'admin')) return Response.json({ error: 'Forbidden' }, { status: 403 });
+    const accessError = await bookingAdminAccessError(session, 'view');
+    if (accessError) return accessError;
     const { id } = await params;
     if (!/^[a-fA-F0-9]{24}$/.test(id)) return Response.json({ error: 'Invalid booking ID' }, { status: 400 });
     await connectDB();

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 const localDate = () => {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Johannesburg' }).format(new Date());
@@ -12,6 +14,7 @@ const formatTime = (value) => {
 };
 
 export default function QuickBookExperience({ courts, initialCourtId = '' }) {
+  const { data: session, status: sessionStatus } = useSession();
   const [courtId, setCourtId] = useState(courts.some((item) => item.id === initialCourtId) ? initialCourtId : (courts[0]?.id || ''));
   const [date, setDate] = useState('');
   const [duration, setDuration] = useState(1);
@@ -58,11 +61,16 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
   }, [courtId, date, availabilityVersion]);
 
   const availableSlots = slots.filter((slot) => slot.availableDurations.includes(duration));
+  const slotSelected = availableSlots.some((slot) => slot.start_time === time);
+  const isGuest = sessionStatus === 'unauthenticated';
+  const accountId = sessionStatus === 'authenticated' ? session?.user?.id : null;
 
   const reserve = async (event) => {
     event.preventDefault();
     setError('');
-    if (!court || !date || !time) return setError('Choose a court, date and time first.');
+    if (saving || sessionStatus === 'loading') return;
+    if (!isGuest && !accountId) return setError('Your account could not be verified. Sign in again to book.');
+    if (!court || !date || !slotSelected || loadingSlots) return setError('Choose a court, date and available time first.');
     setSaving(true);
     try {
       const bookingInput = {
@@ -70,15 +78,17 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
         date,
         start_time: time,
         duration,
-        guestName: details.name,
-        guestEmail: details.email,
-        guestPhone: details.phone,
+        ...(isGuest ? {
+          guestName: details.name,
+          guestEmail: details.email,
+          guestPhone: details.phone,
+        } : { payAtVenue: true }),
       };
-      const signature = JSON.stringify(bookingInput);
+      const signature = JSON.stringify([accountId, bookingInput]);
       if (idempotencyAttempt.current?.signature !== signature) {
         idempotencyAttempt.current = { signature, key: crypto.randomUUID() };
       }
-      const response = await fetch('/api/bookings/guest', {
+      const response = await fetch(isGuest ? '/api/bookings/guest' : '/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyAttempt.current.key },
         body: JSON.stringify(bookingInput),
@@ -91,7 +101,8 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
         }
         throw new Error(result.error || 'Booking could not be saved. Try another time.');
       }
-      setBooking(result);
+      if (!result?._id) throw new Error('Bookit could not verify your reservation. Retry to check the same request.');
+      setBooking({ ...result, court, date, time, duration, isGuest });
     } catch (saveError) {
       setError(saveError.message || 'Booking could not be saved. Try again.');
     } finally {
@@ -103,18 +114,19 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
     return (
       <section className="overflow-hidden rounded-3xl border border-green-400/30 bg-gray-900">
         <div className="relative h-40 sm:h-56">
-          <img src={court.image} alt="" className="h-full w-full object-cover" />
+          <img src={booking.court.image} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent" />
           <div className="absolute bottom-5 left-6">
             <h2 className="mt-1 text-3xl font-black uppercase">Reservation saved</h2>
           </div>
         </div>
         <div className="grid gap-3 p-6 text-sm sm:grid-cols-4">
-          <p><span className="block text-xs uppercase text-gray-500">Court</span>{court.name}</p>
-          <p><span className="block text-xs uppercase text-gray-500">Date</span>{date}</p>
-          <p><span className="block text-xs uppercase text-gray-500">Kick-off</span>{formatTime(time)} · {duration}h</p>
+          <p><span className="block text-xs uppercase text-gray-500">Court</span>{booking.court.name}</p>
+          <p><span className="block text-xs uppercase text-gray-500">Date</span>{booking.date}</p>
+          <p><span className="block text-xs uppercase text-gray-500">Kick-off</span>{formatTime(booking.time)} · {booking.duration}h</p>
           <p><span className="block text-xs uppercase text-gray-500">Due at venue</span>R{booking.total_price}</p>
-          <p className="text-xs text-gray-400 sm:col-span-4">Reference {String(booking._id || '').slice(-8).toUpperCase()} · Pay at the venue.</p>
+          <p className="text-xs text-gray-400 sm:col-span-4">Reference {String(booking._id).slice(-8).toUpperCase()} · <span className="capitalize">{booking.status}</span> · Pay at the venue.</p>
+          {!booking.isGuest && <Link href="/bookings" className="text-sm font-semibold text-yellow-300 sm:col-span-4">View my bookings</Link>}
           <p role="status" className="text-xs text-gray-300 sm:col-span-4">
             {booking.communicationReceipts?.some(receipt => receipt.recipientType === 'user' && receipt.status === 'sent')
               ? 'Check your email for your reservation details.'
@@ -137,6 +149,7 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
             <button
               key={item.id}
               type="button"
+              disabled={saving}
               onClick={() => { setCourtId(item.id); setTime(''); }}
               aria-pressed={courtId === item.id}
               className={`group relative isolate flex min-h-48 items-end overflow-hidden rounded-2xl border p-4 text-left transition ${courtId === item.id ? 'border-yellow-300 ring-2 ring-yellow-300/50' : 'border-white/10 hover:border-white/40'}`}
@@ -157,10 +170,10 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
           <h2 className="text-sm font-black uppercase tracking-widest">02 <span className="ml-2">Pick date &amp; time</span></h2>
           <div className="flex items-center gap-2">
             <label className="sr-only" htmlFor="booking-date">Date</label>
-            <input id="booking-date" type="date" min={minDate} value={date} onChange={(event) => setDate(event.target.value)} className="min-h-10 rounded-lg border border-white/10 bg-gray-900 px-3 text-sm text-white" />
+            <input id="booking-date" type="date" min={minDate} value={date} disabled={saving} onChange={(event) => { setDate(event.target.value); setTime(''); }} className="min-h-10 rounded-lg border border-white/10 bg-gray-900 px-3 text-sm text-white" />
             <div className="flex rounded-lg border border-white/10 bg-gray-900 p-1" aria-label="Booking duration">
               {[1, 2, 3].map((hours) => (
-                <button key={hours} type="button" onClick={() => setDuration(hours)} aria-pressed={duration === hours} className={`rounded-md px-2.5 py-1.5 text-xs font-bold ${duration === hours ? 'bg-yellow-300 text-gray-950' : 'text-gray-400 hover:text-white'}`}>{hours}h</button>
+                <button key={hours} type="button" disabled={saving} onClick={() => setDuration(hours)} aria-pressed={duration === hours} className={`rounded-md px-2.5 py-1.5 text-xs font-bold ${duration === hours ? 'bg-yellow-300 text-gray-950' : 'text-gray-400 hover:text-white'}`}>{hours}h</button>
               ))}
             </div>
           </div>
@@ -172,7 +185,7 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
         {date && !loadingSlots && !slotError && availableSlots.length === 0 ? <p className="mt-4 text-sm text-gray-400">No {duration}-hour times open. Try another date or duration.</p> : null}
         <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
           {availableSlots.map((slot) => (
-            <button key={slot.start_time} type="button" onClick={() => { setTime(slot.start_time); setError(''); }} aria-pressed={time === slot.start_time} className={`min-h-11 rounded-lg border text-sm font-bold transition ${time === slot.start_time ? 'border-yellow-300 bg-yellow-300 text-gray-950' : 'border-white/10 bg-white/[0.04] text-white hover:border-yellow-300/60'}`}>
+            <button key={slot.start_time} type="button" disabled={saving || loadingSlots} onClick={() => { setTime(slot.start_time); setError(''); }} aria-pressed={time === slot.start_time} className={`min-h-11 rounded-lg border text-sm font-bold transition ${time === slot.start_time ? 'border-yellow-300 bg-yellow-300 text-gray-950' : 'border-white/10 bg-white/[0.04] text-white hover:border-yellow-300/60'}`}>
               {formatTime(slot.start_time)}
             </button>
           ))}
@@ -181,19 +194,25 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
 
       <form onSubmit={reserve} className="self-start rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6">
         <div className="flex items-start justify-between gap-4">
-          <div><h2 className="text-sm font-black uppercase tracking-widest">03 <span className="ml-2">Your details</span></h2><p className="mt-1 text-xs text-gray-500">Quick booking · no account needed</p></div>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-widest">03 <span className="ml-2">Your details</span></h2>
+            {isGuest && <p className="mt-1 text-xs text-gray-500">Quick booking · no account needed</p>}
+            {accountId && <p className="mt-1 text-sm text-gray-300">Booking as {session.user.name || session.user.email}</p>}
+            {sessionStatus === 'loading' && <p role="status" className="mt-1 text-xs text-gray-400">Checking your session…</p>}
+            {sessionStatus === 'authenticated' && !accountId && <p role="alert" className="mt-1 text-sm text-red-300">Sign in again to book with your account.</p>}
+          </div>
           <span className="text-right"><strong className="block text-2xl">R{total}</strong><span className="text-[10px] uppercase text-gray-500">Pay at venue</span></span>
         </div>
-        <div className="mt-5 space-y-3">
+        {isGuest && <fieldset disabled={saving} className="mt-5 space-y-3">
           <label className="sr-only" htmlFor="guest-name">Full name</label>
           <input id="guest-name" autoComplete="name" required minLength={2} maxLength={100} value={details.name} onChange={(event) => setDetails({ ...details, name: event.target.value })} placeholder="Your name" className="min-h-11 w-full rounded-lg border border-white/10 bg-gray-950 px-3 text-sm text-white placeholder:text-gray-600" />
           <label className="sr-only" htmlFor="guest-email">Email address</label>
           <input id="guest-email" type="email" autoComplete="email" required value={details.email} onChange={(event) => setDetails({ ...details, email: event.target.value })} placeholder="Email address" className="min-h-11 w-full rounded-lg border border-white/10 bg-gray-950 px-3 text-sm text-white placeholder:text-gray-600" />
           <label className="sr-only" htmlFor="guest-phone">Mobile number</label>
           <input id="guest-phone" type="tel" autoComplete="tel" required value={details.phone} onChange={(event) => setDetails({ ...details, phone: event.target.value })} placeholder="Mobile number" className="min-h-11 w-full rounded-lg border border-white/10 bg-gray-950 px-3 text-sm text-white placeholder:text-gray-600" />
-        </div>
+        </fieldset>}
         {error ? <p className="mt-3 text-sm text-red-300" role="alert">{error}</p> : null}
-        <button type="submit" disabled={!court || !date || !time || saving} className="mt-4 min-h-12 w-full rounded-xl bg-yellow-300 px-4 text-sm font-black uppercase tracking-wider text-gray-950 transition hover:bg-yellow-200 disabled:cursor-not-allowed disabled:opacity-40">
+        <button type="submit" disabled={!court || !date || !slotSelected || loadingSlots || saving || (!isGuest && !accountId)} className="mt-4 min-h-12 w-full rounded-xl bg-yellow-300 px-4 text-sm font-black uppercase tracking-wider text-gray-950 transition hover:bg-yellow-200 disabled:cursor-not-allowed disabled:opacity-40">
           {saving ? 'Saving…' : `Reserve court · R${total}`}
         </button>
         <p className="mt-3 text-center text-[11px] text-gray-500">Your slot is held when Bookit saves your booking.</p>
