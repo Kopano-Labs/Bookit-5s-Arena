@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaInfoCircle, FaCalendarAlt, FaStar, FaClock, FaMapMarkerAlt, FaFutbol } from 'react-icons/fa';
-import BookingForm from '@/components/BookingForm';
 import InfoTooltip from '@/components/InfoTooltip';
 import { normalizeAvailabilityLabel } from '@/lib/bookingSlots';
 
@@ -192,14 +191,25 @@ export default function CourtDetailClient({ court }) {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            <BookingForm
-              courtId={court._id}
-              courtName={court.name}
-              pricePerHour={court.price_per_hour}
-            />
+            <div className="mx-6 mb-6 rounded-2xl border border-gray-700 bg-gray-800/70 p-6">
+              <h2 className="text-xl font-black uppercase text-white">Check live court times</h2>
+              <p className="mt-3 text-sm leading-6 text-gray-300">
+                Choose the matching court in the current online booking calendar. Its available
+                dates, times, price and booking terms are shown there before you confirm.
+              </p>
+              <a
+                href="https://fivesarena.setmore.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-green-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white transition hover:bg-green-500"
+              >
+                Open court calendar
+              </a>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
     </motion.div>
   );
 }
+

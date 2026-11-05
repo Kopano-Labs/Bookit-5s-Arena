@@ -100,7 +100,7 @@ export default withAuth(
           "https://raw.githack.com",
           "https://raw.githubusercontent.com",
         ].join(' '),
-        "frame-src 'self' https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://vercel.live https://*.vercel.live",
+        "frame-src 'self' https://fivesarena.setmore.com https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://vercel.live https://*.vercel.live",
         "media-src 'self' https://www.youtube.com https://i.ytimg.com",
       ].join('; ')
     );

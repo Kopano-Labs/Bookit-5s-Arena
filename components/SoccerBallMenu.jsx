@@ -10,7 +10,7 @@ const MENU_ITEMS = [
   {
     icon: FaFutbol,
     label: 'Book a Court',
-    href: '/#courts',
+    href: '/book',
     color: '#22c55e',
     desc: 'Reserve your pitch',
   },
@@ -23,10 +23,10 @@ const MENU_ITEMS = [
   },
   {
     icon: FaTrophy,
-    label: 'Register for Tournament',
+    label: 'Arena Tournaments & Archive',
     href: '/tournament',
     color: '#eab308',
-    desc: 'World Cup 5s · 29–31 May 2026',
+    desc: '5s Arena leagues · historical archive',
   },
 ];
 
@@ -149,10 +149,10 @@ export default function SoccerBallMenu() {
                   >
                     <Icon size={18} style={{ color: item.color }} />
                   </motion.div>
-                    <div className="min-w-0 text-left">
-                      <p className="text-white text-sm font-black uppercase tracking-widest">{item.label}</p>
-                      <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider">{item.desc}</p>
-                    </div>
+                  <div className="min-w-0 text-left">
+                    <p className="text-white text-sm font-black uppercase tracking-widest">{item.label}</p>
+                    <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider">{item.desc}</p>
+                  </div>
                 </motion.button>
               );
             })}
@@ -221,3 +221,4 @@ export default function SoccerBallMenu() {
     </div>
   );
 }
+

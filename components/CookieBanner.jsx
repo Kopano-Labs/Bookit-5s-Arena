@@ -31,16 +31,16 @@ const CookieBanner = () => {
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-[9999] max-w-sm"
-      style={{ backdropFilter: 'blur(4px)' }}
+      className="fixed bottom-20 sm:bottom-4 left-3 right-3 sm:left-auto sm:right-4 z-[9999] sm:max-w-sm"
+      style={{ backdropFilter: 'blur(12px)' }}
     >
       <div className="max-w-4xl mx-auto">
         <div
-          className="bg-gray-900 border border-gray-700 rounded-2xl p-5 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4"
-          style={{ boxShadow: '0 -4px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(34,197,94,0.1)' }}
+          className="bg-gray-950/95 border border-gray-700 rounded-2xl p-4 sm:p-5 shadow-[0_10px_40px_rgba(0,0,0,0.8)] flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4"
+          style={{ boxShadow: '0 -4px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(34,197,94,0.2)' }}
         >
           {/* Icon */}
-          <div className="text-3xl flex-shrink-0">🍪</div>
+          <div className="text-2xl sm:text-3xl flex-shrink-0">🍪</div>
 
           {/* Text */}
           <div className="flex-1 min-w-0">
@@ -53,30 +53,30 @@ const CookieBanner = () => {
               />
             </p>
             <p className="text-gray-400 text-xs leading-relaxed">
-              5S Arena uses essential cookies to keep you logged in and remember your preferences. We also use analytics cookies to improve your experience on the pitch.{' '}
-              <Link href="/privacy" className="text-green-400 hover:text-green-300 underline">
+              5S Arena uses essential cookies for your session and preferences, plus anonymous analytics to improve the pitch experience.{' '}
+              <Link href="/privacy" className="text-green-400 hover:text-green-300 underline font-bold">
                 Privacy Policy
               </Link>
             </p>
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0 pt-2 sm:pt-0">
             <button
               onClick={decline}
-              className="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl transition-all uppercase tracking-widest"
+              className="flex-1 sm:flex-initial flex items-center justify-center min-h-[44px] px-4 py-2 text-xs font-bold text-gray-400 hover:text-white bg-gray-900 hover:bg-gray-800 border border-gray-700 rounded-xl transition-all uppercase tracking-widest cursor-pointer"
             >
               Decline
             </button>
             <button
               onClick={accept}
-              className="px-5 py-2 text-xs font-black text-white rounded-xl transition-all hover:scale-105 uppercase tracking-widest"
+              className="flex-1 sm:flex-initial flex items-center justify-center min-h-[44px] px-5 py-2 text-xs font-black text-white rounded-xl transition-all hover:scale-105 uppercase tracking-widest cursor-pointer"
               style={{
                 background: 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)',
                 boxShadow: '0 0 15px rgba(34,197,94,0.4)',
               }}
             >
-              Accept All
+              Accept
             </button>
           </div>
         </div>

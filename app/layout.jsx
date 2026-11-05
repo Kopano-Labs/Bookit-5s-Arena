@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import AuthProvider from "@/components/AuthProvider";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import TruthFooter from "@/components/TruthFooter";
 import ClientOnly from "@/components/ClientOnly";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { FeatureAccessProvider } from "@/hooks/useFeatureAccess";
@@ -28,9 +28,8 @@ export const metadata = {
     template: "%s | Bookit 5's Arena",
   },
   description:
-    "Book 5-a-side football at Cape Town's premier arena. Floodlit courts at Hellenic FC, Milnerton. Online booking from R400/hr.",
+    "Explore 5-a-side football at Hellenic FC, Milnerton, with source-qualified court booking, event enquiries, football fixtures and archived competition reference surfaces.",
   keywords: [
-    "World Cup 5s",
     "5-a-side football",
     "Cape Town",
     "Milnerton",
@@ -39,16 +38,28 @@ export const metadata = {
     "Hellenic Football Club",
     "Bookit 5's Arena",
     "Competition Hub",
+    "World Cup 5s archive",
   ],
-  authors: [{ name: "Bookit 5's Arena" }],
+  authors: [
+    { name: "Kholofelo Robyn Rababalela", url: "https://krrababalela.com" },
+    { name: "Bookit 5's Arena", url: "https://fivesarena.com" },
+  ],
+  creator: "Kholofelo Robyn Rababalela",
+  publisher: "Kopano Labs",
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": "/api/rss",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_ZA",
     url: process.env.NEXTAUTH_URL || "https://fivesarena.com",
     siteName: "Bookit 5's Arena",
-    title: "Bookit 5's Arena | World Cup 5s Football Cape Town",
+    title: "Bookit 5's Arena | 5-a-Side Football Cape Town",
     description:
-      "Elite 5-a-side football in Milnerton, Cape Town. Live competition standings, floodlit courts, and integrated fan experiences. Join the World Cup 5s today.",
+      "Explore 5-a-side football in Milnerton, Cape Town, including source-qualified booking surfaces, event enquiries and archived competition reference.",
     images: [
       {
         url: "/icons/icon-512x512.png",
@@ -62,7 +73,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Bookit 5's Arena | Cape Town Football",
     description:
-      "Experience the World Cup 5s and real-time competition stats in Milnerton, Cape Town.",
+      "Explore 5-a-side football in Milnerton, Cape Town, with current-source booking surfaces and archived competition reference.",
   },
   robots: { index: true, follow: true },
 };
@@ -122,7 +133,6 @@ const RootLayout = ({ children }) => {
             __html: `(function(){try{var t=localStorage.getItem('5s_theme');var ok=t==='dark'||t==='light'||t==='crazy'||t==='read';if(ok){document.documentElement.classList.add(t);}}catch(e){}})();`,
           }}
         />
-        {/* Plausible Analytics — Lightweight & Privacy-focused */}
         <script
           defer
           data-domain="fivesarena.com"
@@ -144,10 +154,12 @@ const RootLayout = ({ children }) => {
               <main>
                 <PageTransition>{children}</PageTransition>
               </main>
-              <Footer />
-              {/* Fixed floating elements */}
-              <ScrollToTop />
-              <SoccerBallMenu />
+              <TruthFooter />
+              {/* Desktop-only secondary floaters — Enforcing One Persistent Control on Mobile */}
+              <div className="hidden md:block">
+                <ScrollToTop />
+                <SoccerBallMenu />
+              </div>
               <BottomNavbar />
               <NewsletterPopup />
               <CookieBanner />
