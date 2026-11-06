@@ -1,11 +1,14 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Booking from '@/models/Booking';
 import Court from '@/models/Court';
 import { rateLimit } from '@/lib/rateLimit';
 import { verifyBotRequest } from '@/lib/security/botid';
 import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
+import { bookingResponse } from '@/lib/bookings/bookingResponse';
+import { isValidBookingDateValue, isPastBookingDate, isElapsedStartTimeForDate } from '@/lib/bookingDates';
+import { notifySavedBooking } from '@/lib/bookings/dispatchBookingCommunications';
+import { createGuestManagementToken, createReservationWithClaims, readIdempotencyKey, reservationReplayIdentity, findReservationReplay, reservationError } from '@/lib/bookings/reservationOwnership';
 
 const toMinutes = (t) => {
   const [h, m] = t.split(':').map(Number);
@@ -40,14 +43,11 @@ export async function POST(request) {
     }
 
     // Validate date format (YYYY-MM-DD)
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
+    if (!isValidBookingDateValue(date)) {
       return NextResponse.json({ error: 'Invalid date format.' }, { status: 400 });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const bookingDate = new Date(date);
-    if (bookingDate < today) {
+    if (isPastBookingDate(date)) {
       return NextResponse.json({ error: 'Bookings cannot be in the past.' }, { status: 400 });
     }
 
@@ -69,11 +69,11 @@ export async function POST(request) {
     }
 
     // Basic email validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
+    if (typeof guestEmail !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
       return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
     }
     // Basic phone validation (South African: 10 digits or +27...)
-    if (!/^(\+27|0)[0-9]{9}$/.test(guestPhone.replace(/\s/g, ''))) {
+    if (typeof guestPhone !== 'string' || !/^(\+27|0)[0-9]{9}$/.test(guestPhone.replace(/\s/g, ''))) {
       return NextResponse.json({ error: 'Please enter a valid South African phone number.' }, { status: 400 });
     }
 
@@ -81,48 +81,55 @@ export async function POST(request) {
 
     const court = await Court.findById(courtId);
     if (!court) return NextResponse.json({ error: 'Court not found.' }, { status: 404 });
+    const { idempotencyKey, idempotencyFingerprint } = reservationReplayIdentity(
+      readIdempotencyKey(request), 'guest:' + guestEmail.trim().toLowerCase(), [courtId, date, start_time, duration, guestName.trim(), guestEmail.trim().toLowerCase(), guestPhone.replace(/\s/g, '')]);
+    const existing = await findReservationReplay(idempotencyKey, idempotencyFingerprint);
+    if (existing) return NextResponse.json(bookingResponse(existing, { replay: true }), { status: 200 });
 
     // Time validation
     const OPEN = 10 * 60;
     const CLOSE = 22 * 60;
     const newStart = toMinutes(start_time);
     const newEnd = newStart + duration * 60;
+    if (isElapsedStartTimeForDate(date, newStart)) return NextResponse.json({ error: 'This start time has passed.' }, { status: 400 });
     if (newStart < OPEN || newEnd > CLOSE) {
       return NextResponse.json({ error: 'Bookings must start at 10:00 and end by 22:00.' }, { status: 400 });
-    }
-
-    // Overlap check
-    const sameDayBookings = await Booking.find({ court: courtId, date, status: { $ne: 'cancelled' } }).select('start_time duration');
-    const hasOverlap = sameDayBookings.some((b) => {
-      const existStart = toMinutes(b.start_time);
-      const existEnd = existStart + b.duration * 60;
-      return newStart < existEnd && newEnd > existStart;
-    });
-    if (hasOverlap) {
-      return NextResponse.json({ error: 'This court is already booked during that time. Please choose a different slot.' }, { status: 409 });
     }
 
     const total_price = court.price_per_hour * duration;
 
     // Build booking — omit `user` so Mongoose uses schema default (null)
-    const booking = await Booking.create({
-      court: courtId,
-      guestName: guestName.trim(),
-      guestEmail: guestEmail.trim().toLowerCase(),
-      guestPhone: guestPhone.trim(),
-      date,
-      start_time,
-      duration,
-      total_price,
-      status: 'pending',
-      paymentStatus: 'reserved',
+    const management = createGuestManagementToken();
+    const { booking, replayed } = await createReservationWithClaims({
+      court, date, start_time, duration, idempotencyKey, idempotencyFingerprint,
+      bookingFields: {
+        guestName: guestName.trim(), guestEmail: guestEmail.trim().toLowerCase(), guestPhone: guestPhone.trim(),
+        total_price, status: 'pending', paymentStatus: 'reserved',
+        guestManagementTokenHash: management.hash,
+        guestManagementTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
     });
 
-    return NextResponse.json(booking, { status: 201 });
+    if (replayed) {
+      return NextResponse.json(bookingResponse(booking, { replay: true }), { status: 200 });
+    }
+
+    const communicationReceipts = await notifySavedBooking({ booking, court,
+      customerName: booking.guestName, customerEmail: booking.guestEmail,
+      customerPhone: booking.guestPhone, guestManagementToken: management.token });
+    // The opaque token is returned once to the originating customer flow and
+    // only its SHA-256 verifier is retained in MongoDB.
+    return NextResponse.json({ ...bookingResponse(booking), guestManagementToken: management.token, communicationReceipts },
+      { status: 201, headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
+    const handled = reservationError(error);
+    if (handled) return NextResponse.json({ error: handled.error }, { status: handled.status });
     console.error('POST /api/bookings/guest error:', error);
 
     // Provide a cleaner user-facing message
+    if (error?.code === 'BOOKING_SLOT_TAKEN') {
+      return NextResponse.json({ error: 'This court is already booked during that time. Please choose a different slot.' }, { status: 409 });
+    }
     if (error.name === 'ValidationError') {
       return NextResponse.json(
         { error: `Reservation could not be processed. Please try again or contact us via WhatsApp.` },

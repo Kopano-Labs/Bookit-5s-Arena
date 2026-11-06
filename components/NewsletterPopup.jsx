@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaEnvelope, FaFutbol } from "react-icons/fa";
 import {
@@ -9,19 +10,34 @@ import {
 } from "@/lib/popupPreferences";
 
 export default function NewsletterPopup() {
+  const pathname = usePathname();
+  // A full-screen marketing prompt must not interrupt a customer who is already
+  // choosing a court or using the live locality controls.
+  const uninterruptedJourney =
+    pathname === '/book' ||
+    pathname.startsWith('/book/') ||
+    pathname === '/admin' ||
+    pathname.startsWith('/admin/') ||
+    pathname === '/login' ||
+    pathname.startsWith('/login/') ||
+    pathname === '/role-select' ||
+    pathname.startsWith('/role-select/') ||
+    pathname === '/news' ||
+    pathname.startsWith('/news/');
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [dontShow, setDontShow] = useState(false);
 
   useEffect(() => {
+    if (uninterruptedJourney) return;
     const dismissedForever = localStorage.getItem(NEWSLETTER_POPUP_DISMISSED_KEY);
     const subscribed = localStorage.getItem(NEWSLETTER_POPUP_SUBSCRIBED_KEY);
     if (dismissedForever || subscribed) return;
 
     const timer = setTimeout(() => setShow(true), 20000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [uninterruptedJourney]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +68,7 @@ export default function NewsletterPopup() {
 
   return (
     <AnimatePresence>
-      {show && (
+      {show && !uninterruptedJourney && (
         <motion.div
           className="fixed inset-0 z-60 flex items-center justify-center px-4"
           initial={{ opacity: 0 }}

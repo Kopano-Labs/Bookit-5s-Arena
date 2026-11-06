@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/getSession';
 import { isSuperAdmin } from '@/lib/roles';
+import { resolveFeatureAccess } from '@/lib/features';
 import connectDB from '@/lib/mongodb';
 import FeatureAccess from '@/models/FeatureAccess';
 
@@ -29,27 +30,7 @@ export async function GET() {
 
     const result = {};
     for (const f of features) {
-      let enabled = f.defaultEnabled;
-
-      // Convert lean objects — .lean() turns Maps into plain objects
-      const roleOverrides = f.roleOverrides instanceof Map
-        ? Object.fromEntries(f.roleOverrides) : (f.roleOverrides || {});
-      const userOverrides = f.userOverrides instanceof Map
-        ? Object.fromEntries(f.userOverrides) : (f.userOverrides || {});
-
-      // Role override
-      if (activeRole in roleOverrides) {
-        enabled = roleOverrides[activeRole];
-      }
-
-      // User override takes highest priority (check by email and userId)
-      if (email && email in userOverrides) {
-        enabled = userOverrides[email];
-      } else if (userId && userId in userOverrides) {
-        enabled = userOverrides[userId];
-      }
-
-      result[f.featureKey] = enabled;
+      result[f.featureKey] = resolveFeatureAccess(f, { userId, activeRole, email });
     }
 
     return NextResponse.json(result);

@@ -52,3 +52,5 @@ stripe.exe
 
 .env*.local
 data/newsletter-subscribers.local.json
+
+.next-bookit-sandbox/

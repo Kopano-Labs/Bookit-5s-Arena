@@ -1,13 +1,19 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/getSession';
-import { requireRole } from '@/lib/roles';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import '@/models/Court';
-import { sendBookingConfirmation } from '@/lib/sendBookingConfirmation';
-import { sendResendConfirmation, isResendBookingConfirmationConfigured } from '@/lib/messaging/bookingResendConfirmation';
 import { isAllowedBookingStartTime } from '@/lib/bookingSlots';
+import { canManageBooking } from '@/lib/bookings/bookingAccess';
+import { notifySavedBooking } from '@/lib/bookings/dispatchBookingCommunications';
+import { updateReservation, reservationError } from '@/lib/bookings/reservationOwnership';
+import { bookingResponse } from '@/lib/bookings/bookingResponse';
+import { bookingDateTimeToInstant, isValidBookingDateValue, isPastBookingDate, isElapsedStartTimeForDate } from '@/lib/bookingDates';
+
+function privateResponse(body, options = {}) {
+  return NextResponse.json(body, { ...options, headers: { 'Cache-Control': 'private, no-store' } });
+}
 
 // GET /api/bookings/:id — fetch a single booking (owner or admin)
 export async function GET(request, { params }) {
@@ -16,30 +22,26 @@ export async function GET(request, { params }) {
 
     // Validate ObjectId format
     if (!/^[a-fA-F0-9]{24}$/.test(id)) {
-      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+      return privateResponse({ error: 'Invalid booking ID' }, { status: 400 });
     }
 
     const session = await getAuthSession();
 
-    if (!session) {
-      return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
-    }
-
     await connectDB();
-    const booking = await Booking.findById(id).populate('court');
+    let booking = await Booking.findById(id).select('+guestManagementTokenHash').populate('court');
 
     if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      return privateResponse({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.user.toString() !== session.user.id && !requireRole(session, 'admin')) {
-      return NextResponse.json({ error: 'Not authorised' }, { status: 403 });
+    if (!(await canManageBooking({ request, session, booking, action: 'read' }))) {
+      return privateResponse({ error: session ? 'Not authorised' : 'Guest management token required' }, { status: session ? 403 : 401 });
     }
 
-    return NextResponse.json(booking, { status: 200 });
+    return privateResponse(bookingResponse(booking), { status: 200 });
   } catch (error) {
     console.error('GET /api/bookings/:id error:', error);
-    return NextResponse.json({ error: 'Failed to fetch booking' }, { status: 500 });
+    return privateResponse({ error: 'Failed to fetch booking' }, { status: 500 });
   }
 }
 
@@ -50,48 +52,45 @@ export async function PUT(request, { params }) {
 
     // Validate ObjectId format
     if (!/^[a-fA-F0-9]{24}$/.test(id)) {
-      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+      return privateResponse({ error: 'Invalid booking ID' }, { status: 400 });
     }
 
     const session = await getAuthSession();
 
-    if (!session) {
-      return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
-    }
-
     await connectDB();
-    const booking = await Booking.findById(id).populate('court');
+    let booking = await Booking.findById(id).select('+guestManagementTokenHash').populate('court');
 
     if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      return privateResponse({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.user.toString() !== session.user.id) {
-      return NextResponse.json({ error: 'Not authorised' }, { status: 403 });
+    if (!(await canManageBooking({ request, session, booking, action: 'reschedule' }))) {
+      return privateResponse({ error: session ? 'Not authorised' : 'Guest management token required' }, { status: session ? 403 : 401 });
     }
+
+    if (booking.status === 'cancelled') return privateResponse({ error: 'Cancelled bookings cannot be rescheduled' }, { status: 409 });
 
     // Block edit within 8 hours of booking
-    const [h, m] = booking.start_time.split(':').map(Number);
-    const bookingDateTime = new Date(`${booking.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00`);
+    const bookingDateTime = bookingDateTimeToInstant(booking.date, booking.start_time);
     const hoursUntil = (bookingDateTime - new Date()) / (1000 * 60 * 60);
-    if (hoursUntil < 8) {
-      return NextResponse.json({ error: 'Cannot edit a booking within 8 hours of start time' }, { status: 400 });
+    if (!bookingDateTime || hoursUntil < 8) {
+      return privateResponse({ error: 'Cannot edit a booking within 8 hours of start time' }, { status: 400 });
     }
 
     const { date, start_time, duration } = await request.json();
 
     // Validate required fields
     if (!date || !start_time || !duration) {
-      return NextResponse.json({ error: 'Date, start time and duration are required' }, { status: 400 });
+      return privateResponse({ error: 'Date, start time and duration are required' }, { status: 400 });
     }
 
     // Validate date format (YYYY-MM-DD)
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
-      return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+    if (!isValidBookingDateValue(date) || isPastBookingDate(date)) {
+      return privateResponse({ error: 'Invalid date format' }, { status: 400 });
     }
 
     if (!isAllowedBookingStartTime(start_time, duration)) {
-      return NextResponse.json(
+      return privateResponse(
         { error: 'Start time must be on the hour and the booking must finish by 22:00' },
         { status: 400 }
       );
@@ -99,16 +98,17 @@ export async function PUT(request, { params }) {
 
     // Validate duration is an integer in allowed range
     if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
-      return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
+      return privateResponse({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
     }
 
     const toMinutes = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
     const OPEN = 10 * 60, CLOSE = 22 * 60;
     const newStart = toMinutes(start_time);
     const newEnd = newStart + duration * 60;
+    if (isElapsedStartTimeForDate(date, newStart)) return privateResponse({ error: 'This start time has passed.' }, { status: 400 });
 
     if (newStart < OPEN || newEnd > CLOSE) {
-      return NextResponse.json({ error: 'Bookings must start at 10:00 and end by 22:00' }, { status: 400 });
+      return privateResponse({ error: 'Bookings must start at 10:00 and end by 22:00' }, { status: 400 });
     }
 
     // Overlap check (exclude this booking)
@@ -126,54 +126,22 @@ export async function PUT(request, { params }) {
     });
 
     if (hasOverlap) {
-      return NextResponse.json({ error: 'This slot is already booked. Choose a different time.' }, { status: 409 });
+      return privateResponse({ error: 'This slot is already booked. Choose a different time.' }, { status: 409 });
     }
 
-    booking.date = date;
-    booking.start_time = start_time;
-    booking.duration = duration;
-    booking.total_price = booking.court.price_per_hour * duration;
-        await booking.save();
-
-          try {
-            let emailSent = false;
-            if (isResendBookingConfirmationConfigured()) {
-              const resendResponse = await sendResendConfirmation({
-                id: booking._id.toString(),
-                date: booking.date,
-                time: booking.start_time,
-                court: booking.court.name,
-                amount: booking.total_price,
-                type: 'update'
-              }, session.user.email);
-              
-              if (resendResponse.success) {
-                emailSent = true;
-              } else {
-                console.warn('Resend update email failed, falling back to Nodemailer:', resendResponse.error);
-              }
-            }
-      
-            if (!emailSent) {
-              await sendBookingConfirmation({
-                to: session.user.email,
-                name: session.user.name,
-                courtName: booking.court.name,
-                date: booking.date,
-                start_time: booking.start_time,
-                duration: booking.duration,
-                total_price: booking.total_price,
-                type: 'update',
-              });
-            }
-          } catch (emailError) {
-            console.error('Failed to send update email:', emailError);
-          }
-
-          return NextResponse.json(booking, { status: 200 });
+    ({ booking } = await updateReservation({ booking, changes: {
+      date, start_time, duration, total_price: booking.court.price_per_hour * duration,
+    } }));
+    const receipts = await notifySavedBooking({ booking, court: booking.court,
+      customerName: booking.guestName || session?.user?.name,
+      customerEmail: booking.guestEmail || session?.user?.email,
+      customerPhone: booking.guestPhone });
+    return privateResponse({ ...bookingResponse(booking), communicationReceipts: receipts }, { status: 200 });
   } catch (error) {
+    const handled = reservationError(error);
+    if (handled) return privateResponse({ error: handled.error }, { status: handled.status });
     console.error('PUT /api/bookings/:id error:', error);
-    return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
+    return privateResponse({ error: 'Failed to update booking' }, { status: 500 });
   }
 }
 
@@ -184,35 +152,33 @@ export async function DELETE(request, { params }) {
 
     // Validate ObjectId format
     if (!/^[a-fA-F0-9]{24}$/.test(id)) {
-      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+      return privateResponse({ error: 'Invalid booking ID' }, { status: 400 });
     }
 
     const session = await getAuthSession();
 
-    if (!session) {
-      return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
-    }
-
     await connectDB();
-    const booking = await Booking.findById(id);
+    let booking = await Booking.findById(id).select('+guestManagementTokenHash').populate('court');
 
     if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      return privateResponse({ error: 'Booking not found' }, { status: 404 });
     }
 
-    // Allow booking owner or admin to cancel
-    const isOwner = booking.user && booking.user.toString() === session.user.id;
-    const isAdmin = requireRole(session, 'admin');
-    if (!isOwner && !isAdmin) {
-      return NextResponse.json({ error: 'You are not authorised to cancel this booking' }, { status: 403 });
+    if (!(await canManageBooking({ request, session, booking, action: 'cancel' }))) {
+      return privateResponse({ error: session ? 'You are not authorised to cancel this booking' : 'Guest management token required' }, { status: session ? 403 : 401 });
     }
 
-    booking.status = 'cancelled';
-    await booking.save();
+    ({ booking } = await updateReservation({ booking, changes: { status: 'cancelled' }, revokeGuestToken: true }));
+    const receipts = await notifySavedBooking({ booking, court: booking.court,
+      customerName: booking.guestName || session?.user?.name,
+      customerEmail: booking.guestEmail || session?.user?.email,
+      customerPhone: booking.guestPhone, purpose: 'reservation_notice' });
 
-    return NextResponse.json({ message: 'Booking cancelled successfully' }, { status: 200 });
+    return privateResponse({ message: 'Booking cancelled successfully', communicationReceipts: receipts }, { status: 200 });
   } catch (error) {
+    const handled = reservationError(error);
+    if (handled) return privateResponse({ error: handled.error }, { status: handled.status });
     console.error('DELETE /api/bookings/:id error:', error);
-    return NextResponse.json({ error: 'Failed to cancel booking' }, { status: 500 });
+    return privateResponse({ error: 'Failed to cancel booking' }, { status: 500 });
   }
 }

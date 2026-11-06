@@ -1,17 +1,17 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/getSession';
-import { requireRole } from '@/lib/roles';
 import dbConnect from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import '@/models/Court';
 import '@/models/User';
+import { bookingAdminAccessError, bookingScopeForAdmin } from '@/lib/bookings/arenaAccess';
 
 export async function GET(request) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
-    if (!requireRole(session, 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const accessError = await bookingAdminAccessError(session, 'view');
+    if (accessError) return accessError;
 
     await dbConnect();
 
@@ -21,7 +21,7 @@ export async function GET(request) {
     const status = searchParams.get('status');
     const court = searchParams.get('court');
 
-    const match = {};
+    const match = await bookingScopeForAdmin(session);
     if (from || to) {
       match.date = {};
       if (from && /^\d{4}-\d{2}-\d{2}$/.test(from)) match.date.$gte = from;
@@ -31,7 +31,15 @@ export async function GET(request) {
     const allowedStatuses = ['pending', 'confirmed', 'cancelled'];
     if (status && allowedStatuses.includes(status)) match.status = status;
     // Validate court ObjectId format
-    if (court && /^[a-fA-F0-9]{24}$/.test(court)) match.court = court;
+    if (court && /^[a-fA-F0-9]{24}$/.test(court)) {
+      const allowedCourts = match.court?.$in;
+      if (allowedCourts && !allowedCourts.some((id) => String(id) === court)) {
+        // Keep the tenant scope when a caller supplies another arena's id.
+        match._id = { $exists: false };
+      } else {
+        match.court = court;
+      }
+    }
 
     const bookings = await Booking.find(match)
       .populate('court', 'name price_per_hour')

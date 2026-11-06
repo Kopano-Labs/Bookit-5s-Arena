@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { withBotId } from "botid/next/config";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.BOOKIT_SANDBOX === 'true' ? '.next-bookit-sandbox' : '.next',
   compress: true,
   // Type errors are gated explicitly in CI before the production build.
   typescript: { ignoreBuildErrors: true },

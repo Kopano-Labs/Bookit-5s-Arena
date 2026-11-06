@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { FaFilter, FaTimes, FaFutbol, FaCalendarAlt } from 'react-icons/fa';
@@ -23,6 +23,8 @@ const AdminBookings = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const canView = useFeatureAccess('admin.bookings.view');
+  const canEdit = useFeatureAccess('admin.bookings.edit');
+  const canMarkPaid = useFeatureAccess('admin.bookings.payment');
   const [activeTab, setActiveTab] = useState('courts');
 
   // Courts state
@@ -32,6 +34,9 @@ const AdminBookings = () => {
   const [toDate, setToDate] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [updating, setUpdating] = useState(null);
+  const [courtLoadError, setCourtLoadError] = useState('');
+  const [courtActionError, setCourtActionError] = useState('');
+  const courtRequest = useRef(null);
 
   // Events state
   const [events, setEvents] = useState([]);
@@ -43,15 +48,29 @@ const AdminBookings = () => {
   const [updatingEvent, setUpdatingEvent] = useState(null);
 
   // Fetch court bookings
-  const fetchBookings = useCallback(() => {
+  const fetchBookings = useCallback(async () => {
+    courtRequest.current?.abort();
+    const controller = new AbortController();
+    courtRequest.current = controller;
     const params = new URLSearchParams();
     if (fromDate) params.set('from', fromDate);
     if (toDate) params.set('to', toDate);
     if (statusFilter) params.set('status', statusFilter);
     setLoadingCourts(true);
-    fetch(`/api/admin/bookings?${params.toString()}`)
-      .then((res) => res.json())
-      .then((data) => { setBookings(Array.isArray(data) ? data : []); setLoadingCourts(false); });
+    setCourtLoadError('');
+    try {
+      const response = await fetch(`/api/admin/bookings?${params.toString()}`, { signal: controller.signal });
+      const data = await response.json();
+      if (!response.ok || !Array.isArray(data)) throw new Error(data?.error || 'Could not load court bookings.');
+      if (!controller.signal.aborted) setBookings(data);
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        setBookings([]);
+        setCourtLoadError(error.message || 'Could not load court bookings.');
+      }
+    } finally {
+      if (!controller.signal.aborted) setLoadingCourts(false);
+    }
   }, [fromDate, toDate, statusFilter]);
 
   // Fetch event bookings
@@ -70,38 +89,42 @@ const AdminBookings = () => {
   useEffect(() => {
     if (status === 'unauthenticated') { router.push('/login'); return; }
     if (status === 'authenticated' && session.user.activeRole !== 'admin') { router.push('/'); return; }
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && canView) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchBookings();
+    }
+    return () => courtRequest.current?.abort();
+  }, [status, session, router, canView, fetchBookings]);
+
+  useEffect(() => {
+    if (status === 'authenticated' && session.user.activeRole === 'admin' && canView) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchEvents();
     }
-  }, [status, session, router, fetchBookings, fetchEvents]);
+  }, [status, session, canView, fetchEvents]);
 
-  const handleStatusChange = async (bookingId, newStatus) => {
+  const updateCourtBooking = async (bookingId, field, value) => {
+    const isPayment = field === 'paymentStatus';
     setUpdating(bookingId);
-    await fetch(`/api/admin/bookings/${bookingId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus }),
-    });
-    setBookings((prev) =>
-      prev.map((b) => (b._id === bookingId ? { ...b, status: newStatus } : b))
-    );
-    setUpdating(null);
-  };
-
-  const handleMarkPaid = async (bookingId) => {
-    setUpdating(bookingId);
-    await fetch(`/api/admin/bookings/${bookingId}/payment`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentStatus: 'paid' }),
-    });
-    setBookings((prev) =>
-      prev.map((b) => (b._id === bookingId ? { ...b, paymentStatus: 'paid' } : b))
-    );
-    setUpdating(null);
+    setCourtActionError('');
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}${isPayment ? '/payment' : ''}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || 'Could not update the booking.');
+      const saved = isPayment ? data?.booking : data;
+      if (saved?._id !== bookingId || !saved[field]) throw new Error('Bookit could not verify the update. Refresh bookings to check.');
+      setBookings((prev) => prev.map((b) => (
+        b._id === bookingId ? { ...b, [field]: saved[field] } : b
+      )));
+    } catch (error) {
+      setCourtActionError(error.message || 'Could not update the booking.');
+    } finally {
+      setUpdating(null);
+    }
   };
 
   const handleEventStatusChange = async (eventId, newStatus) => {
@@ -234,9 +257,12 @@ const AdminBookings = () => {
               </div>
 
               {/* Court Bookings Table */}
+              {courtActionError && <p role="alert" className="text-sm text-red-400">{courtActionError}</p>}
               <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
                 {loadingCourts ? (
                   <p className="text-center py-16 text-green-400 animate-pulse">Loading bookings...</p>
+                ) : courtLoadError ? (
+                  <p role="alert" className="text-center py-16 text-red-400">{courtLoadError}</p>
                 ) : bookings.length === 0 ? (
                   <p className="text-center py-16 text-gray-600">No court bookings found.</p>
                 ) : (
@@ -265,8 +291,10 @@ const AdminBookings = () => {
                         {bookings.map((b) => (
                           <tr key={b._id} className="border-b border-gray-800 last:border-0 hover:bg-gray-800/40 transition-colors">
                             <td className="px-5 py-4">
-                              <p className="font-semibold text-white">{b.user?.name ?? 'Unknown'}</p>
-                              <p className="text-xs text-gray-500 mt-0.5">{b.user?.email}</p>
+                              <p className="font-semibold text-white">{b.user?.name || b.guestName || 'Guest'}</p>
+                              <p className="text-xs text-gray-500 mt-0.5">{b.user?.email || b.guestEmail}</p>
+                              {b.guestPhone ? <p className="text-xs text-gray-400">{b.guestPhone}</p> : null}
+                              <p className="mt-1 font-mono text-xs text-gray-500">{b._id}</p>
                             </td>
                             <td className="px-5 py-4 text-gray-300 font-medium">{b.court?.name ?? 'Unknown'}</td>
                             <td className="px-5 py-4 text-gray-400">{b.date}</td>
@@ -294,10 +322,10 @@ const AdminBookings = () => {
                                     {b.paymentStatus === 'paid' ? 'Cash Received' : b.paymentStatus === 'refunded' ? 'Refunded' : 'Awaiting Cash'}
                                   </span>
                                 </div>
-                                {b.paymentStatus !== 'paid' && b.paymentStatus !== 'refunded' && b.status !== 'cancelled' && (
+                                {canMarkPaid && b.paymentStatus !== 'paid' && b.paymentStatus !== 'refunded' && b.status !== 'cancelled' && (
                                   <button
-                                    onClick={() => handleMarkPaid(b._id)}
-                                    disabled={updating === b._id}
+                                    onClick={() => updateCourtBooking(b._id, 'paymentStatus', 'paid')}
+                                    disabled={Boolean(updating)}
                                     className="text-[10px] font-bold text-green-400 hover:text-green-300 border border-green-800/60 hover:border-green-600 rounded px-1.5 py-0.5 transition-all disabled:opacity-50"
                                   >
                                     Mark Paid
@@ -306,16 +334,17 @@ const AdminBookings = () => {
                               </div>
                             </td>
                             <td className="px-5 py-4">
-                              <select
-                                defaultValue={b.status}
-                                onChange={(e) => handleStatusChange(b._id, e.target.value)}
-                                disabled={updating === b._id}
+                              {canEdit && <select
+                                aria-label={`Status for booking ${b._id}`}
+                                value={b.status}
+                                onChange={(e) => updateCourtBooking(b._id, 'status', e.target.value)}
+                                disabled={Boolean(updating)}
                                 className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 transition-all"
                               >
                                 <option value="pending">Pending</option>
                                 <option value="confirmed">Confirmed</option>
                                 <option value="cancelled">Cancelled</option>
-                              </select>
+                              </select>}
                             </td>
                           </tr>
                         ))}

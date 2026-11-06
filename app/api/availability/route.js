@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Court from '@/models/Court';
+import { isValidBookingDateValue, isPastBookingDate, isElapsedStartTimeForDate } from '@/lib/bookingDates';
 import Booking from '@/models/Booking';
 import {
   BOOKING_CLOSE_HOUR,
@@ -44,7 +45,7 @@ export async function GET(request) {
     const date = searchParams.get('date');
     const courtId = searchParams.get('courtId');
 
-    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(date).getTime())) {
+    if (!isValidBookingDateValue(date)) {
       return NextResponse.json({ error: 'Query parameter date (YYYY-MM-DD) is required' }, { status: 400 });
     }
 
@@ -52,10 +53,7 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Invalid courtId' }, { status: 400 });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const bookingDate = new Date(date);
-    if (bookingDate < today) {
+    if (isPastBookingDate(date)) {
       return NextResponse.json({ error: 'date must be today or in the future' }, { status: 400 });
     }
 
@@ -95,6 +93,7 @@ export async function GET(request) {
 
         for (let hour = BOOKING_OPEN_HOUR; hour < BOOKING_CLOSE_HOUR; hour += 1) {
           const start_time = toHourStart(hour);
+          if (isElapsedStartTimeForDate(date, hour * 60)) continue;
           if (!isAllowedBookingStartTime(start_time, 1)) continue;
 
           const availableDurations = [];

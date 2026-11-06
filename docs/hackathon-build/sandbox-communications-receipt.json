@@ -1,0 +1,25 @@
+{
+  "observedAt": "2026-10-20T23:36:19.890Z",
+  "environment": "isolated loopback MongoDB and SMTP",
+  "bookingReference": "6ad7fa9c20b721d001c6b7a8",
+  "checks": [
+    "native guest HTTP save and independent MongoDB read match",
+    "customer and venue inboxes receive the same saved reference and truthful payment state",
+    "public availability reflects saved reservation",
+    "authorized operator API sees same booking; anonymous access rejected",
+    "native credentials signup persists and sends one welcome",
+    "parallel retries suppress duplicate customer and venue messages",
+    "first social signup welcomes once; later sign-in does not",
+    "explicit rejection can retry; ambiguous outcome is held; no duplicate booking",
+    "simulation and destinations outside sandbox allowlist cannot pass delivery",
+    "MongoDB process + Next restart retain booking and operator readback"
+  ],
+  "localInboxMessages": 4,
+  "productionWrites": 0,
+  "limits": [
+    "Local SMTP acceptance and captured inbox only; no external provider/inbox validation",
+    "Operator API verified; dashboard UI visual walkthrough pending",
+    "No overlap/idempotent-booking/lifecycle repair claim",
+    "No production inventory, cutover, deployment or human visual acceptance"
+  ]
+}

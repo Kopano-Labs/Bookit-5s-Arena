@@ -16,7 +16,7 @@ const [
 ] = await Promise.all([
   read('app/page.jsx'),
   read('components/TruthFooter.jsx'),
-  read('components/home/CourtAvailabilityNotice.jsx'),
+  read('components/booking/BookingFallback.jsx'),
   read('components/home/LivingOrganismSurface.tsx'),
   read('app/login/page.jsx'),
   read('components/SearchModal.jsx'),
@@ -52,10 +52,15 @@ for (const forbidden of [
   );
 }
 
-assert.match(home, /<CourtAvailabilityNotice\s*\/>/);
-assert.match(bookingFallback, /Book a court/i);
-assert.match(bookingFallback, /WhatsApp 5s Arena/i);
-assert.match(bookingFallback, /tel:\+27637820245/);
+assert.match(home, /<CourtsSection courts=\{courtShowcase\(courts\)\}/, 'four-photo presentation remains independent of booking inventory');
+assert.match(bookingFallback, /Backup booking calendar/i);
+assert.match(bookingFallback, /https:\/\/fivesarena\.setmore\.com\/book/);
+assert.doesNotMatch(bookingFallback, /<iframe/i, 'fallback never replaces the native booking screen');
+const courtCards = await read('components/home/CourtsSection.jsx');
+assert.match(courtCards, /href=\{bookingHref\}/, 'court card primary action enters native booking');
+assert.match(courtCards, /!court.galleryOnly/, 'gallery cards cannot publish unverified prices and hours');
+assert.match(footer, /wa\.me\/27637820245/, 'venue messaging remains available in the footer');
+assert.match(footer, /tel:\+27637820245/, 'venue phone remains available in the footer');
 assert.match(footer, /Book courts, arrange matches/);
 assert.doesNotMatch(footer, /World Cup 2026 Archive/i);
 assert.match(livingArena, /South Africa pulse/i);

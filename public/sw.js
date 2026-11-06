@@ -17,6 +17,7 @@ const PRIVATE_PREFIXES = [
   '/api/profile/',
   '/admin',
   '/bookings',
+  '/book/manage/',
   '/account',
   '/profile',
   '/checkout',
