@@ -95,3 +95,47 @@ CCP before/after review: current local source, historical 73b7ce1 files, plan/PR
 Final checks for this slice: production build exited 0 (72 static pages; expected missing-database diagnostic during homepage generation in the unconfigured build environment). Final npm run typecheck exited 0. Targeted lint exited 0 with the three recorded warnings. Full repository lint, external providers, production data and human acceptance were not validated. No whole checklist package is checked off.
 
 Screenshot verification correction: independent file readback revealed that browser screenshot exports were blank even though the live tool view and AX state displayed the saved reference. Rejected the images and removed the blank repository artifact. Alternate capture also failed. Browser/API/DB/SMTP proof remains valid; no accepted screenshot or final visual review is claimed.
+
+
+## 6 November 2026 — REV-01 reassessment and reconstructed guest management
+
+**Subject / desired human outcome:** A customer selects a real Hellenic court, books it and sees the same reservation in the existing governed operator backend.
+
+**Primary lane:** VALIDATE. **Deficit type:** KNOWLEDGE + PROOF. The native preview's first broken boundary is still inventory; more customer UI alone cannot populate the correct operational database.
+
+**Why this lane:** A fresh read of the exact `10e30d8d` preview at 04:45 SAST returned HTTP 200 `[]`, `X-FivesArena-Data-State: database-empty`. The Vercel MongoDB setting still spans production, preview and development without an explicit database path. No alternate database name has been established. Default selection may be intentional; it is not proof of a wrong target. A new direct read-only attempt failed with ECONNREFUSED before inventory discovery.
+
+**KMBP coverage:** Cloud repository/PR, current Vercel configuration/runtime, this Linux workspace and test receipts were inspected on 6 November. Bounded prior-conversation retrieval and a Drive Bookit state document (last updated 1 May) supplied no authoritative database/court mapping. Windows Local GSMB remains unavailable. A runtime workspace is not proof of the owner's Windows source state. `human_repair_required=true`: the owner supplied the outsider critique and requested this priority correction; post-correction recovery does not erase the earlier failure to deliver the hosted journey.
+
+**Known / MAYBE:** Inventory is empty through the preview's current public query. Guest APIs and transactional reservation code exist. Correct operational database, physical court mapping/owner, current schedules, Setmore reservations, preview isolation and legacy indexes remain MAYBE. Historical four-court fixtures are not live inventory.
+
+**Cheapest next action / accountable actor:** Fox Forge or the authorized local builder runs the existing read-only inventory command from a reachable environment and reconciles its output with the venue's backend. No new branch, product, paid dependency or synthetic live seed is justified.
+
+**Done when / stop rule:** Identify actual court IDs and owner mapping, reservation source and isolated preview write target; stop at missing access or contradictory inventory instead of changing database settings speculatively. One bounded discovery run (maximum 20 authorized databases) is enough to decide the next implementation. Full release still requires deployed customer/persistence/operator/availability/communication receipts and owner acceptance.
+
+**Evidence receipt / follow-up lane:** This entry, PR #55 and `guest-management-api-receipt-2026-11-06.json`. Follow-up EXECUTE only for a defect established by the inventory/policy evidence. No POC/FOC admission, RTC ruling or production release is asserted.
+
+**Outside-In Reality Check:** The supplied Chat Forge review observes an unusable hosted court journey; internal records show controlled local saves. The gap is operational inventory/integration plus unfinished lifecycle evidence. The independent test remains a real deployed customer-to-operator journey with matching saved reference. No inference about the owner's character or intent is warranted.
+
+### Completed candidate changes
+
+Reconstructed the interrupted guest management screen, confirmation link and customer-only receipt link using the existing read/reschedule/cancel API and token verifier. The token travels in a fragment, is removed from the address bar and retained only in tab-scoped browser storage for reloads. MongoDB stores the verifier; the venue email and delivery records do not receive the bearer token. Invalid, expired, wrong-booking, permission-limited and revoked tokens are tested. Reschedule conflicts preserve the saved reservation; cancellation releases capacity. Existing 8-hour edit policy and 30-day token expiry are unchanged.
+
+Customer API responses use private/no-store. First-party tracking and service-worker caching exclude the management page. Preview email links use the issuing Vercel deployment URL; a missing preview origin fails explicitly rather than producing a production link. This origin fix does not prove database isolation or bypass preview authentication.
+
+The existing inventory command now exposes selected database identity, optional authorized-database count discovery and booking index metadata without initializing models or writing to MongoDB. Its output contains no credentials, guest documents or raw owner IDs. Actual database names, collection names and court records still require private handling.
+
+Native CI now installs Chromium and requires the signed-in/operator and mobile guest browser assertions, with a receipt artifact uploaded when one exists. This is configured coverage, not a hosted CI pass.
+
+### Fresh validation and limits
+
+- 17 disposable MongoDB replica-set / real HTTP / local SMTP integration checks passed at 04:52 SAST. Player `D8F77BCD`, guest `D8F77BD1`, managed guest `D8F77BEE`. The inventory command also identified the selected fixture DB and indexes without creating data.
+- 16 focused unit tests passed. Typecheck passed after build completion. Targeted ESLint passed with two pre-existing image warnings.
+- An initial typecheck raced Next's regeneration of `.next/types` and failed with missing generated files. That validation scheduling error was corrected by running typecheck after the build; it was not attributed to application code.
+- Browser startup failed in this executor, so the new mobile form/reload/email-return/visual-state assertions are not counted as passed. No screenshot or mobile/desktop acceptance is claimed.
+- Final build/publication outcome is recorded in PR #55 after readback. Build metadata does not close runtime gates.
+- Lost/expired link reissue, crash between save and receipt dispatch, real inbox delivery, actual venue schedules, public tenant filtering, historical migration rehearsal, GitHub billing recovery and deployed end-to-end behavior remain open.
+
+### Continuity correction
+
+On resume, `git status` showed none of the 5 November guest edits and the new receipt was absent. The available workspace was the earlier published tree. This reconstruction is fresh work with fresh receipts; the PR's dated 5 November historical checkpoint remains preserved. Future handoffs must identify published commits and distinguish uncommitted workspace state from durable source.

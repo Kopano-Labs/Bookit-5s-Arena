@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { guestManagementPath } from '@/lib/bookings/guestManagementLink';
 
 const localDate = () => {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Johannesburg' }).format(new Date());
@@ -127,6 +128,9 @@ export default function QuickBookExperience({ courts, initialCourtId = '' }) {
           <p><span className="block text-xs uppercase text-gray-500">Due at venue</span>R{booking.total_price}</p>
           <p className="text-xs text-gray-400 sm:col-span-4">Reference {String(booking._id).slice(-8).toUpperCase()} · <span className="capitalize">{booking.status}</span> · Pay at the venue.</p>
           {!booking.isGuest && <Link href="/bookings" className="text-sm font-semibold text-yellow-300 sm:col-span-4">View my bookings</Link>}
+          {booking.isGuest && guestManagementPath(booking._id, booking.guestManagementToken) &&
+            <a href={guestManagementPath(booking._id, booking.guestManagementToken)} rel="noreferrer" className="text-sm font-semibold text-yellow-300 sm:col-span-4">Manage this reservation</a>}
+          {booking.isGuest && !booking.guestManagementToken && <p className="text-xs text-gray-300 sm:col-span-4">Use the private link in your original reservation email or saved confirmation to make changes. If you no longer have it, contact the venue with your reference.</p>}
           <p role="status" className="text-xs text-gray-300 sm:col-span-4">
             {booking.communicationReceipts?.some(receipt => receipt.recipientType === 'user' && receipt.status === 'sent')
               ? 'Check your email for your reservation details.'

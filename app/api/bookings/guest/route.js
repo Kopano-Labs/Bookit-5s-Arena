@@ -116,10 +116,11 @@ export async function POST(request) {
 
     const communicationReceipts = await notifySavedBooking({ booking, court,
       customerName: booking.guestName, customerEmail: booking.guestEmail,
-      customerPhone: booking.guestPhone });
+      customerPhone: booking.guestPhone, guestManagementToken: management.token });
     // The opaque token is returned once to the originating customer flow and
     // only its SHA-256 verifier is retained in MongoDB.
-    return NextResponse.json({ ...bookingResponse(booking), guestManagementToken: management.token, communicationReceipts }, { status: 201 });
+    return NextResponse.json({ ...bookingResponse(booking), guestManagementToken: management.token, communicationReceipts },
+      { status: 201, headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     const handled = reservationError(error);
     if (handled) return NextResponse.json({ error: handled.error }, { status: handled.status });

@@ -2,6 +2,38 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { courtShowcase, venueCourtPhotos } from '../../lib/venueCourtPhotos.js';
 import { buildReservationEmail } from '../../lib/messaging/bookingReservationEmail.js';
+import { guestManagementPath } from '../../lib/bookings/guestManagementLink.js';
+import { bookitOrigin } from '../../lib/messaging/transactionalEmail.js';
+
+test('preview receipt links return to their deployment rather than an inherited production URL', () => {
+  const original = { VERCEL_ENV: process.env.VERCEL_ENV, VERCEL_URL: process.env.VERCEL_URL, NEXTAUTH_URL: process.env.NEXTAUTH_URL };
+  try {
+    process.env.VERCEL_ENV = 'preview'; process.env.VERCEL_URL = 'bookit-fixture.vercel.app';
+    process.env.NEXTAUTH_URL = 'https://fivesarena.com';
+    assert.equal(bookitOrigin(), 'https://bookit-fixture.vercel.app');
+    delete process.env.VERCEL_URL;
+    assert.throws(() => bookitOrigin(), /Preview deployment origin/);
+    process.env.VERCEL_ENV = 'production'; assert.equal(bookitOrigin(), 'https://fivesarena.com');
+  } finally {
+    for (const [key, value] of Object.entries(original)) {
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    }
+  }
+});
+
+test('only a guest customer receives the private fragment link', () => {
+  const id = 'a'.repeat(24), token = 'b'.repeat(43);
+  const path = guestManagementPath(id, token);
+  assert.equal(path, `/book/manage/${id}#token=${token}`);
+  assert.equal(guestManagementPath(id, 'bad&token'), null);
+  assert.equal(guestManagementPath('../admin', token), null);
+  const booking = { _id: id, status: 'pending', date: '2030-01-01', start_time: '10:00' };
+  const args = { booking, court: { name: 'Court' }, guestManagementToken: token };
+  assert(buildReservationEmail({ ...args, recipientType: 'user' }).html.includes(path));
+  assert(!buildReservationEmail({ ...args, recipientType: 'business' }).html.includes(token));
+  assert(!buildReservationEmail({ ...args, recipientType: 'user', booking: { ...booking, user: 'player' } }).html.includes(token));
+  assert(!buildReservationEmail({ ...args, recipientType: 'user', booking: { ...booking, status: 'cancelled' } }).html.includes(token));
+});
 
 test('empty inventory retains the four original photos without fake bookable IDs, prices or slots', () => {
   const cards = courtShowcase();

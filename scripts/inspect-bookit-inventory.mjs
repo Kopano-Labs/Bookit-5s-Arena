@@ -15,6 +15,13 @@ if (!selected) {
 }
 
 const uri = process.env[selected];
+const args = process.argv.slice(2);
+const discover = args.includes('--discover');
+const positional = args.filter(arg => !arg.startsWith('--'));
+if (args.some(arg => arg.startsWith('--') && arg !== '--discover') || positional.length > 1) {
+  console.error('Usage: node scripts/inspect-bookit-inventory.mjs [--discover] [output.json]');
+  process.exit(2);
+}
 const fingerprint = value => createHash('sha256').update(value).digest('hex').slice(0, 12);
 let client;
 
@@ -49,20 +56,55 @@ try {
     unique: Boolean(index.unique),
     partialFilterExpression: index.partialFilterExpression || null,
   }));
+  const bookingIndexes = collections.bookings === null ? [] : (await db.collection('bookings').indexes()).map(index => ({
+    name: index.name, keys: index.key, unique: Boolean(index.unique), sparse: Boolean(index.sparse),
+    partialFilterExpression: index.partialFilterExpression || null,
+  }));
+  // Metadata/counts only: never initialize models, create collections, or read
+  // another database's customer documents. Discovery is explicitly opt-in.
+  let databaseCandidates = null;
+  let discoveryState = 'not-requested';
+  if (discover) {
+    try {
+      const result = await db.admin().listDatabases({ nameOnly: true, authorizedDatabases: true });
+      const names = result.databases.map(item => item.name).filter(name => !['admin', 'config', 'local'].includes(name));
+      databaseCandidates = [];
+      for (const name of names.slice(0, 20)) {
+        const candidate = client.db(name);
+        const collectionNames = (await candidate.listCollections({}, { nameOnly: true }).toArray()).map(item => item.name);
+        const counts = {};
+        for (const collection of ['courts', 'bookings', 'users']) {
+          counts[collection] = collectionNames.includes(collection)
+            ? await candidate.collection(collection).estimatedDocumentCount() : null;
+        }
+        databaseCandidates.push({ database: name, selected: name === db.databaseName, collectionNames, counts });
+      }
+      discoveryState = names.length > 20 ? 'partial-first-20' : 'complete-for-authorized-databases';
+    } catch (error) {
+      discoveryState = `unavailable-${error?.name || 'Error'}`;
+    }
+  }
   const parsed = new URL(uri);
   const target = parsed.hostname || 'unknown-host';
   const report = {
+    schemaVersion: 2,
+    observedAt: new Date().toISOString(),
     readOnly: true,
     configuredVariable: selected,
-    targetFingerprint: fingerprint(`${target}/${parsed.pathname}`),
+    selectedDatabase: db.databaseName,
+    uriHasExplicitDatabase: Boolean(parsed.pathname && parsed.pathname !== '/'),
+    targetFingerprint: fingerprint(`${target}/${db.databaseName}`),
     replicaSet: hello.setName || null,
     topology: hello.msg === 'isdbgrid' ? 'mongos' : hello.setName ? 'replica-set' : 'standalone',
     collections,
     courts: safeCourts,
     courtIndexes: indexes,
+    bookingIndexes,
+    discoveryState,
+    databaseCandidates,
     caveat: 'This report identifies data reachable through this URI; compare its target fingerprint with the intended deployment configuration before using the records.',
   };
-  const outputPath = process.argv[2];
+  const outputPath = positional[0];
   if (outputPath) {
     const destination = path.resolve(outputPath);
     await writeFile(destination, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', mode: 0o600, flag: 'wx' });

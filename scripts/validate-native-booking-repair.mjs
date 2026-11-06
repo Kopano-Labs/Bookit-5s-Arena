@@ -9,6 +9,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
+import { validateGuestManagement } from './guest-management-regression.mjs';
 
 const output = process.env.BOOKIT_REPAIR_RECEIPT || 'docs/hackathon-build/native-repair-receipt.json';
 const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'bookit-native-regression-'));
@@ -68,6 +69,7 @@ try {
   for (const key of Object.keys(env)) if (/^(RESEND|GMAIL|GOOGLE|FACEBOOK|WHATSAPP|SMS_|PAYSTACK|STRIPE)/.test(key)) env[key] = '';
   Object.assign(env, { MONGODB_URI: uri, MONGODB_DIRECT_URI: uri, MONGODB_URI_DIRECT: uri, DATABASE_URL: uri,
     NEXTAUTH_URL: origin, NEXTAUTH_SECRET: secret, AUTH_SECRET: secret, BOOKIT_SANDBOX: 'true',
+    VERCEL_ENV: 'development', VERCEL_URL: '',
     BOOKING_COMMUNICATIONS_ENABLED: 'false', NEXT_TELEMETRY_DISABLED: '1',
     BOOKIT_EMAIL_MODE: 'sandbox', BOOKIT_TEST_SMTP_PORT: String(smtp.address().port),
     BOOKIT_TEST_EMAIL_ALLOWLIST: 'guest@example.invalid,other@example.invalid,owner@example.invalid,player@example.invalid,venue@example.invalid',
@@ -105,7 +107,8 @@ try {
   let playerSave;
   if (process.env.BOOKIT_REPAIR_BROWSER) {
     const { chromium } = await import('playwright');
-    browser = await chromium.launch({ executablePath: process.env.BOOKIT_REPAIR_BROWSER });
+    browser = await chromium.launch(process.env.BOOKIT_REPAIR_BROWSER === 'playwright'
+      ? {} : { executablePath: process.env.BOOKIT_REPAIR_BROWSER });
     const context = await browser.newContext({ serviceWorkers: 'block' });
     await context.addInitScript(() => {
       localStorage.setItem('cookie_consent', 'declined');
@@ -301,9 +304,29 @@ try {
   assert.equal((await db.collection('bookings').findOne({ _id: moved._id })).status, 'cancelled');
   assert.equal(await db.collection('bookingslotclaims').countDocuments({ booking: moved._id }), 0);
   pass('Operator payment persists; cancellation releases capacity; conflicting reactivation rolls back');
+  const managedGuestId = await validateGuestManagement({ browser, request, db, inbox, origin, courtId, cookie, input, pass });
+  const preflightPath = path.join(dir, 'inventory.json');
+  const countBefore = await db.collection('bookings').countDocuments();
+  const namesBefore = (await db.listCollections({}, { nameOnly: true }).toArray()).map(row => row.name).sort();
+  const preflightExit = await new Promise((resolve, reject) => {
+    const preflight = spawn(process.execPath, ['scripts/inspect-bookit-inventory.mjs', '--discover', preflightPath],
+      { env, stdio: 'ignore' });
+    preflight.on('error', reject); preflight.on('exit', resolve);
+  });
+  assert.equal(preflightExit, 0);
+  const inventory = JSON.parse(await fs.readFile(preflightPath, 'utf8'));
+  assert.equal(inventory.selectedDatabase, 'bookit_native_regression');
+  assert.equal(inventory.discoveryState, 'complete-for-authorized-databases');
+  assert.equal(inventory.databaseCandidates.find(row => row.selected).counts.bookings, countBefore);
+  assert.equal(inventory.collections.courts, 1);
+  assert(inventory.bookingIndexes.some(index => index.name === 'booking_idempotency_key' && index.unique));
+  assert.equal(await db.collection('bookings').countDocuments(), countBefore);
+  assert.deepEqual((await db.listCollections({}, { nameOnly: true }).toArray()).map(row => row.name).sort(), namesBefore);
+  assert(!JSON.stringify(inventory).includes('guest@example.invalid'));
+  pass('Read-only inventory discovery identifies the selected database, court counts and booking indexes without creating data');
   await fs.mkdir(path.dirname(output), { recursive: true });
   await fs.writeFile(output, JSON.stringify({ observedAt: new Date().toISOString(), checks,
-    references: { player: playerId.slice(-8).toUpperCase(), guest: id.slice(-8).toUpperCase() },
+    references: { player: playerId.slice(-8).toUpperCase(), guest: id.slice(-8).toUpperCase(), managedGuest: managedGuestId.slice(-8).toUpperCase() },
     environment: 'disposable local MongoDB replica set and real Next HTTP routes', productionWrites: 0,
     limits: ['Local SMTP acceptance only; no external inbox delivery, production inventory or deployment proof',
       browser ? 'Browser BotID challenge bypassed on loopback' : 'Browser flow was not requested for this run'] }, null, 2) + '\n');

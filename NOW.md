@@ -1,3 +1,15 @@
+# REV-01 continuation — 6 November 2026
+
+Published candidate continues PR #55; production release remains HOLD. Primary lane: VALIDATE the authoritative inventory and isolated preview target. Guest management is a supporting repair, not closure of empty live courts. See the 6 November entry in [build notes](docs/hackathon-build/build-notes.md) and [fresh API receipt](docs/hackathon-build/guest-management-api-receipt-2026-11-06.json).
+
+The restored workspace had reverted to the prior published tree: 5 November guest changes and receipt were absent. They were reconstructed and freshly tested; historical passes were not reused as proof of this source. The local duplicate base commit is preserved on `archive/native-local-f14ca818`; this branch now descends from the real remote head `10e30d8d`.
+
+Next decisive operation: from an authorized machine that can reach the existing MongoDB target, supply its URI through the process environment and run `node scripts/inspect-bookit-inventory.mjs --discover inventory.json`. The script does not load dotenv or write to MongoDB. It reports selected database, authorized candidate database counts (maximum 20), hashed owners, court records and booking indexes. Treat the output as private operational evidence; do not commit live records. Do not guess a database name or populate synthetic live courts.
+
+Done for that validation step only when the real court IDs/ownership and reservations are mapped to the intended database and a separate preview write target is proven. Then verify venue schedules, public scope, legacy index migration and Setmore reconciliation before a hosted customer-to-operator booking. Browser assertions are required in the native CI workflow but remain unexecuted here; failed startup is not a browser pass.
+
+---
+
 # Bookit native integration — 5 November 2026
 
 Continue draft PR #55 and issue #42. This slice connects signed-in players to their account booking path, enforces the existing court booking grants on operator APIs, and repairs the invalid MongoDB index that blocked saves in the isolated replica set. See [build notes](docs/hackathon-build/build-notes.md) for the local browser, API, storage and SMTP evidence.

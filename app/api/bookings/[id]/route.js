@@ -11,6 +11,10 @@ import { updateReservation, reservationError } from '@/lib/bookings/reservationO
 import { bookingResponse } from '@/lib/bookings/bookingResponse';
 import { bookingDateTimeToInstant, isValidBookingDateValue, isPastBookingDate, isElapsedStartTimeForDate } from '@/lib/bookingDates';
 
+function privateResponse(body, options = {}) {
+  return NextResponse.json(body, { ...options, headers: { 'Cache-Control': 'private, no-store' } });
+}
+
 // GET /api/bookings/:id — fetch a single booking (owner or admin)
 export async function GET(request, { params }) {
   try {
@@ -18,7 +22,7 @@ export async function GET(request, { params }) {
 
     // Validate ObjectId format
     if (!/^[a-fA-F0-9]{24}$/.test(id)) {
-      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+      return privateResponse({ error: 'Invalid booking ID' }, { status: 400 });
     }
 
     const session = await getAuthSession();
@@ -27,17 +31,17 @@ export async function GET(request, { params }) {
     let booking = await Booking.findById(id).select('+guestManagementTokenHash').populate('court');
 
     if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      return privateResponse({ error: 'Booking not found' }, { status: 404 });
     }
 
     if (!(await canManageBooking({ request, session, booking, action: 'read' }))) {
-      return NextResponse.json({ error: session ? 'Not authorised' : 'Guest management token required' }, { status: session ? 403 : 401 });
+      return privateResponse({ error: session ? 'Not authorised' : 'Guest management token required' }, { status: session ? 403 : 401 });
     }
 
-    return NextResponse.json(bookingResponse(booking), { status: 200 });
+    return privateResponse(bookingResponse(booking), { status: 200 });
   } catch (error) {
     console.error('GET /api/bookings/:id error:', error);
-    return NextResponse.json({ error: 'Failed to fetch booking' }, { status: 500 });
+    return privateResponse({ error: 'Failed to fetch booking' }, { status: 500 });
   }
 }
 
@@ -48,7 +52,7 @@ export async function PUT(request, { params }) {
 
     // Validate ObjectId format
     if (!/^[a-fA-F0-9]{24}$/.test(id)) {
-      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+      return privateResponse({ error: 'Invalid booking ID' }, { status: 400 });
     }
 
     const session = await getAuthSession();
@@ -57,36 +61,36 @@ export async function PUT(request, { params }) {
     let booking = await Booking.findById(id).select('+guestManagementTokenHash').populate('court');
 
     if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      return privateResponse({ error: 'Booking not found' }, { status: 404 });
     }
 
     if (!(await canManageBooking({ request, session, booking, action: 'reschedule' }))) {
-      return NextResponse.json({ error: session ? 'Not authorised' : 'Guest management token required' }, { status: session ? 403 : 401 });
+      return privateResponse({ error: session ? 'Not authorised' : 'Guest management token required' }, { status: session ? 403 : 401 });
     }
 
-    if (booking.status === 'cancelled') return NextResponse.json({ error: 'Cancelled bookings cannot be rescheduled' }, { status: 409 });
+    if (booking.status === 'cancelled') return privateResponse({ error: 'Cancelled bookings cannot be rescheduled' }, { status: 409 });
 
     // Block edit within 8 hours of booking
     const bookingDateTime = bookingDateTimeToInstant(booking.date, booking.start_time);
     const hoursUntil = (bookingDateTime - new Date()) / (1000 * 60 * 60);
     if (!bookingDateTime || hoursUntil < 8) {
-      return NextResponse.json({ error: 'Cannot edit a booking within 8 hours of start time' }, { status: 400 });
+      return privateResponse({ error: 'Cannot edit a booking within 8 hours of start time' }, { status: 400 });
     }
 
     const { date, start_time, duration } = await request.json();
 
     // Validate required fields
     if (!date || !start_time || !duration) {
-      return NextResponse.json({ error: 'Date, start time and duration are required' }, { status: 400 });
+      return privateResponse({ error: 'Date, start time and duration are required' }, { status: 400 });
     }
 
     // Validate date format (YYYY-MM-DD)
     if (!isValidBookingDateValue(date) || isPastBookingDate(date)) {
-      return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+      return privateResponse({ error: 'Invalid date format' }, { status: 400 });
     }
 
     if (!isAllowedBookingStartTime(start_time, duration)) {
-      return NextResponse.json(
+      return privateResponse(
         { error: 'Start time must be on the hour and the booking must finish by 22:00' },
         { status: 400 }
       );
@@ -94,17 +98,17 @@ export async function PUT(request, { params }) {
 
     // Validate duration is an integer in allowed range
     if (typeof duration !== 'number' || duration < 1 || duration > 3 || !Number.isInteger(duration)) {
-      return NextResponse.json({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
+      return privateResponse({ error: 'Duration must be 1, 2 or 3 hours' }, { status: 400 });
     }
 
     const toMinutes = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
     const OPEN = 10 * 60, CLOSE = 22 * 60;
     const newStart = toMinutes(start_time);
     const newEnd = newStart + duration * 60;
-    if (isElapsedStartTimeForDate(date, newStart)) return NextResponse.json({ error: 'This start time has passed.' }, { status: 400 });
+    if (isElapsedStartTimeForDate(date, newStart)) return privateResponse({ error: 'This start time has passed.' }, { status: 400 });
 
     if (newStart < OPEN || newEnd > CLOSE) {
-      return NextResponse.json({ error: 'Bookings must start at 10:00 and end by 22:00' }, { status: 400 });
+      return privateResponse({ error: 'Bookings must start at 10:00 and end by 22:00' }, { status: 400 });
     }
 
     // Overlap check (exclude this booking)
@@ -122,7 +126,7 @@ export async function PUT(request, { params }) {
     });
 
     if (hasOverlap) {
-      return NextResponse.json({ error: 'This slot is already booked. Choose a different time.' }, { status: 409 });
+      return privateResponse({ error: 'This slot is already booked. Choose a different time.' }, { status: 409 });
     }
 
     ({ booking } = await updateReservation({ booking, changes: {
@@ -132,12 +136,12 @@ export async function PUT(request, { params }) {
       customerName: booking.guestName || session?.user?.name,
       customerEmail: booking.guestEmail || session?.user?.email,
       customerPhone: booking.guestPhone });
-    return NextResponse.json({ ...bookingResponse(booking), communicationReceipts: receipts }, { status: 200 });
+    return privateResponse({ ...bookingResponse(booking), communicationReceipts: receipts }, { status: 200 });
   } catch (error) {
     const handled = reservationError(error);
-    if (handled) return NextResponse.json({ error: handled.error }, { status: handled.status });
+    if (handled) return privateResponse({ error: handled.error }, { status: handled.status });
     console.error('PUT /api/bookings/:id error:', error);
-    return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
+    return privateResponse({ error: 'Failed to update booking' }, { status: 500 });
   }
 }
 
@@ -148,7 +152,7 @@ export async function DELETE(request, { params }) {
 
     // Validate ObjectId format
     if (!/^[a-fA-F0-9]{24}$/.test(id)) {
-      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
+      return privateResponse({ error: 'Invalid booking ID' }, { status: 400 });
     }
 
     const session = await getAuthSession();
@@ -157,11 +161,11 @@ export async function DELETE(request, { params }) {
     let booking = await Booking.findById(id).select('+guestManagementTokenHash').populate('court');
 
     if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      return privateResponse({ error: 'Booking not found' }, { status: 404 });
     }
 
     if (!(await canManageBooking({ request, session, booking, action: 'cancel' }))) {
-      return NextResponse.json({ error: session ? 'You are not authorised to cancel this booking' : 'Guest management token required' }, { status: session ? 403 : 401 });
+      return privateResponse({ error: session ? 'You are not authorised to cancel this booking' : 'Guest management token required' }, { status: session ? 403 : 401 });
     }
 
     ({ booking } = await updateReservation({ booking, changes: { status: 'cancelled' }, revokeGuestToken: true }));
@@ -170,11 +174,11 @@ export async function DELETE(request, { params }) {
       customerEmail: booking.guestEmail || session?.user?.email,
       customerPhone: booking.guestPhone, purpose: 'reservation_notice' });
 
-    return NextResponse.json({ message: 'Booking cancelled successfully', communicationReceipts: receipts }, { status: 200 });
+    return privateResponse({ message: 'Booking cancelled successfully', communicationReceipts: receipts }, { status: 200 });
   } catch (error) {
     const handled = reservationError(error);
-    if (handled) return NextResponse.json({ error: handled.error }, { status: handled.status });
+    if (handled) return privateResponse({ error: handled.error }, { status: handled.status });
     console.error('DELETE /api/bookings/:id error:', error);
-    return NextResponse.json({ error: 'Failed to cancel booking' }, { status: 500 });
+    return privateResponse({ error: 'Failed to cancel booking' }, { status: 500 });
   }
 }

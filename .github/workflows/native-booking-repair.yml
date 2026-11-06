@@ -21,5 +21,14 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: node --import tsx --test tests/unit/booking-dates.test.mjs tests/unit/court-input.test.mjs tests/unit/native-booking-security.test.mjs tests/unit/native-court-communications.test.mjs
       - run: npm run typecheck
+      - run: npx playwright install --with-deps chromium
       - run: node --import tsx scripts/validate-native-booking-repair.mjs
+        env:
+          BOOKIT_REPAIR_BROWSER: playwright
       - run: npm run build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-booking-receipt-${{ github.sha }}
+          path: docs/hackathon-build/native-repair-receipt.json
+          if-no-files-found: warn

@@ -1,0 +1,33 @@
+{
+  "observedAt": "2026-11-06T02:52:59.300Z",
+  "checks": [
+    "Admin Add Court payload persists and is visible in native court inventory",
+    "Player reservation, private history, operator list, analytics and email share the saved booking",
+    "Role and account feature grants control operator reads and writes without false saved state",
+    "Availability and reservation reject impossible calendar dates",
+    "Customer and venue SMTP captures contain the identical saved booking reference",
+    "Guest saves native reservation; independent DB, hour ownership and operator records match",
+    "Retry identity and payload are bound; replay exposes no contact or internal token fields",
+    "Concurrent overlapping creates commit exactly one booking",
+    "Guest management requires its token and other arena operators cannot change the booking",
+    "Only the correct arena operator can inspect customer and venue communication receipts",
+    "Concurrent edits leave only claims matching the final saved reservation",
+    "Two edits from the same revision accept one winner with no ghost hour claims",
+    "Operator payment persists; cancellation releases capacity; conflicting reactivation rolls back",
+    "Private management link appears only in customer SMTP; no bearer token is persisted in booking or delivery records",
+    "Missing, incorrect, cross-booking, expired and permission-limited tokens cannot make unauthorized changes",
+    "Conflicts preserve saved guest state; rescheduling reaches the operator; cancellation releases claims and revokes all token access",
+    "Read-only inventory discovery identifies the selected database, court counts and booking indexes without creating data"
+  ],
+  "references": {
+    "player": "D8F77BCD",
+    "guest": "D8F77BD1",
+    "managedGuest": "D8F77BEE"
+  },
+  "environment": "disposable local MongoDB replica set and real Next HTTP routes",
+  "productionWrites": 0,
+  "limits": [
+    "Local SMTP acceptance only; no external inbox delivery, production inventory or deployment proof",
+    "Browser flow was not requested for this run"
+  ]
+}
