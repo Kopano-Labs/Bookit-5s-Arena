@@ -79,6 +79,9 @@
     "postcss": ">=8.5.6",
     "js-yaml": ">=3.13.1",
     "@babel/core": ">=7.29.6",
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.9.16",
+    "@vercel/sandbox": {
+      "undici": "7.30.2"
+    }
   }
 }
