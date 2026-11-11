@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { MongoClient } from 'mongodb';
+import { resolveMongoConnectOptions } from '../lib/mongodb.js';
 
 const variables = ['MONGODB_URI', 'MONGODB_DIRECT_URI', 'MONGODB_URI_DIRECT', 'DATABASE_URL'];
 const selected = variables.find(name => process.env[name]);
@@ -26,9 +27,10 @@ const fingerprint = value => createHash('sha256').update(value).digest('hex').sl
 let client;
 
 try {
+  const connectOptions = resolveMongoConnectOptions(uri);
   client = new MongoClient(uri, { serverSelectionTimeoutMS: 8000, connectTimeoutMS: 8000 });
   await client.connect();
-  const db = client.db();
+  const db = connectOptions.dbName ? client.db(connectOptions.dbName) : client.db();
   const hello = await db.admin().command({ hello: 1 });
   const wantedCollections = ['courts', 'bookings', 'bookingslotclaims'];
   const collections = {};
