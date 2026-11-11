@@ -9,7 +9,6 @@ import PitchStadiumScene from '@/components/3d/PitchStadiumScene';
 import TacticalBoard from '@/components/tactics/TacticalBoard';
 import HomeLiveFixtures from '@/components/home/HomeLiveFixtures';
 import CourtsSection from '@/components/home/CourtsSection';
-import CourtAvailabilityNotice from '@/components/home/CourtAvailabilityNotice';
 import AmenitiesStrip from '@/components/home/AmenitiesStrip';
 import EventsSection from '@/components/home/EventsSection';
 import HomeMediaHighlights from '@/components/home/HomeMediaHighlights';
@@ -22,6 +21,7 @@ import { showBlackboxMarketMaskOnHome } from '@/lib/featureFlags';
 import connectDB from '@/lib/mongodb';
 import { normalizeCourtImageFilename } from '@/lib/courtImage';
 import Court from '@/models/Court';
+import { courtShowcase } from '@/lib/venueCourtPhotos';
 
 export const revalidate = 60; // ISR — revalidate every 60 seconds
 
@@ -90,7 +90,7 @@ const HomePage = async () => {
 
       <LivingOrganismSurface />
 
-      {courtFeedReady ? <CourtsSection courts={courts} /> : <CourtAvailabilityNotice />}
+      <CourtsSection courts={courtShowcase(courts)} />
 
       <AmenitiesStrip />
       <EventsSection />

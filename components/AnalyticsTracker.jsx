@@ -7,7 +7,7 @@ export default function AnalyticsTracker() {
 
   useEffect(() => {
     // Don't track admin pages
-    if (pathname.startsWith('/admin')) return;
+    if (pathname.startsWith('/admin') || pathname.startsWith('/book/manage/')) return;
 
     fetch('/api/analytics/track', {
       method: 'POST',
@@ -23,6 +23,7 @@ export default function AnalyticsTracker() {
   // Track custom events — expose globally
   useEffect(() => {
     window.trackEvent = (event, meta = {}) => {
+      if (window.location.pathname.startsWith('/book/manage/')) return;
       fetch('/api/analytics/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

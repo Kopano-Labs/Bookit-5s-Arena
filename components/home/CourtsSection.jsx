@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { FaFutbol, FaArrowRight, FaChevronLeft, FaChevronRight, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
 import { normalizeAvailabilityLabel } from '@/lib/bookingSlots';
 import { courtImageFallbackUrl, courtImageUrl, normalizeCourtImageFilename } from '@/lib/courtImage';
+import BookingFallback from '@/components/booking/BookingFallback';
 
 // ─── Court Card ──────────────────────────────────────────────────────────────
 
@@ -25,8 +26,7 @@ function CourtCard({ court, index }) {
       }}
     >
       <div
-        onClick={() => window.location.href = `/courts/${court._id}`}
-        className="group block relative overflow-hidden rounded-2xl border border-gray-700/50 backdrop-blur-sm cursor-pointer
+        className="group block relative overflow-hidden rounded-2xl border border-gray-700/50 backdrop-blur-sm
           transition-all duration-500
           hover:border-yellow-600/60
           hover:shadow-[0_0_0_1px_rgba(74,222,128,0.3),0_0_50px_rgba(74,222,128,0.25),0_20px_60px_rgba(0,0,0,0.5)]"
@@ -58,15 +58,10 @@ function CourtCard({ court, index }) {
               <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 40%, transparent 60%)' }} />
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.15) 0%, transparent 50%)' }} />
 
-              {/* Live pulse dot */}
-              <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 backdrop-blur-md border border-white/10">
-                <motion.div
-                  className="w-2 h-2 rounded-full bg-green-400"
-                  animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-                <span className="text-[9px] uppercase tracking-wider text-green-400 font-bold">View Slots</span>
-              </div>
+              {!court.galleryOnly && <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 backdrop-blur-md border border-white/10">
+                <motion.div className="w-2 h-2 rounded-full bg-green-400" animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }} transition={{ duration: 2, repeat: Infinity }} />
+                <span className="text-[9px] uppercase tracking-wider text-green-400 font-bold">Check times</span>
+              </div>}
             </>
           ) : (
             <div className="h-56 bg-gray-800/80 flex items-center justify-center">
@@ -97,25 +92,25 @@ function CourtCard({ court, index }) {
           <div className="flex items-center gap-4 mb-4 text-[11px] text-gray-500 uppercase tracking-wider">
             {court.address && (
               <span className="flex items-center gap-1">
-                <FaMapMarkerAlt className="text-yellow-600/70" size={10} /> Milnerton
+                <FaMapMarkerAlt className="text-yellow-600/70" size={10} /> {court.address}
               </span>
             )}
-            <span className="flex items-center gap-1">
+            {!court.galleryOnly ? <span className="flex items-center gap-1">
               <FaClock className="text-yellow-600/70" size={10} /> {normalizeAvailabilityLabel(court.availability)}
-            </span>
+            </span> : null}
           </div>
 
           {/* Price + CTA */}
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-center justify-between gap-4">
+            {!court.galleryOnly ? <div>
               <span className="text-xs font-bold uppercase tracking-wider text-gray-500 block">From</span>
               <span className="text-3xl font-black text-yellow-500" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                 R{court.price_per_hour}
               </span>
               <span className="text-gray-500 text-xs font-bold uppercase"> /hr</span>
-            </div>
-            <Link
-              href={`/courts/${court._id}`}
+            </div> : <span className="text-xs text-gray-400">Court photo</span>}
+            {!court.galleryOnly && <Link
+              href={court.bookingHref || `/book?courtId=${encodeURIComponent(String(court._id))}`}
               onClick={(e) => e.stopPropagation()}
             >
               <motion.span
@@ -129,7 +124,7 @@ function CourtCard({ court, index }) {
               >
                 BOOK NOW <FaArrowRight size={10} />
               </motion.span>
-            </Link>
+            </Link>}
           </div>
         </div>
 
@@ -148,6 +143,8 @@ function CourtCard({ court, index }) {
 // ─── Main Section ────────────────────────────────────────────────────────────
 
 export default function CourtsSection({ courts = [] }) {
+  const hasLiveCourts = courts.some(court => !court.galleryOnly);
+  const galleryOnly = courts.length > 0 && !hasLiveCourts;
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -294,7 +291,7 @@ export default function CourtsSection({ courts = [] }) {
               filter: 'drop-shadow(0 0 30px rgba(34,197,94,0.3))',
             }}
           >
-            BOOK A COURT
+            {hasLiveCourts ? 'BOOK A COURT' : 'OUR COURTS'}
           </h2>
 
           <motion.div
@@ -306,13 +303,15 @@ export default function CourtsSection({ courts = [] }) {
           />
 
           <p className="text-gray-400 max-w-md mx-auto text-sm leading-relaxed">
-            All courts are floodlit, all-weather synthetic turf pitches at Hellenic Football Club, Milnerton.
+            {galleryOnly
+              ? 'Court photos from Five’s Arena. Live courts and online availability are not connected yet.'
+              : 'All courts are floodlit, all-weather synthetic turf pitches at Hellenic Football Club, Milnerton.'}
           </p>
         </motion.div>
 
         {courts.length === 0 ? (
           <p className="text-center text-gray-500 py-16 text-lg">
-            No courts available right now. Check back soon.
+            Live court inventory is unavailable right now.
           </p>
         ) : (
           <>
@@ -353,7 +352,7 @@ export default function CourtsSection({ courts = [] }) {
               >
                 {courts.map((court, i) => (
                   <div
-                    key={court._id}
+                    key={court._id || court.key}
                     className="flex-shrink-0 snap-center"
                     style={{ width: 'min(85vw, 340px)' }}
                   >
@@ -375,14 +374,14 @@ export default function CourtsSection({ courts = [] }) {
             {/* Desktop grid */}
             <div className="hidden lg:grid lg:grid-cols-4 gap-6">
               {courts.map((court, i) => (
-                <CourtCard key={court._id} court={court} index={i} />
+                <CourtCard key={court._id || court.key} court={court} index={i} />
               ))}
             </div>
           </>
         )}
 
         {/* Bottom CTA */}
-        <motion.div
+        {hasLiveCourts && <motion.div
           className="text-center mt-14"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -405,7 +404,8 @@ export default function CourtsSection({ courts = [] }) {
               <FaFutbol /> Book a Court <FaArrowRight size={12} />
             </motion.span>
           </Link>
-        </motion.div>
+        </motion.div>}
+        <BookingFallback />
       </div>
     </section>
   );

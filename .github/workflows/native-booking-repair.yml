@@ -1,0 +1,34 @@
+name: Native booking repair
+on:
+  pull_request:
+  push:
+    branches: [forge/native-bookit-recovery-20261102]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-booking:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node --import tsx --test tests/unit/booking-dates.test.mjs tests/unit/court-input.test.mjs tests/unit/native-booking-security.test.mjs tests/unit/native-court-communications.test.mjs
+      - run: npm run typecheck
+      - run: npx playwright install --with-deps chromium
+      - run: node --import tsx scripts/validate-native-booking-repair.mjs
+        env:
+          BOOKIT_REPAIR_BROWSER: playwright
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-booking-receipt-${{ github.sha }}
+          path: docs/hackathon-build/native-repair-receipt.json
+          if-no-files-found: warn

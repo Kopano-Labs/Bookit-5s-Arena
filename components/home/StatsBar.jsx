@@ -9,13 +9,13 @@ export default function StatsBar({ courtsCount = null, minPrice = null, courtFee
   const stats = [
     {
       emoji: '⚽',
-      label: hasCourtCount ? 'Courts in booking' : 'Court feed',
-      display: hasCourtCount ? String(courtsCount) : 'CHECK LIVE',
+      label: hasCourtCount ? 'Courts in booking' : 'Live court feed',
+      display: hasCourtCount ? String(courtsCount) : 'UNAVAILABLE',
     },
     {
       emoji: '💰',
-      label: hasPrice ? 'From / hr' : 'Current rate',
-      display: hasPrice ? `R${minPrice}` : 'CHECK BOOKING',
+      label: hasPrice ? 'From / hr' : 'Online rate',
+      display: hasPrice ? `R${minPrice}` : 'NOT VERIFIED',
     },
     {
       emoji: '🕙',

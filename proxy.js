@@ -51,7 +51,7 @@ export default withAuth(
         '/help',
         '/about',
       ];
-      const isAllowed = path === '/' || allowedPrefixes.some(p => path.startsWith(p));
+      const isAllowed = path === '/' || path === '/book' || path.startsWith('/book/') || allowedPrefixes.some(p => path.startsWith(p));
       if (!isAllowed) {
         return NextResponse.redirect(new URL('/login', req.url));
       }
