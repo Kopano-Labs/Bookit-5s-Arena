@@ -1,14 +1,37 @@
 {
-  "name": "Bookit 5s Arena",
+  "name": "Five's Arena",
   "short_name": "5s Arena",
   "description": "Cape Town 5-a-side football at Hellenic FC, Milnerton: court bookings, social football, events, competition reference surfaces, and venue information.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a1628",
+  "background_color": "#040609",
   "theme_color": "#d4a843",
   "orientation": "portrait-primary",
   "id": "/",
   "scope": "/",
+  "categories": ["sports", "lifestyle", "entertainment"],
+  "shortcuts": [
+    {
+      "name": "Book a court",
+      "short_name": "Book",
+      "url": "/#courts"
+    },
+    {
+      "name": "Fixtures",
+      "short_name": "Fixtures",
+      "url": "/fixtures"
+    },
+    {
+      "name": "South Africa pulse",
+      "short_name": "News",
+      "url": "/news"
+    },
+    {
+      "name": "World Cup 2026 archive",
+      "short_name": "Archive",
+      "url": "/tournament"
+    }
+  ],
   "icons": [
     {
       "src": "/icons/icon-48x48.png",

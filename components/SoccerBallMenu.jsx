@@ -10,7 +10,7 @@ const MENU_ITEMS = [
   {
     icon: FaFutbol,
     label: 'Book a Court',
-    href: '/#courts',
+    href: '/book',
     color: '#22c55e',
     desc: 'Reserve your pitch',
   },
@@ -23,10 +23,10 @@ const MENU_ITEMS = [
   },
   {
     icon: FaTrophy,
-    label: '2026 Tournament Archive',
+    label: 'Arena Tournaments & Archive',
     href: '/tournament',
     color: '#eab308',
-    desc: 'World Cup 5s · event window closed',
+    desc: '5s Arena leagues · historical archive',
   },
 ];
 
@@ -221,3 +221,4 @@ export default function SoccerBallMenu() {
     </div>
   );
 }
+

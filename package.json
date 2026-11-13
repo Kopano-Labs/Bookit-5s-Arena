@@ -8,6 +8,13 @@
     "build": "next build --no-lint",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit --pretty false",
+    "typecheck:ts7": "node scripts/typecheck-typescript-7.mjs",
+    "typecheck:compare": "npm run typecheck && npm run typecheck:ts7",
+    "validate:organism": "node scripts/validate-living-organism.mjs",
+    "validate:apu-sync": "node scripts/validate-apu-progressive-sync.mjs",
+    "test:apu": "node --test tests/unit/apu-progressive-update.test.mjs tests/unit/kpgs-progressive-update.test.mjs",
+    "test:e2e:organism": "playwright test --config=playwright.organism.config.ts",
     "build:css": "npx tailwindcss -i ./assets/styles/globals.css -o ./public/styles.css --minify",
     "diagnose:atlas": "node --env-file=.env.local scripts/diagnose-atlas-access.mjs",
     "validate:offline-sync": "node --env-file=.env.local scripts/validate-offline-sync-contract.mjs",
@@ -71,8 +78,7 @@
     "uuid": ">=11.1.1",
     "postcss": ">=8.5.6",
     "js-yaml": ">=3.13.1",
-    "@babel/core": ">=7.29.6","nodemailer": "^6.9.16"
+    "@babel/core": ">=7.29.6",
+    "nodemailer": "^6.9.16"
   }
 }
-
-

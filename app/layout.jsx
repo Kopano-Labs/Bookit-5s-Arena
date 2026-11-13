@@ -40,7 +40,18 @@ export const metadata = {
     "Competition Hub",
     "World Cup 5s archive",
   ],
-  authors: [{ name: "Bookit 5's Arena" }],
+  authors: [
+    { name: "Kholofelo Robyn Rababalela", url: "https://krrababalela.com" },
+    { name: "Bookit 5's Arena", url: "https://fivesarena.com" },
+  ],
+  creator: "Kholofelo Robyn Rababalela",
+  publisher: "Kopano Labs",
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": "/api/rss",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_ZA",
@@ -144,8 +155,11 @@ const RootLayout = ({ children }) => {
                 <PageTransition>{children}</PageTransition>
               </main>
               <TruthFooter />
-              <ScrollToTop />
-              <SoccerBallMenu />
+              {/* Desktop-only secondary floaters — Enforcing One Persistent Control on Mobile */}
+              <div className="hidden md:block">
+                <ScrollToTop />
+                <SoccerBallMenu />
+              </div>
               <BottomNavbar />
               <NewsletterPopup />
               <CookieBanner />
