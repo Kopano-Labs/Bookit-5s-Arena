@@ -1267,9 +1267,9 @@ const BookingsPage = () => {
   };
 
   const handleTabChange = (idx) => {
-    // BOOK COURT → navigate to homepage courts section
+    // BOOK COURT opens the Setmore booking page
     if (idx === 0) {
-      router.push("/");
+      router.push("/book");
       return;
     }
     // BOOK EVENT → navigate to events page
