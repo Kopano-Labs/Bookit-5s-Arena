@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 15613)
+Total output lines: 1539
+
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -264,10 +267,11 @@ function CourtBookCard({ court, index }) {
         damping: 20,
       }}
       whileHover={{ scale: 1.05, y: -4 }}
+      className="relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 hover:border-green-500/50 hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] transition-all duration-300"
     >
       <Link
         href={`/courts/${court._id}`}
-        className="group block relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 hover:border-green-500/50 hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] transition-all duration-300"
+        className="group block relative"
       >
         <div className="relative h-44 overflow-hidden">
           {court.image ? (
@@ -301,22 +305,21 @@ function CourtBookCard({ court, index }) {
             R{court.price_per_hour}/hr
           </div>
         </div>
-        <div className="p-4">
-          <Link href="/bookings">
-            <motion.span
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest text-white"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              style={{
-                background: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)",
-                boxShadow: "0 0 15px rgba(34,197,94,0.4)",
-              }}
-            >
-              BOOK NOW <FaArrowRight size={9} />
-            </motion.span>
-          </Link>
-        </div>
       </Link>
+      <div className="p-4">
+        <a
+          href="https://fivesarena.setmore.com/book"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest text-white"
+          style={{
+            background: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)",
+            boxShadow: "0 0 15px rgba(34,197,94,0.4)",
+          }}
+        >
+          BOOK NOW <FaArrowRight size={9} />
+        </a>
+      </div>
     </motion.div>
   );
 }
@@ -648,300 +651,7 @@ function MyBookingsTab({
                         View <FaArrowRight size={9} />
                       </Link>
                       {booking.status !== "cancelled" && (
-                        <button
-                          onClick={() => handleCancel(booking._id)}
-                          className="text-xs px-3 py-2 bg-red-950 border border-red-900 rounded-xl text-red-400 hover:bg-red-900/50 hover:border-red-700 transition-all flex items-center gap-1 cursor-pointer"
-                        >
-                          <FaTrash size={9} /> Cancel
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-
-          {/* ═══ BUBBLE VIEW ═══ */}
-          {viewMode === "bubble" && (
-            <motion.div
-              key="bubble"
-              className="flex flex-wrap justify-center gap-6"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4 }}
-            >
-              {bookings.map((booking, i) => (
-                <motion.div
-                  key={booking._id}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{
-                    delay: i * 0.08,
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 15,
-                  }}
-                  whileHover={{ scale: 1.08, rotate: 2 }}
-                  className="relative w-40 h-40 rounded-full bg-gray-900 border-2 border-gray-800 flex flex-col items-center justify-center text-center shadow-xl hover:border-green-700 transition-colors cursor-pointer group"
-                >
-                  <div
-                    className={`absolute inset-0 rounded-full border-3 ${
-                      booking.status === "confirmed"
-                        ? "border-green-500/40"
-                        : booking.status === "cancelled"
-                          ? "border-red-500/40"
-                          : "border-yellow-500/40"
-                    }`}
-                  />
-                  <FaFutbol className="text-green-500 mb-1" size={16} />
-                  <p className="text-[11px] font-bold text-white leading-tight px-3 truncate w-full">
-                    {booking.court?.name ?? "Court"}
-                  </p>
-                  <p className="text-[9px] text-gray-400 mt-0.5">
-                    {booking.start_time}
-                  </p>
-                  <p className="text-[9px] text-green-400 font-bold">
-                    R{booking.total_price}
-                  </p>
-                  <span
-                    className={`absolute -bottom-1 px-2 py-0.5 rounded-full text-[8px] font-bold capitalize ${statusStyles[booking.status] ?? statusStyles.pending}`}
-                  >
-                    {booking.status}
-                  </span>
-                  <div className="absolute inset-0 rounded-full bg-black/70 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Link
-                      href={`/bookings/${booking._id}`}
-                      className="p-2 bg-gray-800 rounded-full text-white hover:bg-gray-700"
-                    >
-                      <FaArrowRight size={10} />
-                    </Link>
-                    {booking.status !== "cancelled" && (
-                      <button
-                        onClick={() => handleCancel(booking._id)}
-                        className="p-2 bg-red-900 rounded-full text-red-400 hover:bg-red-800 cursor-pointer"
-                      >
-                        <FaTrash size={10} />
-                      </button>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-
-          {/* ═══ SQUARE VIEW ═══ */}
-          {viewMode === "square" && (
-            <motion.div
-              key="square"
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {bookings.map((booking, i) => (
-                <motion.div
-                  key={booking._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06 }}
-                  whileHover={{ y: -4 }}
-                  className="relative aspect-square bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden group shadow-lg hover:border-gray-700 transition-colors"
-                >
-                  {booking.court?.image ? (
-                    <Image
-                      src={`/images/courts/${booking.court.image}`}
-                      alt={booking.court.name}
-                      fill
-                      className="object-cover opacity-40 group-hover:opacity-60 transition-opacity"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 to-gray-900" />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-[8px] font-bold capitalize mb-1.5 ${statusStyles[booking.status] ?? statusStyles.pending}`}
-                    >
-                      {booking.status}
-                    </span>
-                    <h3 className="text-sm font-bold text-white leading-tight truncate">
-                      {booking.court?.name ?? "Court"}
-                    </h3>
-                    <p className="text-[10px] text-gray-400">
-                      {new Date(booking.date).toLocaleDateString("en-ZA", {
-                        day: "numeric",
-                        month: "short",
-                      })}{" "}
-                      · {booking.start_time}
-                    </p>
-                    <p className="text-[10px] font-bold text-green-400">
-                      R{booking.total_price}
-                    </p>
-                  </div>
-                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Link
-                      href={`/bookings/${booking._id}`}
-                      className="p-1.5 bg-black/60 backdrop-blur rounded-lg text-white hover:bg-black/80"
-                    >
-                      <FaArrowRight size={9} />
-                    </Link>
-                    {booking.status !== "cancelled" && (
-                      <button
-                        onClick={() => handleCancel(booking._id)}
-                        className="p-1.5 bg-black/60 backdrop-blur rounded-lg text-red-400 hover:bg-black/80 cursor-pointer"
-                      >
-                        <FaTrash size={9} />
-                      </button>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-
-          {/* ═══ TIKTOK VIEW ═══ */}
-          {viewMode === "tiktok" && (
-            <motion.div
-              key="tiktok"
-              className="max-w-sm mx-auto space-y-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              {bookings.map((booking, i) => (
-                <motion.div
-                  key={booking._id}
-                  initial={{ opacity: 0, y: 60 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: i * 0.1,
-                    type: "spring",
-                    stiffness: 120,
-                  }}
-                  className="relative rounded-3xl overflow-hidden bg-gray-900 border border-gray-800 shadow-2xl"
-                  style={{ aspectRatio: "9/16", maxHeight: 480 }}
-                >
-                  {booking.court?.image ? (
-                    <Image
-                      src={`/images/courts/${booking.court.image}`}
-                      alt={booking.court.name}
-                      fill
-                      className="object-cover opacity-30"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-b from-green-950 to-gray-950" />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold capitalize mb-3 ${statusStyles[booking.status] ?? statusStyles.pending}`}
-                    >
-                      {booking.status}
-                    </span>
-                    <h3
-                      className="text-xl font-black text-white uppercase tracking-wider mb-2"
-                      style={{ fontFamily: "Impact, Arial Black, sans-serif" }}
-                    >
-                      {booking.court?.name ?? "Court"}
-                    </h3>
-                    <p className="text-sm text-gray-300 flex items-center gap-2 mb-1">
-                      <FaCalendarAlt size={12} className="text-green-400" />
-                      {new Date(booking.date).toLocaleDateString("en-ZA", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </p>
-                    <p className="text-sm text-gray-300 flex items-center gap-2 mb-2">
-                      <FaClock size={12} className="text-green-400" />
-                      {booking.start_time} · {booking.duration}h
-                    </p>
-                    <p className="text-lg font-black text-green-400 mb-4">
-                      R{booking.total_price}
-                    </p>
-                    <div className="flex gap-2">
-                      <Link
-                        href={`/bookings/${booking._id}`}
-                        className="flex-1 text-center text-xs px-4 py-2.5 bg-white/10 backdrop-blur border border-white/20 rounded-xl text-white font-bold uppercase tracking-widest hover:bg-white/20 transition-all"
-                      >
-                        View
-                      </Link>
-                      {booking.status !== "cancelled" && (
-                        <button
-                          onClick={() => handleCancel(booking._id)}
-                          className="px-4 py-2.5 bg-red-600/20 backdrop-blur border border-red-500/30 rounded-xl text-red-400 text-xs font-bold uppercase tracking-widest hover:bg-red-600/30 transition-all cursor-pointer"
-                        >
-                          <FaTrash size={10} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="absolute right-3 bottom-48 flex flex-col items-center gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center">
-                        <FaFutbol className="text-white" size={16} />
-                      </div>
-                      <span className="text-[8px] text-white mt-1 font-bold">
-                        COURT
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center">
-                        <FaClock className="text-white" size={16} />
-                      </div>
-                      <span className="text-[8px] text-white mt-1 font-bold">
-                        {booking.duration}H
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-
-          {/* ═══ INSTAGRAM VIEW ═══ */}
-          {viewMode === "instagram" && (
-            <motion.div
-              key="instagram"
-              className="max-w-lg mx-auto space-y-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              {bookings.map((booking, i) => (
-                <motion.div
-                  key={booking._id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl"
-                >
-                  <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
-                      <FaFutbol size={12} className="text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs font-bold text-white">
-                        {booking.court?.name ?? "Court"}
-                      </p>
-                      <p className="text-[9px] text-gray-500">
-                        {new Date(booking.date).toLocaleDateString("en-ZA", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[8px] font-bold capitalize ${statusStyles[booking.status] ?? statusStyles.pending}`}
-                    >
-                      {booking.status}
-                    </span>
-                  </div>
-                  <div className="relative aspect-square bg-gray-800">
+                  …3613 tokens truncated…iv className="relative aspect-square bg-gray-800">
                     {booking.court?.image ? (
                       <Image
                         src={`/images/courts/${booking.court.image}`}
@@ -1536,3 +1246,4 @@ const BookingsPage = () => {
 };
 
 export default BookingsPage;
+
