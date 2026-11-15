@@ -198,7 +198,7 @@ export default function CourtDetailClient({ court }) {
                 dates, times, price and booking terms are shown there before you confirm.
               </p>
               <a
-                href="https://fivesarena.setmore.com/"
+                href="https://fivesarena.setmore.com/book"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-green-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white transition hover:bg-green-500"

@@ -1,20 +1,16 @@
 import Link from 'next/link';
+import { cache } from 'react';
 import CourtDetailClient from './CourtDetailClient';
-import connectDB from '@/lib/mongodb';
-import Court from '@/models/Court';
+import { findPublicCourt } from '@/lib/publicCourtCatalogue';
 
-const getCourt = async (id) => {
+const getCourt = cache(async (id) => {
   try {
-    if (!/^[a-fA-F0-9]{24}$/.test(id)) return null;
-    await connectDB();
-    const court = await Court.findById(id).lean();
-    if (!court) return null;
-    return JSON.parse(JSON.stringify(court));
-  } catch (error) {
-    console.error('Failed to get court:', error);
+    return await findPublicCourt(id);
+  } catch {
+    console.error('Failed to load the public court details');
     return null;
   }
-};
+});
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -39,8 +35,11 @@ const CourtPage = async ({ params }) => {
             Court unavailable online
           </h1>
           <p className="mt-4 text-sm leading-6 text-gray-400">
-            This URL does not resolve to a court in the current booking inventory. Seed data is not used for booking records.
+            You can check court times in the booking calendar.
           </p>
+          <Link href="/book" className="mt-5 block font-semibold text-white hover:underline">
+            Open booking calendar
+          </Link>
           <Link href="/#courts" className="mt-5 inline-block text-green-400 hover:text-green-300 text-sm">
             ← Back to Courts
           </Link>

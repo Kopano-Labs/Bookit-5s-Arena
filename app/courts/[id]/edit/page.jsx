@@ -27,7 +27,7 @@ const EditCourtPage = () => {
   useEffect(() => {
     const fetchCourt = async () => {
       try {
-        const res = await fetch(`/api/courts/${id}`);
+        const res = await fetch(`/api/courts/${id}?manage=true`);
         if (!res.ok) throw new Error('Court not found');
         const data = await res.json();
         setForm({
