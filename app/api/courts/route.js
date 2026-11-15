@@ -4,6 +4,7 @@ import { getAuthSession } from '@/lib/getSession';
 import { requireRole } from '@/lib/roles';
 import connectDB from '@/lib/mongodb';
 import Court from '@/models/Court';
+import { listPublicCourts } from '@/lib/publicCourtCatalogue';
 
 function publicCourtResponse(courts, status = 200, state = 'verified-source') {
   const response = NextResponse.json(courts, { status });
@@ -16,38 +17,36 @@ function publicCourtResponse(courts, status = 200, state = 'verified-source') {
   return response;
 }
 
-// GET /api/courts — fetch all courts (public) or own courts (?mine=true)
+// GET /api/courts — public Hellenic catalogue, or own editable courts (?mine=true)
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const mine = searchParams.get('mine') === 'true';
 
-  try {
-    let filter = {};
+  if (!mine) {
+    try {
+      const courts = await listPublicCourts();
+      return publicCourtResponse(courts, 200, courts.length > 0 ? 'verified-source' : 'database-empty');
+    } catch {
+      console.error('Failed to load the public court catalogue');
+      return publicCourtResponse([], 503, 'unavailable');
+    }
+  }
 
-    if (mine) {
-      const session = await getAuthSession();
-      if (!session) {
-        return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
-      }
-      filter = { owner: session.user.id };
+  try {
+    const session = await getAuthSession();
+    if (!session) {
+      return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
     }
 
     await connectDB();
 
-    const courts = await Court.find(filter)
+    const courts = await Court.find({ owner: session.user.id })
       .sort({ sortOrder: 1, createdAt: 1 })
       .lean();
 
-    if (!mine) {
-      return publicCourtResponse(courts, 200, courts.length > 0 ? 'verified-source' : 'database-empty');
-    }
-
-    return NextResponse.json(courts, { status: 200 });
+    return NextResponse.json(courts, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     console.error('GET /api/courts error:', error);
-    if (!mine) {
-      return publicCourtResponse([], 503, 'unavailable');
-    }
     return NextResponse.json({ error: 'Failed to fetch courts' }, { status: 500 });
   }
 }

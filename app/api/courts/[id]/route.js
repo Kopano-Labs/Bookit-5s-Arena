@@ -4,8 +4,9 @@ import { getAuthSession } from '@/lib/getSession';
 import { requireRole } from '@/lib/roles';
 import connectDB from '@/lib/mongodb';
 import Court from '@/models/Court';
+import { findPublicCourt } from '@/lib/publicCourtCatalogue';
 
-// GET /api/courts/:id — fetch a single court (public)
+// GET /api/courts/:id — public catalogue, or editable record (?manage=true)
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
@@ -15,6 +16,22 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Invalid court ID' }, { status: 400 });
     }
 
+    const manage = new URL(request.url).searchParams.get('manage') === 'true';
+    if (!manage) {
+      try {
+        const court = await findPublicCourt(id);
+        if (!court) return NextResponse.json({ error: 'Court not found' }, { status: 404 });
+        return NextResponse.json(court);
+      } catch {
+        console.error('Failed to load the public court details');
+        return NextResponse.json({ error: 'Court catalogue unavailable' }, { status: 503 });
+      }
+    }
+
+    const session = await getAuthSession();
+    if (!session) {
+      return NextResponse.json({ error: 'You must be logged in' }, { status: 401 });
+    }
     await connectDB();
     const court = await Court.findById(id);
 
@@ -22,7 +39,11 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Court not found' }, { status: 404 });
     }
 
-    return NextResponse.json(court, { status: 200 });
+    const isOwner = court.owner?.toString() === session.user.id;
+    if (!isOwner && !requireRole(session, 'admin')) {
+      return NextResponse.json({ error: 'You are not authorised to edit this court' }, { status: 403 });
+    }
+    return NextResponse.json(court, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     console.error('GET /api/courts/:id error:', error);
     return NextResponse.json({ error: 'Failed to fetch court' }, { status: 500 });

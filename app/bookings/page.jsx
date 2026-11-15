@@ -264,10 +264,11 @@ function CourtBookCard({ court, index }) {
         damping: 20,
       }}
       whileHover={{ scale: 1.05, y: -4 }}
+      className="relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 hover:border-green-500/50 hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] transition-all duration-300"
     >
       <Link
         href={`/courts/${court._id}`}
-        className="group block relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 hover:border-green-500/50 hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] transition-all duration-300"
+        className="group block relative"
       >
         <div className="relative h-44 overflow-hidden">
           {court.image ? (
@@ -301,22 +302,21 @@ function CourtBookCard({ court, index }) {
             R{court.price_per_hour}/hr
           </div>
         </div>
-        <div className="p-4">
-          <Link href="/bookings">
-            <motion.span
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest text-white"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              style={{
-                background: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)",
-                boxShadow: "0 0 15px rgba(34,197,94,0.4)",
-              }}
-            >
-              BOOK NOW <FaArrowRight size={9} />
-            </motion.span>
-          </Link>
-        </div>
       </Link>
+      <div className="p-4">
+        <a
+          href="https://fivesarena.setmore.com/book"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest text-white"
+          style={{
+            background: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)",
+            boxShadow: "0 0 15px rgba(34,197,94,0.4)",
+          }}
+        >
+          BOOK NOW <FaArrowRight size={9} />
+        </a>
+      </div>
     </motion.div>
   );
 }
@@ -1267,9 +1267,9 @@ const BookingsPage = () => {
   };
 
   const handleTabChange = (idx) => {
-    // BOOK COURT → navigate to homepage courts section
+    // BOOK COURT opens the Setmore booking page
     if (idx === 0) {
-      router.push("/");
+      router.push("/book");
       return;
     }
     // BOOK EVENT → navigate to events page

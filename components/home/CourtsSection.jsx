@@ -25,15 +25,18 @@ function CourtCard({ court, index }) {
       }}
     >
       <div
-        onClick={() => window.location.href = `/courts/${court._id}`}
-        className="group block relative overflow-hidden rounded-2xl border border-gray-700/50 backdrop-blur-sm cursor-pointer
+        className="relative overflow-hidden rounded-2xl border border-gray-700/50 backdrop-blur-sm
           transition-all duration-500
           hover:border-yellow-600/60
           hover:shadow-[0_0_0_1px_rgba(74,222,128,0.3),0_0_50px_rgba(74,222,128,0.25),0_20px_60px_rgba(0,0,0,0.5)]"
         style={{ background: 'linear-gradient(180deg, rgba(17,24,39,0.9) 0%, rgba(5,10,20,0.95) 100%)' }}
       >
         {/* Image */}
-        <div className="relative h-56 overflow-hidden">
+        <Link
+          href={`/courts/${court._id}`}
+          aria-label={`View details for ${court.name}`}
+          className="group relative block h-56 overflow-hidden"
+        >
           {imageSrc ? (
             <>
               <motion.img
@@ -65,7 +68,7 @@ function CourtCard({ court, index }) {
                   animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <span className="text-[9px] uppercase tracking-wider text-green-400 font-bold">View Slots</span>
+                <span className="text-[9px] uppercase tracking-wider text-green-400 font-bold">Court Details</span>
               </div>
             </>
           ) : (
@@ -85,7 +88,7 @@ function CourtCard({ court, index }) {
               {court.name}
             </h3>
           </div>
-        </div>
+        </Link>
 
         {/* Content */}
         <div className="p-5">
@@ -114,10 +117,7 @@ function CourtCard({ court, index }) {
               </span>
               <span className="text-gray-500 text-xs font-bold uppercase"> /hr</span>
             </div>
-            <Link
-              href={`/courts/${court._id}`}
-              onClick={(e) => e.stopPropagation()}
-            >
+            <Link href="/book">
               <motion.span
                 className="inline-flex items-center gap-2 text-white font-black px-6 py-3 rounded-full text-xs uppercase tracking-widest"
                 whileHover={{ scale: 1.08 }}
